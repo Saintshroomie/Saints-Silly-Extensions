@@ -1,0 +1,194 @@
+/* Saint's Silly Extensions — Combined Styles */
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   POSSESSION STYLES
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Group Chat: Radio Button Toggle ── */
+
+.possession_radio_wrapper {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 4px;
+    cursor: pointer;
+}
+
+.possession_radio {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--SmartThemeBorderColor, #555);
+    background: transparent;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.possession_radio:hover {
+    border-color: var(--SmartThemeQuoteColor, #e8a23a);
+}
+
+.possession_radio.possession_active {
+    border-color: var(--SmartThemeQuoteColor, #e8a23a);
+    background: var(--SmartThemeQuoteColor, #e8a23a);
+    box-shadow: inset 0 0 0 3px var(--SmartThemeBlurTintColor, #1a1a2e);
+}
+
+/* ── Solo Chat: Possess Toggle Button ── */
+
+#possession_solo_btn {
+    opacity: 0.7;
+    transition: opacity 0.15s ease, color 0.15s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+#possession_solo_btn:hover {
+    opacity: 1;
+}
+
+#possession_solo_btn.possession_active {
+    opacity: 1;
+    color: var(--SmartThemeQuoteColor, #e8a23a);
+}
+
+#possession_solo_btn.possession_active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--SmartThemeQuoteColor, #e8a23a);
+}
+
+/* ── Group member highlight when possessed ── */
+
+.group_member.possession_possessed {
+    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;
+}
+
+/* ── Hide controls when extension is disabled ── */
+
+.possession_hidden {
+    display: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   PHRASING STYLES
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Input Area Button (next to Send) ── */
+
+#phrasing_send_button {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.7;
+    transition: opacity 0.15s ease, color 0.15s ease;
+    padding: 3px;
+    font-size: 1.2em;
+}
+
+#phrasing_send_button:hover {
+    opacity: 1;
+    color: var(--SmartThemeQuoteColor, #e8a23a);
+}
+
+/* ── Hamburger Menu Item ── */
+
+#phrasing_menu_button {
+    cursor: pointer;
+}
+
+#phrasing_menu_button .fa-solid {
+    margin-right: 5px;
+    width: 1em;
+    text-align: center;
+}
+
+/* ── Message Action Button ── */
+
+.phrasing_mes_button {
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.15s ease, color 0.15s ease;
+    padding: 2px 4px;
+    font-size: 0.9em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.phrasing_mes_button:hover {
+    opacity: 1;
+    color: var(--SmartThemeQuoteColor, #e8a23a);
+}
+
+/* ── Hide buttons during generation ── */
+
+.phrasing-hidden {
+    display: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   SETTINGS PANEL STYLES
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+#saints_silly_settings .inline-drawer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 0;
+}
+
+#saints_silly_settings .checkbox_label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+#saints_silly_settings .saints_section_header {
+    margin: 4px 0 2px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+#saints_silly_settings .saints_divider {
+    border: none;
+    border-top: 1px solid var(--SmartThemeBorderColor, #555);
+    margin: 8px 0;
+}
+
+#saints_silly_settings .phrasing_prompt_section {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+#saints_silly_settings #phrasing_prompt_textarea {
+    width: 100%;
+    min-height: 120px;
+    resize: vertical;
+    font-family: monospace;
+    font-size: 0.9em;
+    margin-top: 4px;
+}
+
+#saints_silly_settings .phrasing_buttons_row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+
+#saints_silly_settings .phrasing_buttons_row .menu_button {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+    white-space: nowrap;
+}

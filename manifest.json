@@ -1,0 +1,13 @@
+{
+    "display_name": "Saint's Silly Extensions",
+    "loading_order": 1,
+    "requires": [],
+    "optional": [],
+    "dependencies": [],
+    "js": "index.js",
+    "css": "style.css",
+    "author": "Chris Phifer",
+    "version": "1.0.0",
+    "homePage": "",
+    "auto_update": true
+}
