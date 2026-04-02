@@ -824,7 +824,7 @@ function onRestoreDefault() {
 function onGenerationStarted() {
     generationGuard = true;
     hideAllPhrasingButtons();
-    possessionDebug('Generation started, guard ON');
+    SSEDebug('Generation started, guard ON');
 }
 
 function onGenerationEnded() {
@@ -835,7 +835,7 @@ function onGenerationEnded() {
         phrasingActive = false;
     }
     showAllPhrasingButtons();
-    possessionDebug('Generation ended, guard OFF');
+    SSEDebug('Generation ended, guard OFF');
 }
 
 function onGenerationStopped() {
@@ -846,7 +846,7 @@ function onGenerationStopped() {
         phrasingActive = false;
     }
     showAllPhrasingButtons();
-    possessionDebug('Generation stopped, guard OFF');
+    SSEDebug('Generation stopped, guard OFF');
 }
 
 function onChatChanged() {
@@ -854,7 +854,7 @@ function onChatChanged() {
     syncAllPossessionUI();
     loadPromptTextarea();
     setTimeout(() => updateMessageActionButtons(), 100);
-    possessionDebug('Chat changed, state reloaded');
+    SSEDebug('Chat changed, state reloaded');
 }
 
 function onGroupUpdated() {
@@ -862,7 +862,7 @@ function onGroupUpdated() {
     removeGroupRadioButtons();
     injectGroupRadioButtons();
     syncGroupRadioButtons();
-    possessionDebug('Group updated, UI rebuilt');
+    SSEDebug('Group updated, UI rebuilt');
 }
 
 function onCharacterPageLoaded() {
@@ -1039,7 +1039,7 @@ async function injectSettingsPanel() {
         possessionDebugMode.addEventListener('change', (e) => {
             settings.possessionDebugMode = e.target.checked;
             saveSettings();
-            console.log('POSSESSION: debugMode toggled to', settings.possessionDebugMode);
+            possessionDebug('debugMode toggled to', settings.possessionDebugMode);
         });
     }
 
@@ -1061,7 +1061,7 @@ async function injectSettingsPanel() {
         phrasingDebugMode.addEventListener('change', (e) => {
             settings.phrasingDebugMode = e.target.checked;
             saveSettings();
-            console.log('PHRASING: debugMode toggled to', settings.phrasingDebugMode);
+            phrasingDebug('debugMode toggled to', settings.phrasingDebugMode);
         });
     }
 
