@@ -18,6 +18,7 @@ import {
 const EXTENSION_NAME = 'Saints-Silly-Extensions';
 const POSSESSION_METADATA_KEY = 'possession';
 const PHRASING_INJECTION_KEY = 'phrasing_instruction';
+const PHRASING_SEED_EXTRA_KEY = 'phrasing_seed';
 
 const DEFAULT_PHRASING_PROMPT = `[Rewrite the following message. Preserve its meaning, intent, and any dialogue, but enrich it with narration, action, and detail consistent with the character and the current scene. Do not continue the scene beyond what the original message describes.
 
@@ -246,9 +247,29 @@ async function executePossessedContinue(text) {
     }
 }
 
+function handlePhrasingSeedReinjection() {
+    if (!settings.phrasingEnabled) return;
+
+    const context = getContext();
+    const lastIndex = context.chat.length - 1;
+    if (lastIndex < 0) return;
+
+    const message = context.chat[lastIndex];
+    const storedPrompt = message?.extra?.[PHRASING_SEED_EXTRA_KEY];
+    if (!storedPrompt) return;
+
+    phrasingDebug('Reinjecting phrasing seed for continue on message', lastIndex);
+    injectPhrasingPrompt(storedPrompt);
+    // The injection will be cleared by onGenerationEnded/onGenerationStopped
+}
+
 function attachContinueInterceptor() {
     document.addEventListener('click', (event) => {
         if (!event.target.closest('#option_continue') && !event.target.closest('#mes_continue')) return;
+
+        // Reinject phrasing seed if the last message was rephrased
+        handlePhrasingSeedReinjection();
+
         handleContinueIntercept(event);
     }, { capture: true });
     possessionDebug('Attached continue interceptor');
@@ -394,12 +415,83 @@ function removeSoloButton() {
     if (btn) btn.remove();
 }
 
+// ─── Section 9b: Possession — Impersonate Button Visibility ───
+
+function hideImpersonateButtons() {
+    const menuBtn = document.getElementById('option_impersonate');
+    const quickBtn = document.getElementById('mes_impersonate');
+    if (menuBtn) menuBtn.classList.add('possession_hidden');
+    if (quickBtn) quickBtn.classList.add('possession_hidden');
+    possessionDebug('Impersonate buttons hidden');
+}
+
+function showImpersonateButtons() {
+    const menuBtn = document.getElementById('option_impersonate');
+    const quickBtn = document.getElementById('mes_impersonate');
+    if (menuBtn) menuBtn.classList.remove('possession_hidden');
+    if (quickBtn) quickBtn.classList.remove('possession_hidden');
+    possessionDebug('Impersonate buttons shown');
+}
+
+// ─── Section 9c: Possession — Impersonate Button (Character Avatar) ───
+
+function injectPossessionImpersonateButton() {
+    removePossessionImpersonateButton(); // Remove stale button first
+
+    const char = getPossessedCharacter();
+    if (!char) return;
+
+    const sendForm = document.getElementById('rightSendForm');
+    if (!sendForm) return;
+
+    const btn = document.createElement('div');
+    btn.id = 'possession_impersonate_btn';
+    btn.classList.add('interactable');
+    btn.title = `Generate as ${char.name}`;
+
+    const img = document.createElement('img');
+    img.src = char.avatar ? `/characters/${char.avatar}` : '/img/ai4.png';
+    img.alt = char.name;
+    img.classList.add('possession_impersonate_avatar');
+    btn.appendChild(img);
+
+    btn.addEventListener('click', async () => {
+        const context = getContext();
+        if (context.isGenerating || generationGuard) return;
+
+        possessionDebug('Possession impersonate clicked — triggering generation for', char.name);
+        if (context.executeSlashCommandsWithOptions) {
+            await context.executeSlashCommandsWithOptions('/continue');
+        } else {
+            const continueBtn = document.getElementById('option_continue');
+            if (continueBtn) continueBtn.click();
+        }
+    });
+
+    // Insert before the phrasing button if it exists, otherwise append
+    const phrasingBtn = document.getElementById('phrasing_send_button');
+    if (phrasingBtn) {
+        sendForm.insertBefore(btn, phrasingBtn);
+    } else {
+        sendForm.appendChild(btn);
+    }
+
+    possessionDebug('Injected possession impersonate button for', char.name);
+}
+
+function removePossessionImpersonateButton() {
+    const btn = document.getElementById('possession_impersonate_btn');
+    if (btn) btn.remove();
+}
+
 // ─── Section 10: Possession — UI Sync ───
 
 function syncAllPossessionUI() {
     if (!settings.possessionEnabled) {
         removeGroupRadioButtons();
         removeSoloButton();
+        showImpersonateButtons();
+        removePossessionImpersonateButton();
         return;
     }
 
@@ -411,6 +503,15 @@ function syncAllPossessionUI() {
         removeGroupRadioButtons();
         injectSoloButton();
         syncSoloButton();
+    }
+
+    // Hide/show impersonate buttons based on possession state
+    if (isPossessing()) {
+        hideImpersonateButtons();
+        injectPossessionImpersonateButton();
+    } else {
+        showImpersonateButtons();
+        removePossessionImpersonateButton();
     }
 }
 
@@ -604,6 +705,10 @@ async function doSwipeMode(messageIndex) {
         const assembled = assemblePrompt(seedText);
         injectPhrasingPrompt(assembled);
 
+        // Store the assembled prompt on the message for continue reinjection
+        if (!message.extra) message.extra = {};
+        message.extra[PHRASING_SEED_EXTRA_KEY] = assembled;
+
         // Jump to the last swipe so a single swipe_right click triggers generation.
         const lastSwipeIndex = message.swipes.length - 1;
         if (message.swipe_id !== lastSwipeIndex) {
@@ -694,6 +799,27 @@ function waitForGenerationEnd() {
 
 // ─── Section 17: Phrasing — Button Handlers ───
 
+function confirmActiveMessageEdit() {
+    const visibleEditButtons = document.querySelector('#chat .mes .mes_edit_buttons[style*="display: inline-flex"]');
+    if (visibleEditButtons) {
+        const editDoneBtn = visibleEditButtons.querySelector('.mes_edit_done');
+        if (editDoneBtn) {
+            editDoneBtn.click();
+            return true;
+        }
+    }
+    return false;
+}
+
+function getEditingMessageIndex() {
+    const visibleEditButtons = document.querySelector('#chat .mes .mes_edit_buttons[style*="display: inline-flex"]');
+    if (!visibleEditButtons) return -1;
+    const mesEl = visibleEditButtons.closest('.mes');
+    if (!mesEl) return -1;
+    const mesId = mesEl.getAttribute('mesid');
+    return mesId !== null ? parseInt(mesId) : -1;
+}
+
 async function onInputPhrasingClick() {
     phrasingDebug('onInputPhrasingClick — triggered');
     if (!settings.phrasingEnabled) return;
@@ -701,26 +827,51 @@ async function onInputPhrasingClick() {
     const context = getContext();
     if (context.isGenerating) return;
 
+    // Immediately disable buttons to prevent double-clicks
+    hideAllPhrasingButtons();
+
     const textarea = document.getElementById('send_textarea');
-    const seedText = textarea?.value?.trim();
+    const inputText = textarea?.value?.trim();
+    const editingIndex = getEditingMessageIndex();
 
-    if (!seedText) {
-        phrasingDebug('onInputPhrasingClick — no input, falling back to impersonate');
-        const impersonateBtn = document.getElementById('option_impersonate');
-        if (impersonateBtn) impersonateBtn.click();
-        return;
+    try {
+        if (!inputText && editingIndex < 0) {
+            // ── Case 1: Empty input, no edit in progress → rephrase last message ──
+            phrasingDebug('onInputPhrasingClick — empty input, no edit → rephrase last message');
+            const lastIndex = context.chat.length - 1;
+            if (lastIndex < 0) {
+                toastr.warning('No messages to rephrase.', 'Phrasing!');
+                return;
+            }
+            await doSwipeMode(lastIndex);
+        } else if (editingIndex >= 0 && !inputText) {
+            // ── Case 2: Editing a message, no text in input → confirm edit, rephrase that message ──
+            phrasingDebug('onInputPhrasingClick — editing message at index', editingIndex, '→ confirm and rephrase');
+            confirmActiveMessageEdit();
+            // Small delay for ST to process the edit confirmation
+            await new Promise(resolve => setTimeout(resolve, 100));
+            await doSwipeMode(editingIndex);
+        } else {
+            // ── Case 3: Text in input → confirm any edit, then handle input text ──
+            if (editingIndex >= 0) {
+                phrasingDebug('onInputPhrasingClick — confirming active edit before processing input');
+                confirmActiveMessageEdit();
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+
+            phrasingDebug('onInputPhrasingClick — input text present, seed length:', inputText.length);
+            textarea.value = '';
+            textarea.dispatchEvent(new Event('input', { bubbles: true }));
+
+            const formattedSeed = isPossessing()
+                ? formatSeedWithSpeaker(inputText, false, possessedCharName)
+                : formatSeedWithSpeaker(inputText, true);
+
+            await doPrimaryFlow(formattedSeed);
+        }
+    } finally {
+        showAllPhrasingButtons();
     }
-
-    phrasingDebug('onInputPhrasingClick — seed length:', seedText.length);
-    textarea.value = '';
-    textarea.dispatchEvent(new Event('input', { bubbles: true }));
-
-    // Integration point: seed attribution depends on possession state
-    const formattedSeed = isPossessing()
-        ? formatSeedWithSpeaker(seedText, false, possessedCharName)
-        : formatSeedWithSpeaker(seedText, true);
-
-    await doPrimaryFlow(formattedSeed);
 }
 
 async function onMessagePhrasingClick(messageIndex) {
@@ -736,7 +887,14 @@ async function onMessagePhrasingClick(messageIndex) {
         return;
     }
 
-    await doSwipeMode(messageIndex);
+    // Immediately disable buttons to prevent double-clicks
+    hideAllPhrasingButtons();
+
+    try {
+        await doSwipeMode(messageIndex);
+    } finally {
+        showAllPhrasingButtons();
+    }
 }
 
 // ─── Section 18: Phrasing — Message Action Button Management ───
