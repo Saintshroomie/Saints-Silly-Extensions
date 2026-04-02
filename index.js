@@ -27,6 +27,7 @@ const DEFAULT_PHRASING_PROMPT = `[Rewrite the following message. Preserve its me
 // ─── State ───
 
 let possessedCharName = null;
+let possessedCharAvatar = null;
 let generationGuard = false;
 let phrasingActive = false;
 
@@ -93,16 +94,26 @@ function loadSettings() {
 
 function savePossessionState() {
     const context = getContext();
-    context.chatMetadata[POSSESSION_METADATA_KEY] = possessedCharName;
+    context.chatMetadata[POSSESSION_METADATA_KEY] = {
+        name: possessedCharName,
+        avatar: possessedCharAvatar,
+    };
     context.saveMetadata();
-    possessionDebug('Saved possession state:', possessedCharName);
+    possessionDebug('Saved possession state:', possessedCharName, '| avatar:', possessedCharAvatar);
 }
 
 function loadPossessionState() {
     const context = getContext();
     const saved = context.chatMetadata?.[POSSESSION_METADATA_KEY] ?? null;
-    possessedCharName = saved;
-    possessionDebug('Loaded possession state:', possessedCharName);
+    // Handle legacy format (plain string) and new format (object)
+    if (saved && typeof saved === 'object') {
+        possessedCharName = saved.name ?? null;
+        possessedCharAvatar = saved.avatar ?? null;
+    } else {
+        possessedCharName = saved;
+        possessedCharAvatar = null;
+    }
+    possessionDebug('Loaded possession state:', possessedCharName, '| avatar:', possessedCharAvatar);
 }
 
 // ─── Section 3: Possession — Character Utilities ───
@@ -110,6 +121,11 @@ function loadPossessionState() {
 function getPossessedCharacter() {
     if (!possessedCharName) return null;
     const context = getContext();
+    // Prefer avatar match (unique), fall back to name match
+    if (possessedCharAvatar) {
+        const byAvatar = context.characters.find(c => c.avatar === possessedCharAvatar);
+        if (byAvatar) return byAvatar;
+    }
     return context.characters.find(c => c.name === possessedCharName) ?? null;
 }
 
@@ -131,9 +147,21 @@ function validatePossessedCharInGroup() {
 
 // ─── Section 4: Possession — Core Logic ───
 
-function setPossession(charName) {
+function setPossession(charName, charAvatar) {
     const previous = possessedCharName;
     possessedCharName = charName;
+    // Resolve avatar: use explicit param, or look up from characters array
+    if (charName) {
+        if (charAvatar) {
+            possessedCharAvatar = charAvatar;
+        } else {
+            const context = getContext();
+            const char = context.characters.find(c => c.name === charName);
+            possessedCharAvatar = char?.avatar ?? null;
+        }
+    } else {
+        possessedCharAvatar = null;
+    }
     savePossessionState();
     syncAllPossessionUI();
     if (previous !== charName) {
@@ -291,15 +319,22 @@ function injectGroupRadioButtons() {
         if (entry.querySelector('.possession_radio_wrapper')) return;
 
         const charId = entry.getAttribute('chid');
-        const charAvatar = entry.getAttribute('grid');
+        const gridAvatar = entry.getAttribute('grid');
         let charName = null;
+        let charAvatar = null;
 
         if (charId !== null) {
             const char = context.characters[parseInt(charId)];
-            if (char) charName = char.name;
-        } else if (charAvatar) {
-            const char = context.characters.find(c => c.avatar === charAvatar);
-            if (char) charName = char.name;
+            if (char) {
+                charName = char.name;
+                charAvatar = char.avatar;
+            }
+        } else if (gridAvatar) {
+            const char = context.characters.find(c => c.avatar === gridAvatar);
+            if (char) {
+                charName = char.name;
+                charAvatar = char.avatar;
+            }
         }
 
         if (!charName) {
@@ -316,6 +351,7 @@ function injectGroupRadioButtons() {
         const radio = document.createElement('div');
         radio.classList.add('possession_radio');
         radio.dataset.charName = charName;
+        if (charAvatar) radio.dataset.charAvatar = charAvatar;
 
         if (possessedCharName === charName) {
             radio.classList.add('possession_active');
@@ -327,7 +363,7 @@ function injectGroupRadioButtons() {
             if (possessedCharName === charName) {
                 setPossession(null);
             } else {
-                setPossession(charName);
+                setPossession(charName, charAvatar);
             }
         });
 
