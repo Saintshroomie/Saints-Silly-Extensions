@@ -51,6 +51,10 @@ function phrasingDebug(...args) {
     console.log('PHRASING:', ...args);
 }
 
+function SSEDebug(...args) {    
+    console.log('SAINTS-SILLY-EXTENSIONS:', ...args);
+}
+
 function toast(message, type = 'info') {
     if (!settings.possessionShowToast) return;
     if (typeof toastr !== 'undefined' && toastr[type]) {
@@ -72,7 +76,7 @@ function saveSettings() {
     const context = getContext();
     context.extensionSettings[EXTENSION_NAME] = { ...settings };
     context.saveSettingsDebounced();
-    possessionDebug('Settings saved');
+    SSEDebug('Settings saved');
 }
 
 function loadSettings() {
@@ -81,7 +85,7 @@ function loadSettings() {
     if (saved) {
         settings = { ...defaultSettings, ...saved };
     }
-    possessionDebug('Settings loaded:', JSON.stringify(settings));
+    SSEDebug('Settings loaded:', JSON.stringify(settings));
 }
 
 // ─── Section 2: Possession — Persistence ───
