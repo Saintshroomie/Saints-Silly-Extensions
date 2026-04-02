@@ -1,0 +1,63 @@
+<div id="saints_silly_settings" class="extension_settings">
+    <div class="inline-drawer">
+        <div class="inline-drawer-toggle inline-drawer-header">
+            <b>Saint's Silly Extensions</b>
+            <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+        </div>
+        <div class="inline-drawer-content">
+
+            <!-- Possession Settings -->
+            <h4 class="saints_section_header">
+                <span class="fa-solid fa-ghost"></span> Possession
+            </h4>
+
+            <label class="checkbox_label">
+                <input id="possession_enabled" type="checkbox" />
+                <span>Enable Possession</span>
+            </label>
+
+            <label class="checkbox_label">
+                <input id="possession_show_toast" type="checkbox" />
+                <span>Show Toast on Possess/Unpossess</span>
+            </label>
+
+            <label class="checkbox_label">
+                <input id="possession_debug_mode" type="checkbox" />
+                <span>Possession Debug Mode</span>
+            </label>
+
+            <hr class="saints_divider" />
+
+            <!-- Phrasing Settings -->
+            <h4 class="saints_section_header">
+                <span class="fa-solid fa-pen-fancy"></span> Phrasing!
+            </h4>
+
+            <label class="checkbox_label">
+                <input id="phrasing_enabled" type="checkbox" checked />
+                <span>Enable Phrasing!</span>
+            </label>
+
+            <label class="checkbox_label">
+                <input id="phrasing_debug_mode" type="checkbox" />
+                <span>Phrasing Debug Mode</span>
+            </label>
+
+            <div class="phrasing_prompt_section">
+                <label for="phrasing_prompt_textarea"><b>Prompt Template:</b></label>
+                <textarea id="phrasing_prompt_textarea" class="text_pole" rows="8"
+                    placeholder="Enter your Phrasing! prompt template..."></textarea>
+            </div>
+
+            <div class="phrasing_buttons_row">
+                <div class="menu_button" id="phrasing_restore_default">
+                    <span class="fa-solid fa-rotate-left"></span> Restore Default
+                </div>
+                <div class="menu_button" id="phrasing_save_to_chat">
+                    <span class="fa-solid fa-floppy-disk"></span> Save to Chat
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
