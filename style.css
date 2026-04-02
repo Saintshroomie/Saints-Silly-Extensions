@@ -71,6 +71,35 @@
     border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;
 }
 
+/* ── Possession Impersonate Button (Character Avatar) ── */
+
+#possession_impersonate_btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.15s ease;
+    padding: 2px;
+}
+
+#possession_impersonate_btn:hover {
+    opacity: 1;
+}
+
+.possession_impersonate_avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    transition: border-color 0.15s ease;
+}
+
+#possession_impersonate_btn:hover .possession_impersonate_avatar {
+    border-color: var(--SmartThemeQuoteColor, #e8a23a);
+}
+
 /* ── Hide controls when extension is disabled ── */
 
 .possession_hidden {
