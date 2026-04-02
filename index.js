@@ -460,11 +460,35 @@ function injectPossessionImpersonateButton() {
         if (context.isGenerating || generationGuard) return;
 
         possessionDebug('Possession impersonate clicked — triggering generation for', char.name);
-        if (context.executeSlashCommandsWithOptions) {
-            await context.executeSlashCommandsWithOptions('/continue');
+
+        if (selected_group) {
+            // Group chat: find and click the possessed character's speak button
+            const radios = document.querySelectorAll('.possession_radio');
+            for (const radio of radios) {
+                if (radio.dataset.charName === possessedCharName) {
+                    const memberEntry = radio.closest('.group_member');
+                    if (memberEntry) {
+                        const speakBtn = memberEntry.querySelector('.right_menu_button[data-action="speak"]');
+                        if (speakBtn) {
+                            speakBtn.click();
+                            return;
+                        }
+                    }
+                    break;
+                }
+            }
+            possessionDebug('Speak button not found, falling back to /trigger');
+            if (context.executeSlashCommandsWithOptions) {
+                await context.executeSlashCommandsWithOptions(`/trigger ${char.name}`);
+            }
         } else {
-            const continueBtn = document.getElementById('option_continue');
-            if (continueBtn) continueBtn.click();
+            // Solo chat: trigger a normal generation
+            if (context.executeSlashCommandsWithOptions) {
+                await context.executeSlashCommandsWithOptions('/trigger');
+            } else {
+                const sendBtn = document.getElementById('send_but');
+                if (sendBtn) sendBtn.click();
+            }
         }
     });
 
@@ -979,9 +1003,20 @@ function onRestoreDefault() {
 
 // ─── Section 20: Merged Event Handlers ───
 
+function hidePossessionImpersonateButton() {
+    const btn = document.getElementById('possession_impersonate_btn');
+    if (btn) btn.classList.add('possession_hidden');
+}
+
+function showPossessionImpersonateButton() {
+    const btn = document.getElementById('possession_impersonate_btn');
+    if (btn) btn.classList.remove('possession_hidden');
+}
+
 function onGenerationStarted() {
     generationGuard = true;
     hideAllPhrasingButtons();
+    hidePossessionImpersonateButton();
     SSEDebug('Generation started, guard ON');
 }
 
@@ -993,6 +1028,7 @@ function onGenerationEnded() {
         phrasingActive = false;
     }
     showAllPhrasingButtons();
+    showPossessionImpersonateButton();
     SSEDebug('Generation ended, guard OFF');
 }
 
@@ -1004,6 +1040,7 @@ function onGenerationStopped() {
         phrasingActive = false;
     }
     showAllPhrasingButtons();
+    showPossessionImpersonateButton();
     SSEDebug('Generation stopped, guard OFF');
 }
 
