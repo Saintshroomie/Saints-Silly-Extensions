@@ -12,6 +12,16 @@ import {
     extension_prompt_roles,
     substituteParams,
 } from '../../../../script.js';
+import {
+    getContext,
+    toast as showToast,
+    createDebugLogger,
+    loadExtensionSettings,
+    saveExtensionSettings,
+    confirmActiveMessageEdit,
+    getEditingMessageIndex,
+    waitForGenerationEnd,
+} from './lib/utils.js';
 
 // ─── Constants ───
 
@@ -43,29 +53,13 @@ let settings = { ...defaultSettings };
 
 // ─── Shared Helpers ───
 
-function possessionDebug(...args) {
-    if (!settings.possessionDebugMode) return;
-    console.log('POSSESSION:', ...args);
-}
-
-function phrasingDebug(...args) {
-    if (!settings.phrasingDebugMode) return;
-    console.log('PHRASING:', ...args);
-}
-
-function SSEDebug(...args) {    
-    console.log('SAINTS-SILLY-EXTENSIONS:', ...args);
-}
+const possessionDebug = createDebugLogger('POSSESSION', () => settings.possessionDebugMode);
+const phrasingDebug = createDebugLogger('PHRASING', () => settings.phrasingDebugMode);
+const SSEDebug = createDebugLogger('SAINTS-SILLY-EXTENSIONS', () => true);
 
 function toast(message, type = 'info') {
     if (!settings.possessionShowToast) return;
-    if (typeof toastr !== 'undefined' && toastr[type]) {
-        toastr[type](message, "Saint's Silly Extensions");
-    }
-}
-
-function getContext() {
-    return SillyTavern.getContext();
+    showToast(message, type, "Saint's Silly Extensions");
 }
 
 function isPossessing() {
@@ -75,18 +69,12 @@ function isPossessing() {
 // ─── Section 1: Settings Persistence ───
 
 function saveSettings() {
-    const context = getContext();
-    context.extensionSettings[EXTENSION_NAME] = { ...settings };
-    context.saveSettingsDebounced();
+    saveExtensionSettings(EXTENSION_NAME, settings);
     SSEDebug('Settings saved');
 }
 
 function loadSettings() {
-    const context = getContext();
-    const saved = context.extensionSettings?.[EXTENSION_NAME];
-    if (saved) {
-        settings = { ...defaultSettings, ...saved };
-    }
+    settings = loadExtensionSettings(EXTENSION_NAME, defaultSettings);
     SSEDebug('Settings loaded:', JSON.stringify(settings));
 }
 
@@ -822,67 +810,7 @@ async function doSwipeMode(messageIndex) {
     }
 }
 
-// ─── Section 16: Phrasing — Wait Helper ───
-
-function waitForGenerationEnd() {
-    phrasingDebug('waitForGenerationEnd — subscribing');
-    return new Promise(resolve => {
-        const context = getContext();
-        const { eventSource, eventTypes } = context;
-        let settled = false;
-
-        const cleanup = () => {
-            eventSource.removeListener(eventTypes.GENERATION_ENDED, onEnd);
-            eventSource.removeListener(eventTypes.GENERATION_STOPPED, onEnd);
-        };
-
-        const onEnd = () => {
-            if (settled) return;
-            settled = true;
-            phrasingDebug('waitForGenerationEnd — generation ended');
-            cleanup();
-            const ctx = getContext();
-            const lastMsg = ctx.chat[ctx.chat.length - 1];
-            resolve(lastMsg ? lastMsg.mes : '');
-        };
-
-        setTimeout(() => {
-            if (settled) return;
-            settled = true;
-            phrasingDebug('waitForGenerationEnd — TIMED OUT after 5 minutes');
-            cleanup();
-            resolve('');
-        }, 5 * 60 * 1000);
-
-        eventSource.on(eventTypes.GENERATION_ENDED, onEnd);
-        if (eventTypes.GENERATION_STOPPED) {
-            eventSource.on(eventTypes.GENERATION_STOPPED, onEnd);
-        }
-    });
-}
-
 // ─── Section 17: Phrasing — Button Handlers ───
-
-function confirmActiveMessageEdit() {
-    const visibleEditButtons = document.querySelector('#chat .mes .mes_edit_buttons[style*="display: inline-flex"]');
-    if (visibleEditButtons) {
-        const editDoneBtn = visibleEditButtons.querySelector('.mes_edit_done');
-        if (editDoneBtn) {
-            editDoneBtn.click();
-            return true;
-        }
-    }
-    return false;
-}
-
-function getEditingMessageIndex() {
-    const visibleEditButtons = document.querySelector('#chat .mes .mes_edit_buttons[style*="display: inline-flex"]');
-    if (!visibleEditButtons) return -1;
-    const mesEl = visibleEditButtons.closest('.mes');
-    if (!mesEl) return -1;
-    const mesId = mesEl.getAttribute('mesid');
-    return mesId !== null ? parseInt(mesId) : -1;
-}
 
 async function onInputPhrasingClick() {
     phrasingDebug('onInputPhrasingClick — triggered');
