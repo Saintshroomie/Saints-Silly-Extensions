@@ -140,24 +140,6 @@
     text-align: center;
 }
 
-/* ── Message Action Button ── */
-
-.phrasing_mes_button {
-    cursor: pointer;
-    opacity: 0.5;
-    transition: opacity 0.15s ease, color 0.15s ease;
-    padding: 2px 4px;
-    font-size: 0.9em;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.phrasing_mes_button:hover {
-    opacity: 1;
-    color: var(--SmartThemeQuoteColor, #e8a23a);
-}
-
 /* ── Hide buttons during generation ── */
 
 .phrasing-hidden {

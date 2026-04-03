@@ -938,62 +938,6 @@ async function onInputPhrasingClick() {
     }
 }
 
-async function onMessagePhrasingClick(messageIndex) {
-    phrasingDebug('onMessagePhrasingClick — index:', messageIndex);
-    if (!settings.phrasingEnabled) return;
-
-    const context = getContext();
-    if (context.isGenerating) return;
-
-    const lastIndex = context.chat.length - 1;
-    if (messageIndex !== lastIndex) {
-        toastr.warning('Phrasing! can only be used on the last message.', 'Phrasing!');
-        return;
-    }
-
-    // Immediately disable buttons to prevent double-clicks
-    hideAllPhrasingButtons();
-
-    try {
-        await doSwipeMode(messageIndex);
-    } finally {
-        showAllPhrasingButtons();
-    }
-}
-
-// ─── Section 18: Phrasing — Message Action Button Management ───
-
-function updateMessageActionButtons() {
-    if (!settings.phrasingEnabled) return;
-
-    const context = getContext();
-    const lastIndex = context.chat.length - 1;
-
-    document.querySelectorAll('.phrasing_mes_button').forEach(el => el.remove());
-
-    if (lastIndex < 0) return;
-
-    const lastMessageEl = document.querySelector(`#chat .mes[mesid="${lastIndex}"]`);
-    if (!lastMessageEl) return;
-
-    const extraButtons = lastMessageEl.querySelector('.extraMesButtons, .mes_buttons');
-    if (!extraButtons) return;
-
-    const btn = document.createElement('div');
-    btn.classList.add('phrasing_mes_button', 'phrasing-trigger', 'mes_button', 'fa-solid', 'fa-pen-fancy', 'interactable');
-    btn.title = 'Phrasing! — Add a rephrased swipe';
-    btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const mesId = parseInt(lastMessageEl.getAttribute('mesid'));
-        onMessagePhrasingClick(mesId);
-    });
-
-    if (context.isGenerating) {
-        btn.classList.add('phrasing-hidden');
-    }
-
-    extraButtons.appendChild(btn);
-}
 
 // ─── Section 19: Phrasing — Prompt Settings UI ───
 
@@ -1088,7 +1032,6 @@ function onChatChanged() {
     loadPossessionState();
     syncAllPossessionUI();
     loadPromptTextarea();
-    setTimeout(() => updateMessageActionButtons(), 100);
     SSEDebug('Chat changed, state reloaded');
 }
 
@@ -1107,9 +1050,6 @@ function onCharacterPageLoaded() {
     }
 }
 
-function onMessageRendered() {
-    setTimeout(() => updateMessageActionButtons(), 50);
-}
 
 function onGroupWrapperFinished() {
     syncAllPossessionUI();
@@ -1286,7 +1226,6 @@ async function injectSettingsPanel() {
             settings.phrasingEnabled = e.target.checked;
             saveSettings();
             applyPhrasingEnabledState();
-            updateMessageActionButtons();
         });
     }
 
@@ -1363,8 +1302,6 @@ jQuery(async () => {
     eventSource.on(eventTypes.GENERATION_STOPPED, onGenerationStopped);
     eventSource.on(eventTypes.GROUP_WRAPPER_FINISHED, onGroupWrapperFinished);
     eventSource.on(eventTypes.MESSAGE_SENT, onMessageSent);
-    eventSource.on(eventTypes.USER_MESSAGE_RENDERED, onMessageRendered);
-    eventSource.on(eventTypes.CHARACTER_MESSAGE_RENDERED, onMessageRendered);
 
     // Slash commands
     registerPossessionSlashCommands();
