@@ -600,6 +600,11 @@ async function doSwipeMode(messageIndex) {
         const assembled = assemblePrompt(seedText);
         injectPhrasingPrompt(assembled);
 
+        // Force regenerate overswipe behavior so ST generates a new swipe instead of
+        // looping (which happens for index-0 messages in pristine chats).
+        if (!message.extra) message.extra = {};
+        message.extra.overswipe_behavior = 'regenerate';
+
         // Jump to the last swipe so a single swipe_right click triggers generation.
         const lastSwipeIndex = message.swipes.length - 1;
         if (message.swipe_id !== lastSwipeIndex) {
