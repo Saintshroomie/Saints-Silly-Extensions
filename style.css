@@ -242,10 +242,8 @@
     background: rgba(0, 0, 0, 0.6);
     z-index: 10000;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
-    padding: 5vh 0;
-    overflow-y: auto;
 }
 
 .acc-modal {
@@ -254,7 +252,7 @@
     border-radius: 8px;
     width: 90%;
     max-width: 700px;
-    max-height: 85vh;
+    height: 90vh;
     display: flex;
     flex-direction: column;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
