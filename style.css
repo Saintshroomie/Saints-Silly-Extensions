@@ -327,9 +327,60 @@
     gap: 4px;
 }
 
+.acc-field-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
 .acc-field-label {
     font-weight: bold;
     font-size: 0.9em;
+}
+
+.acc-field-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.acc-prose-toggle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8em;
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.acc-prose-toggle:hover {
+    opacity: 1;
+}
+
+.acc-prose-label {
+    user-select: none;
+}
+
+.acc-token-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8em;
+    opacity: 0.7;
+}
+
+.acc-token-input {
+    width: 60px !important;
+    padding: 2px 4px !important;
+    font-size: 0.85em !important;
+    text-align: center;
+}
+
+.acc-input-wrap {
+    flex: 1;
+    min-width: 0;
 }
 
 .acc-field-row {
@@ -339,8 +390,7 @@
 }
 
 .acc-field-input {
-    flex: 1;
-    min-width: 0;
+    width: 100%;
 }
 
 .acc-field-input[disabled] {
