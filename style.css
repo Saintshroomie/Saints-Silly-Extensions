@@ -237,26 +237,27 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    right: 0;
+    bottom: 0;
     background: rgba(0, 0, 0, 0.6);
     z-index: 10000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 #acc_modal {
+    position: fixed;
+    top: 5vh;
+    left: 50%;
+    transform: translateX(-50%);
     background: var(--SmartThemeBlurTintColor, #1a1a2e);
     border: 1px solid var(--SmartThemeBorderColor, #555);
     border-radius: 8px;
     width: 90%;
     max-width: 700px;
-    height: 90vh !important;
-    min-height: 400px;
+    height: 90vh;
     display: flex;
     flex-direction: column;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    z-index: 10001;
 }
 
 #acc_modal .acc-modal-header {
