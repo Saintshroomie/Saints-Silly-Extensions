@@ -376,6 +376,8 @@
     padding: 2px 4px !important;
     font-size: 0.85em !important;
     text-align: center;
+    pointer-events: auto;
+    opacity: 1;
 }
 
 .acc-input-wrap {
