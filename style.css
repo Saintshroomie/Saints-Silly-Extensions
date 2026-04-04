@@ -242,8 +242,10 @@
     background: rgba(0, 0, 0, 0.6);
     z-index: 10000;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
+    padding: 5vh 0;
+    overflow-y: auto;
 }
 
 .acc-modal {
@@ -264,6 +266,7 @@
     justify-content: space-between;
     padding: 12px 16px;
     border-bottom: 1px solid var(--SmartThemeBorderColor, #555);
+    flex-shrink: 0;
 }
 
 .acc-modal-header h3 {
@@ -383,6 +386,7 @@
     padding: 12px 16px;
     border-top: 1px solid var(--SmartThemeBorderColor, #555);
     gap: 8px;
+    flex-shrink: 0;
 }
 
 .acc-footer-right {
