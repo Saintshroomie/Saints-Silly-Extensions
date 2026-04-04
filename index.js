@@ -59,6 +59,7 @@ const defaultSettings = {
     accDebugMode: false,
     accActiveSchemaName: 'Default Character Schema',
     accCustomSchemas: {},
+    accProseStates: {},
 };
 
 // ─── State ───
