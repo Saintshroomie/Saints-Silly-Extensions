@@ -58,6 +58,41 @@
                 </div>
             </div>
 
+            <hr class="saints_divider" />
+
+            <!-- Assisted Character Creation Settings -->
+            <h4 class="saints_section_header">
+                <span class="fa-solid fa-wand-magic-sparkles"></span> Assisted Character Creation
+            </h4>
+
+            <label class="checkbox_label">
+                <input id="acc_enabled" type="checkbox" />
+                <span>Enable Assisted Character Creation</span>
+            </label>
+
+            <label class="checkbox_label">
+                <input id="acc_debug_mode" type="checkbox" />
+                <span>ACC Debug Mode</span>
+            </label>
+
+            <div class="acc-schema-selector">
+                <label for="acc_schema_select"><b>Active Schema:</b></label>
+                <select id="acc_schema_select" class="text_pole"></select>
+            </div>
+
+            <div class="acc-schema-buttons">
+                <div class="menu_button" id="acc_import_schema">
+                    <span class="fa-solid fa-file-import"></span> Import Schema
+                </div>
+                <div class="menu_button" id="acc_export_schema">
+                    <span class="fa-solid fa-file-export"></span> Export Schema
+                </div>
+                <div class="menu_button" id="acc_delete_schema">
+                    <span class="fa-solid fa-trash"></span> Delete Schema
+                </div>
+            </div>
+            <input type="file" id="acc_schema_file_input" accept=".json" style="display:none" />
+
         </div>
     </div>
 </div>

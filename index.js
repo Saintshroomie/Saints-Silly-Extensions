@@ -1,5 +1,5 @@
-// Saint's Silly Extensions — Merged Possession + Phrasing!
-// Allows the user to "possess" a character and enrich messages with AI narration.
+// Saint's Silly Extensions — Possession, Phrasing, and Assisted Character Creation
+// Allows the user to "possess" a character, enrich messages with AI narration, and create characters with LLM assistance.
 
 import { renderExtensionTemplateAsync } from '../../../extensions.js';
 import {
@@ -39,6 +39,11 @@ import {
     onGenerationStarted as phrasingGenStarted,
     onGenerationEnded as phrasingGenEnded,
 } from './lib/phrasing.js';
+import {
+    initACC,
+    onCharacterPageLoaded as accOnCharacterPageLoaded,
+    bindACCSettings,
+} from './lib/assisted-character-creation.js';
 
 // ─── Constants ───
 
@@ -50,6 +55,11 @@ const defaultSettings = {
     possessionDebugMode: false,
     phrasingEnabled: true,
     phrasingDebugMode: false,
+    accEnabled: true,
+    accDebugMode: false,
+    accActiveSchemaName: 'Default Character Schema',
+    accCustomSchemas: {},
+    accProseStates: {},
 };
 
 // ─── State ───
@@ -81,6 +91,7 @@ async function injectSettingsPanel() {
 
     bindPossessionSettings(saveSettings);
     bindPhrasingSettings(saveSettings);
+    bindACCSettings(saveSettings);
 }
 
 // ─── Merged Event Handlers ───
@@ -120,6 +131,7 @@ function onGroupUpdatedHandler() {
 
 function onCharacterPageLoadedHandler() {
     onCharacterPageLoaded();
+    accOnCharacterPageLoaded();
 }
 
 function onGroupWrapperFinishedHandler() {
@@ -140,6 +152,7 @@ jQuery(async () => {
         settings,
         possessionApi: { isPossessing, getPossessedCharName, postPossessedMessage },
     });
+    initACC({ settings, saveSettings });
 
     loadPossessionState();
     await injectSettingsPanel();
