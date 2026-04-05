@@ -381,18 +381,12 @@
 }
 
 .acc-input-wrap {
-    flex: 1;
-    min-width: 0;
-}
-
-.acc-field-row {
-    display: flex;
-    gap: 6px;
-    align-items: flex-start;
+    width: 100%;
 }
 
 .acc-field-input {
     width: 100%;
+    resize: vertical;
 }
 
 .acc-field-input[disabled] {
@@ -404,8 +398,7 @@
     display: flex;
     gap: 4px;
     flex-shrink: 0;
-    align-items: flex-start;
-    padding-top: 2px;
+    align-items: center;
 }
 
 .acc-btn {
