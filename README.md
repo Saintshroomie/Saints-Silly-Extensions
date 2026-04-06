@@ -22,7 +22,7 @@ Enrich your messages with LLM-generated narration, actions, and detail that stay
 - **Context-aware rephrase** — The rephrase button (the Quill) adapts to what you're doing:
   - **Empty input** — Rephrases the last message in chat, using its latest swipe as the seed text
   - **Editing a message** — Confirms the edit, then rephrases that message
-  - **Text in input** — Enriches your typed text (Not Possessing: as your selected persona, Possessing: as the possessed character)
+  - **Text in input** — Enriches your typed text
 - **Seed text reinjection** — Rephrased messages remember their original seed prompt, so if you Continue a rephrased message the seed is reinjected to guide the continue generation
 - **Custom prompts** — Customize the phrasing prompt per-chat or use the default template
 - **Possession-aware** — When possessing a character, phrasing generates in that character's voice; otherwise it uses the standard ST impersonate feature
