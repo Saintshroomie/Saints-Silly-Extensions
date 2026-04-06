@@ -9,6 +9,7 @@ import { generateRaw } from '../../../../../script.js';
 import { removeReasoningFromString } from '../../../../reasoning.js';
 import { createDebugLogger, getContext, toast } from './utils.js';
 import { DEFAULT_SCHEMA, validateSchema, getOrderedFields } from './default-character-schema.js';
+import { tryParseCharacterData } from './schema-validation.js';
 
 // ─── Module State ───
 
@@ -362,8 +363,9 @@ function buildModalHTML(schema, existingDesc) {
             </div>`;
     }
 
-    // Reverse mapping temporarily disabled
-    const reverseMapBtn = '';
+    const reverseMapBtn = existingDesc
+        ? '<div id="acc_reverse_map_btn" class="menu_button interactable acc-reverse-btn"><span class="fa-solid fa-file-import"></span> Import from Existing</div>'
+        : '';
 
     return `
         <div id="acc_modal" class="acc-modal">
@@ -668,6 +670,26 @@ async function handleReverseMap() {
 }
 
 async function reverseMapDescription(description, schema) {
+    // Fast path: if the description is a stringified character data object
+    // (which is what compileDescription now produces), parse it directly and
+    // validate against the schema. This avoids an LLM round-trip entirely
+    // for descriptions that were compiled by this extension.
+    const direct = tryParseCharacterData(description, schema);
+    if (direct) {
+        // Keep only keys the current schema knows about — extra keys from a
+        // different schema version are preserved in the file but not surfaced
+        // as fields in this modal.
+        const filtered = {};
+        for (const key of Object.keys(schema.fields)) {
+            if (typeof direct[key] === 'string' && direct[key].trim()) {
+                filtered[key] = direct[key];
+            }
+        }
+        debug('Reverse mapped fields (JSON fast path):', Object.keys(filtered).length);
+        return filtered;
+    }
+
+    // Fallback: legacy prose description — use the LLM to extract fields.
     const fieldList = getOrderedFields(schema)
         .map(([key, f]) => `${key}: ${f.label} — ${f.description}`)
         .join('\n');
@@ -692,7 +714,7 @@ async function reverseMapDescription(description, schema) {
         }
     }
 
-    debug('Reverse mapped fields:', Object.keys(parsed).length);
+    debug('Reverse mapped fields (LLM fallback):', Object.keys(parsed).length);
     return parsed;
 }
 
@@ -729,15 +751,15 @@ function handleDone() {
 }
 
 function compileDescription(schema, states) {
-    const lines = [];
-    for (const [key, field] of getOrderedFields(schema)) {
+    const obj = {};
+    for (const [key] of getOrderedFields(schema)) {
         const val = states[key]?.currentValue?.trim();
         if (val) {
-            lines.push(`${field.label}: ${val}`);
+            obj[key] = val;
         }
     }
-    if (lines.length === 0) return '';
-    return '{\n' + lines.join(',\n') + '\n}';
+    if (Object.keys(obj).length === 0) return '';
+    return JSON.stringify(obj, null, 2);
 }
 
 // ─── UI Helpers ───

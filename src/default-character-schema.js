@@ -163,42 +163,9 @@ export const DEFAULT_SCHEMA = {
     },
 };
 
-/**
- * Validate a schema object. Returns an array of error strings (empty = valid).
- * @param {object} schema
- * @returns {string[]}
- */
-export function validateSchema(schema) {
-    const errors = [];
-
-    if (!schema || typeof schema !== 'object') {
-        errors.push('Schema must be a non-null object.');
-        return errors;
-    }
-    if (typeof schema.schemaName !== 'string' || !schema.schemaName.trim()) {
-        errors.push('Schema must have a non-empty "schemaName" string.');
-    }
-    if (!schema.fields || typeof schema.fields !== 'object' || Object.keys(schema.fields).length === 0) {
-        errors.push('Schema must have a non-empty "fields" object.');
-        return errors;
-    }
-
-    const orders = new Set();
-    for (const [key, field] of Object.entries(schema.fields)) {
-        const prefix = `Field "${key}"`;
-        if (typeof field.order !== 'number') errors.push(`${prefix}: "order" must be a number.`);
-        if (typeof field.label !== 'string' || !field.label.trim()) errors.push(`${prefix}: "label" must be a non-empty string.`);
-        if (typeof field.prompt !== 'string' || !field.prompt.includes('{{seedText}}')) {
-            errors.push(`${prefix}: "prompt" must be a string containing "{{seedText}}".`);
-        }
-        if (field.order !== undefined && orders.has(field.order)) {
-            errors.push(`${prefix}: duplicate order value ${field.order}.`);
-        }
-        orders.add(field.order);
-    }
-
-    return errors;
-}
+// Schema validation is implemented in schema-validation.js using AJV.
+// Re-exported here so existing imports keep working.
+export { validateCharacterSchema as validateSchema } from './schema-validation.js';
 
 /**
  * Returns fields sorted by their order property as [key, field] pairs.
