@@ -93,6 +93,35 @@
             </div>
             <input type="file" id="acc_schema_file_input" accept=".json" style="display:none" />
 
+            <hr class="saints_divider" />
+
+            <!-- World Info Assist Settings -->
+            <h4 class="saints_section_header">
+                <span class="fa-solid fa-book-atlas"></span> World Info Assist
+            </h4>
+
+            <label class="checkbox_label">
+                <input id="wia_enabled" type="checkbox" />
+                <span>Enable World Info Assist</span>
+            </label>
+
+            <label class="checkbox_label">
+                <input id="wia_debug_mode" type="checkbox" />
+                <span>WI Assist Debug Mode</span>
+            </label>
+
+            <div class="wia_prompt_section">
+                <label for="wia_prompt_textarea"><b>Prompt Template:</b></label>
+                <textarea id="wia_prompt_textarea" class="text_pole" rows="10"
+                    placeholder="Enter your World Info Assist prompt template..."></textarea>
+            </div>
+
+            <div class="wia_buttons_row">
+                <div class="menu_button" id="wia_restore_default">
+                    <span class="fa-solid fa-rotate-left"></span> Restore Default
+                </div>
+            </div>
+
         </div>
     </div>
 </div>

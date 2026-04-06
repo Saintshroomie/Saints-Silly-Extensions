@@ -460,3 +460,74 @@
     align-items: center;
     gap: 4px;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   WORLD INFO ASSIST STYLES
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Settings panel */
+#saints_silly_settings .wia_prompt_section {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+#saints_silly_settings #wia_prompt_textarea {
+    width: 100%;
+    min-height: 160px;
+    resize: vertical;
+    font-family: monospace;
+    font-size: 0.9em;
+    margin-top: 4px;
+}
+
+#saints_silly_settings .wia_buttons_row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+
+#saints_silly_settings .wia_buttons_row .menu_button {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* Per-entry assist controls injected into each WI entry form */
+.wia-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin: 6px 0 6px 0;
+}
+
+.wia-controls .wia-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    font-size: 0.85em;
+    padding: 4px 8px;
+}
+
+.wia-controls .wia-btn-assist {
+    color: var(--SmartThemeQuoteColor, #e8a23a);
+}
+
+.wia-controls .wia-btn-label {
+    font-weight: 500;
+}
+
+.wia-controls .wia-spinner {
+    color: var(--SmartThemeQuoteColor, #e8a23a);
+    font-size: 1em;
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 6px;
+}
+
+.wia-controls .wia-hidden {
+    display: none !important;
+}
