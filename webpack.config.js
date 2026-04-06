@@ -14,11 +14,14 @@ const TerserPlugin = require('terser-webpack-plugin');
  * verbatim into the output. So we just mark every `../`-prefixed request as
  * an external module and pass the request through unchanged.
  */
-const externalize = function ({ request }, callback) {
-    // Exclude node_modules helpers (e.g. css-loader runtime) — those still
-    // need to be bundled. Only host-page (SillyTavern) modules referenced via
-    // a `../` relative path get externalized.
-    if (request && request.startsWith('../') && !request.includes('node_modules')) {
+const externalize = function ({ context, request }, callback) {
+    // Exclude node_modules helpers (e.g. css-loader runtime, ajv internals) —
+    // those still need to be bundled. Only host-page (SillyTavern) modules
+    // referenced from our own source via a `../` relative path get
+    // externalized. We detect "our own source" by checking that the issuer's
+    // `context` directory isn't inside node_modules.
+    const fromNodeModules = context && context.includes(`${path.sep}node_modules${path.sep}`);
+    if (!fromNodeModules && request && request.startsWith('../') && !request.includes('node_modules')) {
         return callback(null, 'module ' + request);
     }
     callback();
