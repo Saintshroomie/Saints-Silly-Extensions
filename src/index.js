@@ -1,13 +1,14 @@
 // Saint's Silly Extensions — Possession, Phrasing, and Assisted Character Creation
 // Allows the user to "possess" a character, enrich messages with AI narration, and create characters with LLM assistance.
 
-import { renderExtensionTemplateAsync } from '../../../extensions.js';
+import './style.css';
+import settingsHtml from './settings.html';
 import {
     getContext,
     createDebugLogger,
     loadExtensionSettings,
     saveExtensionSettings,
-} from './lib/utils.js';
+} from './utils.js';
 import {
     initPossession,
     isPossessing,
@@ -25,7 +26,7 @@ import {
     onCharacterPageLoaded,
     onGroupWrapperFinished,
     showPossessionImpersonateButton,
-} from './lib/possession.js';
+} from './possession.js';
 import {
     initPhrasing,
     isPhrasing,
@@ -38,12 +39,12 @@ import {
     registerPhrasingSlashCommand,
     onGenerationStarted as phrasingGenStarted,
     onGenerationEnded as phrasingGenEnded,
-} from './lib/phrasing.js';
+} from './phrasing.js';
 import {
     initACC,
     onCharacterPageLoaded as accOnCharacterPageLoaded,
     bindACCSettings,
-} from './lib/assisted-character-creation.js';
+} from './assisted-character-creation.js';
 
 // ─── Constants ───
 
@@ -82,11 +83,10 @@ function loadSettings() {
 
 // ─── Settings Panel ───
 
-async function injectSettingsPanel() {
+function injectSettingsPanel() {
     const settingsContainer = document.getElementById('extensions_settings');
     if (!settingsContainer) return;
 
-    const settingsHtml = await renderExtensionTemplateAsync(`third-party/${EXTENSION_NAME}`, 'settings', {});
     settingsContainer.insertAdjacentHTML('beforeend', settingsHtml);
 
     bindPossessionSettings(saveSettings);
@@ -155,7 +155,7 @@ jQuery(async () => {
     initACC({ settings, saveSettings });
 
     loadPossessionState();
-    await injectSettingsPanel();
+    injectSettingsPanel();
 
     // Possession UI
     attachContinueInterceptor();
