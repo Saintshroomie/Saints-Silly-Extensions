@@ -1,6 +1,6 @@
 # Saint's Silly Extensions
 
-A [SillyTavern](https://github.com/SillyTavern/SillyTavern) third-party extension that adds three integrated roleplay tools: **Possession**, **Phrasing**, and **Assisted Character Creation**
+A [SillyTavern](https://github.com/SillyTavern/SillyTavern) third-party extension that adds four integrated roleplay tools: **Possession**, **Phrasing**, **Assisted Character Creation**, and **World Info Assist**
 
 ## Features
 
@@ -43,6 +43,17 @@ A modal-based character creator that adds an **Assist** button to SillyTavern's 
 - **Schema management** — The settings panel includes a schema selector plus Import, Export, and Delete buttons. Custom schemas are JSON files with field definitions, ordering, prompts, and default response lengths. The default schema cannot be deleted or overwritten.
 - **Generation lockout** — While any field is generating, all other field controls and the Done button are disabled to prevent overlapping requests.
 
+### World Info Assist
+
+Adds an **Assist** button to every World Info / lore book entry, letting you draft entries with LLM help directly from the entry form.
+
+- **Per-entry Assist button** — Every World Info entry form gets its own Assist button row injected above the content textarea. New entries get one automatically as soon as they're created.
+- **Title-aware priming** — If the entry has a title (the comment field), generation is primed with `[Title: ` so the model continues in the exact bracketed format. If the title is empty, generation is primed with just `[`.
+- **Guidance from the content field** — Whatever you've typed into the entry's content textarea is used as guidance for the generation, so you can sketch a rough idea and let the LLM flesh it out.
+- **Continue / Retry / Revert** — After a generation, the Assist button is replaced by Continue (extends the current entry), Retry (re-rolls from your original guidance text), and Revert (restores your original guidance text and discards the generation).
+- **Editable prompt template** — The default prompt instructs the model to emit a `[ Subject: Description ]` world lore artifact with no commentary. You can edit it freely in the settings panel and Restore Default at any time.
+- **No schema** — Unlike Assisted Character Creation, World Info Assist has no schema. The prompt itself defines the desired output format.
+
 ### How to Use Possession
 
 Possession allows you to "possess" an active character in your solo or group chat (more useful for group chats). When possessing, your messages will be sent as that character rather than your active persona.
@@ -77,6 +88,14 @@ When Possession and Phrasing are used together, you can quickly take over charac
 4. Use **Continue** to extend a generated field, **Retry** to re-roll from your original seed, or **Reset** to discard the generation.
 5. When editing an existing character, click **Import from Existing** to reverse-map the current description back into the form fields.
 6. Click **Done** to write the compiled character into SillyTavern's description and name fields, or **Cancel** to discard.
+
+### How to Use World Info Assist
+
+1. Open any World Info / lore book entry. An **Assist** button will appear above the entry's content textarea.
+2. (Optional) Type a title in the comment field at the top of the entry — it will be used to prime the generation with `[Title: `.
+3. (Optional) Type any guidance into the content textarea — keywords, a rough idea, tone, canon notes, anything you want the model to consider.
+4. Click **Assist** to generate the entry. The result is written into the content textarea and saved automatically.
+5. Click **Continue** to extend the entry, **Retry** to re-roll from your original guidance text, or **Revert** to discard the generation and restore what you originally typed.
 
 
 ## Installation
@@ -129,6 +148,15 @@ Open **Extensions** > **Saint's Silly Extensions** in SillyTavern's settings pan
 | Import Schema | Load a custom schema from a JSON file. Schemas define field labels, descriptions, ordering, prompts, and default response lengths |
 | Export Schema | Download the active schema as a JSON file |
 | Delete Schema | Remove the selected custom schema (the default schema cannot be deleted) |
+
+### World Info Assist Settings
+
+| Setting | Description |
+|---------|-------------|
+| Enable World Info Assist | Toggle the WI Assist feature and inject/remove its per-entry Assist buttons |
+| WI Assist Debug Mode | Log detailed WI Assist events, prompts, and generations to the browser console |
+| Prompt Template | Customize the prompt sent to the LLM for World Info entry generation |
+| Restore Default | Reset the prompt template back to the built-in default |
 
 ## Slash Commands
 
