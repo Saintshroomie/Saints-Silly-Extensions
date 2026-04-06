@@ -45,6 +45,12 @@ import {
     onCharacterPageLoaded as accOnCharacterPageLoaded,
     bindACCSettings,
 } from './assisted-character-creation.js';
+import {
+    initWIA,
+    startWIAObserver,
+    bindWIASettings,
+    DEFAULT_WIA_PROMPT,
+} from './world-info-assist.js';
 
 // ─── Constants ───
 
@@ -61,6 +67,9 @@ const defaultSettings = {
     accActiveSchemaName: 'Default Character Schema',
     accCustomSchemas: {},
     accProseStates: {},
+    wiaEnabled: true,
+    wiaDebugMode: false,
+    wiaPrompt: DEFAULT_WIA_PROMPT,
 };
 
 // ─── State ───
@@ -92,6 +101,7 @@ function injectSettingsPanel() {
     bindPossessionSettings(saveSettings);
     bindPhrasingSettings(saveSettings);
     bindACCSettings(saveSettings);
+    bindWIASettings(saveSettings);
 }
 
 // ─── Merged Event Handlers ───
@@ -153,9 +163,13 @@ jQuery(async () => {
         possessionApi: { isPossessing, getPossessedCharName, postPossessedMessage },
     });
     initACC({ settings, saveSettings });
+    initWIA({ settings });
 
     loadPossessionState();
     injectSettingsPanel();
+
+    // Watch the DOM for World Info entry forms and inject assist controls.
+    startWIAObserver();
 
     // Possession UI
     attachContinueInterceptor();
