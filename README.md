@@ -1,6 +1,6 @@
 # Saint's Silly Extensions
 
-A [SillyTavern](https://github.com/SillyTavern/SillyTavern) third-party extension that adds two integrated roleplay tools: **Possession** and **Phrasing**
+A [SillyTavern](https://github.com/SillyTavern/SillyTavern) third-party extension that adds three integrated roleplay tools: **Possession**, **Phrasing**, and **Assisted Character Creation**
 
 ## Features
 
@@ -28,6 +28,22 @@ Enrich your messages with LLM-generated narration, actions, and detail that stay
 - **Custom prompts** — Customize the phrasing prompt per-chat or use the default template
 - **Possession-aware** — When possessing a character, phrasing generates in that character's voice; otherwise it uses the standard ST impersonate feature
 
+### Assisted Character Creation
+
+A modal-based character creator that adds an **Assist** button to SillyTavern's character creation page, letting you build character cards field-by-field with LLM help.
+
+- **Schema-driven form** — Each field in the active schema becomes a row in the modal with its own input, controls, and per-field LLM prompt. The default schema covers Character Name, Age, Gender & Pronouns, Species/Race, Occupation, and more.
+- **Character Brief** — A top-level free-form description of your concept, setting, and key details. Used as context for every per-field generation.
+- **Per-field Assist** — Click the wand on any field to generate just that value. The field's seed text (anything you typed) and the Character Brief guide the result, and already-filled fields are passed in for consistency.
+- **Continue / Retry / Reset** — After a field generates, the Assist button becomes a Continue button (extends the current text), and Retry (re-generates from the original seed) and Reset (restores the seed text) buttons appear.
+- **Stop mid-generation** — Click the active field's button again while it's generating to stop and discard the result.
+- **Prose toggle** — Each field has a Prose checkbox. Off = brief comma-separated descriptors on a single line; On = descriptive multi-line prose. Prose state is persisted per-schema, per-field.
+- **Token override** — Each field has a per-generation max-token input that overrides the schema default for that field.
+- **Import from Existing** — When editing a character that already has a description, a button appears to reverse-map the existing description back into the form fields. Descriptions previously compiled by ACC are parsed directly from JSON; legacy prose descriptions are parsed via an LLM round-trip.
+- **Compiled output** — Clicking Done writes a structured JSON object of all filled fields into SillyTavern's description textarea, and also fills the character name field if set.
+- **Schema management** — The settings panel includes a schema selector plus Import, Export, and Delete buttons. Custom schemas are JSON files with field definitions, ordering, prompts, and default response lengths. The default schema cannot be deleted or overwritten.
+- **Generation lockout** — While any field is generating, all other field controls and the Done button are disabled to prevent overlapping requests.
+
 ### How to Use Possession
 
 Possession allows you to "possess" an active character in your solo or group chat (more useful for group chats). When possessing, your messages will be sent as that character rather than your active persona.
@@ -53,6 +69,15 @@ When Possession and Phrasing are used together, you can quickly take over charac
 1. Select a character to possess.
 2. Type a paraphrase of what you want your possessed character to do or say or feel, and press the quill button to let the LLM do the hard work.
 3. Pressing the quill button again will perform a swipe using the active message as the guiding seed.
+
+### How to Use Assisted Character Creation
+
+1. Open SillyTavern's **Create Character** page and click the **Assist** button (wand icon) in the character creation button row.
+2. Fill in the **Character Brief** at the top of the modal — a few sentences describing your concept, setting, and any anchor details.
+3. For each field, optionally type a seed (notes, keywords, partial text), then click the wand to generate a value. Toggle **Prose** if you want full sentences instead of comma-separated descriptors, or set a token override for longer/shorter output.
+4. Use **Continue** to extend a generated field, **Retry** to re-roll from your original seed, or **Reset** to discard the generation.
+5. When editing an existing character, click **Import from Existing** to reverse-map the current description back into the form fields.
+6. Click **Done** to write the compiled character into SillyTavern's description and name fields, or **Cancel** to discard.
 
 
 ## Installation
@@ -94,6 +119,17 @@ Open **Extensions** > **Saint's Silly Extensions** in SillyTavern's settings pan
 | Enable Phrasing! | Toggle the phrasing feature on/off |
 | Debug Mode | Log detailed phrasing events to the browser console |
 | Prompt Template | Customize the AI prompt used for enrichment (per-chat) |
+
+### Assisted Character Creation Settings
+
+| Setting | Description |
+|---------|-------------|
+| Enable Assisted Character Creation | Toggle the ACC feature and its Assist button on the character page |
+| ACC Debug Mode | Log detailed ACC events, prompts, and generations to the browser console |
+| Active Schema | Select which character schema drives the modal form (default or any imported custom schema) |
+| Import Schema | Load a custom schema from a JSON file. Schemas define field labels, descriptions, ordering, prompts, and default response lengths |
+| Export Schema | Download the active schema as a JSON file |
+| Delete Schema | Remove the selected custom schema (the default schema cannot be deleted) |
 
 ## Slash Commands
 
