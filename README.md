@@ -23,8 +23,7 @@ Enrich your messages with LLM-generated narration, actions, and detail that stay
   - **Empty input** — Rephrases the last message in chat, using its latest swipe as the seed text
   - **Editing a message** — Confirms the edit, then rephrases that message
   - **Text in input** — Enriches your typed text (Not Possessing: as your selected persona, Possessing: as the possessed character)
-- **Swipe mode** — Click the quill on the most recent message to create an enriched swipe variant while keeping the original
-- **Seed text reinjection** — Rephrased messages remember their original seed prompt, so if you Continue a rephrased message the seed is reinjected to guide the generation
+- **Seed text reinjection** — Rephrased messages remember their original seed prompt, so if you Continue a rephrased message the seed is reinjected to guide the continue generation
 - **Custom prompts** — Customize the phrasing prompt per-chat or use the default template
 - **Possession-aware** — When possessing a character, phrasing generates in that character's voice; otherwise it uses the standard ST impersonate feature
 
