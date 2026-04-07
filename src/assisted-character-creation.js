@@ -7,7 +7,7 @@
 
 import { generateRaw } from '../../../../../script.js';
 import { removeReasoningFromString } from '../../../../reasoning.js';
-import { createDebugLogger, getContext, toast } from './utils.js';
+import { createDebugLogger, toast } from './utils.js';
 import { DEFAULT_SCHEMA, validateSchema, getOrderedFields } from './default-character-schema.js';
 import { tryParseCharacterData } from './schema-validation.js';
 

@@ -1,24 +1,21 @@
-import * as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203__ from "../../../../../script.js";
-import * as __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd__ from "../../../../group-chats.js";
-import * as __WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc__ from "../../../../reasoning.js";
-import * as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommand_js_1b0d5616__ from "../../../../slash-commands/SlashCommand.js";
-import * as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandArgument_js_a42b9371__ from "../../../../slash-commands/SlashCommandArgument.js";
-import * as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandParser_js_42c8b851__ from "../../../../slash-commands/SlashCommandParser.js";
+import { groups as __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_groups__, selected_group as __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__ } from "../../../../group-chats.js";
+import { SlashCommandParser as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandParser_js_42c8b851_SlashCommandParser__ } from "../../../../slash-commands/SlashCommandParser.js";
+import { SlashCommand as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommand_js_1b0d5616_SlashCommand__ } from "../../../../slash-commands/SlashCommand.js";
+import { ARGUMENT_TYPE as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandArgument_js_a42b9371_ARGUMENT_TYPE__, SlashCommandArgument as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandArgument_js_a42b9371_SlashCommandArgument__ } from "../../../../slash-commands/SlashCommandArgument.js";
+import { extension_prompt_roles as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_roles__, extension_prompt_types as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_types__, generateRaw as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__, setExtensionPrompt as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_setExtensionPrompt__, substituteParams as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParams__ } from "../../../../../script.js";
+import { removeReasoningFromString as __WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__ } from "../../../../reasoning.js";
 /******/ var __webpack_modules__ = ({
 
-/***/ "./node_modules/ajv/dist/ajv.js"
-/*!**************************************!*\
-  !*** ./node_modules/ajv/dist/ajv.js ***!
-  \**************************************/
+/***/ 3282
 (module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MissingRefError = exports.ValidationError = exports.CodeGen = exports.Name = exports.nil = exports.stringify = exports.str = exports._ = exports.KeywordCxt = exports.Ajv = void 0;
-const core_1 = __webpack_require__(/*! ./core */ "./node_modules/ajv/dist/core.js");
-const draft7_1 = __webpack_require__(/*! ./vocabularies/draft7 */ "./node_modules/ajv/dist/vocabularies/draft7.js");
-const discriminator_1 = __webpack_require__(/*! ./vocabularies/discriminator */ "./node_modules/ajv/dist/vocabularies/discriminator/index.js");
-const draft7MetaSchema = __webpack_require__(/*! ./refs/json-schema-draft-07.json */ "./node_modules/ajv/dist/refs/json-schema-draft-07.json");
+const core_1 = __webpack_require__(4042);
+const draft7_1 = __webpack_require__(6144);
+const discriminator_1 = __webpack_require__(6653);
+const draft7MetaSchema = __webpack_require__(2079);
 const META_SUPPORT_DATA = ["/properties"];
 const META_SCHEMA_ID = "http://json-schema.org/draft-07/schema";
 class Ajv extends core_1.default {
@@ -48,27 +45,24 @@ module.exports = exports = Ajv;
 module.exports.Ajv = Ajv;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports["default"] = Ajv;
-var validate_1 = __webpack_require__(/*! ./compile/validate */ "./node_modules/ajv/dist/compile/validate/index.js");
+var validate_1 = __webpack_require__(2586);
 Object.defineProperty(exports, "KeywordCxt", ({ enumerable: true, get: function () { return validate_1.KeywordCxt; } }));
-var codegen_1 = __webpack_require__(/*! ./compile/codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
+var codegen_1 = __webpack_require__(9029);
 Object.defineProperty(exports, "_", ({ enumerable: true, get: function () { return codegen_1._; } }));
 Object.defineProperty(exports, "str", ({ enumerable: true, get: function () { return codegen_1.str; } }));
 Object.defineProperty(exports, "stringify", ({ enumerable: true, get: function () { return codegen_1.stringify; } }));
 Object.defineProperty(exports, "nil", ({ enumerable: true, get: function () { return codegen_1.nil; } }));
 Object.defineProperty(exports, "Name", ({ enumerable: true, get: function () { return codegen_1.Name; } }));
 Object.defineProperty(exports, "CodeGen", ({ enumerable: true, get: function () { return codegen_1.CodeGen; } }));
-var validation_error_1 = __webpack_require__(/*! ./runtime/validation_error */ "./node_modules/ajv/dist/runtime/validation_error.js");
+var validation_error_1 = __webpack_require__(3558);
 Object.defineProperty(exports, "ValidationError", ({ enumerable: true, get: function () { return validation_error_1.default; } }));
-var ref_error_1 = __webpack_require__(/*! ./compile/ref_error */ "./node_modules/ajv/dist/compile/ref_error.js");
+var ref_error_1 = __webpack_require__(4551);
 Object.defineProperty(exports, "MissingRefError", ({ enumerable: true, get: function () { return ref_error_1.default; } }));
 //# sourceMappingURL=ajv.js.map
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/compile/codegen/code.js"
-/*!*******************************************************!*\
-  !*** ./node_modules/ajv/dist/compile/codegen/code.js ***!
-  \*******************************************************/
+/***/ 1520
 (__unused_webpack_module, exports) {
 
 
@@ -230,18 +224,15 @@ exports.regexpCode = regexpCode;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/compile/codegen/index.js"
-/*!********************************************************!*\
-  !*** ./node_modules/ajv/dist/compile/codegen/index.js ***!
-  \********************************************************/
+/***/ 9029
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.or = exports.and = exports.not = exports.CodeGen = exports.operators = exports.varKinds = exports.ValueScopeName = exports.ValueScope = exports.Scope = exports.Name = exports.regexpCode = exports.stringify = exports.getProperty = exports.nil = exports.strConcat = exports.str = exports._ = void 0;
-const code_1 = __webpack_require__(/*! ./code */ "./node_modules/ajv/dist/compile/codegen/code.js");
-const scope_1 = __webpack_require__(/*! ./scope */ "./node_modules/ajv/dist/compile/codegen/scope.js");
-var code_2 = __webpack_require__(/*! ./code */ "./node_modules/ajv/dist/compile/codegen/code.js");
+const code_1 = __webpack_require__(1520);
+const scope_1 = __webpack_require__(7845);
+var code_2 = __webpack_require__(1520);
 Object.defineProperty(exports, "_", ({ enumerable: true, get: function () { return code_2._; } }));
 Object.defineProperty(exports, "str", ({ enumerable: true, get: function () { return code_2.str; } }));
 Object.defineProperty(exports, "strConcat", ({ enumerable: true, get: function () { return code_2.strConcat; } }));
@@ -250,7 +241,7 @@ Object.defineProperty(exports, "getProperty", ({ enumerable: true, get: function
 Object.defineProperty(exports, "stringify", ({ enumerable: true, get: function () { return code_2.stringify; } }));
 Object.defineProperty(exports, "regexpCode", ({ enumerable: true, get: function () { return code_2.regexpCode; } }));
 Object.defineProperty(exports, "Name", ({ enumerable: true, get: function () { return code_2.Name; } }));
-var scope_2 = __webpack_require__(/*! ./scope */ "./node_modules/ajv/dist/compile/codegen/scope.js");
+var scope_2 = __webpack_require__(7845);
 Object.defineProperty(exports, "Scope", ({ enumerable: true, get: function () { return scope_2.Scope; } }));
 Object.defineProperty(exports, "ValueScope", ({ enumerable: true, get: function () { return scope_2.ValueScope; } }));
 Object.defineProperty(exports, "ValueScopeName", ({ enumerable: true, get: function () { return scope_2.ValueScopeName; } }));
@@ -936,16 +927,13 @@ function par(x) {
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/compile/codegen/scope.js"
-/*!********************************************************!*\
-  !*** ./node_modules/ajv/dist/compile/codegen/scope.js ***!
-  \********************************************************/
+/***/ 7845
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ValueScope = exports.ValueScopeName = exports.Scope = exports.varKinds = exports.UsedValueState = void 0;
-const code_1 = __webpack_require__(/*! ./code */ "./node_modules/ajv/dist/compile/codegen/code.js");
+const code_1 = __webpack_require__(1520);
 class ValueError extends Error {
     constructor(name) {
         super(`CodeGen: "code" for ${name} not defined`);
@@ -1088,18 +1076,15 @@ exports.ValueScope = ValueScope;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/compile/errors.js"
-/*!*************************************************!*\
-  !*** ./node_modules/ajv/dist/compile/errors.js ***!
-  \*************************************************/
+/***/ 8708
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.extendErrors = exports.resetErrorsCount = exports.reportExtraError = exports.reportError = exports.keyword$DataError = exports.keywordError = void 0;
-const codegen_1 = __webpack_require__(/*! ./codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
-const util_1 = __webpack_require__(/*! ./util */ "./node_modules/ajv/dist/compile/util.js");
-const names_1 = __webpack_require__(/*! ./names */ "./node_modules/ajv/dist/compile/names.js");
+const codegen_1 = __webpack_require__(9029);
+const util_1 = __webpack_require__(4227);
+const names_1 = __webpack_require__(2023);
 exports.keywordError = {
     message: ({ keyword }) => (0, codegen_1.str) `must pass "${keyword}" keyword validation`,
 };
@@ -1220,21 +1205,18 @@ function extraErrorProps(cxt, { params, message }, keyValues) {
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/compile/index.js"
-/*!************************************************!*\
-  !*** ./node_modules/ajv/dist/compile/index.js ***!
-  \************************************************/
+/***/ 3835
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.resolveSchema = exports.getCompilingSchema = exports.resolveRef = exports.compileSchema = exports.SchemaEnv = void 0;
-const codegen_1 = __webpack_require__(/*! ./codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
-const validation_error_1 = __webpack_require__(/*! ../runtime/validation_error */ "./node_modules/ajv/dist/runtime/validation_error.js");
-const names_1 = __webpack_require__(/*! ./names */ "./node_modules/ajv/dist/compile/names.js");
-const resolve_1 = __webpack_require__(/*! ./resolve */ "./node_modules/ajv/dist/compile/resolve.js");
-const util_1 = __webpack_require__(/*! ./util */ "./node_modules/ajv/dist/compile/util.js");
-const validate_1 = __webpack_require__(/*! ./validate */ "./node_modules/ajv/dist/compile/validate/index.js");
+const codegen_1 = __webpack_require__(9029);
+const validation_error_1 = __webpack_require__(3558);
+const names_1 = __webpack_require__(2023);
+const resolve_1 = __webpack_require__(6939);
+const util_1 = __webpack_require__(4227);
+const validate_1 = __webpack_require__(2586);
 class SchemaEnv {
     constructor(env) {
         var _a;
@@ -1471,15 +1453,12 @@ function getJsonPointer(parsedRef, { baseId, schema, root }) {
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/compile/names.js"
-/*!************************************************!*\
-  !*** ./node_modules/ajv/dist/compile/names.js ***!
-  \************************************************/
+/***/ 2023
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __webpack_require__(/*! ./codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
+const codegen_1 = __webpack_require__(9029);
 const names = {
     // validation function arguments
     data: new codegen_1.Name("data"), // data passed to validation function
@@ -1508,15 +1487,12 @@ exports["default"] = names;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/compile/ref_error.js"
-/*!****************************************************!*\
-  !*** ./node_modules/ajv/dist/compile/ref_error.js ***!
-  \****************************************************/
+/***/ 4551
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const resolve_1 = __webpack_require__(/*! ./resolve */ "./node_modules/ajv/dist/compile/resolve.js");
+const resolve_1 = __webpack_require__(6939);
 class MissingRefError extends Error {
     constructor(resolver, baseId, ref, msg) {
         super(msg || `can't resolve reference ${ref} from id ${baseId}`);
@@ -1529,18 +1505,15 @@ exports["default"] = MissingRefError;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/compile/resolve.js"
-/*!**************************************************!*\
-  !*** ./node_modules/ajv/dist/compile/resolve.js ***!
-  \**************************************************/
+/***/ 6939
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getSchemaRefs = exports.resolveUrl = exports.normalizeId = exports._getFullPath = exports.getFullPath = exports.inlineRef = void 0;
-const util_1 = __webpack_require__(/*! ./util */ "./node_modules/ajv/dist/compile/util.js");
-const equal = __webpack_require__(/*! fast-deep-equal */ "./node_modules/fast-deep-equal/index.js");
-const traverse = __webpack_require__(/*! json-schema-traverse */ "./node_modules/json-schema-traverse/index.js");
+const util_1 = __webpack_require__(4227);
+const equal = __webpack_require__(2017);
+const traverse = __webpack_require__(7106);
 // TODO refactor to use keyword definitions
 const SIMPLE_INLINED = new Set([
     "type",
@@ -1693,10 +1666,7 @@ exports.getSchemaRefs = getSchemaRefs;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/compile/rules.js"
-/*!************************************************!*\
-  !*** ./node_modules/ajv/dist/compile/rules.js ***!
-  \************************************************/
+/***/ 396
 (__unused_webpack_module, exports) {
 
 
@@ -1728,17 +1698,14 @@ exports.getRules = getRules;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/compile/util.js"
-/*!***********************************************!*\
-  !*** ./node_modules/ajv/dist/compile/util.js ***!
-  \***********************************************/
+/***/ 4227
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.checkStrictMode = exports.getErrorPath = exports.Type = exports.useFunc = exports.setEvaluated = exports.evaluatedPropsToName = exports.mergeEvaluated = exports.eachItem = exports.unescapeJsonPointer = exports.escapeJsonPointer = exports.escapeFragment = exports.unescapeFragment = exports.schemaRefOrVal = exports.schemaHasRulesButRef = exports.schemaHasRules = exports.checkUnknownRules = exports.alwaysValidSchema = exports.toHash = void 0;
-const codegen_1 = __webpack_require__(/*! ./codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
-const code_1 = __webpack_require__(/*! ./codegen/code */ "./node_modules/ajv/dist/compile/codegen/code.js");
+const codegen_1 = __webpack_require__(9029);
+const code_1 = __webpack_require__(1520);
 // TODO refactor to use Set
 function toHash(arr) {
     const hash = {};
@@ -1915,10 +1882,7 @@ exports.checkStrictMode = checkStrictMode;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/compile/validate/applicability.js"
-/*!*****************************************************************!*\
-  !*** ./node_modules/ajv/dist/compile/validate/applicability.js ***!
-  \*****************************************************************/
+/***/ 7887
 (__unused_webpack_module, exports) {
 
 
@@ -1943,18 +1907,15 @@ exports.shouldUseRule = shouldUseRule;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/compile/validate/boolSchema.js"
-/*!**************************************************************!*\
-  !*** ./node_modules/ajv/dist/compile/validate/boolSchema.js ***!
-  \**************************************************************/
+/***/ 8727
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.boolOrEmptySchema = exports.topBoolOrEmptySchema = void 0;
-const errors_1 = __webpack_require__(/*! ../errors */ "./node_modules/ajv/dist/compile/errors.js");
-const codegen_1 = __webpack_require__(/*! ../codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
-const names_1 = __webpack_require__(/*! ../names */ "./node_modules/ajv/dist/compile/names.js");
+const errors_1 = __webpack_require__(8708);
+const codegen_1 = __webpack_require__(9029);
+const names_1 = __webpack_require__(2023);
 const boolError = {
     message: "boolean schema is false",
 };
@@ -2002,20 +1963,17 @@ function falseSchemaError(it, overrideAllErrors) {
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/compile/validate/dataType.js"
-/*!************************************************************!*\
-  !*** ./node_modules/ajv/dist/compile/validate/dataType.js ***!
-  \************************************************************/
+/***/ 208
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.reportTypeError = exports.checkDataTypes = exports.checkDataType = exports.coerceAndCheckDataType = exports.getJSONTypes = exports.getSchemaTypes = exports.DataType = void 0;
-const rules_1 = __webpack_require__(/*! ../rules */ "./node_modules/ajv/dist/compile/rules.js");
-const applicability_1 = __webpack_require__(/*! ./applicability */ "./node_modules/ajv/dist/compile/validate/applicability.js");
-const errors_1 = __webpack_require__(/*! ../errors */ "./node_modules/ajv/dist/compile/errors.js");
-const codegen_1 = __webpack_require__(/*! ../codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
-const util_1 = __webpack_require__(/*! ../util */ "./node_modules/ajv/dist/compile/util.js");
+const rules_1 = __webpack_require__(396);
+const applicability_1 = __webpack_require__(7887);
+const errors_1 = __webpack_require__(8708);
+const codegen_1 = __webpack_require__(9029);
+const util_1 = __webpack_require__(4227);
 var DataType;
 (function (DataType) {
     DataType[DataType["Correct"] = 0] = "Correct";
@@ -2214,17 +2172,14 @@ function getTypeErrorContext(it) {
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/compile/validate/defaults.js"
-/*!************************************************************!*\
-  !*** ./node_modules/ajv/dist/compile/validate/defaults.js ***!
-  \************************************************************/
+/***/ 7870
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.assignDefaults = void 0;
-const codegen_1 = __webpack_require__(/*! ../codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
-const util_1 = __webpack_require__(/*! ../util */ "./node_modules/ajv/dist/compile/util.js");
+const codegen_1 = __webpack_require__(9029);
+const util_1 = __webpack_require__(4227);
 function assignDefaults(it, ty) {
     const { properties, items } = it.schema;
     if (ty === "object" && properties) {
@@ -2258,27 +2213,24 @@ function assignDefault(it, prop, defaultValue) {
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/compile/validate/index.js"
-/*!*********************************************************!*\
-  !*** ./node_modules/ajv/dist/compile/validate/index.js ***!
-  \*********************************************************/
+/***/ 2586
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getData = exports.KeywordCxt = exports.validateFunctionCode = void 0;
-const boolSchema_1 = __webpack_require__(/*! ./boolSchema */ "./node_modules/ajv/dist/compile/validate/boolSchema.js");
-const dataType_1 = __webpack_require__(/*! ./dataType */ "./node_modules/ajv/dist/compile/validate/dataType.js");
-const applicability_1 = __webpack_require__(/*! ./applicability */ "./node_modules/ajv/dist/compile/validate/applicability.js");
-const dataType_2 = __webpack_require__(/*! ./dataType */ "./node_modules/ajv/dist/compile/validate/dataType.js");
-const defaults_1 = __webpack_require__(/*! ./defaults */ "./node_modules/ajv/dist/compile/validate/defaults.js");
-const keyword_1 = __webpack_require__(/*! ./keyword */ "./node_modules/ajv/dist/compile/validate/keyword.js");
-const subschema_1 = __webpack_require__(/*! ./subschema */ "./node_modules/ajv/dist/compile/validate/subschema.js");
-const codegen_1 = __webpack_require__(/*! ../codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
-const names_1 = __webpack_require__(/*! ../names */ "./node_modules/ajv/dist/compile/names.js");
-const resolve_1 = __webpack_require__(/*! ../resolve */ "./node_modules/ajv/dist/compile/resolve.js");
-const util_1 = __webpack_require__(/*! ../util */ "./node_modules/ajv/dist/compile/util.js");
-const errors_1 = __webpack_require__(/*! ../errors */ "./node_modules/ajv/dist/compile/errors.js");
+const boolSchema_1 = __webpack_require__(8727);
+const dataType_1 = __webpack_require__(208);
+const applicability_1 = __webpack_require__(7887);
+const dataType_2 = __webpack_require__(208);
+const defaults_1 = __webpack_require__(7870);
+const keyword_1 = __webpack_require__(3673);
+const subschema_1 = __webpack_require__(4495);
+const codegen_1 = __webpack_require__(9029);
+const names_1 = __webpack_require__(2023);
+const resolve_1 = __webpack_require__(6939);
+const util_1 = __webpack_require__(4227);
+const errors_1 = __webpack_require__(8708);
 // schema compilation - generates validation function, subschemaCode (below) is used for subschemas
 function validateFunctionCode(it) {
     if (isSchemaObj(it)) {
@@ -2787,19 +2739,16 @@ exports.getData = getData;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/compile/validate/keyword.js"
-/*!***********************************************************!*\
-  !*** ./node_modules/ajv/dist/compile/validate/keyword.js ***!
-  \***********************************************************/
+/***/ 3673
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.validateKeywordUsage = exports.validSchemaType = exports.funcKeywordCode = exports.macroKeywordCode = void 0;
-const codegen_1 = __webpack_require__(/*! ../codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
-const names_1 = __webpack_require__(/*! ../names */ "./node_modules/ajv/dist/compile/names.js");
-const code_1 = __webpack_require__(/*! ../../vocabularies/code */ "./node_modules/ajv/dist/vocabularies/code.js");
-const errors_1 = __webpack_require__(/*! ../errors */ "./node_modules/ajv/dist/compile/errors.js");
+const codegen_1 = __webpack_require__(9029);
+const names_1 = __webpack_require__(2023);
+const code_1 = __webpack_require__(5765);
+const errors_1 = __webpack_require__(8708);
 function macroKeywordCode(cxt, def) {
     const { gen, keyword, schema, parentSchema, it } = cxt;
     const macroSchema = def.macro.call(it.self, schema, parentSchema, it);
@@ -2920,17 +2869,14 @@ exports.validateKeywordUsage = validateKeywordUsage;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/compile/validate/subschema.js"
-/*!*************************************************************!*\
-  !*** ./node_modules/ajv/dist/compile/validate/subschema.js ***!
-  \*************************************************************/
+/***/ 4495
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.extendSubschemaMode = exports.extendSubschemaData = exports.getSubschema = void 0;
-const codegen_1 = __webpack_require__(/*! ../codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
-const util_1 = __webpack_require__(/*! ../util */ "./node_modules/ajv/dist/compile/util.js");
+const codegen_1 = __webpack_require__(9029);
+const util_1 = __webpack_require__(4227);
 function getSubschema(it, { keyword, schemaProp, schema, schemaPath, errSchemaPath, topSchemaRef }) {
     if (keyword !== undefined && schema !== undefined) {
         throw new Error('both "keyword" and "schema" passed, only one allowed');
@@ -3010,34 +2956,31 @@ exports.extendSubschemaMode = extendSubschemaMode;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/core.js"
-/*!***************************************!*\
-  !*** ./node_modules/ajv/dist/core.js ***!
-  \***************************************/
+/***/ 4042
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CodeGen = exports.Name = exports.nil = exports.stringify = exports.str = exports._ = exports.KeywordCxt = void 0;
-var validate_1 = __webpack_require__(/*! ./compile/validate */ "./node_modules/ajv/dist/compile/validate/index.js");
+var validate_1 = __webpack_require__(2586);
 Object.defineProperty(exports, "KeywordCxt", ({ enumerable: true, get: function () { return validate_1.KeywordCxt; } }));
-var codegen_1 = __webpack_require__(/*! ./compile/codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
+var codegen_1 = __webpack_require__(9029);
 Object.defineProperty(exports, "_", ({ enumerable: true, get: function () { return codegen_1._; } }));
 Object.defineProperty(exports, "str", ({ enumerable: true, get: function () { return codegen_1.str; } }));
 Object.defineProperty(exports, "stringify", ({ enumerable: true, get: function () { return codegen_1.stringify; } }));
 Object.defineProperty(exports, "nil", ({ enumerable: true, get: function () { return codegen_1.nil; } }));
 Object.defineProperty(exports, "Name", ({ enumerable: true, get: function () { return codegen_1.Name; } }));
 Object.defineProperty(exports, "CodeGen", ({ enumerable: true, get: function () { return codegen_1.CodeGen; } }));
-const validation_error_1 = __webpack_require__(/*! ./runtime/validation_error */ "./node_modules/ajv/dist/runtime/validation_error.js");
-const ref_error_1 = __webpack_require__(/*! ./compile/ref_error */ "./node_modules/ajv/dist/compile/ref_error.js");
-const rules_1 = __webpack_require__(/*! ./compile/rules */ "./node_modules/ajv/dist/compile/rules.js");
-const compile_1 = __webpack_require__(/*! ./compile */ "./node_modules/ajv/dist/compile/index.js");
-const codegen_2 = __webpack_require__(/*! ./compile/codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
-const resolve_1 = __webpack_require__(/*! ./compile/resolve */ "./node_modules/ajv/dist/compile/resolve.js");
-const dataType_1 = __webpack_require__(/*! ./compile/validate/dataType */ "./node_modules/ajv/dist/compile/validate/dataType.js");
-const util_1 = __webpack_require__(/*! ./compile/util */ "./node_modules/ajv/dist/compile/util.js");
-const $dataRefSchema = __webpack_require__(/*! ./refs/data.json */ "./node_modules/ajv/dist/refs/data.json");
-const uri_1 = __webpack_require__(/*! ./runtime/uri */ "./node_modules/ajv/dist/runtime/uri.js");
+const validation_error_1 = __webpack_require__(3558);
+const ref_error_1 = __webpack_require__(4551);
+const rules_1 = __webpack_require__(396);
+const compile_1 = __webpack_require__(3835);
+const codegen_2 = __webpack_require__(9029);
+const resolve_1 = __webpack_require__(6939);
+const dataType_1 = __webpack_require__(208);
+const util_1 = __webpack_require__(4227);
+const $dataRefSchema = __webpack_require__(3837);
+const uri_1 = __webpack_require__(5944);
 const defaultRegExp = (str, flags) => new RegExp(str, flags);
 defaultRegExp.code = "new RegExp";
 const META_IGNORE_OPTIONS = ["removeAdditional", "useDefaults", "coerceTypes"];
@@ -3637,26 +3580,20 @@ function schemaOrData(schema) {
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/runtime/equal.js"
-/*!************************************************!*\
-  !*** ./node_modules/ajv/dist/runtime/equal.js ***!
-  \************************************************/
+/***/ 6250
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 // https://github.com/ajv-validator/ajv/issues/889
-const equal = __webpack_require__(/*! fast-deep-equal */ "./node_modules/fast-deep-equal/index.js");
+const equal = __webpack_require__(2017);
 equal.code = 'require("ajv/dist/runtime/equal").default';
 exports["default"] = equal;
 //# sourceMappingURL=equal.js.map
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/runtime/ucs2length.js"
-/*!*****************************************************!*\
-  !*** ./node_modules/ajv/dist/runtime/ucs2length.js ***!
-  \*****************************************************/
+/***/ 3853
 (__unused_webpack_module, exports) {
 
 
@@ -3686,25 +3623,19 @@ ucs2length.code = 'require("ajv/dist/runtime/ucs2length").default';
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/runtime/uri.js"
-/*!**********************************************!*\
-  !*** ./node_modules/ajv/dist/runtime/uri.js ***!
-  \**********************************************/
+/***/ 5944
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const uri = __webpack_require__(/*! fast-uri */ "./node_modules/fast-uri/index.js");
+const uri = __webpack_require__(8343);
 uri.code = 'require("ajv/dist/runtime/uri").default';
 exports["default"] = uri;
 //# sourceMappingURL=uri.js.map
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/runtime/validation_error.js"
-/*!***********************************************************!*\
-  !*** ./node_modules/ajv/dist/runtime/validation_error.js ***!
-  \***********************************************************/
+/***/ 3558
 (__unused_webpack_module, exports) {
 
 
@@ -3721,17 +3652,14 @@ exports["default"] = ValidationError;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/applicator/additionalItems.js"
-/*!**************************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/applicator/additionalItems.js ***!
-  \**************************************************************************/
+/***/ 5457
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.validateAdditionalItems = void 0;
-const codegen_1 = __webpack_require__(/*! ../../compile/codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
-const util_1 = __webpack_require__(/*! ../../compile/util */ "./node_modules/ajv/dist/compile/util.js");
+const codegen_1 = __webpack_require__(9029);
+const util_1 = __webpack_require__(4227);
 const error = {
     message: ({ params: { len } }) => (0, codegen_1.str) `must NOT have more than ${len} items`,
     params: ({ params: { len } }) => (0, codegen_1._) `{limit: ${len}}`,
@@ -3779,18 +3707,15 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/applicator/additionalProperties.js"
-/*!*******************************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/applicator/additionalProperties.js ***!
-  \*******************************************************************************/
+/***/ 8660
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const code_1 = __webpack_require__(/*! ../code */ "./node_modules/ajv/dist/vocabularies/code.js");
-const codegen_1 = __webpack_require__(/*! ../../compile/codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
-const names_1 = __webpack_require__(/*! ../../compile/names */ "./node_modules/ajv/dist/compile/names.js");
-const util_1 = __webpack_require__(/*! ../../compile/util */ "./node_modules/ajv/dist/compile/util.js");
+const code_1 = __webpack_require__(5765);
+const codegen_1 = __webpack_require__(9029);
+const names_1 = __webpack_require__(2023);
+const util_1 = __webpack_require__(4227);
 const error = {
     message: "must NOT have additional properties",
     params: ({ params }) => (0, codegen_1._) `{additionalProperty: ${params.additionalProperty}}`,
@@ -3894,15 +3819,12 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/applicator/allOf.js"
-/*!****************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/applicator/allOf.js ***!
-  \****************************************************************/
+/***/ 5844
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const util_1 = __webpack_require__(/*! ../../compile/util */ "./node_modules/ajv/dist/compile/util.js");
+const util_1 = __webpack_require__(4227);
 const def = {
     keyword: "allOf",
     schemaType: "array",
@@ -3926,15 +3848,12 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/applicator/anyOf.js"
-/*!****************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/applicator/anyOf.js ***!
-  \****************************************************************/
+/***/ 6505
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const code_1 = __webpack_require__(/*! ../code */ "./node_modules/ajv/dist/vocabularies/code.js");
+const code_1 = __webpack_require__(5765);
 const def = {
     keyword: "anyOf",
     schemaType: "array",
@@ -3947,16 +3866,13 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/applicator/contains.js"
-/*!*******************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/applicator/contains.js ***!
-  \*******************************************************************/
+/***/ 2661
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __webpack_require__(/*! ../../compile/codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
-const util_1 = __webpack_require__(/*! ../../compile/util */ "./node_modules/ajv/dist/compile/util.js");
+const codegen_1 = __webpack_require__(9029);
+const util_1 = __webpack_require__(4227);
 const error = {
     message: ({ params: { min, max } }) => max === undefined
         ? (0, codegen_1.str) `must contain at least ${min} valid item(s)`
@@ -4051,18 +3967,15 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/applicator/dependencies.js"
-/*!***********************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/applicator/dependencies.js ***!
-  \***********************************************************************/
+/***/ 3025
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.validateSchemaDeps = exports.validatePropertyDeps = exports.error = void 0;
-const codegen_1 = __webpack_require__(/*! ../../compile/codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
-const util_1 = __webpack_require__(/*! ../../compile/util */ "./node_modules/ajv/dist/compile/util.js");
-const code_1 = __webpack_require__(/*! ../code */ "./node_modules/ajv/dist/vocabularies/code.js");
+const codegen_1 = __webpack_require__(9029);
+const util_1 = __webpack_require__(4227);
+const code_1 = __webpack_require__(5765);
 exports.error = {
     message: ({ params: { property, depsCount, deps } }) => {
         const property_ies = depsCount === 1 ? "property" : "properties";
@@ -4145,16 +4058,13 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/applicator/if.js"
-/*!*************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/applicator/if.js ***!
-  \*************************************************************/
+/***/ 1239
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __webpack_require__(/*! ../../compile/codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
-const util_1 = __webpack_require__(/*! ../../compile/util */ "./node_modules/ajv/dist/compile/util.js");
+const codegen_1 = __webpack_require__(9029);
+const util_1 = __webpack_require__(4227);
 const error = {
     message: ({ params }) => (0, codegen_1.str) `must match "${params.ifClause}" schema`,
     params: ({ params }) => (0, codegen_1._) `{failingKeyword: ${params.ifClause}}`,
@@ -4220,30 +4130,27 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/applicator/index.js"
-/*!****************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/applicator/index.js ***!
-  \****************************************************************/
+/***/ 6378
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const additionalItems_1 = __webpack_require__(/*! ./additionalItems */ "./node_modules/ajv/dist/vocabularies/applicator/additionalItems.js");
-const prefixItems_1 = __webpack_require__(/*! ./prefixItems */ "./node_modules/ajv/dist/vocabularies/applicator/prefixItems.js");
-const items_1 = __webpack_require__(/*! ./items */ "./node_modules/ajv/dist/vocabularies/applicator/items.js");
-const items2020_1 = __webpack_require__(/*! ./items2020 */ "./node_modules/ajv/dist/vocabularies/applicator/items2020.js");
-const contains_1 = __webpack_require__(/*! ./contains */ "./node_modules/ajv/dist/vocabularies/applicator/contains.js");
-const dependencies_1 = __webpack_require__(/*! ./dependencies */ "./node_modules/ajv/dist/vocabularies/applicator/dependencies.js");
-const propertyNames_1 = __webpack_require__(/*! ./propertyNames */ "./node_modules/ajv/dist/vocabularies/applicator/propertyNames.js");
-const additionalProperties_1 = __webpack_require__(/*! ./additionalProperties */ "./node_modules/ajv/dist/vocabularies/applicator/additionalProperties.js");
-const properties_1 = __webpack_require__(/*! ./properties */ "./node_modules/ajv/dist/vocabularies/applicator/properties.js");
-const patternProperties_1 = __webpack_require__(/*! ./patternProperties */ "./node_modules/ajv/dist/vocabularies/applicator/patternProperties.js");
-const not_1 = __webpack_require__(/*! ./not */ "./node_modules/ajv/dist/vocabularies/applicator/not.js");
-const anyOf_1 = __webpack_require__(/*! ./anyOf */ "./node_modules/ajv/dist/vocabularies/applicator/anyOf.js");
-const oneOf_1 = __webpack_require__(/*! ./oneOf */ "./node_modules/ajv/dist/vocabularies/applicator/oneOf.js");
-const allOf_1 = __webpack_require__(/*! ./allOf */ "./node_modules/ajv/dist/vocabularies/applicator/allOf.js");
-const if_1 = __webpack_require__(/*! ./if */ "./node_modules/ajv/dist/vocabularies/applicator/if.js");
-const thenElse_1 = __webpack_require__(/*! ./thenElse */ "./node_modules/ajv/dist/vocabularies/applicator/thenElse.js");
+const additionalItems_1 = __webpack_require__(5457);
+const prefixItems_1 = __webpack_require__(5354);
+const items_1 = __webpack_require__(494);
+const items2020_1 = __webpack_require__(3966);
+const contains_1 = __webpack_require__(2661);
+const dependencies_1 = __webpack_require__(3025);
+const propertyNames_1 = __webpack_require__(9713);
+const additionalProperties_1 = __webpack_require__(8660);
+const properties_1 = __webpack_require__(117);
+const patternProperties_1 = __webpack_require__(5333);
+const not_1 = __webpack_require__(7923);
+const anyOf_1 = __webpack_require__(6505);
+const oneOf_1 = __webpack_require__(6163);
+const allOf_1 = __webpack_require__(5844);
+const if_1 = __webpack_require__(1239);
+const thenElse_1 = __webpack_require__(4426);
 function getApplicator(draft2020 = false) {
     const applicator = [
         // any
@@ -4273,18 +4180,15 @@ exports["default"] = getApplicator;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/applicator/items.js"
-/*!****************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/applicator/items.js ***!
-  \****************************************************************/
+/***/ 494
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.validateTuple = void 0;
-const codegen_1 = __webpack_require__(/*! ../../compile/codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
-const util_1 = __webpack_require__(/*! ../../compile/util */ "./node_modules/ajv/dist/compile/util.js");
-const code_1 = __webpack_require__(/*! ../code */ "./node_modules/ajv/dist/vocabularies/code.js");
+const codegen_1 = __webpack_require__(9029);
+const util_1 = __webpack_require__(4227);
+const code_1 = __webpack_require__(5765);
 const def = {
     keyword: "items",
     type: "array",
@@ -4334,18 +4238,15 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/applicator/items2020.js"
-/*!********************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/applicator/items2020.js ***!
-  \********************************************************************/
+/***/ 3966
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __webpack_require__(/*! ../../compile/codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
-const util_1 = __webpack_require__(/*! ../../compile/util */ "./node_modules/ajv/dist/compile/util.js");
-const code_1 = __webpack_require__(/*! ../code */ "./node_modules/ajv/dist/vocabularies/code.js");
-const additionalItems_1 = __webpack_require__(/*! ./additionalItems */ "./node_modules/ajv/dist/vocabularies/applicator/additionalItems.js");
+const codegen_1 = __webpack_require__(9029);
+const util_1 = __webpack_require__(4227);
+const code_1 = __webpack_require__(5765);
+const additionalItems_1 = __webpack_require__(5457);
 const error = {
     message: ({ params: { len } }) => (0, codegen_1.str) `must NOT have more than ${len} items`,
     params: ({ params: { len } }) => (0, codegen_1._) `{limit: ${len}}`,
@@ -4373,15 +4274,12 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/applicator/not.js"
-/*!**************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/applicator/not.js ***!
-  \**************************************************************/
+/***/ 7923
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const util_1 = __webpack_require__(/*! ../../compile/util */ "./node_modules/ajv/dist/compile/util.js");
+const util_1 = __webpack_require__(4227);
 const def = {
     keyword: "not",
     schemaType: ["object", "boolean"],
@@ -4408,16 +4306,13 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/applicator/oneOf.js"
-/*!****************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/applicator/oneOf.js ***!
-  \****************************************************************/
+/***/ 6163
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __webpack_require__(/*! ../../compile/codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
-const util_1 = __webpack_require__(/*! ../../compile/util */ "./node_modules/ajv/dist/compile/util.js");
+const codegen_1 = __webpack_require__(9029);
+const util_1 = __webpack_require__(4227);
 const error = {
     message: "must match exactly one schema in oneOf",
     params: ({ params }) => (0, codegen_1._) `{passingSchemas: ${params.passing}}`,
@@ -4477,18 +4372,15 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/applicator/patternProperties.js"
-/*!****************************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/applicator/patternProperties.js ***!
-  \****************************************************************************/
+/***/ 5333
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const code_1 = __webpack_require__(/*! ../code */ "./node_modules/ajv/dist/vocabularies/code.js");
-const codegen_1 = __webpack_require__(/*! ../../compile/codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
-const util_1 = __webpack_require__(/*! ../../compile/util */ "./node_modules/ajv/dist/compile/util.js");
-const util_2 = __webpack_require__(/*! ../../compile/util */ "./node_modules/ajv/dist/compile/util.js");
+const code_1 = __webpack_require__(5765);
+const codegen_1 = __webpack_require__(9029);
+const util_1 = __webpack_require__(4227);
+const util_2 = __webpack_require__(4227);
 const def = {
     keyword: "patternProperties",
     type: "object",
@@ -4561,15 +4453,12 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/applicator/prefixItems.js"
-/*!**********************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/applicator/prefixItems.js ***!
-  \**********************************************************************/
+/***/ 5354
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const items_1 = __webpack_require__(/*! ./items */ "./node_modules/ajv/dist/vocabularies/applicator/items.js");
+const items_1 = __webpack_require__(494);
 const def = {
     keyword: "prefixItems",
     type: "array",
@@ -4582,18 +4471,15 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/applicator/properties.js"
-/*!*********************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/applicator/properties.js ***!
-  \*********************************************************************/
+/***/ 117
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const validate_1 = __webpack_require__(/*! ../../compile/validate */ "./node_modules/ajv/dist/compile/validate/index.js");
-const code_1 = __webpack_require__(/*! ../code */ "./node_modules/ajv/dist/vocabularies/code.js");
-const util_1 = __webpack_require__(/*! ../../compile/util */ "./node_modules/ajv/dist/compile/util.js");
-const additionalProperties_1 = __webpack_require__(/*! ./additionalProperties */ "./node_modules/ajv/dist/vocabularies/applicator/additionalProperties.js");
+const validate_1 = __webpack_require__(2586);
+const code_1 = __webpack_require__(5765);
+const util_1 = __webpack_require__(4227);
+const additionalProperties_1 = __webpack_require__(8660);
 const def = {
     keyword: "properties",
     type: "object",
@@ -4645,16 +4531,13 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/applicator/propertyNames.js"
-/*!************************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/applicator/propertyNames.js ***!
-  \************************************************************************/
+/***/ 9713
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __webpack_require__(/*! ../../compile/codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
-const util_1 = __webpack_require__(/*! ../../compile/util */ "./node_modules/ajv/dist/compile/util.js");
+const codegen_1 = __webpack_require__(9029);
+const util_1 = __webpack_require__(4227);
 const error = {
     message: "property name must be valid",
     params: ({ params }) => (0, codegen_1._) `{propertyName: ${params.propertyName}}`,
@@ -4692,15 +4575,12 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/applicator/thenElse.js"
-/*!*******************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/applicator/thenElse.js ***!
-  \*******************************************************************/
+/***/ 4426
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const util_1 = __webpack_require__(/*! ../../compile/util */ "./node_modules/ajv/dist/compile/util.js");
+const util_1 = __webpack_require__(4227);
 const def = {
     keyword: ["then", "else"],
     schemaType: ["object", "boolean"],
@@ -4714,19 +4594,16 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/code.js"
-/*!****************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/code.js ***!
-  \****************************************************/
+/***/ 5765
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.validateUnion = exports.validateArray = exports.usePattern = exports.callValidateCode = exports.schemaProperties = exports.allSchemaProperties = exports.noPropertyInData = exports.propertyInData = exports.isOwnProperty = exports.hasPropFunc = exports.reportMissingProp = exports.checkMissingProp = exports.checkReportMissingProp = void 0;
-const codegen_1 = __webpack_require__(/*! ../compile/codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
-const util_1 = __webpack_require__(/*! ../compile/util */ "./node_modules/ajv/dist/compile/util.js");
-const names_1 = __webpack_require__(/*! ../compile/names */ "./node_modules/ajv/dist/compile/names.js");
-const util_2 = __webpack_require__(/*! ../compile/util */ "./node_modules/ajv/dist/compile/util.js");
+const codegen_1 = __webpack_require__(9029);
+const util_1 = __webpack_require__(4227);
+const names_1 = __webpack_require__(2023);
+const util_2 = __webpack_require__(4227);
 function checkReportMissingProp(cxt, prop) {
     const { gen, data, it } = cxt;
     gen.if(noPropertyInData(gen, data, prop, it.opts.ownProperties), () => {
@@ -4854,10 +4731,7 @@ exports.validateUnion = validateUnion;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/core/id.js"
-/*!*******************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/core/id.js ***!
-  \*******************************************************/
+/***/ 3463
 (__unused_webpack_module, exports) {
 
 
@@ -4873,16 +4747,13 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/core/index.js"
-/*!**********************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/core/index.js ***!
-  \**********************************************************/
+/***/ 2128
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const id_1 = __webpack_require__(/*! ./id */ "./node_modules/ajv/dist/vocabularies/core/id.js");
-const ref_1 = __webpack_require__(/*! ./ref */ "./node_modules/ajv/dist/vocabularies/core/ref.js");
+const id_1 = __webpack_require__(3463);
+const ref_1 = __webpack_require__(3693);
 const core = [
     "$schema",
     "$id",
@@ -4898,21 +4769,18 @@ exports["default"] = core;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/core/ref.js"
-/*!********************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/core/ref.js ***!
-  \********************************************************/
+/***/ 3693
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.callRef = exports.getValidate = void 0;
-const ref_error_1 = __webpack_require__(/*! ../../compile/ref_error */ "./node_modules/ajv/dist/compile/ref_error.js");
-const code_1 = __webpack_require__(/*! ../code */ "./node_modules/ajv/dist/vocabularies/code.js");
-const codegen_1 = __webpack_require__(/*! ../../compile/codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
-const names_1 = __webpack_require__(/*! ../../compile/names */ "./node_modules/ajv/dist/compile/names.js");
-const compile_1 = __webpack_require__(/*! ../../compile */ "./node_modules/ajv/dist/compile/index.js");
-const util_1 = __webpack_require__(/*! ../../compile/util */ "./node_modules/ajv/dist/compile/util.js");
+const ref_error_1 = __webpack_require__(4551);
+const code_1 = __webpack_require__(5765);
+const codegen_1 = __webpack_require__(9029);
+const names_1 = __webpack_require__(2023);
+const compile_1 = __webpack_require__(3835);
+const util_1 = __webpack_require__(4227);
 const def = {
     keyword: "$ref",
     schemaType: "string",
@@ -5029,19 +4897,16 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/discriminator/index.js"
-/*!*******************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/discriminator/index.js ***!
-  \*******************************************************************/
+/***/ 6653
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __webpack_require__(/*! ../../compile/codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
-const types_1 = __webpack_require__(/*! ../discriminator/types */ "./node_modules/ajv/dist/vocabularies/discriminator/types.js");
-const compile_1 = __webpack_require__(/*! ../../compile */ "./node_modules/ajv/dist/compile/index.js");
-const ref_error_1 = __webpack_require__(/*! ../../compile/ref_error */ "./node_modules/ajv/dist/compile/ref_error.js");
-const util_1 = __webpack_require__(/*! ../../compile/util */ "./node_modules/ajv/dist/compile/util.js");
+const codegen_1 = __webpack_require__(9029);
+const types_1 = __webpack_require__(7652);
+const compile_1 = __webpack_require__(3835);
+const ref_error_1 = __webpack_require__(4551);
+const util_1 = __webpack_require__(4227);
 const error = {
     message: ({ params: { discrError, tagName } }) => discrError === types_1.DiscrError.Tag
         ? `tag "${tagName}" must be string`
@@ -5142,10 +5007,7 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/discriminator/types.js"
-/*!*******************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/discriminator/types.js ***!
-  \*******************************************************************/
+/***/ 7652
 (__unused_webpack_module, exports) {
 
 
@@ -5160,19 +5022,16 @@ var DiscrError;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/draft7.js"
-/*!******************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/draft7.js ***!
-  \******************************************************/
+/***/ 6144
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core_1 = __webpack_require__(/*! ./core */ "./node_modules/ajv/dist/vocabularies/core/index.js");
-const validation_1 = __webpack_require__(/*! ./validation */ "./node_modules/ajv/dist/vocabularies/validation/index.js");
-const applicator_1 = __webpack_require__(/*! ./applicator */ "./node_modules/ajv/dist/vocabularies/applicator/index.js");
-const format_1 = __webpack_require__(/*! ./format */ "./node_modules/ajv/dist/vocabularies/format/index.js");
-const metadata_1 = __webpack_require__(/*! ./metadata */ "./node_modules/ajv/dist/vocabularies/metadata.js");
+const core_1 = __webpack_require__(2128);
+const validation_1 = __webpack_require__(7060);
+const applicator_1 = __webpack_require__(6378);
+const format_1 = __webpack_require__(7532);
+const metadata_1 = __webpack_require__(9857);
 const draft7Vocabularies = [
     core_1.default,
     validation_1.default,
@@ -5186,15 +5045,12 @@ exports["default"] = draft7Vocabularies;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/format/format.js"
-/*!*************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/format/format.js ***!
-  \*************************************************************/
+/***/ 4737
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __webpack_require__(/*! ../../compile/codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
+const codegen_1 = __webpack_require__(9029);
 const error = {
     message: ({ schemaCode }) => (0, codegen_1.str) `must match format "${schemaCode}"`,
     params: ({ schemaCode }) => (0, codegen_1._) `{format: ${schemaCode}}`,
@@ -5287,25 +5143,19 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/format/index.js"
-/*!************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/format/index.js ***!
-  \************************************************************/
+/***/ 7532
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const format_1 = __webpack_require__(/*! ./format */ "./node_modules/ajv/dist/vocabularies/format/format.js");
+const format_1 = __webpack_require__(4737);
 const format = [format_1.default];
 exports["default"] = format;
 //# sourceMappingURL=index.js.map
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/metadata.js"
-/*!********************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/metadata.js ***!
-  \********************************************************/
+/***/ 9857
 (__unused_webpack_module, exports) {
 
 
@@ -5329,17 +5179,14 @@ exports.contentVocabulary = [
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/validation/const.js"
-/*!****************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/validation/const.js ***!
-  \****************************************************************/
+/***/ 7935
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __webpack_require__(/*! ../../compile/codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
-const util_1 = __webpack_require__(/*! ../../compile/util */ "./node_modules/ajv/dist/compile/util.js");
-const equal_1 = __webpack_require__(/*! ../../runtime/equal */ "./node_modules/ajv/dist/runtime/equal.js");
+const codegen_1 = __webpack_require__(9029);
+const util_1 = __webpack_require__(4227);
+const equal_1 = __webpack_require__(6250);
 const error = {
     message: "must be equal to constant",
     params: ({ schemaCode }) => (0, codegen_1._) `{allowedValue: ${schemaCode}}`,
@@ -5363,17 +5210,14 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/validation/enum.js"
-/*!***************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/validation/enum.js ***!
-  \***************************************************************/
+/***/ 8643
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __webpack_require__(/*! ../../compile/codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
-const util_1 = __webpack_require__(/*! ../../compile/util */ "./node_modules/ajv/dist/compile/util.js");
-const equal_1 = __webpack_require__(/*! ../../runtime/equal */ "./node_modules/ajv/dist/runtime/equal.js");
+const codegen_1 = __webpack_require__(9029);
+const util_1 = __webpack_require__(4227);
+const equal_1 = __webpack_require__(6250);
 const error = {
     message: "must be equal to one of the allowed values",
     params: ({ schemaCode }) => (0, codegen_1._) `{allowedValues: ${schemaCode}}`,
@@ -5420,24 +5264,21 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/validation/index.js"
-/*!****************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/validation/index.js ***!
-  \****************************************************************/
+/***/ 7060
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const limitNumber_1 = __webpack_require__(/*! ./limitNumber */ "./node_modules/ajv/dist/vocabularies/validation/limitNumber.js");
-const multipleOf_1 = __webpack_require__(/*! ./multipleOf */ "./node_modules/ajv/dist/vocabularies/validation/multipleOf.js");
-const limitLength_1 = __webpack_require__(/*! ./limitLength */ "./node_modules/ajv/dist/vocabularies/validation/limitLength.js");
-const pattern_1 = __webpack_require__(/*! ./pattern */ "./node_modules/ajv/dist/vocabularies/validation/pattern.js");
-const limitProperties_1 = __webpack_require__(/*! ./limitProperties */ "./node_modules/ajv/dist/vocabularies/validation/limitProperties.js");
-const required_1 = __webpack_require__(/*! ./required */ "./node_modules/ajv/dist/vocabularies/validation/required.js");
-const limitItems_1 = __webpack_require__(/*! ./limitItems */ "./node_modules/ajv/dist/vocabularies/validation/limitItems.js");
-const uniqueItems_1 = __webpack_require__(/*! ./uniqueItems */ "./node_modules/ajv/dist/vocabularies/validation/uniqueItems.js");
-const const_1 = __webpack_require__(/*! ./const */ "./node_modules/ajv/dist/vocabularies/validation/const.js");
-const enum_1 = __webpack_require__(/*! ./enum */ "./node_modules/ajv/dist/vocabularies/validation/enum.js");
+const limitNumber_1 = __webpack_require__(5882);
+const multipleOf_1 = __webpack_require__(3439);
+const limitLength_1 = __webpack_require__(7307);
+const pattern_1 = __webpack_require__(422);
+const limitProperties_1 = __webpack_require__(4486);
+const required_1 = __webpack_require__(4003);
+const limitItems_1 = __webpack_require__(1163);
+const uniqueItems_1 = __webpack_require__(617);
+const const_1 = __webpack_require__(7935);
+const enum_1 = __webpack_require__(8643);
 const validation = [
     // number
     limitNumber_1.default,
@@ -5462,15 +5303,12 @@ exports["default"] = validation;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/validation/limitItems.js"
-/*!*********************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/validation/limitItems.js ***!
-  \*********************************************************************/
+/***/ 1163
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __webpack_require__(/*! ../../compile/codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
+const codegen_1 = __webpack_require__(9029);
 const error = {
     message({ keyword, schemaCode }) {
         const comp = keyword === "maxItems" ? "more" : "fewer";
@@ -5495,17 +5333,14 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/validation/limitLength.js"
-/*!**********************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/validation/limitLength.js ***!
-  \**********************************************************************/
+/***/ 7307
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __webpack_require__(/*! ../../compile/codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
-const util_1 = __webpack_require__(/*! ../../compile/util */ "./node_modules/ajv/dist/compile/util.js");
-const ucs2length_1 = __webpack_require__(/*! ../../runtime/ucs2length */ "./node_modules/ajv/dist/runtime/ucs2length.js");
+const codegen_1 = __webpack_require__(9029);
+const util_1 = __webpack_require__(4227);
+const ucs2length_1 = __webpack_require__(3853);
 const error = {
     message({ keyword, schemaCode }) {
         const comp = keyword === "maxLength" ? "more" : "fewer";
@@ -5531,15 +5366,12 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/validation/limitNumber.js"
-/*!**********************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/validation/limitNumber.js ***!
-  \**********************************************************************/
+/***/ 5882
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __webpack_require__(/*! ../../compile/codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
+const codegen_1 = __webpack_require__(9029);
 const ops = codegen_1.operators;
 const KWDs = {
     maximum: { okStr: "<=", ok: ops.LTE, fail: ops.GT },
@@ -5567,15 +5399,12 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/validation/limitProperties.js"
-/*!**************************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/validation/limitProperties.js ***!
-  \**************************************************************************/
+/***/ 4486
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __webpack_require__(/*! ../../compile/codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
+const codegen_1 = __webpack_require__(9029);
 const error = {
     message({ keyword, schemaCode }) {
         const comp = keyword === "maxProperties" ? "more" : "fewer";
@@ -5600,15 +5429,12 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/validation/multipleOf.js"
-/*!*********************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/validation/multipleOf.js ***!
-  \*********************************************************************/
+/***/ 3439
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const codegen_1 = __webpack_require__(/*! ../../compile/codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
+const codegen_1 = __webpack_require__(9029);
 const error = {
     message: ({ schemaCode }) => (0, codegen_1.str) `must be multiple of ${schemaCode}`,
     params: ({ schemaCode }) => (0, codegen_1._) `{multipleOf: ${schemaCode}}`,
@@ -5635,17 +5461,14 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/validation/pattern.js"
-/*!******************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/validation/pattern.js ***!
-  \******************************************************************/
+/***/ 422
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const code_1 = __webpack_require__(/*! ../code */ "./node_modules/ajv/dist/vocabularies/code.js");
-const util_1 = __webpack_require__(/*! ../../compile/util */ "./node_modules/ajv/dist/compile/util.js");
-const codegen_1 = __webpack_require__(/*! ../../compile/codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
+const code_1 = __webpack_require__(5765);
+const util_1 = __webpack_require__(4227);
+const codegen_1 = __webpack_require__(9029);
 const error = {
     message: ({ schemaCode }) => (0, codegen_1.str) `must match pattern "${schemaCode}"`,
     params: ({ schemaCode }) => (0, codegen_1._) `{pattern: ${schemaCode}}`,
@@ -5677,17 +5500,14 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/validation/required.js"
-/*!*******************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/validation/required.js ***!
-  \*******************************************************************/
+/***/ 4003
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const code_1 = __webpack_require__(/*! ../code */ "./node_modules/ajv/dist/vocabularies/code.js");
-const codegen_1 = __webpack_require__(/*! ../../compile/codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
-const util_1 = __webpack_require__(/*! ../../compile/util */ "./node_modules/ajv/dist/compile/util.js");
+const code_1 = __webpack_require__(5765);
+const codegen_1 = __webpack_require__(9029);
+const util_1 = __webpack_require__(4227);
 const error = {
     message: ({ params: { missingProperty } }) => (0, codegen_1.str) `must have required property '${missingProperty}'`,
     params: ({ params: { missingProperty } }) => (0, codegen_1._) `{missingProperty: ${missingProperty}}`,
@@ -5765,18 +5585,15 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/vocabularies/validation/uniqueItems.js"
-/*!**********************************************************************!*\
-  !*** ./node_modules/ajv/dist/vocabularies/validation/uniqueItems.js ***!
-  \**********************************************************************/
+/***/ 617
 (__unused_webpack_module, exports, __webpack_require__) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const dataType_1 = __webpack_require__(/*! ../../compile/validate/dataType */ "./node_modules/ajv/dist/compile/validate/dataType.js");
-const codegen_1 = __webpack_require__(/*! ../../compile/codegen */ "./node_modules/ajv/dist/compile/codegen/index.js");
-const util_1 = __webpack_require__(/*! ../../compile/util */ "./node_modules/ajv/dist/compile/util.js");
-const equal_1 = __webpack_require__(/*! ../../runtime/equal */ "./node_modules/ajv/dist/runtime/equal.js");
+const dataType_1 = __webpack_require__(208);
+const codegen_1 = __webpack_require__(9029);
+const util_1 = __webpack_require__(4227);
+const equal_1 = __webpack_require__(6250);
 const error = {
     message: ({ params: { i, j } }) => (0, codegen_1.str) `must NOT have duplicate items (items ## ${j} and ${i} are identical)`,
     params: ({ params: { i, j } }) => (0, codegen_1._) `{i: ${i}, j: ${j}}`,
@@ -5838,19 +5655,15 @@ exports["default"] = def;
 
 /***/ },
 
-/***/ "./node_modules/css-loader/dist/cjs.js!./src/style.css"
-/*!*************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js!./src/style.css ***!
-  \*************************************************************/
+/***/ 1208
 (module, __webpack_exports__, __webpack_require__) {
 
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../node_modules/css-loader/dist/runtime/sourceMaps.js */ "./node_modules/css-loader/dist/runtime/sourceMaps.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1354);
 /* harmony import */ var _node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6314);
 /* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
 // Imports
 
@@ -6397,10 +6210,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Saint's Silly Extensions — Combin
 
 /***/ },
 
-/***/ "./node_modules/css-loader/dist/runtime/api.js"
-/*!*****************************************************!*\
-  !*** ./node_modules/css-loader/dist/runtime/api.js ***!
-  \*****************************************************/
+/***/ 6314
 (module) {
 
 
@@ -6491,10 +6301,7 @@ module.exports = function (cssWithMappingToString) {
 
 /***/ },
 
-/***/ "./node_modules/css-loader/dist/runtime/sourceMaps.js"
-/*!************************************************************!*\
-  !*** ./node_modules/css-loader/dist/runtime/sourceMaps.js ***!
-  \************************************************************/
+/***/ 1354
 (module) {
 
 
@@ -6516,10 +6323,7 @@ module.exports = function (item) {
 
 /***/ },
 
-/***/ "./node_modules/fast-deep-equal/index.js"
-/*!***********************************************!*\
-  !*** ./node_modules/fast-deep-equal/index.js ***!
-  \***********************************************/
+/***/ 2017
 (module) {
 
 
@@ -6572,154 +6376,7 @@ module.exports = function equal(a, b) {
 
 /***/ },
 
-/***/ "./src/settings.html"
-/*!***************************!*\
-  !*** ./src/settings.html ***!
-  \***************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-// Module
-var code = `<div id="saints_silly_settings" class="extension_settings">
-    <div class="inline-drawer">
-        <div class="inline-drawer-toggle inline-drawer-header">
-            <b>Saint's Silly Extensions</b>
-            <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
-        </div>
-        <div class="inline-drawer-content">
-
-            <!-- Possession Settings -->
-            <h4 class="saints_section_header">
-                <span class="fa-solid fa-ghost"></span> Possession
-            </h4>
-
-            <label class="checkbox_label">
-                <input id="possession_enabled" type="checkbox" />
-                <span>Enable Possession</span>
-            </label>
-
-            <label class="checkbox_label">
-                <input id="possession_show_toast" type="checkbox" />
-                <span>Show Toast on Possess/Unpossess</span>
-            </label>
-
-            <label class="checkbox_label">
-                <input id="possession_debug_mode" type="checkbox" />
-                <span>Possession Debug Mode</span>
-            </label>
-
-            <hr class="saints_divider" />
-
-            <!-- Phrasing Settings -->
-            <h4 class="saints_section_header">
-                <span class="fa-solid fa-pen-fancy"></span> Phrasing!
-            </h4>
-
-            <label class="checkbox_label">
-                <input id="phrasing_enabled" type="checkbox" checked />
-                <span>Enable Phrasing!</span>
-            </label>
-
-            <label class="checkbox_label">
-                <input id="phrasing_debug_mode" type="checkbox" />
-                <span>Phrasing Debug Mode</span>
-            </label>
-
-            <div class="phrasing_prompt_section">
-                <label for="phrasing_prompt_textarea"><b>Prompt Template:</b></label>
-                <textarea id="phrasing_prompt_textarea" class="text_pole" rows="8"
-                    placeholder="Enter your Phrasing! prompt template..."></textarea>
-            </div>
-
-            <div class="phrasing_buttons_row">
-                <div class="menu_button" id="phrasing_restore_default">
-                    <span class="fa-solid fa-rotate-left"></span> Restore Default
-                </div>
-                <div class="menu_button" id="phrasing_save_to_chat">
-                    <span class="fa-solid fa-floppy-disk"></span> Save to Chat
-                </div>
-            </div>
-
-            <hr class="saints_divider" />
-
-            <!-- Assisted Character Creation Settings -->
-            <h4 class="saints_section_header">
-                <span class="fa-solid fa-wand-magic-sparkles"></span> Assisted Character Creation
-            </h4>
-
-            <label class="checkbox_label">
-                <input id="acc_enabled" type="checkbox" />
-                <span>Enable Assisted Character Creation</span>
-            </label>
-
-            <label class="checkbox_label">
-                <input id="acc_debug_mode" type="checkbox" />
-                <span>ACC Debug Mode</span>
-            </label>
-
-            <div class="acc-schema-selector">
-                <label for="acc_schema_select"><b>Active Schema:</b></label>
-                <select id="acc_schema_select" class="text_pole"></select>
-            </div>
-
-            <div class="acc-schema-buttons">
-                <div class="menu_button" id="acc_import_schema">
-                    <span class="fa-solid fa-file-import"></span> Import Schema
-                </div>
-                <div class="menu_button" id="acc_export_schema">
-                    <span class="fa-solid fa-file-export"></span> Export Schema
-                </div>
-                <div class="menu_button" id="acc_delete_schema">
-                    <span class="fa-solid fa-trash"></span> Delete Schema
-                </div>
-            </div>
-            <input type="file" id="acc_schema_file_input" accept=".json" style="display:none" />
-
-            <hr class="saints_divider" />
-
-            <!-- World Info Assist Settings -->
-            <h4 class="saints_section_header">
-                <span class="fa-solid fa-book-atlas"></span> World Info Assist
-            </h4>
-
-            <label class="checkbox_label">
-                <input id="wia_enabled" type="checkbox" />
-                <span>Enable World Info Assist</span>
-            </label>
-
-            <label class="checkbox_label">
-                <input id="wia_debug_mode" type="checkbox" />
-                <span>WI Assist Debug Mode</span>
-            </label>
-
-            <div class="wia_prompt_section">
-                <label for="wia_prompt_textarea"><b>Prompt Template:</b></label>
-                <textarea id="wia_prompt_textarea" class="text_pole" rows="10"
-                    placeholder="Enter your World Info Assist prompt template..."></textarea>
-            </div>
-
-            <div class="wia_buttons_row">
-                <div class="menu_button" id="wia_restore_default">
-                    <span class="fa-solid fa-rotate-left"></span> Restore Default
-                </div>
-            </div>
-
-        </div>
-    </div>
-</div>
-`;
-// Exports
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (code);
-
-/***/ },
-
-/***/ "./node_modules/json-schema-traverse/index.js"
-/*!****************************************************!*\
-  !*** ./node_modules/json-schema-traverse/index.js ***!
-  \****************************************************/
+/***/ 7106
 (module) {
 
 
@@ -6819,62 +6476,7 @@ function escapeJsonPtr(str) {
 
 /***/ },
 
-/***/ "./src/style.css"
-/*!***********************!*\
-  !*** ./src/style.css ***!
-  \***********************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
-/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !../node_modules/style-loader/dist/runtime/styleDomAPI.js */ "./node_modules/style-loader/dist/runtime/styleDomAPI.js");
-/* harmony import */ var _node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! !../node_modules/style-loader/dist/runtime/insertBySelector.js */ "./node_modules/style-loader/dist/runtime/insertBySelector.js");
-/* harmony import */ var _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! !../node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js */ "./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js");
-/* harmony import */ var _node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! !../node_modules/style-loader/dist/runtime/insertStyleElement.js */ "./node_modules/style-loader/dist/runtime/insertStyleElement.js");
-/* harmony import */ var _node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! !../node_modules/style-loader/dist/runtime/styleTagTransform.js */ "./node_modules/style-loader/dist/runtime/styleTagTransform.js");
-/* harmony import */ var _node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _node_modules_css_loader_dist_cjs_js_style_css__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! !!../node_modules/css-loader/dist/cjs.js!./style.css */ "./node_modules/css-loader/dist/cjs.js!./src/style.css");
-
-      
-      
-      
-      
-      
-      
-      
-      
-      
-
-var options = {};
-
-options.styleTagTransform = (_node_modules_style_loader_dist_runtime_styleTagTransform_js__WEBPACK_IMPORTED_MODULE_5___default());
-options.setAttributes = (_node_modules_style_loader_dist_runtime_setAttributesWithoutAttributes_js__WEBPACK_IMPORTED_MODULE_3___default());
-options.insert = _node_modules_style_loader_dist_runtime_insertBySelector_js__WEBPACK_IMPORTED_MODULE_2___default().bind(null, "head");
-options.domAPI = (_node_modules_style_loader_dist_runtime_styleDomAPI_js__WEBPACK_IMPORTED_MODULE_1___default());
-options.insertStyleElement = (_node_modules_style_loader_dist_runtime_insertStyleElement_js__WEBPACK_IMPORTED_MODULE_4___default());
-
-var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_style_css__WEBPACK_IMPORTED_MODULE_6__["default"], options);
-
-
-
-
-       /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_style_css__WEBPACK_IMPORTED_MODULE_6__["default"] && _node_modules_css_loader_dist_cjs_js_style_css__WEBPACK_IMPORTED_MODULE_6__["default"].locals ? _node_modules_css_loader_dist_cjs_js_style_css__WEBPACK_IMPORTED_MODULE_6__["default"].locals : undefined);
-
-
-/***/ },
-
-/***/ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js"
-/*!****************************************************************************!*\
-  !*** ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js ***!
-  \****************************************************************************/
+/***/ 5072
 (module) {
 
 
@@ -6964,10 +6566,7 @@ module.exports = function (list, options) {
 
 /***/ },
 
-/***/ "./node_modules/style-loader/dist/runtime/insertBySelector.js"
-/*!********************************************************************!*\
-  !*** ./node_modules/style-loader/dist/runtime/insertBySelector.js ***!
-  \********************************************************************/
+/***/ 7659
 (module) {
 
 
@@ -7007,10 +6606,7 @@ module.exports = insertBySelector;
 
 /***/ },
 
-/***/ "./node_modules/style-loader/dist/runtime/insertStyleElement.js"
-/*!**********************************************************************!*\
-  !*** ./node_modules/style-loader/dist/runtime/insertStyleElement.js ***!
-  \**********************************************************************/
+/***/ 540
 (module) {
 
 
@@ -7026,10 +6622,7 @@ module.exports = insertStyleElement;
 
 /***/ },
 
-/***/ "./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js"
-/*!**********************************************************************************!*\
-  !*** ./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js ***!
-  \**********************************************************************************/
+/***/ 5056
 (module, __unused_webpack_exports, __webpack_require__) {
 
 
@@ -7045,10 +6638,7 @@ module.exports = setAttributesWithoutAttributes;
 
 /***/ },
 
-/***/ "./node_modules/style-loader/dist/runtime/styleDomAPI.js"
-/*!***************************************************************!*\
-  !*** ./node_modules/style-loader/dist/runtime/styleDomAPI.js ***!
-  \***************************************************************/
+/***/ 7825
 (module) {
 
 
@@ -7115,10 +6705,7 @@ module.exports = domAPI;
 
 /***/ },
 
-/***/ "./node_modules/style-loader/dist/runtime/styleTagTransform.js"
-/*!*********************************************************************!*\
-  !*** ./node_modules/style-loader/dist/runtime/styleTagTransform.js ***!
-  \*********************************************************************/
+/***/ 1113
 (module) {
 
 
@@ -7138,3232 +6725,13 @@ module.exports = styleTagTransform;
 
 /***/ },
 
-/***/ "./src/assisted-character-creation.js"
-/*!********************************************!*\
-  !*** ./src/assisted-character-creation.js ***!
-  \********************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   bindACCSettings: () => (/* binding */ bindACCSettings),
-/* harmony export */   initACC: () => (/* binding */ initACC),
-/* harmony export */   onCharacterPageLoaded: () => (/* binding */ onCharacterPageLoaded)
-/* harmony export */ });
-/* harmony import */ var _script_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../../script.js */ "../../../../../script.js");
-/* harmony import */ var _reasoning_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../../reasoning.js */ "../../../../reasoning.js");
-/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils.js */ "./src/utils.js");
-/* harmony import */ var _default_character_schema_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./default-character-schema.js */ "./src/default-character-schema.js");
-/* harmony import */ var _schema_validation_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./schema-validation.js */ "./src/schema-validation.js");
-/**
- * Assisted Character Creation (ACC)
- *
- * Modal-based character creation with per-field LLM assist, YOLO mode,
- * reverse mapping, and schema management.
- */
-
-
-
-
-
-
-
-// ─── Module State ───
-
-let moduleSettings = null;
-let debug = () => {};
-let saveSettingsFn = null;
-
-// Modal state
-let activeFieldKey = null;   // which field is currently generating
-let fieldStates = {};        // per-field state: { originalSeed, currentValue, hasGenerated, prose, tokenOverride }
-let currentSchema = null;    // the active schema object
-let abortRequested = false;  // flag to discard result after stop
-
-// ─── Init ───
-
-/**
- * Initialize ACC module. Called once from index.js.
- * @param {object} opts - { settings, saveSettings }
- */
-function initACC({ settings, saveSettings }) {
-    moduleSettings = settings;
-    saveSettingsFn = saveSettings;
-    debug = (0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.createDebugLogger)('ACC', () => moduleSettings.accDebugMode);
-    debug('Module initialized');
-}
-
-// ─── Prose State Persistence ───
-
-/**
- * Get the saved prose states for a given schema, keyed by field name.
- * Returns an object like { fieldKey: boolean }.
- */
-function getSavedProseStates(schemaName) {
-    if (!moduleSettings.accProseStates) moduleSettings.accProseStates = {};
-    return moduleSettings.accProseStates[schemaName] || {};
-}
-
-/**
- * Save a single field's prose state to settings.
- */
-function saveProseState(schemaName, fieldKey, isProse) {
-    if (!moduleSettings.accProseStates) moduleSettings.accProseStates = {};
-    if (!moduleSettings.accProseStates[schemaName]) moduleSettings.accProseStates[schemaName] = {};
-    moduleSettings.accProseStates[schemaName][fieldKey] = isProse;
-    if (saveSettingsFn) saveSettingsFn();
-}
-
-/**
- * Look up the prose state for a field. Falls back to false (text field).
- */
-function getFieldProseState(schemaName, fieldKey) {
-    const saved = getSavedProseStates(schemaName);
-    return saved[fieldKey] ?? false;
-}
-
-// ─── Schema Helpers ───
-
-function getActiveSchema() {
-    const name = moduleSettings.accActiveSchemaName;
-    if (name === _default_character_schema_js__WEBPACK_IMPORTED_MODULE_3__.DEFAULT_SCHEMA.schemaName) return _default_character_schema_js__WEBPACK_IMPORTED_MODULE_3__.DEFAULT_SCHEMA;
-    const custom = moduleSettings.accCustomSchemas?.[name];
-    if (custom) return custom;
-    // Fallback to default
-    moduleSettings.accActiveSchemaName = _default_character_schema_js__WEBPACK_IMPORTED_MODULE_3__.DEFAULT_SCHEMA.schemaName;
-    return _default_character_schema_js__WEBPACK_IMPORTED_MODULE_3__.DEFAULT_SCHEMA;
-}
-
-function getSchemaNames() {
-    const names = [_default_character_schema_js__WEBPACK_IMPORTED_MODULE_3__.DEFAULT_SCHEMA.schemaName];
-    if (moduleSettings.accCustomSchemas) {
-        names.push(...Object.keys(moduleSettings.accCustomSchemas));
-    }
-    return names;
-}
-
-// ─── Character Page Integration ───
-
-/**
- * Called on CHARACTER_PAGE_LOADED. Injects the ACC launch button.
- */
-function onCharacterPageLoaded() {
-    if (!moduleSettings.accEnabled) return;
-    if (document.getElementById('acc_launch_btn')) return;
-
-    const btnRow = document.querySelector('#form_create .ch_creation_btn_row');
-    const target = btnRow || document.querySelector('#form_create');
-    if (!target) return;
-
-    const btn = document.createElement('div');
-    btn.id = 'acc_launch_btn';
-    btn.classList.add('menu_button', 'interactable');
-    btn.title = 'Assisted Character Creation';
-    btn.innerHTML = '<span class="fa-solid fa-wand-magic-sparkles"></span> <span>Assist</span>';
-    btn.addEventListener('click', openModal);
-
-    target.appendChild(btn);
-    debug('Launch button injected');
-}
-
-// ─── Settings Bindings ───
-
-/**
- * Bind ACC settings panel controls. Called after settings HTML is injected.
- * @param {function} saveSettings
- */
-function bindACCSettings(saveSettings) {
-    const enabledCb = document.getElementById('acc_enabled');
-    const debugCb = document.getElementById('acc_debug_mode');
-    const schemaSelect = document.getElementById('acc_schema_select');
-    const importBtn = document.getElementById('acc_import_schema');
-    const exportBtn = document.getElementById('acc_export_schema');
-    const deleteBtn = document.getElementById('acc_delete_schema');
-    const fileInput = document.getElementById('acc_schema_file_input');
-
-    if (enabledCb) {
-        enabledCb.checked = moduleSettings.accEnabled;
-        enabledCb.addEventListener('change', () => {
-            moduleSettings.accEnabled = enabledCb.checked;
-            saveSettings();
-        });
-    }
-    if (debugCb) {
-        debugCb.checked = moduleSettings.accDebugMode;
-        debugCb.addEventListener('change', () => {
-            moduleSettings.accDebugMode = debugCb.checked;
-            saveSettings();
-        });
-    }
-
-    // Populate schema selector
-    populateSchemaSelect(schemaSelect);
-
-    if (schemaSelect) {
-        schemaSelect.addEventListener('change', () => {
-            moduleSettings.accActiveSchemaName = schemaSelect.value;
-            saveSettings();
-        });
-    }
-    if (importBtn && fileInput) {
-        importBtn.addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', (e) => handleSchemaImport(e, schemaSelect, saveSettings));
-    }
-    if (exportBtn) {
-        exportBtn.addEventListener('click', () => handleSchemaExport());
-    }
-    if (deleteBtn) {
-        deleteBtn.addEventListener('click', () => handleSchemaDelete(schemaSelect, saveSettings));
-    }
-}
-
-function populateSchemaSelect(select) {
-    if (!select) return;
-    select.innerHTML = '';
-    for (const name of getSchemaNames()) {
-        const opt = document.createElement('option');
-        opt.value = name;
-        opt.textContent = name;
-        if (name === moduleSettings.accActiveSchemaName) opt.selected = true;
-        select.appendChild(opt);
-    }
-}
-
-function handleSchemaImport(event, schemaSelect, saveSettings) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        try {
-            const schema = JSON.parse(e.target.result);
-            const errors = (0,_default_character_schema_js__WEBPACK_IMPORTED_MODULE_3__.validateSchema)(schema);
-            if (errors.length > 0) {
-                (0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.toast)('Invalid schema:\n' + errors.join('\n'), 'error');
-                return;
-            }
-            if (schema.schemaName === _default_character_schema_js__WEBPACK_IMPORTED_MODULE_3__.DEFAULT_SCHEMA.schemaName) {
-                (0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.toast)('Cannot import a schema with the default schema name.', 'error');
-                return;
-            }
-            if (!moduleSettings.accCustomSchemas) moduleSettings.accCustomSchemas = {};
-            moduleSettings.accCustomSchemas[schema.schemaName] = schema;
-            moduleSettings.accActiveSchemaName = schema.schemaName;
-            saveSettings();
-            populateSchemaSelect(schemaSelect);
-            (0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.toast)(`Schema "${schema.schemaName}" imported.`, 'success');
-        } catch (err) {
-            (0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.toast)('Failed to parse schema JSON: ' + err.message, 'error');
-        }
-    };
-    reader.readAsText(file);
-    event.target.value = ''; // reset file input
-}
-
-function handleSchemaExport() {
-    const schema = getActiveSchema();
-    const blob = new Blob([JSON.stringify(schema, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${schema.schemaName.replace(/[^a-zA-Z0-9_-]/g, '_')}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    (0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.toast)('Schema exported.', 'success');
-}
-
-function handleSchemaDelete(schemaSelect, saveSettings) {
-    const name = moduleSettings.accActiveSchemaName;
-    if (name === _default_character_schema_js__WEBPACK_IMPORTED_MODULE_3__.DEFAULT_SCHEMA.schemaName) {
-        (0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.toast)('Cannot delete the default schema.', 'warning');
-        return;
-    }
-    if (moduleSettings.accCustomSchemas) {
-        delete moduleSettings.accCustomSchemas[name];
-    }
-    moduleSettings.accActiveSchemaName = _default_character_schema_js__WEBPACK_IMPORTED_MODULE_3__.DEFAULT_SCHEMA.schemaName;
-    saveSettings();
-    populateSchemaSelect(schemaSelect);
-    (0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.toast)(`Schema "${name}" deleted.`, 'success');
-}
-
-// ─── Modal ───
-
-function openModal() {
-    if (document.getElementById('acc_modal_overlay')) return;
-
-    currentSchema = getActiveSchema();
-    fieldStates = {};
-    activeFieldKey = null;
-    abortRequested = false;
-
-    // Initialize field states
-    const schemaName = currentSchema.schemaName;
-    for (const [key] of (0,_default_character_schema_js__WEBPACK_IMPORTED_MODULE_3__.getOrderedFields)(currentSchema)) {
-        fieldStates[key] = {
-            originalSeed: '',
-            currentValue: '',
-            hasGenerated: false,
-            prose: getFieldProseState(schemaName, key),
-            tokenOverride: null,
-        };
-    }
-
-    // Check if editing an existing character
-    const descField = document.getElementById('description_textarea');
-    const existingDesc = descField?.value?.trim() || '';
-
-    const overlay = document.createElement('div');
-    overlay.id = 'acc_modal_overlay';
-    overlay.innerHTML = buildModalHTML(currentSchema, existingDesc);
-    document.body.appendChild(overlay);
-
-    // Close on overlay click (not on modal body)
-    overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) closeModal();
-    });
-
-    // Wire up buttons
-    document.getElementById('acc_close_btn')?.addEventListener('click', closeModal);
-    document.getElementById('acc_cancel_btn')?.addEventListener('click', closeModal);
-    document.getElementById('acc_done_btn')?.addEventListener('click', handleDone);
-    document.getElementById('acc_yolo_btn')?.addEventListener('click', handleYolo);
-
-    if (existingDesc) {
-        document.getElementById('acc_reverse_map_btn')?.addEventListener('click', handleReverseMap);
-    }
-
-    // Wire per-field buttons
-    for (const [key] of (0,_default_character_schema_js__WEBPACK_IMPORTED_MODULE_3__.getOrderedFields)(currentSchema)) {
-        const assistBtn = document.getElementById(`acc_assist_${key}`);
-        const retryBtn = document.getElementById(`acc_retry_${key}`);
-        const resetBtn = document.getElementById(`acc_reset_${key}`);
-        const proseCb = document.getElementById(`acc_prose_${key}`);
-        const tokenInput = document.getElementById(`acc_tokens_${key}`);
-        const input = document.getElementById(`acc_field_${key}`);
-
-        assistBtn?.addEventListener('click', () => onAssistClick(key));
-        retryBtn?.addEventListener('click', () => onRetryClick(key));
-        resetBtn?.addEventListener('click', () => onResetClick(key));
-
-        // Prose toggle — swap input type and persist
-        proseCb?.addEventListener('change', () => {
-            fieldStates[key].prose = proseCb.checked;
-            swapInputType(key, proseCb.checked);
-            saveProseState(currentSchema.schemaName, key, proseCb.checked);
-        });
-
-        // Token override
-        tokenInput?.addEventListener('input', () => {
-            const val = parseInt(tokenInput.value);
-            fieldStates[key].tokenOverride = isNaN(val) ? null : val;
-        });
-
-        // Track manual edits
-        input?.addEventListener('input', () => {
-            fieldStates[key].currentValue = input.value;
-        });
-    }
-
-    debug('Modal opened');
-}
-
-function closeModal() {
-    if (activeFieldKey) {
-        abortRequested = true;
-        stopGeneration();
-    }
-    const overlay = document.getElementById('acc_modal_overlay');
-    if (overlay) overlay.remove();
-    fieldStates = {};
-    activeFieldKey = null;
-    currentSchema = null;
-    debug('Modal closed');
-}
-
-function buildModalHTML(schema, existingDesc) {
-    const fields = (0,_default_character_schema_js__WEBPACK_IMPORTED_MODULE_3__.getOrderedFields)(schema);
-    let fieldsHTML = '';
-
-    for (const [key, field] of fields) {
-        const isProse = getFieldProseState(schema.schemaName, key);
-        const tokenDefault = field.responseLength ?? 200;
-
-        fieldsHTML += `
-            <div class="acc-field-group" data-field-key="${key}">
-                <div class="acc-field-header">
-                    <label class="acc-field-label" for="acc_field_${key}">${escapeHTML(field.label)}</label>
-                    <div class="acc-field-controls">
-                        <div class="acc-field-buttons">
-                            <div id="acc_assist_${key}" class="acc-btn acc-btn-assist menu_button interactable" title="Assist">
-                                <span class="fa-solid fa-wand-magic-sparkles"></span>
-                            </div>
-                            <div id="acc_retry_${key}" class="acc-btn acc-btn-retry menu_button interactable acc-hidden" title="Retry with original seed">
-                                <span class="fa-solid fa-rotate-right"></span>
-                            </div>
-                            <div id="acc_reset_${key}" class="acc-btn acc-btn-reset menu_button interactable acc-hidden" title="Reset to original">
-                                <span class="fa-solid fa-arrow-rotate-left"></span>
-                            </div>
-                        </div>
-                        <label class="acc-prose-toggle" title="Toggle prose mode">
-                            <input id="acc_prose_${key}" type="checkbox" ${isProse ? 'checked' : ''} />
-                            <span class="acc-prose-label">Prose</span>
-                        </label>
-                        <div class="acc-token-label" title="Max tokens for generation (override)">
-                            <span class="fa-solid fa-coins"></span>
-                            <input id="acc_tokens_${key}" type="number" class="acc-token-input text_pole" min="10" max="4096" step="10" placeholder="${tokenDefault}" />
-                        </div>
-                    </div>
-                </div>
-                <div id="acc_input_wrap_${key}" class="acc-input-wrap">
-                    <textarea id="acc_field_${key}" class="acc-field-input text_pole" rows="${isProse ? 5 : 1}" placeholder="${escapeAttr(field.description)}"></textarea>
-                </div>
-            </div>`;
-    }
-
-    const reverseMapBtn = existingDesc
-        ? '<div id="acc_reverse_map_btn" class="menu_button interactable acc-reverse-btn"><span class="fa-solid fa-file-import"></span> Import from Existing</div>'
-        : '';
-
-    return `
-        <div id="acc_modal" class="acc-modal">
-            <div class="acc-modal-header">
-                <h3>Assisted Character Creation</h3>
-                <div id="acc_close_btn" class="acc-close-btn interactable"><span class="fa-solid fa-xmark"></span></div>
-            </div>
-            <div class="acc-modal-body">
-                ${reverseMapBtn}
-                <div class="acc-brief-section">
-                    <label for="acc_character_brief"><b>Character Brief:</b></label>
-                    <textarea id="acc_character_brief" class="text_pole" rows="3" placeholder="Describe your character concept, setting, and any key details..."></textarea>
-                </div>
-                <div class="acc-status-bar acc-hidden" id="acc_status_bar">
-                    <span class="fa-solid fa-spinner fa-spin"></span>
-                    <span id="acc_status_text"></span>
-                </div>
-                <div class="acc-fields-container">
-                    ${fieldsHTML}
-                </div>
-            </div>
-            <div class="acc-modal-footer">
-                <!-- YOLO temporarily disabled
-                <div id="acc_yolo_btn" class="menu_button interactable acc-yolo-btn">
-                    <span class="fa-solid fa-bolt"></span> YOLO Generate All
-                </div>
-                -->
-                <div class="acc-footer-right">
-                    <div id="acc_cancel_btn" class="menu_button interactable">Cancel</div>
-                    <div id="acc_done_btn" class="menu_button interactable acc-done-btn">Done</div>
-                </div>
-            </div>
-        </div>`;
-}
-
-// ─── Input Type Swap ───
-
-function swapInputType(fieldKey, toProse) {
-    const textarea = document.getElementById(`acc_field_${fieldKey}`);
-    if (!textarea) return;
-    textarea.rows = toProse ? 3 : 1;
-}
-
-// ─── Per-Field Generation ───
-
-async function onAssistClick(fieldKey) {
-    if (activeFieldKey) {
-        if (activeFieldKey === fieldKey) {
-            // Stop current generation
-            abortRequested = true;
-            stopGeneration();
-            return;
-        }
-        return; // another field generating, ignore
-    }
-
-    const input = document.getElementById(`acc_field_${fieldKey}`);
-    if (!input) return;
-
-    const isContinue = fieldStates[fieldKey].hasGenerated;
-
-    // Save seed text before first generation
-    if (!isContinue) {
-        fieldStates[fieldKey].originalSeed = input.value;
-    }
-
-    activeFieldKey = fieldKey;
-    abortRequested = false;
-    setFieldGeneratingUI(fieldKey, true);
-    const action = isContinue ? 'Continuing' : 'Generating';
-    setStatusBar(`${action} ${currentSchema.fields[fieldKey].label}...`);
-
-    try {
-        const brief = document.getElementById('acc_character_brief')?.value || '';
-        const result = await generateFieldValue(fieldKey, currentSchema, fieldStates, brief, isContinue);
-
-        if (abortRequested) {
-            debug(`Generation for ${fieldKey} aborted, discarding result`);
-            return;
-        }
-
-        if (isContinue) {
-            // Append to existing content
-            const existing = input.value;
-            const separator = existing.endsWith(' ') || existing.endsWith('\n') ? '' : ' ';
-            input.value = existing + separator + result;
-        } else {
-            input.value = result;
-        }
-        fieldStates[fieldKey].currentValue = input.value;
-        fieldStates[fieldKey].hasGenerated = true;
-        debug(`Field ${fieldKey} ${isContinue ? 'continued' : 'generated'}:`, result.substring(0, 80));
-    } catch (err) {
-        if (!abortRequested) {
-            console.error('ACC generation error:', err);
-            (0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.toast)(`Generation failed: ${err.message}`, 'error');
-        }
-    } finally {
-        activeFieldKey = null;
-        abortRequested = false;
-        setFieldGeneratingUI(fieldKey, false);
-        setStatusBar(null);
-    }
-}
-
-async function onRetryClick(fieldKey) {
-    const input = document.getElementById(`acc_field_${fieldKey}`);
-    if (!input) return;
-
-    // Restore original seed for re-generation
-    input.value = fieldStates[fieldKey].originalSeed;
-    fieldStates[fieldKey].currentValue = fieldStates[fieldKey].originalSeed;
-
-    await onAssistClick(fieldKey);
-}
-
-function onResetClick(fieldKey) {
-    const input = document.getElementById(`acc_field_${fieldKey}`);
-    if (!input) return;
-
-    input.value = fieldStates[fieldKey].originalSeed;
-    fieldStates[fieldKey].currentValue = fieldStates[fieldKey].originalSeed;
-    fieldStates[fieldKey].hasGenerated = false;
-
-    // Hide retry/reset buttons, restore Assist icon
-    const assistBtn = document.getElementById(`acc_assist_${fieldKey}`);
-    const retryBtn = document.getElementById(`acc_retry_${fieldKey}`);
-    const resetBtn = document.getElementById(`acc_reset_${fieldKey}`);
-    if (assistBtn) {
-        assistBtn.innerHTML = '<span class="fa-solid fa-wand-magic-sparkles"></span>';
-        assistBtn.title = 'Assist';
-    }
-    retryBtn?.classList.add('acc-hidden');
-    resetBtn?.classList.add('acc-hidden');
-}
-
-// ─── LLM Generation ───
-
-async function generateFieldValue(fieldKey, schema, states, characterBrief, isContinue = false) {
-    const field = schema.fields[fieldKey];
-    const state = states[fieldKey];
-    const isProse = state.prose;
-    const responseLength = state.tokenOverride || field.responseLength || 200;
-    const filledFields = buildFilledFieldsSummary(schema, states, fieldKey);
-
-    let prompt;
-    if (isContinue) {
-        // Continue mode: ask to continue from where it left off
-        const existingText = state.currentValue || '';
-        prompt = `Continue writing the "${field.label}" field for this character. Pick up exactly where the text left off.\n\nCharacter Brief:\n${characterBrief || '(no brief provided)'}\n\nOther fields already defined:\n${filledFields || '(none yet)'}\n\nText so far:\n${existingText}\n\nContinue:`;
-    } else {
-        const seedText = state.currentValue || '';
-        prompt = field.prompt
-            .replace(/\{\{seedText\}\}/g, seedText || '(no user input)')
-            .replace(/\{\{context\}\}/g, characterBrief || '(no brief provided)')
-            .replace(/\{\{filledFields\}\}/g, filledFields || '(none yet)');
-        prompt += `\n\nRespond with only the value for "${field.label}":`;
-    }
-
-    const styleInstruction = isProse
-        ? 'Write in descriptive prose.'
-        : 'Be brief and concise. Use comma-separated descriptors, not full sentences.';
-
-    const systemPrompt = `You are a character creation assistant. ${styleInstruction} Do not include labels, explanations, or extra formatting. Output only the field value.`;
-
-    debug(`Generating field "${fieldKey}" (continue=${isContinue}, prose=${isProse}, tokens=${responseLength})`);
-    debug(`[${fieldKey}] System prompt:`, systemPrompt);
-    debug(`[${fieldKey}] Prompt:`, prompt);
-
-    const result = await (0,_script_js__WEBPACK_IMPORTED_MODULE_0__.generateRaw)({
-        prompt,
-        systemPrompt,
-        responseLength,
-    });
-
-    let cleaned = (0,_reasoning_js__WEBPACK_IMPORTED_MODULE_1__.removeReasoningFromString)(result).trim();
-
-    // Strip label echo
-    if (cleaned.startsWith(field.label + ':')) {
-        cleaned = cleaned.substring(field.label.length + 1).trim();
-    }
-
-    // Non-prose: trim to first newline
-    if (!isProse && cleaned.includes('\n')) {
-        cleaned = cleaned.split('\n')[0].trim();
-    }
-
-    return cleaned;
-}
-
-function buildFilledFieldsSummary(schema, states, excludeKey) {
-    const parts = [];
-    for (const [key, field] of (0,_default_character_schema_js__WEBPACK_IMPORTED_MODULE_3__.getOrderedFields)(schema)) {
-        if (key === excludeKey) continue;
-        const val = states[key]?.currentValue?.trim();
-        if (val) {
-            parts.push(`${field.label}: ${val}`);
-        }
-    }
-    return parts.join('\n');
-}
-
-function stopGeneration() {
-    const stopBtn = document.getElementById('mes_stop');
-    if (stopBtn) stopBtn.click();
-    debug('Stop generation triggered');
-}
-
-// ─── YOLO Mode ───
-
-async function handleYolo() {
-    if (activeFieldKey) return;
-
-    const brief = document.getElementById('acc_character_brief')?.value?.trim();
-    if (!brief) {
-        (0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.toast)('Please enter a Character Brief before using YOLO mode.', 'warning');
-        return;
-    }
-
-    activeFieldKey = '__yolo__';
-    setAllFieldsDisabled(true);
-    setStatusBar('YOLO generating entire character...');
-
-    try {
-        const result = await yoloGenerate(currentSchema, brief);
-        if (abortRequested) return;
-
-        // Set directly into ST description field
-        const descField = document.getElementById('description_textarea');
-        if (descField) {
-            descField.value = result;
-            descField.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-        (0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.toast)('YOLO generation complete! Description field updated.', 'success');
-        closeModal();
-    } catch (err) {
-        console.error('ACC YOLO error:', err);
-        (0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.toast)(`YOLO generation failed: ${err.message}`, 'error');
-    } finally {
-        activeFieldKey = null;
-        abortRequested = false;
-        setAllFieldsDisabled(false);
-        setStatusBar(null);
-    }
-}
-
-async function yoloGenerate(schema, characterBrief) {
-    const fieldList = (0,_default_character_schema_js__WEBPACK_IMPORTED_MODULE_3__.getOrderedFields)(schema)
-        .map(([, f]) => `${f.label}: ${f.description}`)
-        .join('\n');
-
-    const prompt = `Create a complete character description using the format below. Fill in every field with creative, detailed content.\n\nCharacter Brief:\n${characterBrief}\n\nFormat:\n{\n${fieldList}\n}`;
-    const systemPrompt = 'You are a character creation assistant. Generate a complete character description in the exact format requested. Be creative and detailed.';
-
-    debug('YOLO generating with brief length', characterBrief.length);
-    debug('[YOLO] System prompt:', systemPrompt);
-    debug('[YOLO] Prompt:', prompt);
-
-    const result = await (0,_script_js__WEBPACK_IMPORTED_MODULE_0__.generateRaw)({ prompt, systemPrompt, responseLength: 2000 });
-    return (0,_reasoning_js__WEBPACK_IMPORTED_MODULE_1__.removeReasoningFromString)(result).trim();
-}
-
-// ─── Reverse Mapping ───
-
-async function handleReverseMap() {
-    if (activeFieldKey) return;
-
-    const descField = document.getElementById('description_textarea');
-    const description = descField?.value?.trim();
-    if (!description) {
-        (0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.toast)('No existing description to import from.', 'warning');
-        return;
-    }
-
-    activeFieldKey = '__reverse__';
-    setAllFieldsDisabled(true);
-    setStatusBar('Parsing existing description into fields...');
-
-    try {
-        const parsed = await reverseMapDescription(description, currentSchema);
-        if (abortRequested) return;
-
-        // Populate fields
-        for (const [key, value] of Object.entries(parsed)) {
-            const input = document.getElementById(`acc_field_${key}`);
-            if (input && value) {
-                input.value = value;
-                fieldStates[key].currentValue = value;
-                fieldStates[key].originalSeed = value;
-            }
-        }
-        (0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.toast)('Description parsed into fields. Review and edit as needed.', 'success');
-    } catch (err) {
-        console.error('ACC reverse map error:', err);
-        (0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.toast)(`Reverse mapping failed: ${err.message}`, 'error');
-    } finally {
-        activeFieldKey = null;
-        abortRequested = false;
-        setAllFieldsDisabled(false);
-        setStatusBar(null);
-    }
-}
-
-async function reverseMapDescription(description, schema) {
-    // Fast path: if the description is a stringified character data object
-    // (which is what compileDescription now produces), parse it directly and
-    // validate against the schema. This avoids an LLM round-trip entirely
-    // for descriptions that were compiled by this extension.
-    const direct = (0,_schema_validation_js__WEBPACK_IMPORTED_MODULE_4__.tryParseCharacterData)(description, schema);
-    if (direct) {
-        // Keep only keys the current schema knows about — extra keys from a
-        // different schema version are preserved in the file but not surfaced
-        // as fields in this modal.
-        const filtered = {};
-        for (const key of Object.keys(schema.fields)) {
-            if (typeof direct[key] === 'string' && direct[key].trim()) {
-                filtered[key] = direct[key];
-            }
-        }
-        debug('Reverse mapped fields (JSON fast path):', Object.keys(filtered).length);
-        return filtered;
-    }
-
-    // Fallback: legacy prose description — use the LLM to extract fields.
-    const fieldList = (0,_default_character_schema_js__WEBPACK_IMPORTED_MODULE_3__.getOrderedFields)(schema)
-        .map(([key, f]) => `${key}: ${f.label} — ${f.description}`)
-        .join('\n');
-
-    const prompt = `Parse this character description into the following fields. For each field, output exactly one line: FIELD_KEY | value\nIf a field has no matching content, output: FIELD_KEY | (empty)\n\nFields:\n${fieldList}\n\nDescription:\n${description}`;
-    const systemPrompt = 'You are a character parsing assistant. Extract information from the description into the specified fields. Output exactly one line per field in the format: FIELD_KEY | value';
-
-    debug('[ReverseMap] System prompt:', systemPrompt);
-    debug('[ReverseMap] Prompt:', prompt);
-
-    const result = await (0,_script_js__WEBPACK_IMPORTED_MODULE_0__.generateRaw)({ prompt, systemPrompt, responseLength: 2000 });
-    const cleaned = (0,_reasoning_js__WEBPACK_IMPORTED_MODULE_1__.removeReasoningFromString)(result).trim();
-
-    const parsed = {};
-    for (const line of cleaned.split('\n')) {
-        const pipeIndex = line.indexOf('|');
-        if (pipeIndex === -1) continue;
-        const key = line.substring(0, pipeIndex).trim();
-        const value = line.substring(pipeIndex + 1).trim();
-        if (schema.fields[key] && value && value !== '(empty)') {
-            parsed[key] = value;
-        }
-    }
-
-    debug('Reverse mapped fields (LLM fallback):', Object.keys(parsed).length);
-    return parsed;
-}
-
-// ─── Compilation & Output ───
-
-function handleDone() {
-    if (activeFieldKey) return;
-
-    const compiled = compileDescription(currentSchema, fieldStates);
-    if (!compiled.trim()) {
-        (0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.toast)('All fields are empty. Nothing to save.', 'warning');
-        return;
-    }
-
-    // Set ST description field
-    const descField = document.getElementById('description_textarea');
-    if (descField) {
-        descField.value = compiled;
-        descField.dispatchEvent(new Event('input', { bubbles: true }));
-    }
-
-    // Set ST name field
-    const nameValue = fieldStates.characterName?.currentValue?.trim();
-    if (nameValue) {
-        const nameField = document.getElementById('character_name_pole');
-        if (nameField) {
-            nameField.value = nameValue;
-            nameField.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-    }
-
-    (0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.toast)('Character description compiled and applied!', 'success');
-    closeModal();
-}
-
-function compileDescription(schema, states) {
-    const obj = {};
-    for (const [key] of (0,_default_character_schema_js__WEBPACK_IMPORTED_MODULE_3__.getOrderedFields)(schema)) {
-        const val = states[key]?.currentValue?.trim();
-        if (val) {
-            obj[key] = val;
-        }
-    }
-    if (Object.keys(obj).length === 0) return '';
-    return JSON.stringify(obj, null, 2);
-}
-
-// ─── UI Helpers ───
-
-function setFieldGeneratingUI(fieldKey, generating) {
-    const input = document.getElementById(`acc_field_${fieldKey}`);
-    const assistBtn = document.getElementById(`acc_assist_${fieldKey}`);
-    const retryBtn = document.getElementById(`acc_retry_${fieldKey}`);
-    const resetBtn = document.getElementById(`acc_reset_${fieldKey}`);
-
-    if (generating) {
-        input?.setAttribute('disabled', 'true');
-        if (assistBtn) {
-            assistBtn.innerHTML = '<span class="fa-solid fa-stop"></span>';
-            assistBtn.title = 'Stop';
-        }
-        retryBtn?.classList.add('acc-hidden');
-        resetBtn?.classList.add('acc-hidden');
-
-        // Disable all other field buttons and inputs
-        document.querySelectorAll('.acc-btn').forEach(btn => {
-            if (btn.id !== `acc_assist_${fieldKey}`) {
-                btn.classList.add('acc-disabled');
-            }
-        });
-        document.querySelectorAll('.acc-field-input').forEach(el => {
-            if (el.id !== `acc_field_${fieldKey}`) {
-                el.setAttribute('disabled', 'true');
-            }
-        });
-
-        // Disable YOLO and Done buttons
-        document.getElementById('acc_yolo_btn')?.classList.add('acc-disabled');
-        document.getElementById('acc_done_btn')?.classList.add('acc-disabled');
-    } else {
-        input?.removeAttribute('disabled');
-        if (fieldStates[fieldKey]?.hasGenerated) {
-            // Post-generation: show Continue button
-            if (assistBtn) {
-                assistBtn.innerHTML = '<span class="fa-solid fa-forward"></span>';
-                assistBtn.title = 'Continue';
-            }
-            retryBtn?.classList.remove('acc-hidden');
-            resetBtn?.classList.remove('acc-hidden');
-        } else {
-            if (assistBtn) {
-                assistBtn.innerHTML = '<span class="fa-solid fa-wand-magic-sparkles"></span>';
-                assistBtn.title = 'Assist';
-            }
-        }
-
-        // Re-enable all field buttons and inputs
-        document.querySelectorAll('.acc-btn').forEach(btn => {
-            btn.classList.remove('acc-disabled');
-        });
-        document.querySelectorAll('.acc-field-input').forEach(el => {
-            el.removeAttribute('disabled');
-        });
-
-        // Re-enable YOLO and Done buttons
-        document.getElementById('acc_yolo_btn')?.classList.remove('acc-disabled');
-        document.getElementById('acc_done_btn')?.classList.remove('acc-disabled');
-    }
-}
-
-function setAllFieldsDisabled(disabled) {
-    document.querySelectorAll('.acc-field-input').forEach(el => {
-        if (disabled) el.setAttribute('disabled', 'true');
-        else el.removeAttribute('disabled');
-    });
-    document.querySelectorAll('.acc-btn').forEach(btn => {
-        if (disabled) btn.classList.add('acc-disabled');
-        else btn.classList.remove('acc-disabled');
-    });
-    const yoloBtn = document.getElementById('acc_yolo_btn');
-    const doneBtn = document.getElementById('acc_done_btn');
-    if (disabled) {
-        yoloBtn?.classList.add('acc-disabled');
-        doneBtn?.classList.add('acc-disabled');
-    } else {
-        yoloBtn?.classList.remove('acc-disabled');
-        doneBtn?.classList.remove('acc-disabled');
-    }
-}
-
-function setStatusBar(message) {
-    const bar = document.getElementById('acc_status_bar');
-    const text = document.getElementById('acc_status_text');
-    if (!bar || !text) return;
-    if (message) {
-        text.textContent = message;
-        bar.classList.remove('acc-hidden');
-    } else {
-        bar.classList.add('acc-hidden');
-    }
-}
-
-function escapeHTML(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-}
-
-function escapeAttr(str) {
-    return str.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-}
-
-
-/***/ },
-
-/***/ "./src/default-character-schema.js"
-/*!*****************************************!*\
-  !*** ./src/default-character-schema.js ***!
-  \*****************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   DEFAULT_SCHEMA: () => (/* binding */ DEFAULT_SCHEMA),
-/* harmony export */   getOrderedFields: () => (/* binding */ getOrderedFields),
-/* harmony export */   validateSchema: () => (/* reexport safe */ _schema_validation_js__WEBPACK_IMPORTED_MODULE_0__.validateCharacterSchema)
-/* harmony export */ });
-/* harmony import */ var _schema_validation_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./schema-validation.js */ "./src/schema-validation.js");
-/**
- * Default Character Schema for Assisted Character Creation.
- *
- * Each field defines an attribute of a character card. The schema drives
- * the modal form layout, per-field LLM prompts, and the compiled output
- * that is written into SillyTavern's description field.
- *
- * The `prose` flag is NOT part of the schema — it's a per-field UI toggle
- * that the user controls at runtime. Prose state is persisted in extension
- * settings so changes survive modal close/reopen.
- */
-
-const DEFAULT_SCHEMA = {
-    schemaName: 'Default Character Schema',
-    fields: {
-        characterName: {
-            order: 1,
-            label: 'Character Name',
-            description: 'Full name, aliases/titles in parentheses if any.',
-            responseLength: 100,
-            prompt: 'Generate a fitting character name based on the brief and any notes provided. Include aliases or titles in parentheses if appropriate.\n\nCharacter Brief:\n{{context}}\n\nUser\'s notes for this field:\n{{seedText}}',
-        },
-        age: {
-            order: 2,
-            label: 'Age',
-            description: 'Numeric age and life-stage descriptor.',
-            responseLength: 80,
-            prompt: 'Determine an appropriate age for this character. Provide the numeric age and a brief life-stage descriptor (e.g. "28, young adult").\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
-        },
-        genderPronouns: {
-            order: 3,
-            label: 'Gender & Pronouns',
-            description: 'Gender identity and preferred pronouns.',
-            responseLength: 80,
-            prompt: 'Specify the character\'s gender identity and pronouns.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
-        },
-        species: {
-            order: 4,
-            label: 'Species / Race',
-            description: 'Species, race, or ancestry (human, elf, android, etc.).',
-            responseLength: 80,
-            prompt: 'Determine the character\'s species, race, or ancestry based on the setting and brief.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
-        },
-        occupation: {
-            order: 5,
-            label: 'Occupation / Role',
-            description: 'Job, title, social role, or adventuring class.',
-            responseLength: 100,
-            prompt: 'Determine the character\'s occupation, title, or role in their world.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
-        },
-        physicalAppearance: {
-            order: 6,
-            label: 'Physical Appearance',
-            description: 'Height, build, hair, eyes, distinguishing features.',
-            responseLength: 500,
-            prompt: 'Describe this character\'s physical appearance in vivid detail. Include height, build, hair, eyes, skin, and any distinguishing features.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
-        },
-        clothingStyle: {
-            order: 7,
-            label: 'Clothing & Style',
-            description: 'Typical attire, accessories, aesthetic.',
-            responseLength: 400,
-            prompt: 'Describe this character\'s typical clothing, accessories, and overall aesthetic style.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
-        },
-        personalityTraits: {
-            order: 8,
-            label: 'Personality Traits',
-            description: 'Core personality traits, temperament, demeanor.',
-            responseLength: 200,
-            prompt: 'List the character\'s core personality traits, temperament, and general demeanor. Use comma-separated descriptors.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
-        },
-        strengths: {
-            order: 9,
-            label: 'Strengths',
-            description: 'Key strengths, talents, positive qualities.',
-            responseLength: 200,
-            prompt: 'List this character\'s key strengths, talents, and positive qualities.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
-        },
-        weaknesses: {
-            order: 10,
-            label: 'Weaknesses',
-            description: 'Flaws, vulnerabilities, shortcomings.',
-            responseLength: 200,
-            prompt: 'List this character\'s flaws, vulnerabilities, and shortcomings.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
-        },
-        fears: {
-            order: 11,
-            label: 'Fears',
-            description: 'Phobias, deep fears, anxieties.',
-            responseLength: 150,
-            prompt: 'Identify this character\'s fears, phobias, or deep anxieties.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
-        },
-        motivations: {
-            order: 12,
-            label: 'Motivations & Goals',
-            description: 'What drives them, their ambitions and desires.',
-            responseLength: 400,
-            prompt: 'Describe what motivates this character — their goals, ambitions, and deepest desires.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
-        },
-        speechStyle: {
-            order: 13,
-            label: 'Speech Style',
-            description: 'How they talk: dialect, vocabulary, verbal tics, tone.',
-            responseLength: 400,
-            prompt: 'Describe how this character speaks — their dialect, vocabulary level, verbal tics, catchphrases, and conversational tone.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
-        },
-        mannerisms: {
-            order: 14,
-            label: 'Mannerisms & Habits',
-            description: 'Body language, habitual gestures, quirks.',
-            responseLength: 400,
-            prompt: 'Describe this character\'s mannerisms, habitual gestures, body language, and quirks.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
-        },
-        backstorySummary: {
-            order: 15,
-            label: 'Backstory Summary',
-            description: 'Origin, key events, current situation.',
-            responseLength: 600,
-            prompt: 'Write a backstory summary for this character covering their origin, formative experiences, key life events, and current situation.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
-        },
-        relationships: {
-            order: 16,
-            label: 'Relationships',
-            description: 'Key relationships: family, friends, rivals, romantic.',
-            responseLength: 500,
-            prompt: 'Describe this character\'s key relationships — family, friends, rivals, mentors, romantic interests, or enemies.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
-        },
-        skills: {
-            order: 17,
-            label: 'Skills & Abilities',
-            description: 'Trained skills, powers, areas of expertise.',
-            responseLength: 200,
-            prompt: 'List this character\'s trained skills, special abilities, powers, or areas of expertise.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
-        },
-        possessions: {
-            order: 18,
-            label: 'Key Possessions',
-            description: 'Important items, weapons, heirlooms, tools.',
-            responseLength: 200,
-            prompt: 'List this character\'s important possessions — signature items, weapons, heirlooms, tools, or artifacts.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
-        },
-        likes: {
-            order: 19,
-            label: 'Likes',
-            description: 'Things they enjoy, hobbies, preferences.',
-            responseLength: 200,
-            prompt: 'List things this character enjoys — hobbies, preferences, favorite activities, foods, etc.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
-        },
-        dislikes: {
-            order: 20,
-            label: 'Dislikes',
-            description: 'Things they dislike, pet peeves, aversions.',
-            responseLength: 200,
-            prompt: 'List things this character dislikes — pet peeves, aversions, things that annoy or upset them.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
-        },
-        additionalNotes: {
-            order: 21,
-            label: 'Additional Notes',
-            description: 'Anything else: lore hooks, secrets, trivia.',
-            responseLength: 500,
-            prompt: 'Generate additional notes for this character — lore hooks, hidden secrets, trivia, or anything else that adds depth.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
-        },
-    },
-};
-
-// Schema validation is implemented in schema-validation.js using AJV.
-// Re-exported here so existing imports keep working.
-
-
-/**
- * Returns fields sorted by their order property as [key, field] pairs.
- * @param {object} schema
- * @returns {Array<[string, object]>}
- */
-function getOrderedFields(schema) {
-    return Object.entries(schema.fields).sort((a, b) => a[1].order - b[1].order);
-}
-
-
-/***/ },
-
-/***/ "./src/phrasing.js"
-/*!*************************!*\
-  !*** ./src/phrasing.js ***!
-  \*************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   applyPhrasingEnabledState: () => (/* binding */ applyPhrasingEnabledState),
-/* harmony export */   bindPhrasingSettings: () => (/* binding */ bindPhrasingSettings),
-/* harmony export */   clearPhrasingInjection: () => (/* binding */ clearPhrasingInjection),
-/* harmony export */   createHamburgerMenuItem: () => (/* binding */ createHamburgerMenuItem),
-/* harmony export */   createInputAreaButton: () => (/* binding */ createInputAreaButton),
-/* harmony export */   handlePhrasingSeedReinjection: () => (/* binding */ handlePhrasingSeedReinjection),
-/* harmony export */   hideAllPhrasingButtons: () => (/* binding */ hideAllPhrasingButtons),
-/* harmony export */   initPhrasing: () => (/* binding */ initPhrasing),
-/* harmony export */   isPhrasing: () => (/* binding */ isPhrasing),
-/* harmony export */   loadPromptTextarea: () => (/* binding */ loadPromptTextarea),
-/* harmony export */   onGenerationEnded: () => (/* binding */ onGenerationEnded),
-/* harmony export */   onGenerationStarted: () => (/* binding */ onGenerationStarted),
-/* harmony export */   registerPhrasingSlashCommand: () => (/* binding */ registerPhrasingSlashCommand),
-/* harmony export */   showAllPhrasingButtons: () => (/* binding */ showAllPhrasingButtons)
-/* harmony export */ });
-/* harmony import */ var _slash_commands_SlashCommandParser_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../slash-commands/SlashCommandParser.js */ "../../../../slash-commands/SlashCommandParser.js");
-/* harmony import */ var _slash_commands_SlashCommand_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../../slash-commands/SlashCommand.js */ "../../../../slash-commands/SlashCommand.js");
-/* harmony import */ var _slash_commands_SlashCommandArgument_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../slash-commands/SlashCommandArgument.js */ "../../../../slash-commands/SlashCommandArgument.js");
-/* harmony import */ var _script_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../../script.js */ "../../../../../script.js");
-/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./utils.js */ "./src/utils.js");
-/**
- * Phrasing module — enriches messages with AI-generated narration via
- * prompt injection + impersonate/swipe flows.
- */
-
-
-
-
-
-
-
-// ─── Constants ───
-
-const PHRASING_INJECTION_KEY = 'phrasing_instruction';
-const PHRASING_SEED_EXTRA_KEY = 'phrasing_seed';
-
-const DEFAULT_PHRASING_PROMPT = `[Rewrite the following message. Preserve its meaning, intent, and any dialogue, but enrich it with narration, action, and detail consistent with the character and the current scene. Do not continue the scene beyond what the original message describes.
-
-{{phrasingSeed}}]`;
-
-// ─── State ───
-
-let phrasingActive = false;
-
-/** @type {{ settings: object }} */
-let ctx = null;
-
-/** @type {{ isPossessing: function, getPossessedCharName: function, postPossessedMessage: function }} */
-let possessionApi = null;
-
-let debug = () => {};
-
-// ─── Public Getters ───
-
-function isPhrasing() {
-    return phrasingActive;
-}
-
-// ─── Prompt Management ───
-
-function getActivePrompt() {
-    const context = (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.getContext)();
-    const chatPrompt = context.chatMetadata?.phrasing?.prompt;
-    debug('getActivePrompt — source:', chatPrompt ? 'chat metadata' : 'default');
-    return chatPrompt || DEFAULT_PHRASING_PROMPT;
-}
-
-function formatSeedWithSpeaker(seedText, isUser, speakerName) {
-    const context = (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.getContext)();
-    let name;
-    if (speakerName) {
-        name = speakerName;
-    } else if (isUser) {
-        name = context.name1;
-    } else {
-        name = context.name2;
-    }
-    debug('formatSeedWithSpeaker — speaker:', name, '| isUser:', isUser);
-    return `${name}: ${seedText}`;
-}
-
-function assemblePrompt(seedText) {
-    debug('assemblePrompt — seed length:', seedText.length);
-    let prompt = getActivePrompt();
-    prompt = prompt.replace(/\{\{phrasingSeed\}\}/g, seedText);
-    prompt = (0,_script_js__WEBPACK_IMPORTED_MODULE_3__.substituteParams)(prompt);
-    debug('assemblePrompt — final length:', prompt.length);
-    return prompt;
-}
-
-// ─── Injection ───
-
-function injectPhrasingPrompt(assembledPrompt) {
-    debug('injectPhrasingPrompt — injecting at depth 0, SYSTEM role');
-    (0,_script_js__WEBPACK_IMPORTED_MODULE_3__.setExtensionPrompt)(
-        PHRASING_INJECTION_KEY,
-        assembledPrompt,
-        _script_js__WEBPACK_IMPORTED_MODULE_3__.extension_prompt_types.IN_CHAT,
-        0,
-        false,
-        _script_js__WEBPACK_IMPORTED_MODULE_3__.extension_prompt_roles.SYSTEM,
-    );
-}
-
-function clearPhrasingInjection() {
-    debug('clearPhrasingInjection — removing injection');
-    (0,_script_js__WEBPACK_IMPORTED_MODULE_3__.setExtensionPrompt)(PHRASING_INJECTION_KEY, '', _script_js__WEBPACK_IMPORTED_MODULE_3__.extension_prompt_types.NONE, 0);
-}
-
-/**
- * Called from the continue interceptor — reinjects the phrasing seed prompt
- * if the last message was rephrased.
- */
-function handlePhrasingSeedReinjection() {
-    if (!ctx.settings.phrasingEnabled) return;
-
-    const context = (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.getContext)();
-    const lastIndex = context.chat.length - 1;
-    if (lastIndex < 0) return;
-
-    const message = context.chat[lastIndex];
-    const storedPrompt = message?.extra?.[PHRASING_SEED_EXTRA_KEY];
-    if (!storedPrompt) return;
-
-    debug('Reinjecting phrasing seed for continue on message', lastIndex);
-    injectPhrasingPrompt(storedPrompt);
-}
-
-// ─── Button Visibility ───
-
-function hideAllPhrasingButtons() {
-    document.querySelectorAll('.phrasing-trigger').forEach(el => {
-        el.classList.add('phrasing-hidden');
-    });
-}
-
-function showAllPhrasingButtons() {
-    if (!ctx.settings.phrasingEnabled) return;
-    document.querySelectorAll('.phrasing-trigger').forEach(el => {
-        el.classList.remove('phrasing-hidden');
-    });
-}
-
-function applyPhrasingEnabledState() {
-    if (ctx.settings.phrasingEnabled) {
-        showAllPhrasingButtons();
-    } else {
-        hideAllPhrasingButtons();
-    }
-}
-
-// ─── Primary Flow (Input Enrichment) ───
-
-async function doPrimaryFlow(seedText) {
-    debug('doPrimaryFlow — starting, seed length:', seedText.length);
-    const context = (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.getContext)();
-
-    if (context.isGenerating) {
-        debug('doPrimaryFlow — ABORTED: generation in progress');
-        return '';
-    }
-
-    phrasingActive = true;
-
-    try {
-        if (possessionApi?.isPossessing()) {
-            debug('doPrimaryFlow — possessed path: posting message then swiping');
-
-            const colonIndex = seedText.indexOf(': ');
-            const rawText = colonIndex !== -1 ? seedText.substring(colonIndex + 2) : seedText;
-
-            const messageIndex = await possessionApi.postPossessedMessage(rawText);
-            if (messageIndex < 0) {
-                debug('doPrimaryFlow — FAILED: could not post possessed message');
-                return '';
-            }
-
-            await new Promise(resolve => setTimeout(resolve, 100));
-
-            const result = await doSwipeMode(messageIndex);
-            debug('doPrimaryFlow — possessed path complete, result length:', result.length);
-            return result;
-        } else {
-            const assembled = assemblePrompt(seedText);
-            injectPhrasingPrompt(assembled);
-
-            debug('doPrimaryFlow — normal path: triggering impersonate');
-            const impersonateBtn = document.getElementById('option_impersonate');
-            if (impersonateBtn) {
-                impersonateBtn.click();
-            } else {
-                debug('doPrimaryFlow — FAILED: option_impersonate not found');
-                return '';
-            }
-
-            await (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.waitForGenerationEnd)();
-
-            const textarea = document.getElementById('send_textarea');
-            const result = textarea?.value?.trim() || '';
-            debug('doPrimaryFlow — normal path complete, result length:', result.length);
-            return result;
-        }
-    } finally {
-        clearPhrasingInjection();
-        phrasingActive = false;
-        showAllPhrasingButtons();
-        debug('doPrimaryFlow — cleanup complete');
-    }
-}
-
-// ─── Swipe Mode ───
-
-async function doSwipeMode(messageIndex) {
-    debug('doSwipeMode — starting for message index:', messageIndex);
-    const context = (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.getContext)();
-
-    if (context.isGenerating) {
-        debug('doSwipeMode — ABORTED: generation in progress');
-        return '';
-    }
-
-    const message = context.chat[messageIndex];
-    if (!message) {
-        debug('doSwipeMode — ABORTED: no message at index', messageIndex);
-        return '';
-    }
-
-    const rawSeedText = message.mes;
-    if (!rawSeedText || !rawSeedText.trim()) {
-        debug('doSwipeMode — ABORTED: message is empty');
-        toastr.warning('Cannot rephrase an empty message.', 'Phrasing!');
-        return '';
-    }
-
-    const seedText = formatSeedWithSpeaker(rawSeedText, message.is_user, message.name);
-    debug('doSwipeMode — seed length:', seedText.length, '| speaker:', message.name);
-
-    const wasAlreadyActive = phrasingActive;
-    phrasingActive = true;
-
-    try {
-        if (!message.swipes || message.swipes.length === 0) {
-            debug('doSwipeMode — initializing swipes array');
-            message.swipes = [message.mes];
-            message.swipe_id = 0;
-            message.swipe_info = [{}];
-        }
-
-        const assembled = assemblePrompt(seedText);
-        injectPhrasingPrompt(assembled);
-
-        if (!message.extra) message.extra = {};
-        message.extra[PHRASING_SEED_EXTRA_KEY] = assembled;
-        message.extra.overswipe_behavior = 'regenerate';
-
-        const lastSwipeIndex = message.swipes.length - 1;
-        if (message.swipe_id !== lastSwipeIndex) {
-            debug('doSwipeMode — jumping to last swipe', lastSwipeIndex);
-            message.swipe_id = lastSwipeIndex;
-            message.mes = message.swipes[lastSwipeIndex];
-
-            const messageEl = document.querySelector(`#chat .mes[mesid="${messageIndex}"]`);
-            if (messageEl) {
-                const textEl = messageEl.querySelector('.mes_text');
-                if (textEl) {
-                    if (typeof context.messageFormatting === 'function') {
-                        textEl.innerHTML = context.messageFormatting(
-                            message.mes, message.name, message.is_system, message.is_user, messageIndex,
-                        );
-                    } else {
-                        textEl.textContent = message.mes;
-                    }
-                }
-                const swipeCounter = messageEl.querySelector('.swipes-counter');
-                if (swipeCounter) {
-                    swipeCounter.textContent = `${message.swipe_id + 1}/${message.swipes.length}`;
-                }
-            }
-        }
-
-        const swipeRight = document.querySelector(`#chat .mes[mesid="${messageIndex}"] .swipe_right`);
-        if (!swipeRight) {
-            debug('doSwipeMode — FAILED: swipe_right button not found');
-            return '';
-        }
-
-        debug('doSwipeMode — clicking swipe_right');
-        swipeRight.click();
-
-        const result = await (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.waitForGenerationEnd)();
-        debug('doSwipeMode — complete, result length:', result.length);
-        return result;
-    } finally {
-        clearPhrasingInjection();
-        if (!wasAlreadyActive) {
-            phrasingActive = false;
-            showAllPhrasingButtons();
-        }
-        debug('doSwipeMode — cleanup complete');
-    }
-}
-
-// ─── Button Handlers ───
-
-async function onInputPhrasingClick() {
-    debug('onInputPhrasingClick — triggered');
-    if (!ctx.settings.phrasingEnabled) return;
-
-    const context = (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.getContext)();
-    if (context.isGenerating) return;
-
-    hideAllPhrasingButtons();
-
-    const textarea = document.getElementById('send_textarea');
-    const inputText = textarea?.value?.trim();
-    const editingIndex = (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.getEditingMessageIndex)();
-
-    try {
-        if (!inputText && editingIndex < 0) {
-            debug('onInputPhrasingClick — empty input, no edit → rephrase last message');
-            const lastIndex = context.chat.length - 1;
-            if (lastIndex < 0) {
-                toastr.warning('No messages to rephrase.', 'Phrasing!');
-                return;
-            }
-            await doSwipeMode(lastIndex);
-        } else if (editingIndex >= 0 && !inputText) {
-            debug('onInputPhrasingClick — editing message at index', editingIndex, '→ confirm and rephrase');
-            (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.confirmActiveMessageEdit)();
-            await new Promise(resolve => setTimeout(resolve, 100));
-            await doSwipeMode(editingIndex);
-        } else {
-            if (editingIndex >= 0) {
-                debug('onInputPhrasingClick — confirming active edit before processing input');
-                (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.confirmActiveMessageEdit)();
-                await new Promise(resolve => setTimeout(resolve, 100));
-            }
-
-            debug('onInputPhrasingClick — input text present, seed length:', inputText.length);
-            textarea.value = '';
-            textarea.dispatchEvent(new Event('input', { bubbles: true }));
-
-            const formattedSeed = possessionApi?.isPossessing()
-                ? formatSeedWithSpeaker(inputText, false, possessionApi.getPossessedCharName())
-                : formatSeedWithSpeaker(inputText, true);
-
-            await doPrimaryFlow(formattedSeed);
-        }
-    } finally {
-        showAllPhrasingButtons();
-    }
-}
-
-// ─── Prompt Settings UI ───
-
-function loadPromptTextarea() {
-    const textarea = document.getElementById('phrasing_prompt_textarea');
-    if (!textarea) return;
-    textarea.value = getActivePrompt();
-}
-
-function onSaveToChat() {
-    debug('onSaveToChat — triggered');
-    const textarea = document.getElementById('phrasing_prompt_textarea');
-    if (!textarea) return;
-
-    const promptText = textarea.value.trim();
-    const context = (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.getContext)();
-
-    if (promptText && !promptText.includes('{{phrasingSeed}}')) {
-        toastr.warning("Warning: Prompt does not contain {{phrasingSeed}}. The AI won't receive your input text.", 'Phrasing!');
-    }
-
-    if (!context.chatMetadata.phrasing) {
-        context.chatMetadata.phrasing = {};
-    }
-
-    context.chatMetadata.phrasing.prompt = promptText || null;
-    context.saveMetadata();
-    toastr.success('Phrasing! prompt saved to chat.', 'Phrasing!');
-}
-
-function onRestoreDefault() {
-    debug('onRestoreDefault — triggered');
-    if (!confirm('Restore the default Phrasing! prompt? This will overwrite your current prompt.')) return;
-
-    const textarea = document.getElementById('phrasing_prompt_textarea');
-    if (textarea) {
-        textarea.value = DEFAULT_PHRASING_PROMPT;
-    }
-
-    const context = (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.getContext)();
-    if (context.chatMetadata.phrasing) {
-        context.chatMetadata.phrasing.prompt = null;
-    }
-    context.saveMetadata();
-    toastr.info('Phrasing! prompt restored to default.', 'Phrasing!');
-}
-
-// ─── Generation Lifecycle ───
-
-function onGenerationStarted() {
-    hideAllPhrasingButtons();
-}
-
-function onGenerationEnded() {
-    if (phrasingActive) {
-        clearPhrasingInjection();
-        phrasingActive = false;
-    }
-    showAllPhrasingButtons();
-}
-
-// ─── UI Creation ───
-
-function createInputAreaButton() {
-    if (document.getElementById('phrasing_send_button')) return;
-
-    const sendForm = document.getElementById('rightSendForm');
-    if (!sendForm) return;
-
-    const btn = document.createElement('div');
-    btn.id = 'phrasing_send_button';
-    btn.classList.add('phrasing-trigger', 'fa-solid', 'fa-pen-fancy', 'interactable');
-    btn.title = 'Phrasing! — Enrich your message with AI narration';
-    btn.addEventListener('click', onInputPhrasingClick);
-
-    sendForm.appendChild(btn);
-    debug('Created input area button');
-}
-
-function createHamburgerMenuItem() {
-    if (document.getElementById('phrasing_menu_button')) return;
-
-    const impersonateBtn = document.getElementById('option_impersonate');
-    if (!impersonateBtn) return;
-
-    const btn = document.createElement('div');
-    btn.id = 'phrasing_menu_button';
-    btn.classList.add('phrasing-trigger', 'list-group-item', 'interactable');
-    btn.innerHTML = '<span class="fa-solid fa-pen-fancy"></span> Phrasing!';
-    btn.addEventListener('click', onInputPhrasingClick);
-
-    impersonateBtn.parentNode.insertBefore(btn, impersonateBtn.nextSibling);
-    debug('Created hamburger menu item');
-}
-
-// ─── Settings Panel ───
-
-function bindPhrasingSettings(saveSettings) {
-    const phrasingEnabled = document.getElementById('phrasing_enabled');
-    if (phrasingEnabled) {
-        phrasingEnabled.checked = ctx.settings.phrasingEnabled;
-        phrasingEnabled.addEventListener('change', (e) => {
-            ctx.settings.phrasingEnabled = e.target.checked;
-            saveSettings();
-            applyPhrasingEnabledState();
-        });
-    }
-
-    const phrasingDebugMode = document.getElementById('phrasing_debug_mode');
-    if (phrasingDebugMode) {
-        phrasingDebugMode.checked = ctx.settings.phrasingDebugMode;
-        phrasingDebugMode.addEventListener('change', (e) => {
-            ctx.settings.phrasingDebugMode = e.target.checked;
-            saveSettings();
-            debug('debugMode toggled to', ctx.settings.phrasingDebugMode);
-        });
-    }
-
-    document.getElementById('phrasing_save_to_chat')?.addEventListener('click', onSaveToChat);
-    document.getElementById('phrasing_restore_default')?.addEventListener('click', onRestoreDefault);
-}
-
-// ─── Slash Command ───
-
-function registerPhrasingSlashCommand() {
-    _slash_commands_SlashCommandParser_js__WEBPACK_IMPORTED_MODULE_0__.SlashCommandParser.addCommandObject(_slash_commands_SlashCommand_js__WEBPACK_IMPORTED_MODULE_1__.SlashCommand.fromProps({
-        name: 'phrasing',
-        callback: async (_namedArgs, unnamedArgs) => {
-            debug('slashCommand /phrasing — invoked');
-            if (!ctx.settings.phrasingEnabled) return '';
-
-            const rawSeedText = unnamedArgs?.trim();
-
-            if (rawSeedText) {
-                const seedText = possessionApi?.isPossessing()
-                    ? formatSeedWithSpeaker(rawSeedText, false, possessionApi.getPossessedCharName())
-                    : formatSeedWithSpeaker(rawSeedText, true);
-                return await doPrimaryFlow(seedText);
-            } else {
-                const context = (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.getContext)();
-                const lastIndex = context.chat.length - 1;
-                if (lastIndex < 0) {
-                    toastr.warning('No messages to rephrase.', 'Phrasing!');
-                    return '';
-                }
-                return await doSwipeMode(lastIndex);
-            }
-        },
-        unnamedArgumentList: [
-            _slash_commands_SlashCommandArgument_js__WEBPACK_IMPORTED_MODULE_2__.SlashCommandArgument.fromProps({
-                description: 'Optional seed text to post and rephrase',
-                typeList: [_slash_commands_SlashCommandArgument_js__WEBPACK_IMPORTED_MODULE_2__.ARGUMENT_TYPE.STRING],
-                isRequired: false,
-            }),
-        ],
-        aliases: [],
-        helpString: 'Enriches a message with AI narration. With text: generates enriched prose. Without text: rephrases the last message as a new swipe.',
-    }));
-
-    debug('Registered /phrasing slash command');
-}
-
-// ─── Init ───
-
-/**
- * @param {object} options
- * @param {object} options.settings       - Shared mutable settings reference.
- * @param {object} options.possessionApi  - { isPossessing(), getPossessedCharName(), postPossessedMessage(text) }
- */
-function initPhrasing({ settings, possessionApi: pApi }) {
-    ctx = { settings };
-    possessionApi = pApi;
-    debug = (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.createDebugLogger)('PHRASING', () => settings.phrasingDebugMode);
-}
-
-
-/***/ },
-
-/***/ "./src/possession.js"
-/*!***************************!*\
-  !*** ./src/possession.js ***!
-  \***************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   attachContinueInterceptor: () => (/* binding */ attachContinueInterceptor),
-/* harmony export */   bindPossessionSettings: () => (/* binding */ bindPossessionSettings),
-/* harmony export */   getPossessedCharName: () => (/* binding */ getPossessedCharName),
-/* harmony export */   getPossessedCharacter: () => (/* binding */ getPossessedCharacter),
-/* harmony export */   hidePossessionImpersonateButton: () => (/* binding */ hidePossessionImpersonateButton),
-/* harmony export */   initPossession: () => (/* binding */ initPossession),
-/* harmony export */   isGenerationGuarded: () => (/* binding */ isGenerationGuarded),
-/* harmony export */   isPossessing: () => (/* binding */ isPossessing),
-/* harmony export */   loadPossessionState: () => (/* binding */ loadPossessionState),
-/* harmony export */   onCharacterPageLoaded: () => (/* binding */ onCharacterPageLoaded),
-/* harmony export */   onGenerationEnded: () => (/* binding */ onGenerationEnded),
-/* harmony export */   onGenerationStarted: () => (/* binding */ onGenerationStarted),
-/* harmony export */   onGroupUpdated: () => (/* binding */ onGroupUpdated),
-/* harmony export */   onGroupWrapperFinished: () => (/* binding */ onGroupWrapperFinished),
-/* harmony export */   onMessageSent: () => (/* binding */ onMessageSent),
-/* harmony export */   postPossessedMessage: () => (/* binding */ postPossessedMessage),
-/* harmony export */   registerPossessionSlashCommands: () => (/* binding */ registerPossessionSlashCommands),
-/* harmony export */   showPossessionImpersonateButton: () => (/* binding */ showPossessionImpersonateButton),
-/* harmony export */   syncAllPossessionUI: () => (/* binding */ syncAllPossessionUI)
-/* harmony export */ });
-/* harmony import */ var _group_chats_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../group-chats.js */ "../../../../group-chats.js");
-/* harmony import */ var _slash_commands_SlashCommandParser_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../../slash-commands/SlashCommandParser.js */ "../../../../slash-commands/SlashCommandParser.js");
-/* harmony import */ var _slash_commands_SlashCommand_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../slash-commands/SlashCommand.js */ "../../../../slash-commands/SlashCommand.js");
-/* harmony import */ var _slash_commands_SlashCommandArgument_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../slash-commands/SlashCommandArgument.js */ "../../../../slash-commands/SlashCommandArgument.js");
-/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./utils.js */ "./src/utils.js");
-/**
- * Possession module — lets the user "possess" a character so their messages
- * are posted under that character's name/avatar.
- */
-
-
-
-
-
-
-
-const POSSESSION_METADATA_KEY = 'possession';
-
-// ─── State ───
-
-let possessedCharName = null;
-let possessedCharAvatar = null;
-let generationGuard = false;
-
-/** @type {{ settings: object, saveSettings: function }} */
-let ctx = null;
-
-/** @type {{ handlePhrasingSeedReinjection: function, isPhrasing: function }} */
-let phrasingApi = null;
-
-let debug = () => {};
-
-function toast(message, type = 'info') {
-    if (!ctx.settings.possessionShowToast) return;
-    (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.toast)(message, type, "Saint's Silly Extensions");
-}
-
-// ─── Public Getters ───
-
-function isPossessing() {
-    return ctx.settings.possessionEnabled && possessedCharName !== null;
-}
-
-function getPossessedCharName() {
-    return possessedCharName;
-}
-
-function isGenerationGuarded() {
-    return generationGuard;
-}
-
-// ─── Persistence ───
-
-function savePossessionState() {
-    const context = (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.getContext)();
-    context.chatMetadata[POSSESSION_METADATA_KEY] = {
-        name: possessedCharName,
-        avatar: possessedCharAvatar,
-    };
-    context.saveMetadata();
-    debug('Saved possession state:', possessedCharName, '| avatar:', possessedCharAvatar);
-}
-
-function loadPossessionState() {
-    const context = (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.getContext)();
-    const saved = context.chatMetadata?.[POSSESSION_METADATA_KEY] ?? null;
-    if (saved && typeof saved === 'object') {
-        possessedCharName = saved.name ?? null;
-        possessedCharAvatar = saved.avatar ?? null;
-    } else {
-        possessedCharName = saved;
-        possessedCharAvatar = null;
-    }
-    debug('Loaded possession state:', possessedCharName, '| avatar:', possessedCharAvatar);
-}
-
-// ─── Character Utilities ───
-
-function getPossessedCharacter() {
-    if (!possessedCharName) return null;
-    const context = (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.getContext)();
-    if (possessedCharAvatar) {
-        const byAvatar = context.characters.find(c => c.avatar === possessedCharAvatar);
-        if (byAvatar) return byAvatar;
-    }
-    // In group chats, prefer the character whose avatar is in the group members list
-    if (_group_chats_js__WEBPACK_IMPORTED_MODULE_0__.selected_group) {
-        const group = _group_chats_js__WEBPACK_IMPORTED_MODULE_0__.groups.find(g => g.id === _group_chats_js__WEBPACK_IMPORTED_MODULE_0__.selected_group);
-        if (group) {
-            const groupChar = group.members
-                .map(avatar => context.characters.find(c => c.avatar === avatar))
-                .find(c => c && c.name === possessedCharName);
-            if (groupChar) return groupChar;
-        }
-    }
-    return context.characters.find(c => c.name === possessedCharName) ?? null;
-}
-
-function validatePossessedCharInGroup() {
-    if (!_group_chats_js__WEBPACK_IMPORTED_MODULE_0__.selected_group || !possessedCharName) return;
-    const group = _group_chats_js__WEBPACK_IMPORTED_MODULE_0__.groups.find(g => g.id === _group_chats_js__WEBPACK_IMPORTED_MODULE_0__.selected_group);
-    if (!group) return;
-    const context = (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.getContext)();
-    const isMember = group.members.some(avatar => {
-        if (possessedCharAvatar) return avatar === possessedCharAvatar;
-        const char = context.characters.find(c => c.avatar === avatar);
-        return char && char.name === possessedCharName;
-    });
-    if (!isMember) {
-        debug('Possessed character removed from group, clearing');
-        toast(`${possessedCharName} was removed from the group. Possession cleared.`, 'warning');
-        setPossession(null);
-    }
-}
-
-// ─── Core Logic ───
-
-function setPossession(charName, charAvatar) {
-    const previous = possessedCharName;
-    possessedCharName = charName;
-    if (charName) {
-        if (charAvatar) {
-            possessedCharAvatar = charAvatar;
-        } else {
-            const context = (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.getContext)();
-            // In group chats, prefer the character whose avatar is in the group members list
-            let char = null;
-            if (_group_chats_js__WEBPACK_IMPORTED_MODULE_0__.selected_group) {
-                const group = _group_chats_js__WEBPACK_IMPORTED_MODULE_0__.groups.find(g => g.id === _group_chats_js__WEBPACK_IMPORTED_MODULE_0__.selected_group);
-                if (group) {
-                    char = group.members
-                        .map(avatar => context.characters.find(c => c.avatar === avatar))
-                        .find(c => c && c.name === charName) ?? null;
-                }
-            }
-            if (!char) {
-                char = context.characters.find(c => c.name === charName) ?? null;
-            }
-            possessedCharAvatar = char?.avatar ?? null;
-        }
-    } else {
-        possessedCharAvatar = null;
-    }
-    savePossessionState();
-    syncAllPossessionUI();
-    if (previous !== charName) {
-        if (charName) {
-            toast(`Possessing ${charName}`, 'success');
-            debug('Now possessing:', charName);
-        } else if (previous) {
-            toast('Possession cleared', 'info');
-            debug('Possession cleared');
-        }
-    }
-}
-
-// ─── Message Posting ───
-
-async function postPossessedMessage(text) {
-    const context = (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.getContext)();
-    const char = getPossessedCharacter();
-    if (!char || !text) return -1;
-
-    const message = {
-        name: char.name,
-        is_user: false,
-        is_system: false,
-        send_date: Date.now(),
-        mes: text,
-        force_avatar: char.avatar ? `/characters/${char.avatar}` : undefined,
-        extra: { possession: true },
-    };
-
-    if (_group_chats_js__WEBPACK_IMPORTED_MODULE_0__.selected_group) {
-        message.original_avatar = char.avatar;
-        message.is_name = true;
-    }
-
-    context.chat.push(message);
-    const messageIndex = context.chat.length - 1;
-
-    if (typeof context.addOneMessage === 'function') {
-        context.addOneMessage(message);
-    }
-
-    await context.saveChat();
-    debug('Posted possessed message at index', messageIndex);
-    return messageIndex;
-}
-
-// ─── Send Handling (MESSAGE_SENT) ───
-
-function onMessageSent(messageIndex) {
-    if (!ctx.settings.possessionEnabled || !isPossessing()) return;
-    if (phrasingApi?.isPhrasing()) return;
-
-    const context = (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.getContext)();
-    const message = context.chat[messageIndex];
-    if (!message || !message.is_user) return;
-
-    const char = getPossessedCharacter();
-    if (!char) return;
-
-    debug('Converting user message to possessed character message at index', messageIndex);
-
-    message.is_user = false;
-    message.name = char.name;
-    message.force_avatar = char.avatar ? `/characters/${char.avatar}` : undefined;
-    message.extra = { ...(message.extra || {}), possession: true };
-
-    if (_group_chats_js__WEBPACK_IMPORTED_MODULE_0__.selected_group) {
-        message.original_avatar = char.avatar;
-        message.is_name = true;
-    }
-
-    debug('Converted message — name:', char.name);
-}
-
-// ─── Continue Interception ───
-
-function handleContinueIntercept(event) {
-    if (!ctx.settings.possessionEnabled || !isPossessing() || generationGuard) return;
-
-    const textarea = document.getElementById('send_textarea');
-    const text = textarea?.value?.trim();
-    if (!text) return;
-
-    event.stopImmediatePropagation();
-    event.preventDefault();
-
-    debug('Intercepted Continue with text:', text.substring(0, 50) + '...');
-    executePossessedContinue(text);
-}
-
-async function executePossessedContinue(text) {
-    const context = (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.getContext)();
-
-    const textarea = document.getElementById('send_textarea');
-    if (textarea) {
-        textarea.value = '';
-        textarea.dispatchEvent(new Event('input', { bubbles: true }));
-    }
-
-    await postPossessedMessage(text);
-    await new Promise(resolve => requestAnimationFrame(resolve));
-
-    if (context.executeSlashCommandsWithOptions) {
-        await context.executeSlashCommandsWithOptions('/continue');
-    } else {
-        const continueBtn = document.getElementById('option_continue');
-        if (continueBtn) continueBtn.click();
-    }
-}
-
-function attachContinueInterceptor() {
-    document.addEventListener('click', (event) => {
-        if (!event.target.closest('#option_continue') && !event.target.closest('#mes_continue')) return;
-
-        // Reinject phrasing seed if the last message was rephrased
-        phrasingApi?.handlePhrasingSeedReinjection();
-
-        handleContinueIntercept(event);
-    }, { capture: true });
-    debug('Attached continue interceptor');
-}
-
-// ─── UI: Group Radio Buttons ───
-
-function injectGroupRadioButtons() {
-    if (!_group_chats_js__WEBPACK_IMPORTED_MODULE_0__.selected_group) return;
-    if (!ctx.settings.possessionEnabled) return;
-
-    const group = _group_chats_js__WEBPACK_IMPORTED_MODULE_0__.groups.find(g => g.id === _group_chats_js__WEBPACK_IMPORTED_MODULE_0__.selected_group);
-    if (!group) return;
-
-    const context = (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.getContext)();
-    const memberEntries = document.querySelectorAll('#rm_group_members .group_member');
-
-    memberEntries.forEach(entry => {
-        if (entry.querySelector('.possession_radio_wrapper')) return;
-
-        const charId = entry.getAttribute('chid');
-        const gridAvatar = entry.getAttribute('grid');
-        let charName = null;
-        let charAvatar = null;
-
-        // Try chid first (character index)
-        if (charId !== null) {
-            const char = context.characters[parseInt(charId)];
-            if (char) {
-                charName = char.name;
-                charAvatar = char.avatar;
-            }
-        }
-
-        // Fallback to grid attribute (avatar filename)
-        if (!charAvatar && gridAvatar) {
-            const char = context.characters.find(c => c.avatar === gridAvatar);
-            if (char) {
-                charName = charName || char.name;
-                charAvatar = char.avatar;
-            } else {
-                // grid is the avatar filename even if character lookup fails
-                charAvatar = gridAvatar;
-            }
-        }
-
-        // Fallback: extract avatar from the member's displayed image
-        if (!charAvatar) {
-            const img = entry.querySelector('img');
-            if (img?.src) {
-                const match = img.src.match(/[?&]file=([^&]+)|\/characters\/([^/?]+)/);
-                const filename = match?.[1] || match?.[2];
-                if (filename) {
-                    const decoded = decodeURIComponent(filename);
-                    charAvatar = decoded;
-                    if (!charName) {
-                        const char = context.characters.find(c => c.avatar === decoded);
-                        if (char) charName = char.name;
-                    }
-                }
-            }
-        }
-
-        if (!charName) {
-            const nameEl = entry.querySelector('.ch_name');
-            if (nameEl) charName = nameEl.textContent?.trim() || nameEl.getAttribute('title');
-        }
-
-        if (!charName) return;
-
-        const wrapper = document.createElement('div');
-        wrapper.classList.add('possession_radio_wrapper');
-        wrapper.title = `Possess ${charName}`;
-
-        const radio = document.createElement('div');
-        radio.classList.add('possession_radio');
-        radio.dataset.charName = charName;
-        if (charAvatar) radio.dataset.charAvatar = charAvatar;
-
-        const isActive = (possessedCharAvatar && charAvatar)
-            ? possessedCharAvatar === charAvatar
-            : possessedCharName === charName;
-        if (isActive) {
-            radio.classList.add('possession_active');
-            entry.classList.add('possession_possessed');
-        }
-
-        radio.addEventListener('click', (event) => {
-            event.stopPropagation();
-            const isCurrentlyPossessed = (possessedCharAvatar && charAvatar)
-                ? possessedCharAvatar === charAvatar
-                : possessedCharName === charName;
-            if (isCurrentlyPossessed) {
-                setPossession(null);
-            } else {
-                setPossession(charName, charAvatar);
-            }
-        });
-
-        wrapper.appendChild(radio);
-
-        const iconContainer = entry.querySelector('.group_member_icon');
-        if (iconContainer) {
-            iconContainer.insertBefore(wrapper, iconContainer.firstChild);
-        } else {
-            entry.appendChild(wrapper);
-        }
-    });
-}
-
-function syncGroupRadioButtons() {
-    document.querySelectorAll('.possession_radio').forEach(radio => {
-        const charName = radio.dataset.charName;
-        const charAvatar = radio.dataset.charAvatar;
-        const isActive = (possessedCharAvatar && charAvatar)
-            ? possessedCharAvatar === charAvatar
-            : charName === possessedCharName;
-        radio.classList.toggle('possession_active', isActive);
-    });
-
-    document.querySelectorAll('.group_member').forEach(entry => {
-        entry.classList.remove('possession_possessed');
-    });
-
-    if (possessedCharName) {
-        document.querySelectorAll('.possession_radio.possession_active').forEach(radio => {
-            const member = radio.closest('.group_member');
-            if (member) member.classList.add('possession_possessed');
-        });
-    }
-}
-
-function removeGroupRadioButtons() {
-    document.querySelectorAll('.possession_radio_wrapper').forEach(el => el.remove());
-    document.querySelectorAll('.group_member.possession_possessed').forEach(el => {
-        el.classList.remove('possession_possessed');
-    });
-}
-
-// ─── UI: Solo Chat Button ───
-
-function injectSoloButton() {
-    if (_group_chats_js__WEBPACK_IMPORTED_MODULE_0__.selected_group) return;
-    if (!ctx.settings.possessionEnabled) return;
-    if (document.getElementById('possession_solo_btn')) return;
-
-    const panelButtonRow = document.querySelector('#form_create .ch_creation_btn_row, #form_create .form_create_bottom_buttons_block');
-    const target = panelButtonRow || document.getElementById('rightSendForm');
-    if (!target) return;
-
-    const btn = document.createElement('div');
-    btn.id = 'possession_solo_btn';
-    btn.classList.add('menu_button', 'interactable');
-    btn.title = 'Possess this character';
-    btn.innerHTML = '<span class="fa-solid fa-ghost"></span>';
-
-    if (isPossessing()) {
-        btn.classList.add('possession_active');
-    }
-
-    btn.addEventListener('click', () => {
-        const context = (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.getContext)();
-        const char = context.characters?.[context.characterId];
-        if (!char) return;
-
-        if (possessedCharName === char.name && (!possessedCharAvatar || possessedCharAvatar === char.avatar)) {
-            setPossession(null);
-        } else {
-            setPossession(char.name, char.avatar);
-        }
-    });
-
-    target.appendChild(btn);
-    debug('Injected solo possess button');
-}
-
-function syncSoloButton() {
-    const btn = document.getElementById('possession_solo_btn');
-    if (!btn) return;
-    btn.classList.toggle('possession_active', isPossessing());
-}
-
-function removeSoloButton() {
-    const btn = document.getElementById('possession_solo_btn');
-    if (btn) btn.remove();
-}
-
-// ─── UI: Impersonate Button Visibility ───
-
-function hideImpersonateButtons() {
-    const menuBtn = document.getElementById('option_impersonate');
-    const quickBtn = document.getElementById('mes_impersonate');
-    if (menuBtn) menuBtn.classList.add('possession_hidden');
-    if (quickBtn) quickBtn.classList.add('possession_hidden');
-    debug('Impersonate buttons hidden');
-}
-
-function showImpersonateButtons() {
-    const menuBtn = document.getElementById('option_impersonate');
-    const quickBtn = document.getElementById('mes_impersonate');
-    if (menuBtn) menuBtn.classList.remove('possession_hidden');
-    if (quickBtn) quickBtn.classList.remove('possession_hidden');
-    debug('Impersonate buttons shown');
-}
-
-// ─── UI: Possession Impersonate Button (Character Avatar) ───
-
-function injectPossessionImpersonateButton() {
-    removePossessionImpersonateButton();
-
-    const char = getPossessedCharacter();
-    if (!char) return;
-
-    const sendForm = document.getElementById('rightSendForm');
-    if (!sendForm) return;
-
-    const btn = document.createElement('div');
-    btn.id = 'possession_impersonate_btn';
-    btn.classList.add('interactable');
-    btn.title = `Generate as ${char.name}`;
-
-    const img = document.createElement('img');
-    img.src = char.avatar ? `/characters/${char.avatar}` : '/img/ai4.png';
-    img.alt = char.name;
-    img.classList.add('possession_impersonate_avatar');
-    btn.appendChild(img);
-
-    btn.addEventListener('click', async () => {
-        const context = (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.getContext)();
-        if (context.isGenerating || generationGuard) return;
-
-        debug('Possession impersonate clicked — triggering generation for', char.name);
-
-        if (_group_chats_js__WEBPACK_IMPORTED_MODULE_0__.selected_group) {
-            const radios = document.querySelectorAll('.possession_radio');
-            for (const radio of radios) {
-                const radioMatch = (possessedCharAvatar && radio.dataset.charAvatar)
-                    ? radio.dataset.charAvatar === possessedCharAvatar
-                    : radio.dataset.charName === possessedCharName;
-                if (radioMatch) {
-                    const memberEntry = radio.closest('.group_member');
-                    if (memberEntry) {
-                        const speakBtn = memberEntry.querySelector('.right_menu_button[data-action="speak"]');
-                        if (speakBtn) {
-                            speakBtn.click();
-                            return;
-                        }
-                    }
-                    break;
-                }
-            }
-            debug('Speak button not found, falling back to /trigger');
-            if (context.executeSlashCommandsWithOptions) {
-                await context.executeSlashCommandsWithOptions(`/trigger ${char.name}`);
-            }
-        } else {
-            if (context.executeSlashCommandsWithOptions) {
-                await context.executeSlashCommandsWithOptions('/trigger');
-            } else {
-                const sendBtn = document.getElementById('send_but');
-                if (sendBtn) sendBtn.click();
-            }
-        }
-    });
-
-    const phrasingBtn = document.getElementById('phrasing_send_button');
-    if (phrasingBtn) {
-        sendForm.insertBefore(btn, phrasingBtn);
-    } else {
-        sendForm.appendChild(btn);
-    }
-
-    debug('Injected possession impersonate button for', char.name);
-}
-
-function removePossessionImpersonateButton() {
-    const btn = document.getElementById('possession_impersonate_btn');
-    if (btn) btn.remove();
-}
-
-function hidePossessionImpersonateButton() {
-    const btn = document.getElementById('possession_impersonate_btn');
-    if (btn) btn.classList.add('possession_hidden');
-}
-
-function showPossessionImpersonateButton() {
-    const btn = document.getElementById('possession_impersonate_btn');
-    if (btn) btn.classList.remove('possession_hidden');
-}
-
-// ─── UI Sync ───
-
-function syncAllPossessionUI() {
-    if (!ctx.settings.possessionEnabled) {
-        removeGroupRadioButtons();
-        removeSoloButton();
-        showImpersonateButtons();
-        removePossessionImpersonateButton();
-        return;
-    }
-
-    if (_group_chats_js__WEBPACK_IMPORTED_MODULE_0__.selected_group) {
-        removeSoloButton();
-        injectGroupRadioButtons();
-        syncGroupRadioButtons();
-    } else {
-        removeGroupRadioButtons();
-        injectSoloButton();
-        syncSoloButton();
-    }
-
-    if (isPossessing()) {
-        hideImpersonateButtons();
-        injectPossessionImpersonateButton();
-    } else {
-        showImpersonateButtons();
-        removePossessionImpersonateButton();
-    }
-}
-
-// ─── Generation Lifecycle ───
-
-function onGenerationStarted() {
-    generationGuard = true;
-    hidePossessionImpersonateButton();
-}
-
-function onGenerationEnded() {
-    generationGuard = false;
-    syncAllPossessionUI();
-}
-
-// ─── Event Handlers ───
-
-function onGroupUpdated() {
-    validatePossessedCharInGroup();
-    removeGroupRadioButtons();
-    injectGroupRadioButtons();
-    syncGroupRadioButtons();
-}
-
-function onCharacterPageLoaded() {
-    if (!_group_chats_js__WEBPACK_IMPORTED_MODULE_0__.selected_group) {
-        injectSoloButton();
-        syncSoloButton();
-    }
-}
-
-function onGroupWrapperFinished() {
-    syncAllPossessionUI();
-}
-
-// ─── Settings Panel ───
-
-function bindPossessionSettings(saveSettings) {
-    const possessionEnabled = document.getElementById('possession_enabled');
-    if (possessionEnabled) {
-        possessionEnabled.checked = ctx.settings.possessionEnabled;
-        possessionEnabled.addEventListener('change', (e) => {
-            ctx.settings.possessionEnabled = e.target.checked;
-            saveSettings();
-            syncAllPossessionUI();
-        });
-    }
-
-    const possessionShowToast = document.getElementById('possession_show_toast');
-    if (possessionShowToast) {
-        possessionShowToast.checked = ctx.settings.possessionShowToast;
-        possessionShowToast.addEventListener('change', (e) => {
-            ctx.settings.possessionShowToast = e.target.checked;
-            saveSettings();
-        });
-    }
-
-    const possessionDebugMode = document.getElementById('possession_debug_mode');
-    if (possessionDebugMode) {
-        possessionDebugMode.checked = ctx.settings.possessionDebugMode;
-        possessionDebugMode.addEventListener('change', (e) => {
-            ctx.settings.possessionDebugMode = e.target.checked;
-            saveSettings();
-            debug('debugMode toggled to', ctx.settings.possessionDebugMode);
-        });
-    }
-}
-
-// ─── Slash Commands ───
-
-function registerPossessionSlashCommands() {
-    _slash_commands_SlashCommandParser_js__WEBPACK_IMPORTED_MODULE_1__.SlashCommandParser.addCommandObject(_slash_commands_SlashCommand_js__WEBPACK_IMPORTED_MODULE_2__.SlashCommand.fromProps({
-        name: 'possess',
-        callback: async (namedArgs, unnamedArgs) => {
-            const name = unnamedArgs?.trim();
-
-            if (!name) {
-                if (isPossessing()) {
-                    toastr.info(`Currently possessing: ${possessedCharName}`, 'Possession');
-                    return possessedCharName;
-                }
-                if (!_group_chats_js__WEBPACK_IMPORTED_MODULE_0__.selected_group) {
-                    const context = (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.getContext)();
-                    const char = context.characters?.[context.characterId];
-                    if (char) {
-                        setPossession(char.name, char.avatar);
-                        return char.name;
-                    }
-                }
-                toastr.info('No character is currently possessed.', 'Possession');
-                return 'None';
-            }
-
-            const context = (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.getContext)();
-            const nameLower = name.toLowerCase();
-
-            if (_group_chats_js__WEBPACK_IMPORTED_MODULE_0__.selected_group) {
-                const group = _group_chats_js__WEBPACK_IMPORTED_MODULE_0__.groups.find(g => g.id === _group_chats_js__WEBPACK_IMPORTED_MODULE_0__.selected_group);
-                if (!group) {
-                    toastr.error('No active group found.', 'Possession');
-                    return '';
-                }
-                const match = group.members
-                    .map(avatar => context.characters.find(c => c.avatar === avatar))
-                    .filter(Boolean)
-                    .find(c => c.name.toLowerCase().includes(nameLower));
-
-                if (!match) {
-                    toastr.error(`No group member matching "${name}" found.`, 'Possession');
-                    return '';
-                }
-                setPossession(match.name, match.avatar);
-                return match.name;
-            } else {
-                const char = context.characters?.[context.characterId];
-                if (char && char.name.toLowerCase().includes(nameLower)) {
-                    setPossession(char.name, char.avatar);
-                    return char.name;
-                }
-                toastr.error(`Character "${name}" does not match the active character.`, 'Possession');
-                return '';
-            }
-        },
-        unnamedArgumentList: [
-            _slash_commands_SlashCommandArgument_js__WEBPACK_IMPORTED_MODULE_3__.SlashCommandArgument.fromProps({
-                description: 'Character name (partial match). Omit to show current or toggle in solo chat.',
-                typeList: [_slash_commands_SlashCommandArgument_js__WEBPACK_IMPORTED_MODULE_3__.ARGUMENT_TYPE.STRING],
-                isRequired: false,
-            }),
-        ],
-        aliases: [],
-        helpString: 'Possess a character so your messages are posted under their name. Usage: /possess [name]',
-    }));
-
-    _slash_commands_SlashCommandParser_js__WEBPACK_IMPORTED_MODULE_1__.SlashCommandParser.addCommandObject(_slash_commands_SlashCommand_js__WEBPACK_IMPORTED_MODULE_2__.SlashCommand.fromProps({
-        name: 'unpossess',
-        callback: async () => {
-            if (isPossessing()) {
-                setPossession(null);
-            }
-            return '';
-        },
-        unnamedArgumentList: [],
-        aliases: [],
-        helpString: 'Clear the currently possessed character, returning to normal mode.',
-    }));
-
-    debug('Registered possession slash commands');
-}
-
-// ─── Init ───
-
-/**
- * @param {object} options
- * @param {object} options.settings  - Shared mutable settings reference.
- * @param {object} options.phrasingApi - { isPhrasing(), handlePhrasingSeedReinjection() }
- */
-function initPossession({ settings, phrasingApi: pApi }) {
-    ctx = { settings };
-    phrasingApi = pApi;
-    debug = (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.createDebugLogger)('POSSESSION', () => settings.possessionDebugMode);
-}
-
-
-/***/ },
-
-/***/ "./src/schema-validation.js"
-/*!**********************************!*\
-  !*** ./src/schema-validation.js ***!
-  \**********************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   buildDataSchema: () => (/* binding */ buildDataSchema),
-/* harmony export */   tryParseCharacterData: () => (/* binding */ tryParseCharacterData),
-/* harmony export */   validateCharacterData: () => (/* binding */ validateCharacterData),
-/* harmony export */   validateCharacterSchema: () => (/* binding */ validateCharacterSchema)
-/* harmony export */ });
-/* harmony import */ var ajv__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ajv */ "./node_modules/ajv/dist/ajv.js");
-/* harmony import */ var ajv__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(ajv__WEBPACK_IMPORTED_MODULE_0__);
-/**
- * Schema validation for Assisted Character Creation.
- *
- * Uses AJV to do two things:
- *
- *   1. Meta-validate Character Schemas — the objects defined in
- *      default-character-schema.js and loaded via schema import. A single
- *      JSON Schema (META_SCHEMA) describes the expected shape of those
- *      objects (schemaName, fields, per-field order/label/prompt, etc.).
- *
- *   2. Validate Character *data* — the `{ fieldKey: value }` object that
- *      the compiled description is a stringified form of. Because every
- *      field is a free-form string, the generated JSON Schema for a given
- *      Character Schema is trivial: an object of string properties, with
- *      `additionalProperties: true` so a description compiled under one
- *      schema can still be imported under another without data loss.
- */
-
-
-
-const ajv = new (ajv__WEBPACK_IMPORTED_MODULE_0___default())({ allErrors: true, strict: false });
-
-// ─── Meta-Schema: validates Character Schema definitions ───
-
-const META_SCHEMA = {
-    type: 'object',
-    required: ['schemaName', 'fields'],
-    properties: {
-        schemaName: { type: 'string', minLength: 1 },
-        fields: {
-            type: 'object',
-            minProperties: 1,
-            additionalProperties: {
-                type: 'object',
-                required: ['order', 'label', 'prompt'],
-                properties: {
-                    order: { type: 'number' },
-                    label: { type: 'string', minLength: 1 },
-                    description: { type: 'string' },
-                    responseLength: { type: 'number' },
-                    prompt: { type: 'string', pattern: '\\{\\{seedText\\}\\}' },
-                },
-                additionalProperties: true,
-            },
-        },
-    },
-    additionalProperties: true,
-};
-
-const validateMetaSchema = ajv.compile(META_SCHEMA);
-
-/**
- * Validate a Character Schema object against the meta-schema.
- * Also enforces the cross-field "unique order" constraint that JSON Schema
- * can't express directly.
- *
- * @param {object} schema
- * @returns {string[]} Array of human-readable error messages (empty = valid).
- */
-function validateCharacterSchema(schema) {
-    const errors = [];
-
-    if (!validateMetaSchema(schema)) {
-        for (const err of validateMetaSchema.errors || []) {
-            const path = err.instancePath || '(root)';
-            errors.push(`${path} ${err.message}`);
-        }
-        return errors;
-    }
-
-    // AJV can't express "all field.order values must be unique" cleanly,
-    // so we check it by hand. Same rule the old hand-rolled validator had.
-    const seen = new Map();
-    for (const [key, field] of Object.entries(schema.fields)) {
-        if (seen.has(field.order)) {
-            errors.push(`Field "${key}": duplicate order value ${field.order} (also used by "${seen.get(field.order)}").`);
-        } else {
-            seen.set(field.order, key);
-        }
-    }
-
-    return errors;
-}
-
-// ─── Data Schema: validates compiled character data objects ───
-
-/**
- * Build a JSON Schema that validates the *data* object produced by a given
- * Character Schema. Every field is a string; unknown keys are permitted so
- * old descriptions survive schema changes.
- *
- * @param {object} characterSchema
- * @returns {object} JSON Schema
- */
-function buildDataSchema(characterSchema) {
-    const properties = {};
-    for (const key of Object.keys(characterSchema.fields || {})) {
-        properties[key] = { type: 'string' };
-    }
-    return {
-        type: 'object',
-        properties,
-        additionalProperties: { type: 'string' },
-    };
-}
-
-/**
- * Validate a character data object (the thing that gets JSON.stringify'd
- * into ST's description field) against a Character Schema.
- *
- * @param {object} characterSchema
- * @param {object} data
- * @returns {{ valid: boolean, errors: string[] }}
- */
-function validateCharacterData(characterSchema, data) {
-    const dataSchema = buildDataSchema(characterSchema);
-    const validate = ajv.compile(dataSchema);
-    if (validate(data)) return { valid: true, errors: [] };
-    const errors = (validate.errors || []).map(err => {
-        const path = err.instancePath || '(root)';
-        return `${path} ${err.message}`;
-    });
-    return { valid: false, errors };
-}
-
-/**
- * Attempt to parse a description string as a character data object.
- * Returns the parsed object on success, or null on any failure
- * (not valid JSON, not an object, or fails schema validation).
- *
- * The caller can fall back to LLM-based reverse mapping when this returns null.
- *
- * @param {string} description
- * @param {object} characterSchema
- * @returns {object|null}
- */
-function tryParseCharacterData(description, characterSchema) {
-    if (typeof description !== 'string' || !description.trim()) return null;
-    let parsed;
-    try {
-        parsed = JSON.parse(description);
-    } catch {
-        return null;
-    }
-    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return null;
-    const { valid } = validateCharacterData(characterSchema, parsed);
-    return valid ? parsed : null;
-}
-
-
-/***/ },
-
-/***/ "./src/utils.js"
-/*!**********************!*\
-  !*** ./src/utils.js ***!
-  \**********************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   confirmActiveMessageEdit: () => (/* binding */ confirmActiveMessageEdit),
-/* harmony export */   createDebugLogger: () => (/* binding */ createDebugLogger),
-/* harmony export */   getContext: () => (/* binding */ getContext),
-/* harmony export */   getEditingMessageIndex: () => (/* binding */ getEditingMessageIndex),
-/* harmony export */   loadExtensionSettings: () => (/* binding */ loadExtensionSettings),
-/* harmony export */   saveExtensionSettings: () => (/* binding */ saveExtensionSettings),
-/* harmony export */   toast: () => (/* binding */ toast),
-/* harmony export */   waitForGenerationEnd: () => (/* binding */ waitForGenerationEnd)
-/* harmony export */ });
-/**
- * Shared utilities for SillyTavern extensions.
- *
- * These helpers encapsulate patterns that recur across extensions:
- *   - Context access
- *   - Toast notifications
- *   - Debug logging
- *   - Settings persistence
- *   - Message-editing helpers
- *   - Generation lifecycle helpers
- */
-
-// ─── Context ───
-
-/**
- * Returns a fresh SillyTavern context object.
- * Always call this when you need the context — do not cache it long-term.
- */
-function getContext() {
-    return SillyTavern.getContext();
-}
-
-// ─── Toast Notifications ───
-
-/**
- * Show a toast notification via SillyTavern's global `toastr`.
- *
- * @param {string} message  - Text to display.
- * @param {string} [type]   - One of 'info', 'success', 'warning', 'error'.
- * @param {string} [title]  - Optional toast title.
- */
-function toast(message, type = 'info', title = undefined) {
-    if (typeof toastr !== 'undefined' && toastr[type]) {
-        toastr[type](message, title);
-    }
-}
-
-// ─── Debug Logger Factory ───
-
-/**
- * Creates a conditional debug logger.
- *
- * @param {string}   prefix     - Label printed before every message (e.g. 'MY-EXT').
- * @param {function} isEnabled  - Callback that returns `true` when logging should be active.
- * @returns {function} A `console.log`-style function that only logs when enabled.
- *
- * @example
- *   const debug = createDebugLogger('PHRASING', () => settings.phrasingDebugMode);
- *   debug('seed length:', text.length);
- */
-function createDebugLogger(prefix, isEnabled) {
-    return (...args) => {
-        if (typeof isEnabled === 'function' && !isEnabled()) return;
-        console.log(`${prefix}:`, ...args);
-    };
-}
-
-// ─── Settings Persistence ───
-
-/**
- * Load extension settings, merging saved values over the supplied defaults.
- *
- * @param {string} extensionName  - Key under `context.extensionSettings`.
- * @param {object} defaults       - Default settings object (used for new keys).
- * @returns {object} The merged settings object.
- */
-function loadExtensionSettings(extensionName, defaults) {
-    const context = getContext();
-    const saved = context.extensionSettings?.[extensionName];
-    return saved ? { ...defaults, ...saved } : { ...defaults };
-}
-
-/**
- * Persist extension settings (debounced).
- *
- * @param {string} extensionName - Key under `context.extensionSettings`.
- * @param {object} settings      - The settings object to save.
- */
-function saveExtensionSettings(extensionName, settings) {
-    const context = getContext();
-    context.extensionSettings[extensionName] = { ...settings };
-    context.saveSettingsDebounced();
-}
-
-// ─── Message Edit Helpers ───
-
-/**
- * If a message is currently being edited (edit textarea visible), click "Done"
- * to confirm the edit programmatically.
- *
- * @returns {boolean} `true` if an active edit was confirmed; `false` otherwise.
- */
-function confirmActiveMessageEdit() {
-    const visibleEditButtons = document.querySelector(
-        '#chat .mes .mes_edit_buttons[style*="display: inline-flex"]',
-    );
-    if (visibleEditButtons) {
-        const editDoneBtn = visibleEditButtons.querySelector('.mes_edit_done');
-        if (editDoneBtn) {
-            editDoneBtn.click();
-            return true;
-        }
-    }
-    return false;
-}
-
-/**
- * Returns the chat-array index of the message currently being edited, or -1
- * if no edit is in progress.
- *
- * @returns {number}
- */
-function getEditingMessageIndex() {
-    const visibleEditButtons = document.querySelector(
-        '#chat .mes .mes_edit_buttons[style*="display: inline-flex"]',
-    );
-    if (!visibleEditButtons) return -1;
-    const mesEl = visibleEditButtons.closest('.mes');
-    if (!mesEl) return -1;
-    const mesId = mesEl.getAttribute('mesid');
-    return mesId !== null ? parseInt(mesId) : -1;
-}
-
-// ─── Generation Lifecycle ───
-
-/**
- * Returns a Promise that resolves when the current LLM generation ends
- * (either normally or via user stop). Resolves with the text of the last
- * message in the chat, or '' on timeout / empty chat.
- *
- * @param {number} [timeoutMs=300000] - Timeout in milliseconds (default 5 min).
- * @returns {Promise<string>}
- */
-function waitForGenerationEnd(timeoutMs = 5 * 60 * 1000) {
-    return new Promise(resolve => {
-        const context = getContext();
-        const { eventSource, eventTypes } = context;
-        let settled = false;
-
-        const cleanup = () => {
-            eventSource.removeListener(eventTypes.GENERATION_ENDED, onEnd);
-            eventSource.removeListener(eventTypes.GENERATION_STOPPED, onEnd);
-        };
-
-        const onEnd = () => {
-            if (settled) return;
-            settled = true;
-            cleanup();
-            const ctx = getContext();
-            const lastMsg = ctx.chat[ctx.chat.length - 1];
-            resolve(lastMsg ? lastMsg.mes : '');
-        };
-
-        setTimeout(() => {
-            if (settled) return;
-            settled = true;
-            cleanup();
-            resolve('');
-        }, timeoutMs);
-
-        eventSource.on(eventTypes.GENERATION_ENDED, onEnd);
-        if (eventTypes.GENERATION_STOPPED) {
-            eventSource.on(eventTypes.GENERATION_STOPPED, onEnd);
-        }
-    });
-}
-
-
-/***/ },
-
-/***/ "./src/world-info-assist.js"
-/*!**********************************!*\
-  !*** ./src/world-info-assist.js ***!
-  \**********************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   DEFAULT_WIA_PROMPT: () => (/* binding */ DEFAULT_WIA_PROMPT),
-/* harmony export */   bindWIASettings: () => (/* binding */ bindWIASettings),
-/* harmony export */   initWIA: () => (/* binding */ initWIA),
-/* harmony export */   removeAllControls: () => (/* binding */ removeAllControls),
-/* harmony export */   rescanAllForms: () => (/* binding */ rescanAllForms),
-/* harmony export */   startWIAObserver: () => (/* binding */ startWIAObserver)
-/* harmony export */ });
-/* harmony import */ var _script_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../../script.js */ "../../../../../script.js");
-/* harmony import */ var _reasoning_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../../reasoning.js */ "../../../../reasoning.js");
-/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils.js */ "./src/utils.js");
-/**
- * World Info Assist (WIA)
- *
- * Adds an LLM-driven Assist button to every World Info / Lore book entry
- * form. Each entry gets its own button row above the content textarea
- * with Assist, Continue, Retry, and Revert controls — mirroring the
- * Assisted Character Creation tool, but operating on a single field
- * (the entry's content) and using a free-form prompt instead of a schema.
- */
-
-
-
-
-
-// ─── Default Prompt ───
-
-const DEFAULT_WIA_PROMPT = `[
-The next reply will be an out of story generated World Lore Description. This is a setting reference entry that codifies key facts about an event, person, place, institution, or artifact so they remain consistent and reusable. It should prioritize clear, canonical details over narrative dramatization.
-
-General Input Rules:
-* Guidance (optional): IP/canon, tone/genre, tags, audience, era, length, style notes.
-
-Defaults:
-* Tone: Genre-appropriate, neutral-evocative.
-* Canon: Respect canon when named or implied.
-* Length: 1–3 crisp sentences per entry (unless the user requests more).
-
-Output Format (use exactly as written):
-[ <Name of the Subject>: <Detailed Description of the Event, Person, Place, or Thing> ]
-
-Format Rules:
-
-* Return only the World Lore Description artifact.
-* Follow schema verbatim (brackets, colon, spacing).
-* No extra commentary.
-
-Example — World Lore:
-[ The Ashen Concord: A pact of five city-states after the Ember War to share river trade, standardize coinage, and outlaw pyromancy; prosperity rose while hedge mages went underground, fueling a decade of covert arson reprisals; ]
-]`;
-
-// ─── Module State ───
-
-let moduleSettings = null;
-let debug = () => {};
-let observer = null;
-
-// Per-entry state, keyed by a stable id derived from the entry uid / DOM element
-const entryStates = new Map(); // id -> { originalSeed, hasGenerated, generating }
-
-// ─── Init ───
-
-/**
- * Initialize WIA module. Called once from index.js.
- * @param {object} opts - { settings }
- */
-function initWIA({ settings }) {
-    moduleSettings = settings;
-    debug = (0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.createDebugLogger)('WIA', () => moduleSettings.wiaDebugMode);
-    debug('Module initialized');
-}
-
-// ─── DOM Observation / Injection ───
-
-/**
- * Start watching the DOM for new World Info entry forms and inject
- * assist controls into each one.
- */
-function startWIAObserver() {
-    if (observer) return;
-
-    observer = new MutationObserver((mutations) => {
-        if (!moduleSettings?.wiaEnabled) return;
-        for (const m of mutations) {
-            for (const node of m.addedNodes) {
-                if (!(node instanceof HTMLElement)) continue;
-                if (node.matches?.('.world_entry_edit')) {
-                    injectControls(node);
-                }
-                node.querySelectorAll?.('.world_entry_edit').forEach(injectControls);
-            }
-        }
-    });
-
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    // Process anything already present on the page
-    document.querySelectorAll('.world_entry_edit').forEach(injectControls);
-    debug('Observer started');
-}
-
-/**
- * Re-scan all currently visible WI forms (used after enable toggle).
- */
-function rescanAllForms() {
-    if (!moduleSettings?.wiaEnabled) return;
-    document.querySelectorAll('.world_entry_edit').forEach(injectControls);
-}
-
-/**
- * Remove all injected controls (used when the feature is disabled).
- */
-function removeAllControls() {
-    document.querySelectorAll('.wia-controls').forEach(el => el.remove());
-}
-
-function injectControls(formEl) {
-    if (!moduleSettings?.wiaEnabled) return;
-    // Skip the hidden template element that SillyTavern clones from —
-    // otherwise the template ends up with baked-in .wia-controls markup
-    // that clones inherit without their click handlers, permanently
-    // blocking injection on every live entry.
-    if (formEl.closest('#entry_edit_template')) return;
-    if (formEl.querySelector('.wia-controls')) return;
-
-    const contentTextarea = formEl.querySelector('textarea[name="content"]');
-    if (!contentTextarea) return;
-
-    // The label sits immediately before the textarea inside the form control
-    // wrapper. We append the controls into the label so they sit on the
-    // header line above the textarea.
-    const formControl = contentTextarea.closest('.world_entry_form_control');
-    if (!formControl) return;
-
-    const id = contentTextarea.id || `wia_${Math.random().toString(36).slice(2)}`;
-
-    const controls = document.createElement('div');
-    controls.className = 'wia-controls';
-    controls.dataset.wiaFor = id;
-    controls.innerHTML = `
-        <div class="wia-btn wia-btn-assist menu_button interactable" title="LLM Assist — generate this World Info entry">
-            <span class="fa-solid fa-wand-magic-sparkles"></span>
-            <span class="wia-btn-label">Assist</span>
-        </div>
-        <div class="wia-btn wia-btn-continue menu_button interactable wia-hidden" title="Continue generation from where it left off">
-            <span class="fa-solid fa-forward"></span>
-        </div>
-        <div class="wia-btn wia-btn-retry menu_button interactable wia-hidden" title="Retry from your original guidance text">
-            <span class="fa-solid fa-rotate-right"></span>
-        </div>
-        <div class="wia-btn wia-btn-revert menu_button interactable wia-hidden" title="Revert to your original guidance text">
-            <span class="fa-solid fa-arrow-rotate-left"></span>
-        </div>
-        <div class="wia-spinner wia-hidden" title="Generating..."><span class="fa-solid fa-spinner fa-spin"></span></div>
-    `;
-
-    // Insert at the very top of the content form control so it's clearly
-    // visible above both the label and textarea.
-    formControl.insertBefore(controls, formControl.firstChild);
-
-    const assistBtn = controls.querySelector('.wia-btn-assist');
-    const continueBtn = controls.querySelector('.wia-btn-continue');
-    const retryBtn = controls.querySelector('.wia-btn-retry');
-    const revertBtn = controls.querySelector('.wia-btn-revert');
-
-    assistBtn.addEventListener('click', () => onAssist(formEl, id, false));
-    continueBtn.addEventListener('click', () => onAssist(formEl, id, true));
-    retryBtn.addEventListener('click', () => onRetry(formEl, id));
-    revertBtn.addEventListener('click', () => onRevert(formEl, id));
-
-    debug('Injected controls for entry', id);
-}
-
-// ─── Helpers ───
-
-function getContentTextarea(formEl) {
-    return formEl.querySelector('textarea[name="content"]');
-}
-
-function getTitle(formEl) {
-    // The title field (textarea[name="comment"]) lives in the entry's
-    // inline-drawer header, which is a sibling of `.world_entry_edit` —
-    // not a descendant. Walk up to the enclosing form before querying.
-    const formRoot = formEl.closest('form.world_entry_form') || formEl.closest('form') || formEl;
-    const commentInput = formRoot.querySelector('textarea[name="comment"], input[name="comment"]');
-    return commentInput?.value?.trim() || '';
-}
-
-function setUIState(formEl, state) {
-    const controls = formEl.querySelector('.wia-controls');
-    if (!controls) return;
-    const assistBtn = controls.querySelector('.wia-btn-assist');
-    const continueBtn = controls.querySelector('.wia-btn-continue');
-    const retryBtn = controls.querySelector('.wia-btn-retry');
-    const revertBtn = controls.querySelector('.wia-btn-revert');
-    const spinner = controls.querySelector('.wia-spinner');
-
-    const show = (el, vis) => el && el.classList.toggle('wia-hidden', !vis);
-
-    if (state === 'idle') {
-        show(assistBtn, true);
-        show(continueBtn, false);
-        show(retryBtn, false);
-        show(revertBtn, false);
-        show(spinner, false);
-    } else if (state === 'generating') {
-        show(assistBtn, false);
-        show(continueBtn, false);
-        show(retryBtn, false);
-        show(revertBtn, false);
-        show(spinner, true);
-    } else if (state === 'generated') {
-        show(assistBtn, false);
-        show(continueBtn, true);
-        show(retryBtn, true);
-        show(revertBtn, true);
-        show(spinner, false);
-    }
-}
-
-// ─── Generation ───
-
-async function onAssist(formEl, id, isContinue) {
-    const state = entryStates.get(id) || { originalSeed: '', hasGenerated: false, generating: false };
-    if (state.generating) return;
-
-    const contentEl = getContentTextarea(formEl);
-    if (!contentEl) return;
-
-    if (!isContinue) {
-        // First-pass generation: capture the user's seed text from the field
-        // so we can revert / retry from it later.
-        state.originalSeed = contentEl.value;
-    }
-    state.generating = true;
-    entryStates.set(id, state);
-
-    setUIState(formEl, 'generating');
-
-    try {
-        const title = getTitle(formEl);
-        const seed = state.originalSeed || '';
-        const currentText = contentEl.value || '';
-
-        const promptTemplate = (moduleSettings.wiaPrompt && moduleSettings.wiaPrompt.trim())
-            ? moduleSettings.wiaPrompt
-            : DEFAULT_WIA_PROMPT;
-
-        let userPrompt;
-        let prefill;
-
-        if (isContinue) {
-            userPrompt =
-                `${promptTemplate}\n\n` +
-                `Guidance from the user:\n${seed || '(none provided)'}\n\n` +
-                `The entry so far:\n${currentText}\n\n` +
-                'Continue exactly where the entry left off. Do not repeat any text. ' +
-                'Maintain the bracketed format and close the bracket when the entry is complete.';
-            prefill = '';
-        } else {
-            userPrompt =
-                `${promptTemplate}\n\n` +
-                `Guidance from the user:\n${seed || '(no specific guidance — invent a fitting entry)'}\n\n` +
-                (title
-                    ? `Respond on one line with only the value for "${title}":`
-                    : 'No title was provided — invent a fitting subject name.');
-            prefill = title ? `[${title}: ` : '[';
-        }
-
-        const systemPrompt =
-            'You are a world-building assistant. Output only the requested ' +
-            'World Lore Description in the exact bracketed format described. ' +
-            'No commentary, no preamble, no explanations.';
-
-        debug('System prompt:', systemPrompt);
-        debug('User prompt:', userPrompt);
-        debug('Prefill:', prefill);
-
-        const raw = await (0,_script_js__WEBPACK_IMPORTED_MODULE_0__.generateRaw)({
-            prompt: userPrompt,
-            systemPrompt,
-            responseLength: 600,
-            ...(prefill ? { prefill } : {}),
-        });
-
-        let cleaned = (0,_reasoning_js__WEBPACK_IMPORTED_MODULE_1__.removeReasoningFromString)(raw).trim();
-
-        if (isContinue) {
-            const sep =
-                currentText.length === 0 ||
-                currentText.endsWith(' ') ||
-                currentText.endsWith('\n') ||
-                cleaned.startsWith(' ')
-                    ? ''
-                    : ' ';
-            contentEl.value = currentText + sep + cleaned;
-        } else {
-            // If the model didn't echo the prefill back, prepend it so the
-            // entry always starts in the desired format.
-            let finalText = cleaned;
-            if (prefill && !finalText.startsWith('[')) {
-                finalText = prefill + finalText;
-            }
-            contentEl.value = finalText;
-        }
-
-        // Notify SillyTavern that the entry has changed so it gets persisted.
-        contentEl.dispatchEvent(new Event('input', { bubbles: true }));
-
-        state.hasGenerated = true;
-        state.generating = false;
-        entryStates.set(id, state);
-
-        setUIState(formEl, 'generated');
-        debug('Generation complete for', id);
-    } catch (err) {
-        console.error('WIA generation error:', err);
-        (0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.toast)(`World Info assist failed: ${err.message}`, 'error');
-        state.generating = false;
-        entryStates.set(id, state);
-        setUIState(formEl, state.hasGenerated ? 'generated' : 'idle');
-    }
-}
-
-async function onRetry(formEl, id) {
-    const state = entryStates.get(id);
-    if (!state) return;
-    const contentEl = getContentTextarea(formEl);
-    if (!contentEl) return;
-
-    contentEl.value = state.originalSeed || '';
-    contentEl.dispatchEvent(new Event('input', { bubbles: true }));
-    state.hasGenerated = false;
-    entryStates.set(id, state);
-
-    await onAssist(formEl, id, false);
-}
-
-function onRevert(formEl, id) {
-    const state = entryStates.get(id);
-    if (!state) return;
-    const contentEl = getContentTextarea(formEl);
-    if (!contentEl) return;
-
-    contentEl.value = state.originalSeed || '';
-    contentEl.dispatchEvent(new Event('input', { bubbles: true }));
-    state.hasGenerated = false;
-    entryStates.set(id, state);
-    setUIState(formEl, 'idle');
-}
-
-// ─── Settings ───
-
-/**
- * Bind WIA settings panel controls. Called after settings HTML is injected.
- * @param {function} saveSettings
- */
-function bindWIASettings(saveSettings) {
-    const enabledCb = document.getElementById('wia_enabled');
-    const debugCb = document.getElementById('wia_debug_mode');
-    const promptArea = document.getElementById('wia_prompt_textarea');
-    const restoreBtn = document.getElementById('wia_restore_default');
-
-    if (enabledCb) {
-        enabledCb.checked = !!moduleSettings.wiaEnabled;
-        enabledCb.addEventListener('change', () => {
-            moduleSettings.wiaEnabled = enabledCb.checked;
-            saveSettings();
-            if (moduleSettings.wiaEnabled) {
-                rescanAllForms();
-            } else {
-                removeAllControls();
-            }
-        });
-    }
-    if (debugCb) {
-        debugCb.checked = !!moduleSettings.wiaDebugMode;
-        debugCb.addEventListener('change', () => {
-            moduleSettings.wiaDebugMode = debugCb.checked;
-            saveSettings();
-        });
-    }
-    if (promptArea) {
-        promptArea.value = moduleSettings.wiaPrompt || DEFAULT_WIA_PROMPT;
-        promptArea.addEventListener('input', () => {
-            moduleSettings.wiaPrompt = promptArea.value;
-            saveSettings();
-        });
-    }
-    if (restoreBtn) {
-        restoreBtn.addEventListener('click', () => {
-            moduleSettings.wiaPrompt = DEFAULT_WIA_PROMPT;
-            if (promptArea) promptArea.value = DEFAULT_WIA_PROMPT;
-            saveSettings();
-            (0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.toast)('Default World Info assist prompt restored.', 'success');
-        });
-    }
-}
-
-
-/***/ },
-
-/***/ "../../../../../script.js"
-/*!*******************************************!*\
-  !*** external "../../../../../script.js" ***!
-  \*******************************************/
-(module) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE__script_js_588e7203__;
-
-/***/ },
-
-/***/ "../../../../group-chats.js"
-/*!*********************************************!*\
-  !*** external "../../../../group-chats.js" ***!
-  \*********************************************/
-(module) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd__;
-
-/***/ },
-
-/***/ "../../../../reasoning.js"
-/*!*******************************************!*\
-  !*** external "../../../../reasoning.js" ***!
-  \*******************************************/
-(module) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc__;
-
-/***/ },
-
-/***/ "../../../../slash-commands/SlashCommand.js"
-/*!*************************************************************!*\
-  !*** external "../../../../slash-commands/SlashCommand.js" ***!
-  \*************************************************************/
-(module) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommand_js_1b0d5616__;
-
-/***/ },
-
-/***/ "../../../../slash-commands/SlashCommandArgument.js"
-/*!*********************************************************************!*\
-  !*** external "../../../../slash-commands/SlashCommandArgument.js" ***!
-  \*********************************************************************/
-(module) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandArgument_js_a42b9371__;
-
-/***/ },
-
-/***/ "../../../../slash-commands/SlashCommandParser.js"
-/*!*******************************************************************!*\
-  !*** external "../../../../slash-commands/SlashCommandParser.js" ***!
-  \*******************************************************************/
-(module) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandParser_js_42c8b851__;
-
-/***/ },
-
-/***/ "./node_modules/fast-uri/index.js"
-/*!****************************************!*\
-  !*** ./node_modules/fast-uri/index.js ***!
-  \****************************************/
+/***/ 8343
 (module, __unused_webpack_exports, __webpack_require__) {
 
 
 
-const { normalizeIPv6, removeDotSegments, recomposeAuthority, normalizeComponentEncoding, isIPv4, nonSimpleDomain } = __webpack_require__(/*! ./lib/utils */ "./node_modules/fast-uri/lib/utils.js")
-const { SCHEMES, getSchemeHandler } = __webpack_require__(/*! ./lib/schemes */ "./node_modules/fast-uri/lib/schemes.js")
+const { normalizeIPv6, removeDotSegments, recomposeAuthority, normalizeComponentEncoding, isIPv4, nonSimpleDomain } = __webpack_require__(4834)
+const { SCHEMES, getSchemeHandler } = __webpack_require__(343)
 
 /**
  * @template {import('./types/index').URIComponent|string} T
@@ -10704,15 +7072,12 @@ module.exports.fastUri = fastUri
 
 /***/ },
 
-/***/ "./node_modules/fast-uri/lib/schemes.js"
-/*!**********************************************!*\
-  !*** ./node_modules/fast-uri/lib/schemes.js ***!
-  \**********************************************/
+/***/ 343
 (module, __unused_webpack_exports, __webpack_require__) {
 
 
 
-const { isUUID } = __webpack_require__(/*! ./utils */ "./node_modules/fast-uri/lib/utils.js")
+const { isUUID } = __webpack_require__(4834)
 const URN_REG = /([\da-z][\d\-a-z]{0,31}):((?:[\w!$'()*+,\-.:;=@]|%[\da-f]{2})+)/iu
 
 const supportedSchemeNames = /** @type {const} */ (['http', 'https', 'ws',
@@ -10981,10 +7346,7 @@ module.exports = {
 
 /***/ },
 
-/***/ "./node_modules/fast-uri/lib/utils.js"
-/*!********************************************!*\
-  !*** ./node_modules/fast-uri/lib/utils.js ***!
-  \********************************************/
+/***/ 4834
 (module) {
 
 
@@ -11327,20 +7689,14 @@ module.exports = {
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/refs/data.json"
-/*!**********************************************!*\
-  !*** ./node_modules/ajv/dist/refs/data.json ***!
-  \**********************************************/
+/***/ 3837
 (module) {
 
 module.exports = /*#__PURE__*/JSON.parse('{"$id":"https://raw.githubusercontent.com/ajv-validator/ajv/master/lib/refs/data.json#","description":"Meta-schema for $data reference (JSON AnySchema extension proposal)","type":"object","required":["$data"],"properties":{"$data":{"type":"string","anyOf":[{"format":"relative-json-pointer"},{"format":"json-pointer"}]}},"additionalProperties":false}');
 
 /***/ },
 
-/***/ "./node_modules/ajv/dist/refs/json-schema-draft-07.json"
-/*!**************************************************************!*\
-  !*** ./node_modules/ajv/dist/refs/json-schema-draft-07.json ***!
-  \**************************************************************/
+/***/ 2079
 (module) {
 
 module.exports = /*#__PURE__*/JSON.parse('{"$schema":"http://json-schema.org/draft-07/schema#","$id":"http://json-schema.org/draft-07/schema#","title":"Core schema meta-schema","definitions":{"schemaArray":{"type":"array","minItems":1,"items":{"$ref":"#"}},"nonNegativeInteger":{"type":"integer","minimum":0},"nonNegativeIntegerDefault0":{"allOf":[{"$ref":"#/definitions/nonNegativeInteger"},{"default":0}]},"simpleTypes":{"enum":["array","boolean","integer","null","number","object","string"]},"stringArray":{"type":"array","items":{"type":"string"},"uniqueItems":true,"default":[]}},"type":["object","boolean"],"properties":{"$id":{"type":"string","format":"uri-reference"},"$schema":{"type":"string","format":"uri"},"$ref":{"type":"string","format":"uri-reference"},"$comment":{"type":"string"},"title":{"type":"string"},"description":{"type":"string"},"default":true,"readOnly":{"type":"boolean","default":false},"examples":{"type":"array","items":true},"multipleOf":{"type":"number","exclusiveMinimum":0},"maximum":{"type":"number"},"exclusiveMaximum":{"type":"number"},"minimum":{"type":"number"},"exclusiveMinimum":{"type":"number"},"maxLength":{"$ref":"#/definitions/nonNegativeInteger"},"minLength":{"$ref":"#/definitions/nonNegativeIntegerDefault0"},"pattern":{"type":"string","format":"regex"},"additionalItems":{"$ref":"#"},"items":{"anyOf":[{"$ref":"#"},{"$ref":"#/definitions/schemaArray"}],"default":true},"maxItems":{"$ref":"#/definitions/nonNegativeInteger"},"minItems":{"$ref":"#/definitions/nonNegativeIntegerDefault0"},"uniqueItems":{"type":"boolean","default":false},"contains":{"$ref":"#"},"maxProperties":{"$ref":"#/definitions/nonNegativeInteger"},"minProperties":{"$ref":"#/definitions/nonNegativeIntegerDefault0"},"required":{"$ref":"#/definitions/stringArray"},"additionalProperties":{"$ref":"#"},"definitions":{"type":"object","additionalProperties":{"$ref":"#"},"default":{}},"properties":{"type":"object","additionalProperties":{"$ref":"#"},"default":{}},"patternProperties":{"type":"object","additionalProperties":{"$ref":"#"},"propertyNames":{"format":"regex"},"default":{}},"dependencies":{"type":"object","additionalProperties":{"anyOf":[{"$ref":"#"},{"$ref":"#/definitions/stringArray"}]}},"propertyNames":{"$ref":"#"},"const":true,"enum":{"type":"array","items":true,"minItems":1,"uniqueItems":true},"type":{"anyOf":[{"$ref":"#/definitions/simpleTypes"},{"type":"array","items":{"$ref":"#/definitions/simpleTypes"},"minItems":1,"uniqueItems":true}]},"format":{"type":"string"},"contentMediaType":{"type":"string"},"contentEncoding":{"type":"string"},"if":{"$ref":"#"},"then":{"$ref":"#"},"else":{"$ref":"#"},"allOf":{"$ref":"#/definitions/schemaArray"},"anyOf":{"$ref":"#/definitions/schemaArray"},"oneOf":{"$ref":"#/definitions/schemaArray"},"not":{"$ref":"#"}},"default":true}');
@@ -11367,12 +7723,6 @@ module.exports = /*#__PURE__*/JSON.parse('{"$schema":"http://json-schema.org/dra
 /******/ 	};
 /******/ 
 /******/ 	// Execute the module function
-/******/ 	if (!(moduleId in __webpack_modules__)) {
-/******/ 		delete __webpack_module_cache__[moduleId];
-/******/ 		var e = new Error("Cannot find module '" + moduleId + "'");
-/******/ 		e.code = 'MODULE_NOT_FOUND';
-/******/ 		throw e;
-/******/ 	}
 /******/ 	__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
 /******/ 
 /******/ 	// Return the exports of the module
@@ -11409,17 +7759,6 @@ module.exports = /*#__PURE__*/JSON.parse('{"$schema":"http://json-schema.org/dra
 /******/ 	__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ })();
 /******/ 
-/******/ /* webpack/runtime/make namespace object */
-/******/ (() => {
-/******/ 	// define __esModule on exports
-/******/ 	__webpack_require__.r = (exports) => {
-/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 		}
-/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 	};
-/******/ })();
-/******/ 
 /******/ /* webpack/runtime/nonce */
 /******/ (() => {
 /******/ 	__webpack_require__.nc = undefined;
@@ -11427,19 +7766,3076 @@ module.exports = /*#__PURE__*/JSON.parse('{"$schema":"http://json-schema.org/dra
 /******/ 
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry needs to be wrapped in an IIFE because it needs to be isolated against other modules in the chunk.
-(() => {
-/*!**********************!*\
-  !*** ./src/index.js ***!
-  \**********************/
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _style_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./style.css */ "./src/style.css");
-/* harmony import */ var _settings_html__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./settings.html */ "./src/settings.html");
-/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils.js */ "./src/utils.js");
-/* harmony import */ var _possession_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./possession.js */ "./src/possession.js");
-/* harmony import */ var _phrasing_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./phrasing.js */ "./src/phrasing.js");
-/* harmony import */ var _assisted_character_creation_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./assisted-character-creation.js */ "./src/assisted-character-creation.js");
-/* harmony import */ var _world_info_assist_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./world-info-assist.js */ "./src/world-info-assist.js");
+
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js
+var injectStylesIntoStyleTag = __webpack_require__(5072);
+var injectStylesIntoStyleTag_default = /*#__PURE__*/__webpack_require__.n(injectStylesIntoStyleTag);
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleDomAPI.js
+var styleDomAPI = __webpack_require__(7825);
+var styleDomAPI_default = /*#__PURE__*/__webpack_require__.n(styleDomAPI);
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/insertBySelector.js
+var insertBySelector = __webpack_require__(7659);
+var insertBySelector_default = /*#__PURE__*/__webpack_require__.n(insertBySelector);
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js
+var setAttributesWithoutAttributes = __webpack_require__(5056);
+var setAttributesWithoutAttributes_default = /*#__PURE__*/__webpack_require__.n(setAttributesWithoutAttributes);
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/insertStyleElement.js
+var insertStyleElement = __webpack_require__(540);
+var insertStyleElement_default = /*#__PURE__*/__webpack_require__.n(insertStyleElement);
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleTagTransform.js
+var styleTagTransform = __webpack_require__(1113);
+var styleTagTransform_default = /*#__PURE__*/__webpack_require__.n(styleTagTransform);
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./src/style.css
+var style = __webpack_require__(1208);
+;// ./src/style.css
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+var options = {};
+
+options.styleTagTransform = (styleTagTransform_default());
+options.setAttributes = (setAttributesWithoutAttributes_default());
+options.insert = insertBySelector_default().bind(null, "head");
+options.domAPI = (styleDomAPI_default());
+options.insertStyleElement = (insertStyleElement_default());
+
+var update = injectStylesIntoStyleTag_default()(style/* default */.A, options);
+
+
+
+
+       /* harmony default export */ const src_style = (style/* default */.A && style/* default */.A.locals ? style/* default */.A.locals : undefined);
+
+;// ./src/settings.html
+// Module
+var code = `<div id="saints_silly_settings" class="extension_settings"> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Saint's Silly Extensions</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content"> <h4 class="saints_section_header"> <span class="fa-solid fa-ghost"></span> Possession </h4> <label class="checkbox_label"> <input id="possession_enabled" type="checkbox"/> <span>Enable Possession</span> </label> <label class="checkbox_label"> <input id="possession_show_toast" type="checkbox"/> <span>Show Toast on Possess/Unpossess</span> </label> <label class="checkbox_label"> <input id="possession_debug_mode" type="checkbox"/> <span>Possession Debug Mode</span> </label> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-pen-fancy"></span> Phrasing! </h4> <label class="checkbox_label"> <input id="phrasing_enabled" type="checkbox" checked="checked"/> <span>Enable Phrasing!</span> </label> <label class="checkbox_label"> <input id="phrasing_debug_mode" type="checkbox"/> <span>Phrasing Debug Mode</span> </label> <div class="phrasing_prompt_section"> <label for="phrasing_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="phrasing_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Phrasing! prompt template..."></textarea> </div> <div class="phrasing_buttons_row"> <div class="menu_button" id="phrasing_restore_default"> <span class="fa-solid fa-rotate-left"></span> Restore Default </div> <div class="menu_button" id="phrasing_save_to_chat"> <span class="fa-solid fa-floppy-disk"></span> Save to Chat </div> </div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-wand-magic-sparkles"></span> Assisted Character Creation </h4> <label class="checkbox_label"> <input id="acc_enabled" type="checkbox"/> <span>Enable Assisted Character Creation</span> </label> <label class="checkbox_label"> <input id="acc_debug_mode" type="checkbox"/> <span>ACC Debug Mode</span> </label> <div class="acc-schema-selector"> <label for="acc_schema_select"><b>Active Schema:</b></label> <select id="acc_schema_select" class="text_pole"></select> </div> <div class="acc-schema-buttons"> <div class="menu_button" id="acc_import_schema"> <span class="fa-solid fa-file-import"></span> Import Schema </div> <div class="menu_button" id="acc_export_schema"> <span class="fa-solid fa-file-export"></span> Export Schema </div> <div class="menu_button" id="acc_delete_schema"> <span class="fa-solid fa-trash"></span> Delete Schema </div> </div> <input type="file" id="acc_schema_file_input" accept=".json" style="display:none"/> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-book-atlas"></span> World Info Assist </h4> <label class="checkbox_label"> <input id="wia_enabled" type="checkbox"/> <span>Enable World Info Assist</span> </label> <label class="checkbox_label"> <input id="wia_debug_mode" type="checkbox"/> <span>WI Assist Debug Mode</span> </label> <div class="wia_prompt_section"> <label for="wia_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="wia_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your World Info Assist prompt template..."></textarea> </div> <div class="wia_buttons_row"> <div class="menu_button" id="wia_restore_default"> <span class="fa-solid fa-rotate-left"></span> Restore Default </div> </div> </div> </div> </div> `;
+// Exports
+/* harmony default export */ const settings = (code);
+;// ./src/utils.js
+/**
+ * Shared utilities for SillyTavern extensions.
+ *
+ * These helpers encapsulate patterns that recur across extensions:
+ *   - Context access
+ *   - Toast notifications
+ *   - Debug logging
+ *   - Settings persistence
+ *   - Message-editing helpers
+ *   - Generation lifecycle helpers
+ */
+
+// ─── Context ───
+
+/**
+ * Returns a fresh SillyTavern context object.
+ * Always call this when you need the context — do not cache it long-term.
+ */
+function getContext() {
+    return SillyTavern.getContext();
+}
+
+// ─── Toast Notifications ───
+
+/**
+ * Show a toast notification via SillyTavern's global `toastr`.
+ *
+ * @param {string} message  - Text to display.
+ * @param {string} [type]   - One of 'info', 'success', 'warning', 'error'.
+ * @param {string} [title]  - Optional toast title.
+ */
+function toast(message, type = 'info', title = undefined) {
+    if (typeof toastr !== 'undefined' && toastr[type]) {
+        toastr[type](message, title);
+    }
+}
+
+// ─── Debug Logger Factory ───
+
+/**
+ * Creates a conditional debug logger.
+ *
+ * @param {string}   prefix     - Label printed before every message (e.g. 'MY-EXT').
+ * @param {function} isEnabled  - Callback that returns `true` when logging should be active.
+ * @returns {function} A `console.log`-style function that only logs when enabled.
+ *
+ * @example
+ *   const debug = createDebugLogger('PHRASING', () => settings.phrasingDebugMode);
+ *   debug('seed length:', text.length);
+ */
+function createDebugLogger(prefix, isEnabled) {
+    return (...args) => {
+        if (typeof isEnabled === 'function' && !isEnabled()) return;
+        console.log(`${prefix}:`, ...args);
+    };
+}
+
+// ─── Settings Persistence ───
+
+/**
+ * Load extension settings, merging saved values over the supplied defaults.
+ *
+ * @param {string} extensionName  - Key under `context.extensionSettings`.
+ * @param {object} defaults       - Default settings object (used for new keys).
+ * @returns {object} The merged settings object.
+ */
+function loadExtensionSettings(extensionName, defaults) {
+    const context = getContext();
+    const saved = context.extensionSettings?.[extensionName];
+    return saved ? { ...defaults, ...saved } : { ...defaults };
+}
+
+/**
+ * Persist extension settings (debounced).
+ *
+ * @param {string} extensionName - Key under `context.extensionSettings`.
+ * @param {object} settings      - The settings object to save.
+ */
+function saveExtensionSettings(extensionName, settings) {
+    const context = getContext();
+    context.extensionSettings[extensionName] = { ...settings };
+    context.saveSettingsDebounced();
+}
+
+// ─── Message Edit Helpers ───
+
+/**
+ * If a message is currently being edited (edit textarea visible), click "Done"
+ * to confirm the edit programmatically.
+ *
+ * @returns {boolean} `true` if an active edit was confirmed; `false` otherwise.
+ */
+function confirmActiveMessageEdit() {
+    const visibleEditButtons = document.querySelector(
+        '#chat .mes .mes_edit_buttons[style*="display: inline-flex"]',
+    );
+    if (visibleEditButtons) {
+        const editDoneBtn = visibleEditButtons.querySelector('.mes_edit_done');
+        if (editDoneBtn) {
+            editDoneBtn.click();
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * Returns the chat-array index of the message currently being edited, or -1
+ * if no edit is in progress.
+ *
+ * @returns {number}
+ */
+function getEditingMessageIndex() {
+    const visibleEditButtons = document.querySelector(
+        '#chat .mes .mes_edit_buttons[style*="display: inline-flex"]',
+    );
+    if (!visibleEditButtons) return -1;
+    const mesEl = visibleEditButtons.closest('.mes');
+    if (!mesEl) return -1;
+    const mesId = mesEl.getAttribute('mesid');
+    return mesId !== null ? parseInt(mesId) : -1;
+}
+
+// ─── Generation Lifecycle ───
+
+/**
+ * Returns a Promise that resolves when the current LLM generation ends
+ * (either normally or via user stop). Resolves with the text of the last
+ * message in the chat, or '' on timeout / empty chat.
+ *
+ * @param {number} [timeoutMs=300000] - Timeout in milliseconds (default 5 min).
+ * @returns {Promise<string>}
+ */
+function waitForGenerationEnd(timeoutMs = 5 * 60 * 1000) {
+    return new Promise(resolve => {
+        const context = getContext();
+        const { eventSource, eventTypes } = context;
+        let settled = false;
+
+        const cleanup = () => {
+            eventSource.removeListener(eventTypes.GENERATION_ENDED, onEnd);
+            eventSource.removeListener(eventTypes.GENERATION_STOPPED, onEnd);
+        };
+
+        const onEnd = () => {
+            if (settled) return;
+            settled = true;
+            cleanup();
+            const ctx = getContext();
+            const lastMsg = ctx.chat[ctx.chat.length - 1];
+            resolve(lastMsg ? lastMsg.mes : '');
+        };
+
+        setTimeout(() => {
+            if (settled) return;
+            settled = true;
+            cleanup();
+            resolve('');
+        }, timeoutMs);
+
+        eventSource.on(eventTypes.GENERATION_ENDED, onEnd);
+        if (eventTypes.GENERATION_STOPPED) {
+            eventSource.on(eventTypes.GENERATION_STOPPED, onEnd);
+        }
+    });
+}
+
+;// external "../../../../group-chats.js"
+
+;// external "../../../../slash-commands/SlashCommandParser.js"
+
+;// external "../../../../slash-commands/SlashCommand.js"
+
+;// external "../../../../slash-commands/SlashCommandArgument.js"
+
+;// ./src/possession.js
+/**
+ * Possession module — lets the user "possess" a character so their messages
+ * are posted under that character's name/avatar.
+ */
+
+
+
+
+
+
+
+const POSSESSION_METADATA_KEY = 'possession';
+
+// ─── State ───
+
+let possessedCharName = null;
+let possessedCharAvatar = null;
+let generationGuard = false;
+
+/** @type {{ settings: object, saveSettings: function }} */
+let ctx = null;
+
+/** @type {{ handlePhrasingSeedReinjection: function, isPhrasing: function }} */
+let phrasingApi = null;
+
+let debug = () => {};
+
+function possession_toast(message, type = 'info') {
+    if (!ctx.settings.possessionShowToast) return;
+    toast(message, type, 'Saint\'s Silly Extensions');
+}
+
+// ─── Public Getters ───
+
+function isPossessing() {
+    return ctx.settings.possessionEnabled && possessedCharName !== null;
+}
+
+function getPossessedCharName() {
+    return possessedCharName;
+}
+
+function isGenerationGuarded() {
+    return generationGuard;
+}
+
+// ─── Persistence ───
+
+function savePossessionState() {
+    const context = getContext();
+    context.chatMetadata[POSSESSION_METADATA_KEY] = {
+        name: possessedCharName,
+        avatar: possessedCharAvatar,
+    };
+    context.saveMetadata();
+    debug('Saved possession state:', possessedCharName, '| avatar:', possessedCharAvatar);
+}
+
+function loadPossessionState() {
+    const context = getContext();
+    const saved = context.chatMetadata?.[POSSESSION_METADATA_KEY] ?? null;
+    if (saved && typeof saved === 'object') {
+        possessedCharName = saved.name ?? null;
+        possessedCharAvatar = saved.avatar ?? null;
+    } else {
+        possessedCharName = saved;
+        possessedCharAvatar = null;
+    }
+    debug('Loaded possession state:', possessedCharName, '| avatar:', possessedCharAvatar);
+}
+
+// ─── Character Utilities ───
+
+function getPossessedCharacter() {
+    if (!possessedCharName) return null;
+    const context = getContext();
+    if (possessedCharAvatar) {
+        const byAvatar = context.characters.find(c => c.avatar === possessedCharAvatar);
+        if (byAvatar) return byAvatar;
+    }
+    // In group chats, prefer the character whose avatar is in the group members list
+    if (__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__) {
+        const group = __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_groups__.find(g => g.id === __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__);
+        if (group) {
+            const groupChar = group.members
+                .map(avatar => context.characters.find(c => c.avatar === avatar))
+                .find(c => c && c.name === possessedCharName);
+            if (groupChar) return groupChar;
+        }
+    }
+    return context.characters.find(c => c.name === possessedCharName) ?? null;
+}
+
+function validatePossessedCharInGroup() {
+    if (!__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__ || !possessedCharName) return;
+    const group = __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_groups__.find(g => g.id === __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__);
+    if (!group) return;
+    const context = getContext();
+    const isMember = group.members.some(avatar => {
+        if (possessedCharAvatar) return avatar === possessedCharAvatar;
+        const char = context.characters.find(c => c.avatar === avatar);
+        return char && char.name === possessedCharName;
+    });
+    if (!isMember) {
+        debug('Possessed character removed from group, clearing');
+        possession_toast(`${possessedCharName} was removed from the group. Possession cleared.`, 'warning');
+        setPossession(null);
+    }
+}
+
+// ─── Core Logic ───
+
+function setPossession(charName, charAvatar) {
+    const previous = possessedCharName;
+    possessedCharName = charName;
+    if (charName) {
+        if (charAvatar) {
+            possessedCharAvatar = charAvatar;
+        } else {
+            const context = getContext();
+            // In group chats, prefer the character whose avatar is in the group members list
+            let char = null;
+            if (__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__) {
+                const group = __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_groups__.find(g => g.id === __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__);
+                if (group) {
+                    char = group.members
+                        .map(avatar => context.characters.find(c => c.avatar === avatar))
+                        .find(c => c && c.name === charName) ?? null;
+                }
+            }
+            if (!char) {
+                char = context.characters.find(c => c.name === charName) ?? null;
+            }
+            possessedCharAvatar = char?.avatar ?? null;
+        }
+    } else {
+        possessedCharAvatar = null;
+    }
+    savePossessionState();
+    syncAllPossessionUI();
+    if (previous !== charName) {
+        if (charName) {
+            possession_toast(`Possessing ${charName}`, 'success');
+            debug('Now possessing:', charName);
+        } else if (previous) {
+            possession_toast('Possession cleared', 'info');
+            debug('Possession cleared');
+        }
+    }
+}
+
+// ─── Message Posting ───
+
+async function postPossessedMessage(text) {
+    const context = getContext();
+    const char = getPossessedCharacter();
+    if (!char || !text) return -1;
+
+    const message = {
+        name: char.name,
+        is_user: false,
+        is_system: false,
+        send_date: Date.now(),
+        mes: text,
+        force_avatar: char.avatar ? `/characters/${char.avatar}` : undefined,
+        extra: { possession: true },
+    };
+
+    if (__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__) {
+        message.original_avatar = char.avatar;
+        message.is_name = true;
+    }
+
+    context.chat.push(message);
+    const messageIndex = context.chat.length - 1;
+
+    if (typeof context.addOneMessage === 'function') {
+        context.addOneMessage(message);
+    }
+
+    await context.saveChat();
+    debug('Posted possessed message at index', messageIndex);
+    return messageIndex;
+}
+
+// ─── Send Handling (MESSAGE_SENT) ───
+
+function onMessageSent(messageIndex) {
+    if (!ctx.settings.possessionEnabled || !isPossessing()) return;
+    if (phrasingApi?.isPhrasing()) return;
+
+    const context = getContext();
+    const message = context.chat[messageIndex];
+    if (!message || !message.is_user) return;
+
+    const char = getPossessedCharacter();
+    if (!char) return;
+
+    debug('Converting user message to possessed character message at index', messageIndex);
+
+    message.is_user = false;
+    message.name = char.name;
+    message.force_avatar = char.avatar ? `/characters/${char.avatar}` : undefined;
+    message.extra = { ...(message.extra || {}), possession: true };
+
+    if (__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__) {
+        message.original_avatar = char.avatar;
+        message.is_name = true;
+    }
+
+    debug('Converted message — name:', char.name);
+}
+
+// ─── Continue Interception ───
+
+function handleContinueIntercept(event) {
+    if (!ctx.settings.possessionEnabled || !isPossessing() || generationGuard) return;
+
+    const textarea = document.getElementById('send_textarea');
+    const text = textarea?.value?.trim();
+    if (!text) return;
+
+    event.stopImmediatePropagation();
+    event.preventDefault();
+
+    debug('Intercepted Continue with text:', text.substring(0, 50) + '...');
+    executePossessedContinue(text);
+}
+
+async function executePossessedContinue(text) {
+    const context = getContext();
+
+    const textarea = document.getElementById('send_textarea');
+    if (textarea) {
+        textarea.value = '';
+        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    await postPossessedMessage(text);
+    await new Promise(resolve => requestAnimationFrame(resolve));
+
+    if (context.executeSlashCommandsWithOptions) {
+        await context.executeSlashCommandsWithOptions('/continue');
+    } else {
+        const continueBtn = document.getElementById('option_continue');
+        if (continueBtn) continueBtn.click();
+    }
+}
+
+function attachContinueInterceptor() {
+    document.addEventListener('click', (event) => {
+        if (!event.target.closest('#option_continue') && !event.target.closest('#mes_continue')) return;
+
+        // Reinject phrasing seed if the last message was rephrased
+        phrasingApi?.handlePhrasingSeedReinjection();
+
+        handleContinueIntercept(event);
+    }, { capture: true });
+    debug('Attached continue interceptor');
+}
+
+// ─── UI: Group Radio Buttons ───
+
+function injectGroupRadioButtons() {
+    if (!__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__) return;
+    if (!ctx.settings.possessionEnabled) return;
+
+    const group = __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_groups__.find(g => g.id === __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__);
+    if (!group) return;
+
+    const context = getContext();
+    const memberEntries = document.querySelectorAll('#rm_group_members .group_member');
+
+    memberEntries.forEach(entry => {
+        if (entry.querySelector('.possession_radio_wrapper')) return;
+
+        const charId = entry.getAttribute('chid');
+        const gridAvatar = entry.getAttribute('grid');
+        let charName = null;
+        let charAvatar = null;
+
+        // Try chid first (character index)
+        if (charId !== null) {
+            const char = context.characters[parseInt(charId)];
+            if (char) {
+                charName = char.name;
+                charAvatar = char.avatar;
+            }
+        }
+
+        // Fallback to grid attribute (avatar filename)
+        if (!charAvatar && gridAvatar) {
+            const char = context.characters.find(c => c.avatar === gridAvatar);
+            if (char) {
+                charName = charName || char.name;
+                charAvatar = char.avatar;
+            } else {
+                // grid is the avatar filename even if character lookup fails
+                charAvatar = gridAvatar;
+            }
+        }
+
+        // Fallback: extract avatar from the member's displayed image
+        if (!charAvatar) {
+            const img = entry.querySelector('img');
+            if (img?.src) {
+                const match = img.src.match(/[?&]file=([^&]+)|\/characters\/([^/?]+)/);
+                const filename = match?.[1] || match?.[2];
+                if (filename) {
+                    const decoded = decodeURIComponent(filename);
+                    charAvatar = decoded;
+                    if (!charName) {
+                        const char = context.characters.find(c => c.avatar === decoded);
+                        if (char) charName = char.name;
+                    }
+                }
+            }
+        }
+
+        if (!charName) {
+            const nameEl = entry.querySelector('.ch_name');
+            if (nameEl) charName = nameEl.textContent?.trim() || nameEl.getAttribute('title');
+        }
+
+        if (!charName) return;
+
+        const wrapper = document.createElement('div');
+        wrapper.classList.add('possession_radio_wrapper');
+        wrapper.title = `Possess ${charName}`;
+
+        const radio = document.createElement('div');
+        radio.classList.add('possession_radio');
+        radio.dataset.charName = charName;
+        if (charAvatar) radio.dataset.charAvatar = charAvatar;
+
+        const isActive = (possessedCharAvatar && charAvatar)
+            ? possessedCharAvatar === charAvatar
+            : possessedCharName === charName;
+        if (isActive) {
+            radio.classList.add('possession_active');
+            entry.classList.add('possession_possessed');
+        }
+
+        radio.addEventListener('click', (event) => {
+            event.stopPropagation();
+            const isCurrentlyPossessed = (possessedCharAvatar && charAvatar)
+                ? possessedCharAvatar === charAvatar
+                : possessedCharName === charName;
+            if (isCurrentlyPossessed) {
+                setPossession(null);
+            } else {
+                setPossession(charName, charAvatar);
+            }
+        });
+
+        wrapper.appendChild(radio);
+
+        const iconContainer = entry.querySelector('.group_member_icon');
+        if (iconContainer) {
+            iconContainer.insertBefore(wrapper, iconContainer.firstChild);
+        } else {
+            entry.appendChild(wrapper);
+        }
+    });
+}
+
+function syncGroupRadioButtons() {
+    document.querySelectorAll('.possession_radio').forEach(radio => {
+        const charName = radio.dataset.charName;
+        const charAvatar = radio.dataset.charAvatar;
+        const isActive = (possessedCharAvatar && charAvatar)
+            ? possessedCharAvatar === charAvatar
+            : charName === possessedCharName;
+        radio.classList.toggle('possession_active', isActive);
+    });
+
+    document.querySelectorAll('.group_member').forEach(entry => {
+        entry.classList.remove('possession_possessed');
+    });
+
+    if (possessedCharName) {
+        document.querySelectorAll('.possession_radio.possession_active').forEach(radio => {
+            const member = radio.closest('.group_member');
+            if (member) member.classList.add('possession_possessed');
+        });
+    }
+}
+
+function removeGroupRadioButtons() {
+    document.querySelectorAll('.possession_radio_wrapper').forEach(el => el.remove());
+    document.querySelectorAll('.group_member.possession_possessed').forEach(el => {
+        el.classList.remove('possession_possessed');
+    });
+}
+
+// ─── UI: Solo Chat Button ───
+
+function injectSoloButton() {
+    if (__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__) return;
+    if (!ctx.settings.possessionEnabled) return;
+    if (document.getElementById('possession_solo_btn')) return;
+
+    const panelButtonRow = document.querySelector('#form_create .ch_creation_btn_row, #form_create .form_create_bottom_buttons_block');
+    const target = panelButtonRow || document.getElementById('rightSendForm');
+    if (!target) return;
+
+    const btn = document.createElement('div');
+    btn.id = 'possession_solo_btn';
+    btn.classList.add('menu_button', 'interactable');
+    btn.title = 'Possess this character';
+    btn.innerHTML = '<span class="fa-solid fa-ghost"></span>';
+
+    if (isPossessing()) {
+        btn.classList.add('possession_active');
+    }
+
+    btn.addEventListener('click', () => {
+        const context = getContext();
+        const char = context.characters?.[context.characterId];
+        if (!char) return;
+
+        if (possessedCharName === char.name && (!possessedCharAvatar || possessedCharAvatar === char.avatar)) {
+            setPossession(null);
+        } else {
+            setPossession(char.name, char.avatar);
+        }
+    });
+
+    target.appendChild(btn);
+    debug('Injected solo possess button');
+}
+
+function syncSoloButton() {
+    const btn = document.getElementById('possession_solo_btn');
+    if (!btn) return;
+    btn.classList.toggle('possession_active', isPossessing());
+}
+
+function removeSoloButton() {
+    const btn = document.getElementById('possession_solo_btn');
+    if (btn) btn.remove();
+}
+
+// ─── UI: Impersonate Button Visibility ───
+
+function hideImpersonateButtons() {
+    const menuBtn = document.getElementById('option_impersonate');
+    const quickBtn = document.getElementById('mes_impersonate');
+    if (menuBtn) menuBtn.classList.add('possession_hidden');
+    if (quickBtn) quickBtn.classList.add('possession_hidden');
+    debug('Impersonate buttons hidden');
+}
+
+function showImpersonateButtons() {
+    const menuBtn = document.getElementById('option_impersonate');
+    const quickBtn = document.getElementById('mes_impersonate');
+    if (menuBtn) menuBtn.classList.remove('possession_hidden');
+    if (quickBtn) quickBtn.classList.remove('possession_hidden');
+    debug('Impersonate buttons shown');
+}
+
+// ─── UI: Possession Impersonate Button (Character Avatar) ───
+
+function injectPossessionImpersonateButton() {
+    removePossessionImpersonateButton();
+
+    const char = getPossessedCharacter();
+    if (!char) return;
+
+    const sendForm = document.getElementById('rightSendForm');
+    if (!sendForm) return;
+
+    const btn = document.createElement('div');
+    btn.id = 'possession_impersonate_btn';
+    btn.classList.add('interactable');
+    btn.title = `Generate as ${char.name}`;
+
+    const img = document.createElement('img');
+    img.src = char.avatar ? `/characters/${char.avatar}` : '/img/ai4.png';
+    img.alt = char.name;
+    img.classList.add('possession_impersonate_avatar');
+    btn.appendChild(img);
+
+    btn.addEventListener('click', async () => {
+        const context = getContext();
+        if (context.isGenerating || generationGuard) return;
+
+        debug('Possession impersonate clicked — triggering generation for', char.name);
+
+        if (__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__) {
+            const radios = document.querySelectorAll('.possession_radio');
+            for (const radio of radios) {
+                const radioMatch = (possessedCharAvatar && radio.dataset.charAvatar)
+                    ? radio.dataset.charAvatar === possessedCharAvatar
+                    : radio.dataset.charName === possessedCharName;
+                if (radioMatch) {
+                    const memberEntry = radio.closest('.group_member');
+                    if (memberEntry) {
+                        const speakBtn = memberEntry.querySelector('.right_menu_button[data-action="speak"]');
+                        if (speakBtn) {
+                            speakBtn.click();
+                            return;
+                        }
+                    }
+                    break;
+                }
+            }
+            debug('Speak button not found, falling back to /trigger');
+            if (context.executeSlashCommandsWithOptions) {
+                await context.executeSlashCommandsWithOptions(`/trigger ${char.name}`);
+            }
+        } else {
+            if (context.executeSlashCommandsWithOptions) {
+                await context.executeSlashCommandsWithOptions('/trigger');
+            } else {
+                const sendBtn = document.getElementById('send_but');
+                if (sendBtn) sendBtn.click();
+            }
+        }
+    });
+
+    const phrasingBtn = document.getElementById('phrasing_send_button');
+    if (phrasingBtn) {
+        sendForm.insertBefore(btn, phrasingBtn);
+    } else {
+        sendForm.appendChild(btn);
+    }
+
+    debug('Injected possession impersonate button for', char.name);
+}
+
+function removePossessionImpersonateButton() {
+    const btn = document.getElementById('possession_impersonate_btn');
+    if (btn) btn.remove();
+}
+
+function hidePossessionImpersonateButton() {
+    const btn = document.getElementById('possession_impersonate_btn');
+    if (btn) btn.classList.add('possession_hidden');
+}
+
+function showPossessionImpersonateButton() {
+    const btn = document.getElementById('possession_impersonate_btn');
+    if (btn) btn.classList.remove('possession_hidden');
+}
+
+// ─── UI Sync ───
+
+function syncAllPossessionUI() {
+    if (!ctx.settings.possessionEnabled) {
+        removeGroupRadioButtons();
+        removeSoloButton();
+        showImpersonateButtons();
+        removePossessionImpersonateButton();
+        return;
+    }
+
+    if (__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__) {
+        removeSoloButton();
+        injectGroupRadioButtons();
+        syncGroupRadioButtons();
+    } else {
+        removeGroupRadioButtons();
+        injectSoloButton();
+        syncSoloButton();
+    }
+
+    if (isPossessing()) {
+        hideImpersonateButtons();
+        injectPossessionImpersonateButton();
+    } else {
+        showImpersonateButtons();
+        removePossessionImpersonateButton();
+    }
+}
+
+// ─── Generation Lifecycle ───
+
+function onGenerationStarted() {
+    generationGuard = true;
+    hidePossessionImpersonateButton();
+}
+
+function onGenerationEnded() {
+    generationGuard = false;
+    syncAllPossessionUI();
+}
+
+// ─── Event Handlers ───
+
+function onGroupUpdated() {
+    validatePossessedCharInGroup();
+    removeGroupRadioButtons();
+    injectGroupRadioButtons();
+    syncGroupRadioButtons();
+}
+
+function onCharacterPageLoaded() {
+    if (!__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__) {
+        injectSoloButton();
+        syncSoloButton();
+    }
+}
+
+function onGroupWrapperFinished() {
+    syncAllPossessionUI();
+}
+
+// ─── Settings Panel ───
+
+function bindPossessionSettings(saveSettings) {
+    const possessionEnabled = document.getElementById('possession_enabled');
+    if (possessionEnabled) {
+        possessionEnabled.checked = ctx.settings.possessionEnabled;
+        possessionEnabled.addEventListener('change', (e) => {
+            ctx.settings.possessionEnabled = e.target.checked;
+            saveSettings();
+            syncAllPossessionUI();
+        });
+    }
+
+    const possessionShowToast = document.getElementById('possession_show_toast');
+    if (possessionShowToast) {
+        possessionShowToast.checked = ctx.settings.possessionShowToast;
+        possessionShowToast.addEventListener('change', (e) => {
+            ctx.settings.possessionShowToast = e.target.checked;
+            saveSettings();
+        });
+    }
+
+    const possessionDebugMode = document.getElementById('possession_debug_mode');
+    if (possessionDebugMode) {
+        possessionDebugMode.checked = ctx.settings.possessionDebugMode;
+        possessionDebugMode.addEventListener('change', (e) => {
+            ctx.settings.possessionDebugMode = e.target.checked;
+            saveSettings();
+            debug('debugMode toggled to', ctx.settings.possessionDebugMode);
+        });
+    }
+}
+
+// ─── Slash Commands ───
+
+function registerPossessionSlashCommands() {
+    __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandParser_js_42c8b851_SlashCommandParser__.addCommandObject(__WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommand_js_1b0d5616_SlashCommand__.fromProps({
+        name: 'possess',
+        callback: async (namedArgs, unnamedArgs) => {
+            const name = unnamedArgs?.trim();
+
+            if (!name) {
+                if (isPossessing()) {
+                    toastr.info(`Currently possessing: ${possessedCharName}`, 'Possession');
+                    return possessedCharName;
+                }
+                if (!__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__) {
+                    const context = getContext();
+                    const char = context.characters?.[context.characterId];
+                    if (char) {
+                        setPossession(char.name, char.avatar);
+                        return char.name;
+                    }
+                }
+                toastr.info('No character is currently possessed.', 'Possession');
+                return 'None';
+            }
+
+            const context = getContext();
+            const nameLower = name.toLowerCase();
+
+            if (__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__) {
+                const group = __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_groups__.find(g => g.id === __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__);
+                if (!group) {
+                    toastr.error('No active group found.', 'Possession');
+                    return '';
+                }
+                const match = group.members
+                    .map(avatar => context.characters.find(c => c.avatar === avatar))
+                    .filter(Boolean)
+                    .find(c => c.name.toLowerCase().includes(nameLower));
+
+                if (!match) {
+                    toastr.error(`No group member matching "${name}" found.`, 'Possession');
+                    return '';
+                }
+                setPossession(match.name, match.avatar);
+                return match.name;
+            } else {
+                const char = context.characters?.[context.characterId];
+                if (char && char.name.toLowerCase().includes(nameLower)) {
+                    setPossession(char.name, char.avatar);
+                    return char.name;
+                }
+                toastr.error(`Character "${name}" does not match the active character.`, 'Possession');
+                return '';
+            }
+        },
+        unnamedArgumentList: [
+            __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandArgument_js_a42b9371_SlashCommandArgument__.fromProps({
+                description: 'Character name (partial match). Omit to show current or toggle in solo chat.',
+                typeList: [__WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandArgument_js_a42b9371_ARGUMENT_TYPE__.STRING],
+                isRequired: false,
+            }),
+        ],
+        aliases: [],
+        helpString: 'Possess a character so your messages are posted under their name. Usage: /possess [name]',
+    }));
+
+    __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandParser_js_42c8b851_SlashCommandParser__.addCommandObject(__WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommand_js_1b0d5616_SlashCommand__.fromProps({
+        name: 'unpossess',
+        callback: async () => {
+            if (isPossessing()) {
+                setPossession(null);
+            }
+            return '';
+        },
+        unnamedArgumentList: [],
+        aliases: [],
+        helpString: 'Clear the currently possessed character, returning to normal mode.',
+    }));
+
+    debug('Registered possession slash commands');
+}
+
+// ─── Init ───
+
+/**
+ * @param {object} options
+ * @param {object} options.settings  - Shared mutable settings reference.
+ * @param {object} options.phrasingApi - { isPhrasing(), handlePhrasingSeedReinjection() }
+ */
+function initPossession({ settings, phrasingApi: pApi }) {
+    ctx = { settings };
+    phrasingApi = pApi;
+    debug = createDebugLogger('POSSESSION', () => settings.possessionDebugMode);
+}
+
+;// external "../../../../../script.js"
+
+;// ./src/phrasing.js
+/**
+ * Phrasing module — enriches messages with AI-generated narration via
+ * prompt injection + impersonate/swipe flows.
+ */
+
+
+
+
+
+
+
+// ─── Constants ───
+
+const PHRASING_INJECTION_KEY = 'phrasing_instruction';
+const PHRASING_SEED_EXTRA_KEY = 'phrasing_seed';
+
+const DEFAULT_PHRASING_PROMPT = `[Rewrite the following message. Preserve its meaning, intent, and any dialogue, but enrich it with narration, action, and detail consistent with the character and the current scene. Do not continue the scene beyond what the original message describes.
+
+{{phrasingSeed}}]`;
+
+// ─── State ───
+
+let phrasingActive = false;
+
+/** @type {{ settings: object }} */
+let phrasing_ctx = null;
+
+/** @type {{ isPossessing: function, getPossessedCharName: function, postPossessedMessage: function }} */
+let possessionApi = null;
+
+let phrasing_debug = () => {};
+
+// ─── Public Getters ───
+
+function isPhrasing() {
+    return phrasingActive;
+}
+
+// ─── Prompt Management ───
+
+function getActivePrompt() {
+    const context = getContext();
+    const chatPrompt = context.chatMetadata?.phrasing?.prompt;
+    phrasing_debug('getActivePrompt — source:', chatPrompt ? 'chat metadata' : 'default');
+    return chatPrompt || DEFAULT_PHRASING_PROMPT;
+}
+
+function formatSeedWithSpeaker(seedText, isUser, speakerName) {
+    const context = getContext();
+    let name;
+    if (speakerName) {
+        name = speakerName;
+    } else if (isUser) {
+        name = context.name1;
+    } else {
+        name = context.name2;
+    }
+    phrasing_debug('formatSeedWithSpeaker — speaker:', name, '| isUser:', isUser);
+    return `${name}: ${seedText}`;
+}
+
+function assemblePrompt(seedText) {
+    phrasing_debug('assemblePrompt — seed length:', seedText.length);
+    let prompt = getActivePrompt();
+    prompt = prompt.replace(/\{\{phrasingSeed\}\}/g, seedText);
+    prompt = __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParams__(prompt);
+    phrasing_debug('assemblePrompt — final length:', prompt.length);
+    return prompt;
+}
+
+// ─── Injection ───
+
+function injectPhrasingPrompt(assembledPrompt) {
+    phrasing_debug('injectPhrasingPrompt — injecting at depth 0, SYSTEM role');
+    __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_setExtensionPrompt__(
+        PHRASING_INJECTION_KEY,
+        assembledPrompt,
+        __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_types__.IN_CHAT,
+        0,
+        false,
+        __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_roles__.SYSTEM,
+    );
+}
+
+function clearPhrasingInjection() {
+    phrasing_debug('clearPhrasingInjection — removing injection');
+    __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_setExtensionPrompt__(PHRASING_INJECTION_KEY, '', __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_types__.NONE, 0);
+}
+
+/**
+ * Called from the continue interceptor — reinjects the phrasing seed prompt
+ * if the last message was rephrased.
+ */
+function handlePhrasingSeedReinjection() {
+    if (!phrasing_ctx.settings.phrasingEnabled) return;
+
+    const context = getContext();
+    const lastIndex = context.chat.length - 1;
+    if (lastIndex < 0) return;
+
+    const message = context.chat[lastIndex];
+    const storedPrompt = message?.extra?.[PHRASING_SEED_EXTRA_KEY];
+    if (!storedPrompt) return;
+
+    phrasing_debug('Reinjecting phrasing seed for continue on message', lastIndex);
+    injectPhrasingPrompt(storedPrompt);
+}
+
+// ─── Button Visibility ───
+
+function hideAllPhrasingButtons() {
+    document.querySelectorAll('.phrasing-trigger').forEach(el => {
+        el.classList.add('phrasing-hidden');
+    });
+}
+
+function showAllPhrasingButtons() {
+    if (!phrasing_ctx.settings.phrasingEnabled) return;
+    document.querySelectorAll('.phrasing-trigger').forEach(el => {
+        el.classList.remove('phrasing-hidden');
+    });
+}
+
+function applyPhrasingEnabledState() {
+    if (phrasing_ctx.settings.phrasingEnabled) {
+        showAllPhrasingButtons();
+    } else {
+        hideAllPhrasingButtons();
+    }
+}
+
+// ─── Primary Flow (Input Enrichment) ───
+
+async function doPrimaryFlow(seedText) {
+    phrasing_debug('doPrimaryFlow — starting, seed length:', seedText.length);
+    const context = getContext();
+
+    if (context.isGenerating) {
+        phrasing_debug('doPrimaryFlow — ABORTED: generation in progress');
+        return '';
+    }
+
+    phrasingActive = true;
+
+    try {
+        if (possessionApi?.isPossessing()) {
+            phrasing_debug('doPrimaryFlow — possessed path: posting message then swiping');
+
+            const colonIndex = seedText.indexOf(': ');
+            const rawText = colonIndex !== -1 ? seedText.substring(colonIndex + 2) : seedText;
+
+            const messageIndex = await possessionApi.postPossessedMessage(rawText);
+            if (messageIndex < 0) {
+                phrasing_debug('doPrimaryFlow — FAILED: could not post possessed message');
+                return '';
+            }
+
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            const result = await doSwipeMode(messageIndex);
+            phrasing_debug('doPrimaryFlow — possessed path complete, result length:', result.length);
+            return result;
+        } else {
+            const assembled = assemblePrompt(seedText);
+            injectPhrasingPrompt(assembled);
+
+            phrasing_debug('doPrimaryFlow — normal path: triggering impersonate');
+            const impersonateBtn = document.getElementById('option_impersonate');
+            if (impersonateBtn) {
+                impersonateBtn.click();
+            } else {
+                phrasing_debug('doPrimaryFlow — FAILED: option_impersonate not found');
+                return '';
+            }
+
+            await waitForGenerationEnd();
+
+            const textarea = document.getElementById('send_textarea');
+            const result = textarea?.value?.trim() || '';
+            phrasing_debug('doPrimaryFlow — normal path complete, result length:', result.length);
+            return result;
+        }
+    } finally {
+        clearPhrasingInjection();
+        phrasingActive = false;
+        showAllPhrasingButtons();
+        phrasing_debug('doPrimaryFlow — cleanup complete');
+    }
+}
+
+// ─── Swipe Mode ───
+
+async function doSwipeMode(messageIndex) {
+    phrasing_debug('doSwipeMode — starting for message index:', messageIndex);
+    const context = getContext();
+
+    if (context.isGenerating) {
+        phrasing_debug('doSwipeMode — ABORTED: generation in progress');
+        return '';
+    }
+
+    const message = context.chat[messageIndex];
+    if (!message) {
+        phrasing_debug('doSwipeMode — ABORTED: no message at index', messageIndex);
+        return '';
+    }
+
+    const rawSeedText = message.mes;
+    if (!rawSeedText || !rawSeedText.trim()) {
+        phrasing_debug('doSwipeMode — ABORTED: message is empty');
+        toastr.warning('Cannot rephrase an empty message.', 'Phrasing!');
+        return '';
+    }
+
+    const seedText = formatSeedWithSpeaker(rawSeedText, message.is_user, message.name);
+    phrasing_debug('doSwipeMode — seed length:', seedText.length, '| speaker:', message.name);
+
+    const wasAlreadyActive = phrasingActive;
+    phrasingActive = true;
+
+    try {
+        if (!message.swipes || message.swipes.length === 0) {
+            phrasing_debug('doSwipeMode — initializing swipes array');
+            message.swipes = [message.mes];
+            message.swipe_id = 0;
+            message.swipe_info = [{}];
+        }
+
+        const assembled = assemblePrompt(seedText);
+        injectPhrasingPrompt(assembled);
+
+        if (!message.extra) message.extra = {};
+        message.extra[PHRASING_SEED_EXTRA_KEY] = assembled;
+        message.extra.overswipe_behavior = 'regenerate';
+
+        const lastSwipeIndex = message.swipes.length - 1;
+        if (message.swipe_id !== lastSwipeIndex) {
+            phrasing_debug('doSwipeMode — jumping to last swipe', lastSwipeIndex);
+            message.swipe_id = lastSwipeIndex;
+            message.mes = message.swipes[lastSwipeIndex];
+
+            const messageEl = document.querySelector(`#chat .mes[mesid="${messageIndex}"]`);
+            if (messageEl) {
+                const textEl = messageEl.querySelector('.mes_text');
+                if (textEl) {
+                    if (typeof context.messageFormatting === 'function') {
+                        textEl.innerHTML = context.messageFormatting(
+                            message.mes, message.name, message.is_system, message.is_user, messageIndex,
+                        );
+                    } else {
+                        textEl.textContent = message.mes;
+                    }
+                }
+                const swipeCounter = messageEl.querySelector('.swipes-counter');
+                if (swipeCounter) {
+                    swipeCounter.textContent = `${message.swipe_id + 1}/${message.swipes.length}`;
+                }
+            }
+        }
+
+        const swipeRight = document.querySelector(`#chat .mes[mesid="${messageIndex}"] .swipe_right`);
+        if (!swipeRight) {
+            phrasing_debug('doSwipeMode — FAILED: swipe_right button not found');
+            return '';
+        }
+
+        phrasing_debug('doSwipeMode — clicking swipe_right');
+        swipeRight.click();
+
+        const result = await waitForGenerationEnd();
+        phrasing_debug('doSwipeMode — complete, result length:', result.length);
+        return result;
+    } finally {
+        clearPhrasingInjection();
+        if (!wasAlreadyActive) {
+            phrasingActive = false;
+            showAllPhrasingButtons();
+        }
+        phrasing_debug('doSwipeMode — cleanup complete');
+    }
+}
+
+// ─── Button Handlers ───
+
+async function onInputPhrasingClick() {
+    phrasing_debug('onInputPhrasingClick — triggered');
+    if (!phrasing_ctx.settings.phrasingEnabled) return;
+
+    const context = getContext();
+    if (context.isGenerating) return;
+
+    hideAllPhrasingButtons();
+
+    const textarea = document.getElementById('send_textarea');
+    const inputText = textarea?.value?.trim();
+    const editingIndex = getEditingMessageIndex();
+
+    try {
+        if (!inputText && editingIndex < 0) {
+            phrasing_debug('onInputPhrasingClick — empty input, no edit → rephrase last message');
+            const lastIndex = context.chat.length - 1;
+            if (lastIndex < 0) {
+                toastr.warning('No messages to rephrase.', 'Phrasing!');
+                return;
+            }
+            await doSwipeMode(lastIndex);
+        } else if (editingIndex >= 0 && !inputText) {
+            phrasing_debug('onInputPhrasingClick — editing message at index', editingIndex, '→ confirm and rephrase');
+            confirmActiveMessageEdit();
+            await new Promise(resolve => setTimeout(resolve, 100));
+            await doSwipeMode(editingIndex);
+        } else {
+            if (editingIndex >= 0) {
+                phrasing_debug('onInputPhrasingClick — confirming active edit before processing input');
+                confirmActiveMessageEdit();
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+
+            phrasing_debug('onInputPhrasingClick — input text present, seed length:', inputText.length);
+            textarea.value = '';
+            textarea.dispatchEvent(new Event('input', { bubbles: true }));
+
+            const formattedSeed = possessionApi?.isPossessing()
+                ? formatSeedWithSpeaker(inputText, false, possessionApi.getPossessedCharName())
+                : formatSeedWithSpeaker(inputText, true);
+
+            await doPrimaryFlow(formattedSeed);
+        }
+    } finally {
+        showAllPhrasingButtons();
+    }
+}
+
+// ─── Prompt Settings UI ───
+
+function loadPromptTextarea() {
+    const textarea = document.getElementById('phrasing_prompt_textarea');
+    if (!textarea) return;
+    textarea.value = getActivePrompt();
+}
+
+function onSaveToChat() {
+    phrasing_debug('onSaveToChat — triggered');
+    const textarea = document.getElementById('phrasing_prompt_textarea');
+    if (!textarea) return;
+
+    const promptText = textarea.value.trim();
+    const context = getContext();
+
+    if (promptText && !promptText.includes('{{phrasingSeed}}')) {
+        toastr.warning('Warning: Prompt does not contain {{phrasingSeed}}. The AI won\'t receive your input text.', 'Phrasing!');
+    }
+
+    if (!context.chatMetadata.phrasing) {
+        context.chatMetadata.phrasing = {};
+    }
+
+    context.chatMetadata.phrasing.prompt = promptText || null;
+    context.saveMetadata();
+    toastr.success('Phrasing! prompt saved to chat.', 'Phrasing!');
+}
+
+function onRestoreDefault() {
+    phrasing_debug('onRestoreDefault — triggered');
+    if (!confirm('Restore the default Phrasing! prompt? This will overwrite your current prompt.')) return;
+
+    const textarea = document.getElementById('phrasing_prompt_textarea');
+    if (textarea) {
+        textarea.value = DEFAULT_PHRASING_PROMPT;
+    }
+
+    const context = getContext();
+    if (context.chatMetadata.phrasing) {
+        context.chatMetadata.phrasing.prompt = null;
+    }
+    context.saveMetadata();
+    toastr.info('Phrasing! prompt restored to default.', 'Phrasing!');
+}
+
+// ─── Generation Lifecycle ───
+
+function phrasing_onGenerationStarted() {
+    hideAllPhrasingButtons();
+}
+
+function phrasing_onGenerationEnded() {
+    if (phrasingActive) {
+        clearPhrasingInjection();
+        phrasingActive = false;
+    }
+    showAllPhrasingButtons();
+}
+
+// ─── UI Creation ───
+
+function createInputAreaButton() {
+    if (document.getElementById('phrasing_send_button')) return;
+
+    const sendForm = document.getElementById('rightSendForm');
+    if (!sendForm) return;
+
+    const btn = document.createElement('div');
+    btn.id = 'phrasing_send_button';
+    btn.classList.add('phrasing-trigger', 'fa-solid', 'fa-pen-fancy', 'interactable');
+    btn.title = 'Phrasing! — Enrich your message with AI narration';
+    btn.addEventListener('click', onInputPhrasingClick);
+
+    sendForm.appendChild(btn);
+    phrasing_debug('Created input area button');
+}
+
+function createHamburgerMenuItem() {
+    if (document.getElementById('phrasing_menu_button')) return;
+
+    const impersonateBtn = document.getElementById('option_impersonate');
+    if (!impersonateBtn) return;
+
+    const btn = document.createElement('div');
+    btn.id = 'phrasing_menu_button';
+    btn.classList.add('phrasing-trigger', 'list-group-item', 'interactable');
+    btn.innerHTML = '<span class="fa-solid fa-pen-fancy"></span> Phrasing!';
+    btn.addEventListener('click', onInputPhrasingClick);
+
+    impersonateBtn.parentNode.insertBefore(btn, impersonateBtn.nextSibling);
+    phrasing_debug('Created hamburger menu item');
+}
+
+// ─── Settings Panel ───
+
+function bindPhrasingSettings(saveSettings) {
+    const phrasingEnabled = document.getElementById('phrasing_enabled');
+    if (phrasingEnabled) {
+        phrasingEnabled.checked = phrasing_ctx.settings.phrasingEnabled;
+        phrasingEnabled.addEventListener('change', (e) => {
+            phrasing_ctx.settings.phrasingEnabled = e.target.checked;
+            saveSettings();
+            applyPhrasingEnabledState();
+        });
+    }
+
+    const phrasingDebugMode = document.getElementById('phrasing_debug_mode');
+    if (phrasingDebugMode) {
+        phrasingDebugMode.checked = phrasing_ctx.settings.phrasingDebugMode;
+        phrasingDebugMode.addEventListener('change', (e) => {
+            phrasing_ctx.settings.phrasingDebugMode = e.target.checked;
+            saveSettings();
+            phrasing_debug('debugMode toggled to', phrasing_ctx.settings.phrasingDebugMode);
+        });
+    }
+
+    document.getElementById('phrasing_save_to_chat')?.addEventListener('click', onSaveToChat);
+    document.getElementById('phrasing_restore_default')?.addEventListener('click', onRestoreDefault);
+}
+
+// ─── Slash Command ───
+
+function registerPhrasingSlashCommand() {
+    __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandParser_js_42c8b851_SlashCommandParser__.addCommandObject(__WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommand_js_1b0d5616_SlashCommand__.fromProps({
+        name: 'phrasing',
+        callback: async (_namedArgs, unnamedArgs) => {
+            phrasing_debug('slashCommand /phrasing — invoked');
+            if (!phrasing_ctx.settings.phrasingEnabled) return '';
+
+            const rawSeedText = unnamedArgs?.trim();
+
+            if (rawSeedText) {
+                const seedText = possessionApi?.isPossessing()
+                    ? formatSeedWithSpeaker(rawSeedText, false, possessionApi.getPossessedCharName())
+                    : formatSeedWithSpeaker(rawSeedText, true);
+                return await doPrimaryFlow(seedText);
+            } else {
+                const context = getContext();
+                const lastIndex = context.chat.length - 1;
+                if (lastIndex < 0) {
+                    toastr.warning('No messages to rephrase.', 'Phrasing!');
+                    return '';
+                }
+                return await doSwipeMode(lastIndex);
+            }
+        },
+        unnamedArgumentList: [
+            __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandArgument_js_a42b9371_SlashCommandArgument__.fromProps({
+                description: 'Optional seed text to post and rephrase',
+                typeList: [__WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandArgument_js_a42b9371_ARGUMENT_TYPE__.STRING],
+                isRequired: false,
+            }),
+        ],
+        aliases: [],
+        helpString: 'Enriches a message with AI narration. With text: generates enriched prose. Without text: rephrases the last message as a new swipe.',
+    }));
+
+    phrasing_debug('Registered /phrasing slash command');
+}
+
+// ─── Init ───
+
+/**
+ * @param {object} options
+ * @param {object} options.settings       - Shared mutable settings reference.
+ * @param {object} options.possessionApi  - { isPossessing(), getPossessedCharName(), postPossessedMessage(text) }
+ */
+function initPhrasing({ settings, possessionApi: pApi }) {
+    phrasing_ctx = { settings };
+    possessionApi = pApi;
+    phrasing_debug = createDebugLogger('PHRASING', () => settings.phrasingDebugMode);
+}
+
+;// external "../../../../reasoning.js"
+
+// EXTERNAL MODULE: ./node_modules/ajv/dist/ajv.js
+var ajv = __webpack_require__(3282);
+var ajv_default = /*#__PURE__*/__webpack_require__.n(ajv);
+;// ./src/schema-validation.js
+/**
+ * Schema validation for Assisted Character Creation.
+ *
+ * Uses AJV to do two things:
+ *
+ *   1. Meta-validate Character Schemas — the objects defined in
+ *      default-character-schema.js and loaded via schema import. A single
+ *      JSON Schema (META_SCHEMA) describes the expected shape of those
+ *      objects (schemaName, fields, per-field order/label/prompt, etc.).
+ *
+ *   2. Validate Character *data* — the `{ fieldKey: value }` object that
+ *      the compiled description is a stringified form of. Because every
+ *      field is a free-form string, the generated JSON Schema for a given
+ *      Character Schema is trivial: an object of string properties, with
+ *      `additionalProperties: true` so a description compiled under one
+ *      schema can still be imported under another without data loss.
+ */
+
+
+
+const schema_validation_ajv = new (ajv_default())({ allErrors: true, strict: false });
+
+// ─── Meta-Schema: validates Character Schema definitions ───
+
+const META_SCHEMA = {
+    type: 'object',
+    required: ['schemaName', 'fields'],
+    properties: {
+        schemaName: { type: 'string', minLength: 1 },
+        fields: {
+            type: 'object',
+            minProperties: 1,
+            additionalProperties: {
+                type: 'object',
+                required: ['order', 'label', 'prompt'],
+                properties: {
+                    order: { type: 'number' },
+                    label: { type: 'string', minLength: 1 },
+                    description: { type: 'string' },
+                    responseLength: { type: 'number' },
+                    prompt: { type: 'string', pattern: '\\{\\{seedText\\}\\}' },
+                },
+                additionalProperties: true,
+            },
+        },
+    },
+    additionalProperties: true,
+};
+
+const validateMetaSchema = schema_validation_ajv.compile(META_SCHEMA);
+
+/**
+ * Validate a Character Schema object against the meta-schema.
+ * Also enforces the cross-field "unique order" constraint that JSON Schema
+ * can't express directly.
+ *
+ * @param {object} schema
+ * @returns {string[]} Array of human-readable error messages (empty = valid).
+ */
+function validateCharacterSchema(schema) {
+    const errors = [];
+
+    if (!validateMetaSchema(schema)) {
+        for (const err of validateMetaSchema.errors || []) {
+            const path = err.instancePath || '(root)';
+            errors.push(`${path} ${err.message}`);
+        }
+        return errors;
+    }
+
+    // AJV can't express "all field.order values must be unique" cleanly,
+    // so we check it by hand. Same rule the old hand-rolled validator had.
+    const seen = new Map();
+    for (const [key, field] of Object.entries(schema.fields)) {
+        if (seen.has(field.order)) {
+            errors.push(`Field "${key}": duplicate order value ${field.order} (also used by "${seen.get(field.order)}").`);
+        } else {
+            seen.set(field.order, key);
+        }
+    }
+
+    return errors;
+}
+
+// ─── Data Schema: validates compiled character data objects ───
+
+/**
+ * Build a JSON Schema that validates the *data* object produced by a given
+ * Character Schema. Every field is a string; unknown keys are permitted so
+ * old descriptions survive schema changes.
+ *
+ * @param {object} characterSchema
+ * @returns {object} JSON Schema
+ */
+function buildDataSchema(characterSchema) {
+    const properties = {};
+    for (const key of Object.keys(characterSchema.fields || {})) {
+        properties[key] = { type: 'string' };
+    }
+    return {
+        type: 'object',
+        properties,
+        additionalProperties: { type: 'string' },
+    };
+}
+
+/**
+ * Validate a character data object (the thing that gets JSON.stringify'd
+ * into ST's description field) against a Character Schema.
+ *
+ * @param {object} characterSchema
+ * @param {object} data
+ * @returns {{ valid: boolean, errors: string[] }}
+ */
+function validateCharacterData(characterSchema, data) {
+    const dataSchema = buildDataSchema(characterSchema);
+    const validate = schema_validation_ajv.compile(dataSchema);
+    if (validate(data)) return { valid: true, errors: [] };
+    const errors = (validate.errors || []).map(err => {
+        const path = err.instancePath || '(root)';
+        return `${path} ${err.message}`;
+    });
+    return { valid: false, errors };
+}
+
+/**
+ * Attempt to parse a description string as a character data object.
+ * Returns the parsed object on success, or null on any failure
+ * (not valid JSON, not an object, or fails schema validation).
+ *
+ * The caller can fall back to LLM-based reverse mapping when this returns null.
+ *
+ * @param {string} description
+ * @param {object} characterSchema
+ * @returns {object|null}
+ */
+function tryParseCharacterData(description, characterSchema) {
+    if (typeof description !== 'string' || !description.trim()) return null;
+    let parsed;
+    try {
+        parsed = JSON.parse(description);
+    } catch {
+        return null;
+    }
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return null;
+    const { valid } = validateCharacterData(characterSchema, parsed);
+    return valid ? parsed : null;
+}
+
+;// ./src/default-character-schema.js
+/**
+ * Default Character Schema for Assisted Character Creation.
+ *
+ * Each field defines an attribute of a character card. The schema drives
+ * the modal form layout, per-field LLM prompts, and the compiled output
+ * that is written into SillyTavern's description field.
+ *
+ * The `prose` flag is NOT part of the schema — it's a per-field UI toggle
+ * that the user controls at runtime. Prose state is persisted in extension
+ * settings so changes survive modal close/reopen.
+ */
+
+const DEFAULT_SCHEMA = {
+    schemaName: 'Default Character Schema',
+    fields: {
+        characterName: {
+            order: 1,
+            label: 'Character Name',
+            description: 'Full name, aliases/titles in parentheses if any.',
+            responseLength: 100,
+            prompt: 'Generate a fitting character name based on the brief and any notes provided. Include aliases or titles in parentheses if appropriate.\n\nCharacter Brief:\n{{context}}\n\nUser\'s notes for this field:\n{{seedText}}',
+        },
+        age: {
+            order: 2,
+            label: 'Age',
+            description: 'Numeric age and life-stage descriptor.',
+            responseLength: 80,
+            prompt: 'Determine an appropriate age for this character. Provide the numeric age and a brief life-stage descriptor (e.g. "28, young adult").\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
+        },
+        genderPronouns: {
+            order: 3,
+            label: 'Gender & Pronouns',
+            description: 'Gender identity and preferred pronouns.',
+            responseLength: 80,
+            prompt: 'Specify the character\'s gender identity and pronouns.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
+        },
+        species: {
+            order: 4,
+            label: 'Species / Race',
+            description: 'Species, race, or ancestry (human, elf, android, etc.).',
+            responseLength: 80,
+            prompt: 'Determine the character\'s species, race, or ancestry based on the setting and brief.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
+        },
+        occupation: {
+            order: 5,
+            label: 'Occupation / Role',
+            description: 'Job, title, social role, or adventuring class.',
+            responseLength: 100,
+            prompt: 'Determine the character\'s occupation, title, or role in their world.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
+        },
+        physicalAppearance: {
+            order: 6,
+            label: 'Physical Appearance',
+            description: 'Height, build, hair, eyes, distinguishing features.',
+            responseLength: 500,
+            prompt: 'Describe this character\'s physical appearance in vivid detail. Include height, build, hair, eyes, skin, and any distinguishing features.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
+        },
+        clothingStyle: {
+            order: 7,
+            label: 'Clothing & Style',
+            description: 'Typical attire, accessories, aesthetic.',
+            responseLength: 400,
+            prompt: 'Describe this character\'s typical clothing, accessories, and overall aesthetic style.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
+        },
+        personalityTraits: {
+            order: 8,
+            label: 'Personality Traits',
+            description: 'Core personality traits, temperament, demeanor.',
+            responseLength: 200,
+            prompt: 'List the character\'s core personality traits, temperament, and general demeanor. Use comma-separated descriptors.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
+        },
+        strengths: {
+            order: 9,
+            label: 'Strengths',
+            description: 'Key strengths, talents, positive qualities.',
+            responseLength: 200,
+            prompt: 'List this character\'s key strengths, talents, and positive qualities.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
+        },
+        weaknesses: {
+            order: 10,
+            label: 'Weaknesses',
+            description: 'Flaws, vulnerabilities, shortcomings.',
+            responseLength: 200,
+            prompt: 'List this character\'s flaws, vulnerabilities, and shortcomings.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
+        },
+        fears: {
+            order: 11,
+            label: 'Fears',
+            description: 'Phobias, deep fears, anxieties.',
+            responseLength: 150,
+            prompt: 'Identify this character\'s fears, phobias, or deep anxieties.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
+        },
+        motivations: {
+            order: 12,
+            label: 'Motivations & Goals',
+            description: 'What drives them, their ambitions and desires.',
+            responseLength: 400,
+            prompt: 'Describe what motivates this character — their goals, ambitions, and deepest desires.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
+        },
+        speechStyle: {
+            order: 13,
+            label: 'Speech Style',
+            description: 'How they talk: dialect, vocabulary, verbal tics, tone.',
+            responseLength: 400,
+            prompt: 'Describe how this character speaks — their dialect, vocabulary level, verbal tics, catchphrases, and conversational tone.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
+        },
+        mannerisms: {
+            order: 14,
+            label: 'Mannerisms & Habits',
+            description: 'Body language, habitual gestures, quirks.',
+            responseLength: 400,
+            prompt: 'Describe this character\'s mannerisms, habitual gestures, body language, and quirks.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
+        },
+        backstorySummary: {
+            order: 15,
+            label: 'Backstory Summary',
+            description: 'Origin, key events, current situation.',
+            responseLength: 600,
+            prompt: 'Write a backstory summary for this character covering their origin, formative experiences, key life events, and current situation.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
+        },
+        relationships: {
+            order: 16,
+            label: 'Relationships',
+            description: 'Key relationships: family, friends, rivals, romantic.',
+            responseLength: 500,
+            prompt: 'Describe this character\'s key relationships — family, friends, rivals, mentors, romantic interests, or enemies.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
+        },
+        skills: {
+            order: 17,
+            label: 'Skills & Abilities',
+            description: 'Trained skills, powers, areas of expertise.',
+            responseLength: 200,
+            prompt: 'List this character\'s trained skills, special abilities, powers, or areas of expertise.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
+        },
+        possessions: {
+            order: 18,
+            label: 'Key Possessions',
+            description: 'Important items, weapons, heirlooms, tools.',
+            responseLength: 200,
+            prompt: 'List this character\'s important possessions — signature items, weapons, heirlooms, tools, or artifacts.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
+        },
+        likes: {
+            order: 19,
+            label: 'Likes',
+            description: 'Things they enjoy, hobbies, preferences.',
+            responseLength: 200,
+            prompt: 'List things this character enjoys — hobbies, preferences, favorite activities, foods, etc.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
+        },
+        dislikes: {
+            order: 20,
+            label: 'Dislikes',
+            description: 'Things they dislike, pet peeves, aversions.',
+            responseLength: 200,
+            prompt: 'List things this character dislikes — pet peeves, aversions, things that annoy or upset them.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
+        },
+        additionalNotes: {
+            order: 21,
+            label: 'Additional Notes',
+            description: 'Anything else: lore hooks, secrets, trivia.',
+            responseLength: 500,
+            prompt: 'Generate additional notes for this character — lore hooks, hidden secrets, trivia, or anything else that adds depth.\n\nCharacter Brief:\n{{context}}\n\nOther fields already defined:\n{{filledFields}}\n\nUser\'s notes for this field:\n{{seedText}}',
+        },
+    },
+};
+
+// Schema validation is implemented in schema-validation.js using AJV.
+// Re-exported here so existing imports keep working.
+
+
+/**
+ * Returns fields sorted by their order property as [key, field] pairs.
+ * @param {object} schema
+ * @returns {Array<[string, object]>}
+ */
+function getOrderedFields(schema) {
+    return Object.entries(schema.fields).sort((a, b) => a[1].order - b[1].order);
+}
+
+;// ./src/assisted-character-creation.js
+/**
+ * Assisted Character Creation (ACC)
+ *
+ * Modal-based character creation with per-field LLM assist, YOLO mode,
+ * reverse mapping, and schema management.
+ */
+
+
+
+
+
+
+
+// ─── Module State ───
+
+let moduleSettings = null;
+let assisted_character_creation_debug = () => {};
+let saveSettingsFn = null;
+
+// Modal state
+let activeFieldKey = null;   // which field is currently generating
+let fieldStates = {};        // per-field state: { originalSeed, currentValue, hasGenerated, prose, tokenOverride }
+let currentSchema = null;    // the active schema object
+let abortRequested = false;  // flag to discard result after stop
+
+// ─── Init ───
+
+/**
+ * Initialize ACC module. Called once from index.js.
+ * @param {object} opts - { settings, saveSettings }
+ */
+function initACC({ settings, saveSettings }) {
+    moduleSettings = settings;
+    saveSettingsFn = saveSettings;
+    assisted_character_creation_debug = createDebugLogger('ACC', () => moduleSettings.accDebugMode);
+    assisted_character_creation_debug('Module initialized');
+}
+
+// ─── Prose State Persistence ───
+
+/**
+ * Get the saved prose states for a given schema, keyed by field name.
+ * Returns an object like { fieldKey: boolean }.
+ */
+function getSavedProseStates(schemaName) {
+    if (!moduleSettings.accProseStates) moduleSettings.accProseStates = {};
+    return moduleSettings.accProseStates[schemaName] || {};
+}
+
+/**
+ * Save a single field's prose state to settings.
+ */
+function saveProseState(schemaName, fieldKey, isProse) {
+    if (!moduleSettings.accProseStates) moduleSettings.accProseStates = {};
+    if (!moduleSettings.accProseStates[schemaName]) moduleSettings.accProseStates[schemaName] = {};
+    moduleSettings.accProseStates[schemaName][fieldKey] = isProse;
+    if (saveSettingsFn) saveSettingsFn();
+}
+
+/**
+ * Look up the prose state for a field. Falls back to false (text field).
+ */
+function getFieldProseState(schemaName, fieldKey) {
+    const saved = getSavedProseStates(schemaName);
+    return saved[fieldKey] ?? false;
+}
+
+// ─── Schema Helpers ───
+
+function getActiveSchema() {
+    const name = moduleSettings.accActiveSchemaName;
+    if (name === DEFAULT_SCHEMA.schemaName) return DEFAULT_SCHEMA;
+    const custom = moduleSettings.accCustomSchemas?.[name];
+    if (custom) return custom;
+    // Fallback to default
+    moduleSettings.accActiveSchemaName = DEFAULT_SCHEMA.schemaName;
+    return DEFAULT_SCHEMA;
+}
+
+function getSchemaNames() {
+    const names = [DEFAULT_SCHEMA.schemaName];
+    if (moduleSettings.accCustomSchemas) {
+        names.push(...Object.keys(moduleSettings.accCustomSchemas));
+    }
+    return names;
+}
+
+// ─── Character Page Integration ───
+
+/**
+ * Called on CHARACTER_PAGE_LOADED. Injects the ACC launch button.
+ */
+function assisted_character_creation_onCharacterPageLoaded() {
+    if (!moduleSettings.accEnabled) return;
+    if (document.getElementById('acc_launch_btn')) return;
+
+    const btnRow = document.querySelector('#form_create .ch_creation_btn_row');
+    const target = btnRow || document.querySelector('#form_create');
+    if (!target) return;
+
+    const btn = document.createElement('div');
+    btn.id = 'acc_launch_btn';
+    btn.classList.add('menu_button', 'interactable');
+    btn.title = 'Assisted Character Creation';
+    btn.innerHTML = '<span class="fa-solid fa-wand-magic-sparkles"></span> <span>Assist</span>';
+    btn.addEventListener('click', openModal);
+
+    target.appendChild(btn);
+    assisted_character_creation_debug('Launch button injected');
+}
+
+// ─── Settings Bindings ───
+
+/**
+ * Bind ACC settings panel controls. Called after settings HTML is injected.
+ * @param {function} saveSettings
+ */
+function bindACCSettings(saveSettings) {
+    const enabledCb = document.getElementById('acc_enabled');
+    const debugCb = document.getElementById('acc_debug_mode');
+    const schemaSelect = document.getElementById('acc_schema_select');
+    const importBtn = document.getElementById('acc_import_schema');
+    const exportBtn = document.getElementById('acc_export_schema');
+    const deleteBtn = document.getElementById('acc_delete_schema');
+    const fileInput = document.getElementById('acc_schema_file_input');
+
+    if (enabledCb) {
+        enabledCb.checked = moduleSettings.accEnabled;
+        enabledCb.addEventListener('change', () => {
+            moduleSettings.accEnabled = enabledCb.checked;
+            saveSettings();
+        });
+    }
+    if (debugCb) {
+        debugCb.checked = moduleSettings.accDebugMode;
+        debugCb.addEventListener('change', () => {
+            moduleSettings.accDebugMode = debugCb.checked;
+            saveSettings();
+        });
+    }
+
+    // Populate schema selector
+    populateSchemaSelect(schemaSelect);
+
+    if (schemaSelect) {
+        schemaSelect.addEventListener('change', () => {
+            moduleSettings.accActiveSchemaName = schemaSelect.value;
+            saveSettings();
+        });
+    }
+    if (importBtn && fileInput) {
+        importBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => handleSchemaImport(e, schemaSelect, saveSettings));
+    }
+    if (exportBtn) {
+        exportBtn.addEventListener('click', () => handleSchemaExport());
+    }
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', () => handleSchemaDelete(schemaSelect, saveSettings));
+    }
+}
+
+function populateSchemaSelect(select) {
+    if (!select) return;
+    select.innerHTML = '';
+    for (const name of getSchemaNames()) {
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        if (name === moduleSettings.accActiveSchemaName) opt.selected = true;
+        select.appendChild(opt);
+    }
+}
+
+function handleSchemaImport(event, schemaSelect, saveSettings) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const schema = JSON.parse(e.target.result);
+            const errors = validateCharacterSchema(schema);
+            if (errors.length > 0) {
+                toast('Invalid schema:\n' + errors.join('\n'), 'error');
+                return;
+            }
+            if (schema.schemaName === DEFAULT_SCHEMA.schemaName) {
+                toast('Cannot import a schema with the default schema name.', 'error');
+                return;
+            }
+            if (!moduleSettings.accCustomSchemas) moduleSettings.accCustomSchemas = {};
+            moduleSettings.accCustomSchemas[schema.schemaName] = schema;
+            moduleSettings.accActiveSchemaName = schema.schemaName;
+            saveSettings();
+            populateSchemaSelect(schemaSelect);
+            toast(`Schema "${schema.schemaName}" imported.`, 'success');
+        } catch (err) {
+            toast('Failed to parse schema JSON: ' + err.message, 'error');
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = ''; // reset file input
+}
+
+function handleSchemaExport() {
+    const schema = getActiveSchema();
+    const blob = new Blob([JSON.stringify(schema, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${schema.schemaName.replace(/[^a-zA-Z0-9_-]/g, '_')}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('Schema exported.', 'success');
+}
+
+function handleSchemaDelete(schemaSelect, saveSettings) {
+    const name = moduleSettings.accActiveSchemaName;
+    if (name === DEFAULT_SCHEMA.schemaName) {
+        toast('Cannot delete the default schema.', 'warning');
+        return;
+    }
+    if (moduleSettings.accCustomSchemas) {
+        delete moduleSettings.accCustomSchemas[name];
+    }
+    moduleSettings.accActiveSchemaName = DEFAULT_SCHEMA.schemaName;
+    saveSettings();
+    populateSchemaSelect(schemaSelect);
+    toast(`Schema "${name}" deleted.`, 'success');
+}
+
+// ─── Modal ───
+
+function openModal() {
+    if (document.getElementById('acc_modal_overlay')) return;
+
+    currentSchema = getActiveSchema();
+    fieldStates = {};
+    activeFieldKey = null;
+    abortRequested = false;
+
+    // Initialize field states
+    const schemaName = currentSchema.schemaName;
+    for (const [key] of getOrderedFields(currentSchema)) {
+        fieldStates[key] = {
+            originalSeed: '',
+            currentValue: '',
+            hasGenerated: false,
+            prose: getFieldProseState(schemaName, key),
+            tokenOverride: null,
+        };
+    }
+
+    // Check if editing an existing character
+    const descField = document.getElementById('description_textarea');
+    const existingDesc = descField?.value?.trim() || '';
+
+    const overlay = document.createElement('div');
+    overlay.id = 'acc_modal_overlay';
+    overlay.innerHTML = buildModalHTML(currentSchema, existingDesc);
+    document.body.appendChild(overlay);
+
+    // Close on overlay click (not on modal body)
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) closeModal();
+    });
+
+    // Wire up buttons
+    document.getElementById('acc_close_btn')?.addEventListener('click', closeModal);
+    document.getElementById('acc_cancel_btn')?.addEventListener('click', closeModal);
+    document.getElementById('acc_done_btn')?.addEventListener('click', handleDone);
+    document.getElementById('acc_yolo_btn')?.addEventListener('click', handleYolo);
+
+    if (existingDesc) {
+        document.getElementById('acc_reverse_map_btn')?.addEventListener('click', handleReverseMap);
+    }
+
+    // Wire per-field buttons
+    for (const [key] of getOrderedFields(currentSchema)) {
+        const assistBtn = document.getElementById(`acc_assist_${key}`);
+        const retryBtn = document.getElementById(`acc_retry_${key}`);
+        const resetBtn = document.getElementById(`acc_reset_${key}`);
+        const proseCb = document.getElementById(`acc_prose_${key}`);
+        const tokenInput = document.getElementById(`acc_tokens_${key}`);
+        const input = document.getElementById(`acc_field_${key}`);
+
+        assistBtn?.addEventListener('click', () => onAssistClick(key));
+        retryBtn?.addEventListener('click', () => onRetryClick(key));
+        resetBtn?.addEventListener('click', () => onResetClick(key));
+
+        // Prose toggle — swap input type and persist
+        proseCb?.addEventListener('change', () => {
+            fieldStates[key].prose = proseCb.checked;
+            swapInputType(key, proseCb.checked);
+            saveProseState(currentSchema.schemaName, key, proseCb.checked);
+        });
+
+        // Token override
+        tokenInput?.addEventListener('input', () => {
+            const val = parseInt(tokenInput.value);
+            fieldStates[key].tokenOverride = isNaN(val) ? null : val;
+        });
+
+        // Track manual edits
+        input?.addEventListener('input', () => {
+            fieldStates[key].currentValue = input.value;
+        });
+    }
+
+    assisted_character_creation_debug('Modal opened');
+}
+
+function closeModal() {
+    if (activeFieldKey) {
+        abortRequested = true;
+        stopGeneration();
+    }
+    const overlay = document.getElementById('acc_modal_overlay');
+    if (overlay) overlay.remove();
+    fieldStates = {};
+    activeFieldKey = null;
+    currentSchema = null;
+    assisted_character_creation_debug('Modal closed');
+}
+
+function buildModalHTML(schema, existingDesc) {
+    const fields = getOrderedFields(schema);
+    let fieldsHTML = '';
+
+    for (const [key, field] of fields) {
+        const isProse = getFieldProseState(schema.schemaName, key);
+        const tokenDefault = field.responseLength ?? 200;
+
+        fieldsHTML += `
+            <div class="acc-field-group" data-field-key="${key}">
+                <div class="acc-field-header">
+                    <label class="acc-field-label" for="acc_field_${key}">${escapeHTML(field.label)}</label>
+                    <div class="acc-field-controls">
+                        <div class="acc-field-buttons">
+                            <div id="acc_assist_${key}" class="acc-btn acc-btn-assist menu_button interactable" title="Assist">
+                                <span class="fa-solid fa-wand-magic-sparkles"></span>
+                            </div>
+                            <div id="acc_retry_${key}" class="acc-btn acc-btn-retry menu_button interactable acc-hidden" title="Retry with original seed">
+                                <span class="fa-solid fa-rotate-right"></span>
+                            </div>
+                            <div id="acc_reset_${key}" class="acc-btn acc-btn-reset menu_button interactable acc-hidden" title="Reset to original">
+                                <span class="fa-solid fa-arrow-rotate-left"></span>
+                            </div>
+                        </div>
+                        <label class="acc-prose-toggle" title="Toggle prose mode">
+                            <input id="acc_prose_${key}" type="checkbox" ${isProse ? 'checked' : ''} />
+                            <span class="acc-prose-label">Prose</span>
+                        </label>
+                        <div class="acc-token-label" title="Max tokens for generation (override)">
+                            <span class="fa-solid fa-coins"></span>
+                            <input id="acc_tokens_${key}" type="number" class="acc-token-input text_pole" min="10" max="4096" step="10" placeholder="${tokenDefault}" />
+                        </div>
+                    </div>
+                </div>
+                <div id="acc_input_wrap_${key}" class="acc-input-wrap">
+                    <textarea id="acc_field_${key}" class="acc-field-input text_pole" rows="${isProse ? 5 : 1}" placeholder="${escapeAttr(field.description)}"></textarea>
+                </div>
+            </div>`;
+    }
+
+    const reverseMapBtn = existingDesc
+        ? '<div id="acc_reverse_map_btn" class="menu_button interactable acc-reverse-btn"><span class="fa-solid fa-file-import"></span> Import from Existing</div>'
+        : '';
+
+    return `
+        <div id="acc_modal" class="acc-modal">
+            <div class="acc-modal-header">
+                <h3>Assisted Character Creation</h3>
+                <div id="acc_close_btn" class="acc-close-btn interactable"><span class="fa-solid fa-xmark"></span></div>
+            </div>
+            <div class="acc-modal-body">
+                ${reverseMapBtn}
+                <div class="acc-brief-section">
+                    <label for="acc_character_brief"><b>Character Brief:</b></label>
+                    <textarea id="acc_character_brief" class="text_pole" rows="3" placeholder="Describe your character concept, setting, and any key details..."></textarea>
+                </div>
+                <div class="acc-status-bar acc-hidden" id="acc_status_bar">
+                    <span class="fa-solid fa-spinner fa-spin"></span>
+                    <span id="acc_status_text"></span>
+                </div>
+                <div class="acc-fields-container">
+                    ${fieldsHTML}
+                </div>
+            </div>
+            <div class="acc-modal-footer">
+                <!-- YOLO temporarily disabled
+                <div id="acc_yolo_btn" class="menu_button interactable acc-yolo-btn">
+                    <span class="fa-solid fa-bolt"></span> YOLO Generate All
+                </div>
+                -->
+                <div class="acc-footer-right">
+                    <div id="acc_cancel_btn" class="menu_button interactable">Cancel</div>
+                    <div id="acc_done_btn" class="menu_button interactable acc-done-btn">Done</div>
+                </div>
+            </div>
+        </div>`;
+}
+
+// ─── Input Type Swap ───
+
+function swapInputType(fieldKey, toProse) {
+    const textarea = document.getElementById(`acc_field_${fieldKey}`);
+    if (!textarea) return;
+    textarea.rows = toProse ? 3 : 1;
+}
+
+// ─── Per-Field Generation ───
+
+async function onAssistClick(fieldKey) {
+    if (activeFieldKey) {
+        if (activeFieldKey === fieldKey) {
+            // Stop current generation
+            abortRequested = true;
+            stopGeneration();
+            return;
+        }
+        return; // another field generating, ignore
+    }
+
+    const input = document.getElementById(`acc_field_${fieldKey}`);
+    if (!input) return;
+
+    const isContinue = fieldStates[fieldKey].hasGenerated;
+
+    // Save seed text before first generation
+    if (!isContinue) {
+        fieldStates[fieldKey].originalSeed = input.value;
+    }
+
+    activeFieldKey = fieldKey;
+    abortRequested = false;
+    setFieldGeneratingUI(fieldKey, true);
+    const action = isContinue ? 'Continuing' : 'Generating';
+    setStatusBar(`${action} ${currentSchema.fields[fieldKey].label}...`);
+
+    try {
+        const brief = document.getElementById('acc_character_brief')?.value || '';
+        const result = await generateFieldValue(fieldKey, currentSchema, fieldStates, brief, isContinue);
+
+        if (abortRequested) {
+            assisted_character_creation_debug(`Generation for ${fieldKey} aborted, discarding result`);
+            return;
+        }
+
+        if (isContinue) {
+            // Append to existing content
+            const existing = input.value;
+            const separator = existing.endsWith(' ') || existing.endsWith('\n') ? '' : ' ';
+            input.value = existing + separator + result;
+        } else {
+            input.value = result;
+        }
+        fieldStates[fieldKey].currentValue = input.value;
+        fieldStates[fieldKey].hasGenerated = true;
+        assisted_character_creation_debug(`Field ${fieldKey} ${isContinue ? 'continued' : 'generated'}:`, result.substring(0, 80));
+    } catch (err) {
+        if (!abortRequested) {
+            console.error('ACC generation error:', err);
+            toast(`Generation failed: ${err.message}`, 'error');
+        }
+    } finally {
+        activeFieldKey = null;
+        abortRequested = false;
+        setFieldGeneratingUI(fieldKey, false);
+        setStatusBar(null);
+    }
+}
+
+async function onRetryClick(fieldKey) {
+    const input = document.getElementById(`acc_field_${fieldKey}`);
+    if (!input) return;
+
+    // Restore original seed for re-generation
+    input.value = fieldStates[fieldKey].originalSeed;
+    fieldStates[fieldKey].currentValue = fieldStates[fieldKey].originalSeed;
+
+    await onAssistClick(fieldKey);
+}
+
+function onResetClick(fieldKey) {
+    const input = document.getElementById(`acc_field_${fieldKey}`);
+    if (!input) return;
+
+    input.value = fieldStates[fieldKey].originalSeed;
+    fieldStates[fieldKey].currentValue = fieldStates[fieldKey].originalSeed;
+    fieldStates[fieldKey].hasGenerated = false;
+
+    // Hide retry/reset buttons, restore Assist icon
+    const assistBtn = document.getElementById(`acc_assist_${fieldKey}`);
+    const retryBtn = document.getElementById(`acc_retry_${fieldKey}`);
+    const resetBtn = document.getElementById(`acc_reset_${fieldKey}`);
+    if (assistBtn) {
+        assistBtn.innerHTML = '<span class="fa-solid fa-wand-magic-sparkles"></span>';
+        assistBtn.title = 'Assist';
+    }
+    retryBtn?.classList.add('acc-hidden');
+    resetBtn?.classList.add('acc-hidden');
+}
+
+// ─── LLM Generation ───
+
+async function generateFieldValue(fieldKey, schema, states, characterBrief, isContinue = false) {
+    const field = schema.fields[fieldKey];
+    const state = states[fieldKey];
+    const isProse = state.prose;
+    const responseLength = state.tokenOverride || field.responseLength || 200;
+    const filledFields = buildFilledFieldsSummary(schema, states, fieldKey);
+
+    let prompt;
+    if (isContinue) {
+        // Continue mode: ask to continue from where it left off
+        const existingText = state.currentValue || '';
+        prompt = `Continue writing the "${field.label}" field for this character. Pick up exactly where the text left off.\n\nCharacter Brief:\n${characterBrief || '(no brief provided)'}\n\nOther fields already defined:\n${filledFields || '(none yet)'}\n\nText so far:\n${existingText}\n\nContinue:`;
+    } else {
+        const seedText = state.currentValue || '';
+        prompt = field.prompt
+            .replace(/\{\{seedText\}\}/g, seedText || '(no user input)')
+            .replace(/\{\{context\}\}/g, characterBrief || '(no brief provided)')
+            .replace(/\{\{filledFields\}\}/g, filledFields || '(none yet)');
+        prompt += `\n\nRespond with only the value for "${field.label}":`;
+    }
+
+    const styleInstruction = isProse
+        ? 'Write in descriptive prose.'
+        : 'Be brief and concise. Use comma-separated descriptors, not full sentences.';
+
+    const systemPrompt = `You are a character creation assistant. ${styleInstruction} Do not include labels, explanations, or extra formatting. Output only the field value.`;
+
+    assisted_character_creation_debug(`Generating field "${fieldKey}" (continue=${isContinue}, prose=${isProse}, tokens=${responseLength})`);
+    assisted_character_creation_debug(`[${fieldKey}] System prompt:`, systemPrompt);
+    assisted_character_creation_debug(`[${fieldKey}] Prompt:`, prompt);
+
+    const result = await __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__({
+        prompt,
+        systemPrompt,
+        responseLength,
+    });
+
+    let cleaned = __WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(result).trim();
+
+    // Strip label echo
+    if (cleaned.startsWith(field.label + ':')) {
+        cleaned = cleaned.substring(field.label.length + 1).trim();
+    }
+
+    // Non-prose: trim to first newline
+    if (!isProse && cleaned.includes('\n')) {
+        cleaned = cleaned.split('\n')[0].trim();
+    }
+
+    return cleaned;
+}
+
+function buildFilledFieldsSummary(schema, states, excludeKey) {
+    const parts = [];
+    for (const [key, field] of getOrderedFields(schema)) {
+        if (key === excludeKey) continue;
+        const val = states[key]?.currentValue?.trim();
+        if (val) {
+            parts.push(`${field.label}: ${val}`);
+        }
+    }
+    return parts.join('\n');
+}
+
+function stopGeneration() {
+    const stopBtn = document.getElementById('mes_stop');
+    if (stopBtn) stopBtn.click();
+    assisted_character_creation_debug('Stop generation triggered');
+}
+
+// ─── YOLO Mode ───
+
+async function handleYolo() {
+    if (activeFieldKey) return;
+
+    const brief = document.getElementById('acc_character_brief')?.value?.trim();
+    if (!brief) {
+        toast('Please enter a Character Brief before using YOLO mode.', 'warning');
+        return;
+    }
+
+    activeFieldKey = '__yolo__';
+    setAllFieldsDisabled(true);
+    setStatusBar('YOLO generating entire character...');
+
+    try {
+        const result = await yoloGenerate(currentSchema, brief);
+        if (abortRequested) return;
+
+        // Set directly into ST description field
+        const descField = document.getElementById('description_textarea');
+        if (descField) {
+            descField.value = result;
+            descField.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        toast('YOLO generation complete! Description field updated.', 'success');
+        closeModal();
+    } catch (err) {
+        console.error('ACC YOLO error:', err);
+        toast(`YOLO generation failed: ${err.message}`, 'error');
+    } finally {
+        activeFieldKey = null;
+        abortRequested = false;
+        setAllFieldsDisabled(false);
+        setStatusBar(null);
+    }
+}
+
+async function yoloGenerate(schema, characterBrief) {
+    const fieldList = getOrderedFields(schema)
+        .map(([, f]) => `${f.label}: ${f.description}`)
+        .join('\n');
+
+    const prompt = `Create a complete character description using the format below. Fill in every field with creative, detailed content.\n\nCharacter Brief:\n${characterBrief}\n\nFormat:\n{\n${fieldList}\n}`;
+    const systemPrompt = 'You are a character creation assistant. Generate a complete character description in the exact format requested. Be creative and detailed.';
+
+    assisted_character_creation_debug('YOLO generating with brief length', characterBrief.length);
+    assisted_character_creation_debug('[YOLO] System prompt:', systemPrompt);
+    assisted_character_creation_debug('[YOLO] Prompt:', prompt);
+
+    const result = await __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__({ prompt, systemPrompt, responseLength: 2000 });
+    return __WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(result).trim();
+}
+
+// ─── Reverse Mapping ───
+
+async function handleReverseMap() {
+    if (activeFieldKey) return;
+
+    const descField = document.getElementById('description_textarea');
+    const description = descField?.value?.trim();
+    if (!description) {
+        toast('No existing description to import from.', 'warning');
+        return;
+    }
+
+    activeFieldKey = '__reverse__';
+    setAllFieldsDisabled(true);
+    setStatusBar('Parsing existing description into fields...');
+
+    try {
+        const parsed = await reverseMapDescription(description, currentSchema);
+        if (abortRequested) return;
+
+        // Populate fields
+        for (const [key, value] of Object.entries(parsed)) {
+            const input = document.getElementById(`acc_field_${key}`);
+            if (input && value) {
+                input.value = value;
+                fieldStates[key].currentValue = value;
+                fieldStates[key].originalSeed = value;
+            }
+        }
+        toast('Description parsed into fields. Review and edit as needed.', 'success');
+    } catch (err) {
+        console.error('ACC reverse map error:', err);
+        toast(`Reverse mapping failed: ${err.message}`, 'error');
+    } finally {
+        activeFieldKey = null;
+        abortRequested = false;
+        setAllFieldsDisabled(false);
+        setStatusBar(null);
+    }
+}
+
+async function reverseMapDescription(description, schema) {
+    // Fast path: if the description is a stringified character data object
+    // (which is what compileDescription now produces), parse it directly and
+    // validate against the schema. This avoids an LLM round-trip entirely
+    // for descriptions that were compiled by this extension.
+    const direct = tryParseCharacterData(description, schema);
+    if (direct) {
+        // Keep only keys the current schema knows about — extra keys from a
+        // different schema version are preserved in the file but not surfaced
+        // as fields in this modal.
+        const filtered = {};
+        for (const key of Object.keys(schema.fields)) {
+            if (typeof direct[key] === 'string' && direct[key].trim()) {
+                filtered[key] = direct[key];
+            }
+        }
+        assisted_character_creation_debug('Reverse mapped fields (JSON fast path):', Object.keys(filtered).length);
+        return filtered;
+    }
+
+    // Fallback: legacy prose description — use the LLM to extract fields.
+    const fieldList = getOrderedFields(schema)
+        .map(([key, f]) => `${key}: ${f.label} — ${f.description}`)
+        .join('\n');
+
+    const prompt = `Parse this character description into the following fields. For each field, output exactly one line: FIELD_KEY | value\nIf a field has no matching content, output: FIELD_KEY | (empty)\n\nFields:\n${fieldList}\n\nDescription:\n${description}`;
+    const systemPrompt = 'You are a character parsing assistant. Extract information from the description into the specified fields. Output exactly one line per field in the format: FIELD_KEY | value';
+
+    assisted_character_creation_debug('[ReverseMap] System prompt:', systemPrompt);
+    assisted_character_creation_debug('[ReverseMap] Prompt:', prompt);
+
+    const result = await __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__({ prompt, systemPrompt, responseLength: 2000 });
+    const cleaned = __WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(result).trim();
+
+    const parsed = {};
+    for (const line of cleaned.split('\n')) {
+        const pipeIndex = line.indexOf('|');
+        if (pipeIndex === -1) continue;
+        const key = line.substring(0, pipeIndex).trim();
+        const value = line.substring(pipeIndex + 1).trim();
+        if (schema.fields[key] && value && value !== '(empty)') {
+            parsed[key] = value;
+        }
+    }
+
+    assisted_character_creation_debug('Reverse mapped fields (LLM fallback):', Object.keys(parsed).length);
+    return parsed;
+}
+
+// ─── Compilation & Output ───
+
+function handleDone() {
+    if (activeFieldKey) return;
+
+    const compiled = compileDescription(currentSchema, fieldStates);
+    if (!compiled.trim()) {
+        toast('All fields are empty. Nothing to save.', 'warning');
+        return;
+    }
+
+    // Set ST description field
+    const descField = document.getElementById('description_textarea');
+    if (descField) {
+        descField.value = compiled;
+        descField.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    // Set ST name field
+    const nameValue = fieldStates.characterName?.currentValue?.trim();
+    if (nameValue) {
+        const nameField = document.getElementById('character_name_pole');
+        if (nameField) {
+            nameField.value = nameValue;
+            nameField.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    }
+
+    toast('Character description compiled and applied!', 'success');
+    closeModal();
+}
+
+function compileDescription(schema, states) {
+    const obj = {};
+    for (const [key] of getOrderedFields(schema)) {
+        const val = states[key]?.currentValue?.trim();
+        if (val) {
+            obj[key] = val;
+        }
+    }
+    if (Object.keys(obj).length === 0) return '';
+    return JSON.stringify(obj, null, 2);
+}
+
+// ─── UI Helpers ───
+
+function setFieldGeneratingUI(fieldKey, generating) {
+    const input = document.getElementById(`acc_field_${fieldKey}`);
+    const assistBtn = document.getElementById(`acc_assist_${fieldKey}`);
+    const retryBtn = document.getElementById(`acc_retry_${fieldKey}`);
+    const resetBtn = document.getElementById(`acc_reset_${fieldKey}`);
+
+    if (generating) {
+        input?.setAttribute('disabled', 'true');
+        if (assistBtn) {
+            assistBtn.innerHTML = '<span class="fa-solid fa-stop"></span>';
+            assistBtn.title = 'Stop';
+        }
+        retryBtn?.classList.add('acc-hidden');
+        resetBtn?.classList.add('acc-hidden');
+
+        // Disable all other field buttons and inputs
+        document.querySelectorAll('.acc-btn').forEach(btn => {
+            if (btn.id !== `acc_assist_${fieldKey}`) {
+                btn.classList.add('acc-disabled');
+            }
+        });
+        document.querySelectorAll('.acc-field-input').forEach(el => {
+            if (el.id !== `acc_field_${fieldKey}`) {
+                el.setAttribute('disabled', 'true');
+            }
+        });
+
+        // Disable YOLO and Done buttons
+        document.getElementById('acc_yolo_btn')?.classList.add('acc-disabled');
+        document.getElementById('acc_done_btn')?.classList.add('acc-disabled');
+    } else {
+        input?.removeAttribute('disabled');
+        if (fieldStates[fieldKey]?.hasGenerated) {
+            // Post-generation: show Continue button
+            if (assistBtn) {
+                assistBtn.innerHTML = '<span class="fa-solid fa-forward"></span>';
+                assistBtn.title = 'Continue';
+            }
+            retryBtn?.classList.remove('acc-hidden');
+            resetBtn?.classList.remove('acc-hidden');
+        } else {
+            if (assistBtn) {
+                assistBtn.innerHTML = '<span class="fa-solid fa-wand-magic-sparkles"></span>';
+                assistBtn.title = 'Assist';
+            }
+        }
+
+        // Re-enable all field buttons and inputs
+        document.querySelectorAll('.acc-btn').forEach(btn => {
+            btn.classList.remove('acc-disabled');
+        });
+        document.querySelectorAll('.acc-field-input').forEach(el => {
+            el.removeAttribute('disabled');
+        });
+
+        // Re-enable YOLO and Done buttons
+        document.getElementById('acc_yolo_btn')?.classList.remove('acc-disabled');
+        document.getElementById('acc_done_btn')?.classList.remove('acc-disabled');
+    }
+}
+
+function setAllFieldsDisabled(disabled) {
+    document.querySelectorAll('.acc-field-input').forEach(el => {
+        if (disabled) el.setAttribute('disabled', 'true');
+        else el.removeAttribute('disabled');
+    });
+    document.querySelectorAll('.acc-btn').forEach(btn => {
+        if (disabled) btn.classList.add('acc-disabled');
+        else btn.classList.remove('acc-disabled');
+    });
+    const yoloBtn = document.getElementById('acc_yolo_btn');
+    const doneBtn = document.getElementById('acc_done_btn');
+    if (disabled) {
+        yoloBtn?.classList.add('acc-disabled');
+        doneBtn?.classList.add('acc-disabled');
+    } else {
+        yoloBtn?.classList.remove('acc-disabled');
+        doneBtn?.classList.remove('acc-disabled');
+    }
+}
+
+function setStatusBar(message) {
+    const bar = document.getElementById('acc_status_bar');
+    const text = document.getElementById('acc_status_text');
+    if (!bar || !text) return;
+    if (message) {
+        text.textContent = message;
+        bar.classList.remove('acc-hidden');
+    } else {
+        bar.classList.add('acc-hidden');
+    }
+}
+
+function escapeHTML(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+function escapeAttr(str) {
+    return str.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+;// ./src/world-info-assist.js
+/**
+ * World Info Assist (WIA)
+ *
+ * Adds an LLM-driven Assist button to every World Info / Lore book entry
+ * form. Each entry gets its own button row above the content textarea
+ * with Assist, Continue, Retry, and Revert controls — mirroring the
+ * Assisted Character Creation tool, but operating on a single field
+ * (the entry's content) and using a free-form prompt instead of a schema.
+ */
+
+
+
+
+
+// ─── Default Prompt ───
+
+const DEFAULT_WIA_PROMPT = `[
+The next reply will be an out of story generated World Lore Description. This is a setting reference entry that codifies key facts about an event, person, place, institution, or artifact so they remain consistent and reusable. It should prioritize clear, canonical details over narrative dramatization.
+
+General Input Rules:
+* Guidance (optional): IP/canon, tone/genre, tags, audience, era, length, style notes.
+
+Defaults:
+* Tone: Genre-appropriate, neutral-evocative.
+* Canon: Respect canon when named or implied.
+* Length: 1–3 crisp sentences per entry (unless the user requests more).
+
+Output Format (use exactly as written):
+[ <Name of the Subject>: <Detailed Description of the Event, Person, Place, or Thing> ]
+
+Format Rules:
+
+* Return only the World Lore Description artifact.
+* Follow schema verbatim (brackets, colon, spacing).
+* No extra commentary.
+
+Example — World Lore:
+[ The Ashen Concord: A pact of five city-states after the Ember War to share river trade, standardize coinage, and outlaw pyromancy; prosperity rose while hedge mages went underground, fueling a decade of covert arson reprisals; ]
+]`;
+
+// ─── Module State ───
+
+let world_info_assist_moduleSettings = null;
+let world_info_assist_debug = () => {};
+let observer = null;
+
+// Per-entry state, keyed by a stable id derived from the entry uid / DOM element
+const entryStates = new Map(); // id -> { originalSeed, hasGenerated, generating }
+
+// ─── Init ───
+
+/**
+ * Initialize WIA module. Called once from index.js.
+ * @param {object} opts - { settings }
+ */
+function initWIA({ settings }) {
+    world_info_assist_moduleSettings = settings;
+    world_info_assist_debug = createDebugLogger('WIA', () => world_info_assist_moduleSettings.wiaDebugMode);
+    world_info_assist_debug('Module initialized');
+}
+
+// ─── DOM Observation / Injection ───
+
+/**
+ * Start watching the DOM for new World Info entry forms and inject
+ * assist controls into each one.
+ */
+function startWIAObserver() {
+    if (observer) return;
+
+    observer = new MutationObserver((mutations) => {
+        if (!world_info_assist_moduleSettings?.wiaEnabled) return;
+        for (const m of mutations) {
+            for (const node of m.addedNodes) {
+                if (!(node instanceof HTMLElement)) continue;
+                if (node.matches?.('.world_entry_edit')) {
+                    injectControls(node);
+                }
+                node.querySelectorAll?.('.world_entry_edit').forEach(injectControls);
+            }
+        }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // Process anything already present on the page
+    document.querySelectorAll('.world_entry_edit').forEach(injectControls);
+    world_info_assist_debug('Observer started');
+}
+
+/**
+ * Re-scan all currently visible WI forms (used after enable toggle).
+ */
+function rescanAllForms() {
+    if (!world_info_assist_moduleSettings?.wiaEnabled) return;
+    document.querySelectorAll('.world_entry_edit').forEach(injectControls);
+}
+
+/**
+ * Remove all injected controls (used when the feature is disabled).
+ */
+function removeAllControls() {
+    document.querySelectorAll('.wia-controls').forEach(el => el.remove());
+}
+
+function injectControls(formEl) {
+    if (!world_info_assist_moduleSettings?.wiaEnabled) return;
+    // Skip the hidden template element that SillyTavern clones from —
+    // otherwise the template ends up with baked-in .wia-controls markup
+    // that clones inherit without their click handlers, permanently
+    // blocking injection on every live entry.
+    if (formEl.closest('#entry_edit_template')) return;
+    if (formEl.querySelector('.wia-controls')) return;
+
+    const contentTextarea = formEl.querySelector('textarea[name="content"]');
+    if (!contentTextarea) return;
+
+    // The label sits immediately before the textarea inside the form control
+    // wrapper. We append the controls into the label so they sit on the
+    // header line above the textarea.
+    const formControl = contentTextarea.closest('.world_entry_form_control');
+    if (!formControl) return;
+
+    const id = contentTextarea.id || `wia_${Math.random().toString(36).slice(2)}`;
+
+    const controls = document.createElement('div');
+    controls.className = 'wia-controls';
+    controls.dataset.wiaFor = id;
+    controls.innerHTML = `
+        <div class="wia-btn wia-btn-assist menu_button interactable" title="LLM Assist — generate this World Info entry">
+            <span class="fa-solid fa-wand-magic-sparkles"></span>
+            <span class="wia-btn-label">Assist</span>
+        </div>
+        <div class="wia-btn wia-btn-continue menu_button interactable wia-hidden" title="Continue generation from where it left off">
+            <span class="fa-solid fa-forward"></span>
+        </div>
+        <div class="wia-btn wia-btn-retry menu_button interactable wia-hidden" title="Retry from your original guidance text">
+            <span class="fa-solid fa-rotate-right"></span>
+        </div>
+        <div class="wia-btn wia-btn-revert menu_button interactable wia-hidden" title="Revert to your original guidance text">
+            <span class="fa-solid fa-arrow-rotate-left"></span>
+        </div>
+        <div class="wia-spinner wia-hidden" title="Generating..."><span class="fa-solid fa-spinner fa-spin"></span></div>
+    `;
+
+    // Insert at the very top of the content form control so it's clearly
+    // visible above both the label and textarea.
+    formControl.insertBefore(controls, formControl.firstChild);
+
+    const assistBtn = controls.querySelector('.wia-btn-assist');
+    const continueBtn = controls.querySelector('.wia-btn-continue');
+    const retryBtn = controls.querySelector('.wia-btn-retry');
+    const revertBtn = controls.querySelector('.wia-btn-revert');
+
+    assistBtn.addEventListener('click', () => onAssist(formEl, id, false));
+    continueBtn.addEventListener('click', () => onAssist(formEl, id, true));
+    retryBtn.addEventListener('click', () => onRetry(formEl, id));
+    revertBtn.addEventListener('click', () => onRevert(formEl, id));
+
+    world_info_assist_debug('Injected controls for entry', id);
+}
+
+// ─── Helpers ───
+
+function getContentTextarea(formEl) {
+    return formEl.querySelector('textarea[name="content"]');
+}
+
+function getTitle(formEl) {
+    // The title field (textarea[name="comment"]) lives in the entry's
+    // inline-drawer header, which is a sibling of `.world_entry_edit` —
+    // not a descendant. Walk up to the enclosing form before querying.
+    const formRoot = formEl.closest('form.world_entry_form') || formEl.closest('form') || formEl;
+    const commentInput = formRoot.querySelector('textarea[name="comment"], input[name="comment"]');
+    return commentInput?.value?.trim() || '';
+}
+
+function setUIState(formEl, state) {
+    const controls = formEl.querySelector('.wia-controls');
+    if (!controls) return;
+    const assistBtn = controls.querySelector('.wia-btn-assist');
+    const continueBtn = controls.querySelector('.wia-btn-continue');
+    const retryBtn = controls.querySelector('.wia-btn-retry');
+    const revertBtn = controls.querySelector('.wia-btn-revert');
+    const spinner = controls.querySelector('.wia-spinner');
+
+    const show = (el, vis) => el && el.classList.toggle('wia-hidden', !vis);
+
+    if (state === 'idle') {
+        show(assistBtn, true);
+        show(continueBtn, false);
+        show(retryBtn, false);
+        show(revertBtn, false);
+        show(spinner, false);
+    } else if (state === 'generating') {
+        show(assistBtn, false);
+        show(continueBtn, false);
+        show(retryBtn, false);
+        show(revertBtn, false);
+        show(spinner, true);
+    } else if (state === 'generated') {
+        show(assistBtn, false);
+        show(continueBtn, true);
+        show(retryBtn, true);
+        show(revertBtn, true);
+        show(spinner, false);
+    }
+}
+
+// ─── Generation ───
+
+async function onAssist(formEl, id, isContinue) {
+    const state = entryStates.get(id) || { originalSeed: '', hasGenerated: false, generating: false };
+    if (state.generating) return;
+
+    const contentEl = getContentTextarea(formEl);
+    if (!contentEl) return;
+
+    if (!isContinue) {
+        // First-pass generation: capture the user's seed text from the field
+        // so we can revert / retry from it later.
+        state.originalSeed = contentEl.value;
+    }
+    state.generating = true;
+    entryStates.set(id, state);
+
+    setUIState(formEl, 'generating');
+
+    try {
+        const title = getTitle(formEl);
+        const seed = state.originalSeed || '';
+        const currentText = contentEl.value || '';
+
+        const promptTemplate = (world_info_assist_moduleSettings.wiaPrompt && world_info_assist_moduleSettings.wiaPrompt.trim())
+            ? world_info_assist_moduleSettings.wiaPrompt
+            : DEFAULT_WIA_PROMPT;
+
+        let userPrompt;
+        let prefill;
+
+        if (isContinue) {
+            userPrompt =
+                `${promptTemplate}\n\n` +
+                `Guidance from the user:\n${seed || '(none provided)'}\n\n` +
+                `The entry so far:\n${currentText}\n\n` +
+                'Continue exactly where the entry left off. Do not repeat any text. ' +
+                'Maintain the bracketed format and close the bracket when the entry is complete.';
+            prefill = '';
+        } else {
+            userPrompt =
+                `${promptTemplate}\n\n` +
+                `Guidance from the user:\n${seed || '(no specific guidance — invent a fitting entry)'}\n\n` +
+                (title
+                    ? `Respond on one line with only the value for "${title}":`
+                    : 'No title was provided — invent a fitting subject name.');
+            prefill = title ? `[${title}: ` : '[';
+        }
+
+        const systemPrompt =
+            'You are a world-building assistant. Output only the requested ' +
+            'World Lore Description in the exact bracketed format described. ' +
+            'No commentary, no preamble, no explanations.';
+
+        world_info_assist_debug('System prompt:', systemPrompt);
+        world_info_assist_debug('User prompt:', userPrompt);
+        world_info_assist_debug('Prefill:', prefill);
+
+        const raw = await __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__({
+            prompt: userPrompt,
+            systemPrompt,
+            responseLength: 600,
+            ...(prefill ? { prefill } : {}),
+        });
+
+        let cleaned = __WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(raw).trim();
+
+        if (isContinue) {
+            const sep =
+                currentText.length === 0 ||
+                currentText.endsWith(' ') ||
+                currentText.endsWith('\n') ||
+                cleaned.startsWith(' ')
+                    ? ''
+                    : ' ';
+            contentEl.value = currentText + sep + cleaned;
+        } else {
+            // If the model didn't echo the prefill back, prepend it so the
+            // entry always starts in the desired format.
+            let finalText = cleaned;
+            if (prefill && !finalText.startsWith('[')) {
+                finalText = prefill + finalText;
+            }
+            contentEl.value = finalText;
+        }
+
+        // Notify SillyTavern that the entry has changed so it gets persisted.
+        contentEl.dispatchEvent(new Event('input', { bubbles: true }));
+
+        state.hasGenerated = true;
+        state.generating = false;
+        entryStates.set(id, state);
+
+        setUIState(formEl, 'generated');
+        world_info_assist_debug('Generation complete for', id);
+    } catch (err) {
+        console.error('WIA generation error:', err);
+        toast(`World Info assist failed: ${err.message}`, 'error');
+        state.generating = false;
+        entryStates.set(id, state);
+        setUIState(formEl, state.hasGenerated ? 'generated' : 'idle');
+    }
+}
+
+async function onRetry(formEl, id) {
+    const state = entryStates.get(id);
+    if (!state) return;
+    const contentEl = getContentTextarea(formEl);
+    if (!contentEl) return;
+
+    contentEl.value = state.originalSeed || '';
+    contentEl.dispatchEvent(new Event('input', { bubbles: true }));
+    state.hasGenerated = false;
+    entryStates.set(id, state);
+
+    await onAssist(formEl, id, false);
+}
+
+function onRevert(formEl, id) {
+    const state = entryStates.get(id);
+    if (!state) return;
+    const contentEl = getContentTextarea(formEl);
+    if (!contentEl) return;
+
+    contentEl.value = state.originalSeed || '';
+    contentEl.dispatchEvent(new Event('input', { bubbles: true }));
+    state.hasGenerated = false;
+    entryStates.set(id, state);
+    setUIState(formEl, 'idle');
+}
+
+// ─── Settings ───
+
+/**
+ * Bind WIA settings panel controls. Called after settings HTML is injected.
+ * @param {function} saveSettings
+ */
+function bindWIASettings(saveSettings) {
+    const enabledCb = document.getElementById('wia_enabled');
+    const debugCb = document.getElementById('wia_debug_mode');
+    const promptArea = document.getElementById('wia_prompt_textarea');
+    const restoreBtn = document.getElementById('wia_restore_default');
+
+    if (enabledCb) {
+        enabledCb.checked = !!world_info_assist_moduleSettings.wiaEnabled;
+        enabledCb.addEventListener('change', () => {
+            world_info_assist_moduleSettings.wiaEnabled = enabledCb.checked;
+            saveSettings();
+            if (world_info_assist_moduleSettings.wiaEnabled) {
+                rescanAllForms();
+            } else {
+                removeAllControls();
+            }
+        });
+    }
+    if (debugCb) {
+        debugCb.checked = !!world_info_assist_moduleSettings.wiaDebugMode;
+        debugCb.addEventListener('change', () => {
+            world_info_assist_moduleSettings.wiaDebugMode = debugCb.checked;
+            saveSettings();
+        });
+    }
+    if (promptArea) {
+        promptArea.value = world_info_assist_moduleSettings.wiaPrompt || DEFAULT_WIA_PROMPT;
+        promptArea.addEventListener('input', () => {
+            world_info_assist_moduleSettings.wiaPrompt = promptArea.value;
+            saveSettings();
+        });
+    }
+    if (restoreBtn) {
+        restoreBtn.addEventListener('click', () => {
+            world_info_assist_moduleSettings.wiaPrompt = DEFAULT_WIA_PROMPT;
+            if (promptArea) promptArea.value = DEFAULT_WIA_PROMPT;
+            saveSettings();
+            toast('Default World Info assist prompt restored.', 'success');
+        });
+    }
+}
+
+;// ./src/index.js
 // Saint's Silly Extensions — Possession, Phrasing, and Assisted Character Creation
 // Allows the user to "possess" a character, enrich messages with AI narration, and create characters with LLM assistance.
 
@@ -11468,25 +10864,25 @@ const defaultSettings = {
     accProseStates: {},
     wiaEnabled: true,
     wiaDebugMode: false,
-    wiaPrompt: _world_info_assist_js__WEBPACK_IMPORTED_MODULE_6__.DEFAULT_WIA_PROMPT,
+    wiaPrompt: DEFAULT_WIA_PROMPT,
 };
 
 // ─── State ───
 
-let settings = { ...defaultSettings };
+let src_settings = { ...defaultSettings };
 
-const SSEDebug = (0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.createDebugLogger)('SAINTS-SILLY-EXTENSIONS', () => true);
+const SSEDebug = createDebugLogger('SAINTS-SILLY-EXTENSIONS', () => true);
 
 // ─── Settings Persistence ───
 
 function saveSettings() {
-    (0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.saveExtensionSettings)(EXTENSION_NAME, settings);
+    saveExtensionSettings(EXTENSION_NAME, src_settings);
     SSEDebug('Settings saved');
 }
 
 function loadSettings() {
-    settings = (0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.loadExtensionSettings)(EXTENSION_NAME, defaultSettings);
-    SSEDebug('Settings loaded:', JSON.stringify(settings));
+    src_settings = loadExtensionSettings(EXTENSION_NAME, defaultSettings);
+    SSEDebug('Settings loaded:', JSON.stringify(src_settings));
 }
 
 // ─── Settings Panel ───
@@ -11495,56 +10891,56 @@ function injectSettingsPanel() {
     const settingsContainer = document.getElementById('extensions_settings');
     if (!settingsContainer) return;
 
-    settingsContainer.insertAdjacentHTML('beforeend', _settings_html__WEBPACK_IMPORTED_MODULE_1__["default"]);
+    settingsContainer.insertAdjacentHTML('beforeend', settings);
 
-    (0,_possession_js__WEBPACK_IMPORTED_MODULE_3__.bindPossessionSettings)(saveSettings);
-    (0,_phrasing_js__WEBPACK_IMPORTED_MODULE_4__.bindPhrasingSettings)(saveSettings);
-    (0,_assisted_character_creation_js__WEBPACK_IMPORTED_MODULE_5__.bindACCSettings)(saveSettings);
-    (0,_world_info_assist_js__WEBPACK_IMPORTED_MODULE_6__.bindWIASettings)(saveSettings);
+    bindPossessionSettings(saveSettings);
+    bindPhrasingSettings(saveSettings);
+    bindACCSettings(saveSettings);
+    bindWIASettings(saveSettings);
 }
 
 // ─── Merged Event Handlers ───
 
-function onGenerationStarted() {
-    (0,_possession_js__WEBPACK_IMPORTED_MODULE_3__.onGenerationStarted)();
-    (0,_phrasing_js__WEBPACK_IMPORTED_MODULE_4__.onGenerationStarted)();
+function src_onGenerationStarted() {
+    onGenerationStarted();
+    phrasing_onGenerationStarted();
     SSEDebug('Generation started, guard ON');
 }
 
-function onGenerationEnded() {
-    (0,_possession_js__WEBPACK_IMPORTED_MODULE_3__.onGenerationEnded)();
-    (0,_phrasing_js__WEBPACK_IMPORTED_MODULE_4__.onGenerationEnded)();
-    (0,_possession_js__WEBPACK_IMPORTED_MODULE_3__.showPossessionImpersonateButton)();
+function src_onGenerationEnded() {
+    onGenerationEnded();
+    phrasing_onGenerationEnded();
+    showPossessionImpersonateButton();
     SSEDebug('Generation ended, guard OFF');
 }
 
 function onGenerationStopped() {
     // Same cleanup as ended
-    (0,_possession_js__WEBPACK_IMPORTED_MODULE_3__.onGenerationEnded)();
-    (0,_phrasing_js__WEBPACK_IMPORTED_MODULE_4__.onGenerationEnded)();
-    (0,_possession_js__WEBPACK_IMPORTED_MODULE_3__.showPossessionImpersonateButton)();
+    onGenerationEnded();
+    phrasing_onGenerationEnded();
+    showPossessionImpersonateButton();
     SSEDebug('Generation stopped, guard OFF');
 }
 
 function onChatChanged() {
-    (0,_possession_js__WEBPACK_IMPORTED_MODULE_3__.loadPossessionState)();
-    (0,_possession_js__WEBPACK_IMPORTED_MODULE_3__.syncAllPossessionUI)();
-    (0,_phrasing_js__WEBPACK_IMPORTED_MODULE_4__.loadPromptTextarea)();
+    loadPossessionState();
+    syncAllPossessionUI();
+    loadPromptTextarea();
     SSEDebug('Chat changed, state reloaded');
 }
 
 function onGroupUpdatedHandler() {
-    (0,_possession_js__WEBPACK_IMPORTED_MODULE_3__.onGroupUpdated)();
+    onGroupUpdated();
     SSEDebug('Group updated, UI rebuilt');
 }
 
 function onCharacterPageLoadedHandler() {
-    (0,_possession_js__WEBPACK_IMPORTED_MODULE_3__.onCharacterPageLoaded)();
-    (0,_assisted_character_creation_js__WEBPACK_IMPORTED_MODULE_5__.onCharacterPageLoaded)();
+    onCharacterPageLoaded();
+    assisted_character_creation_onCharacterPageLoaded();
 }
 
 function onGroupWrapperFinishedHandler() {
-    (0,_possession_js__WEBPACK_IMPORTED_MODULE_3__.onGroupWrapperFinished)();
+    onGroupWrapperFinished();
 }
 
 // ─── Initialization ───
@@ -11553,54 +10949,52 @@ jQuery(async () => {
     loadSettings();
 
     // Wire up cross-module dependencies via shared settings reference
-    (0,_possession_js__WEBPACK_IMPORTED_MODULE_3__.initPossession)({
-        settings,
-        phrasingApi: { isPhrasing: _phrasing_js__WEBPACK_IMPORTED_MODULE_4__.isPhrasing, handlePhrasingSeedReinjection: _phrasing_js__WEBPACK_IMPORTED_MODULE_4__.handlePhrasingSeedReinjection },
+    initPossession({
+        settings: src_settings,
+        phrasingApi: { isPhrasing: isPhrasing, handlePhrasingSeedReinjection: handlePhrasingSeedReinjection },
     });
-    (0,_phrasing_js__WEBPACK_IMPORTED_MODULE_4__.initPhrasing)({
-        settings,
-        possessionApi: { isPossessing: _possession_js__WEBPACK_IMPORTED_MODULE_3__.isPossessing, getPossessedCharName: _possession_js__WEBPACK_IMPORTED_MODULE_3__.getPossessedCharName, postPossessedMessage: _possession_js__WEBPACK_IMPORTED_MODULE_3__.postPossessedMessage },
+    initPhrasing({
+        settings: src_settings,
+        possessionApi: { isPossessing: isPossessing, getPossessedCharName: getPossessedCharName, postPossessedMessage: postPossessedMessage },
     });
-    (0,_assisted_character_creation_js__WEBPACK_IMPORTED_MODULE_5__.initACC)({ settings, saveSettings });
-    (0,_world_info_assist_js__WEBPACK_IMPORTED_MODULE_6__.initWIA)({ settings });
+    initACC({ settings: src_settings, saveSettings });
+    initWIA({ settings: src_settings });
 
-    (0,_possession_js__WEBPACK_IMPORTED_MODULE_3__.loadPossessionState)();
+    loadPossessionState();
     injectSettingsPanel();
 
     // Watch the DOM for World Info entry forms and inject assist controls.
-    (0,_world_info_assist_js__WEBPACK_IMPORTED_MODULE_6__.startWIAObserver)();
+    startWIAObserver();
 
     // Possession UI
-    (0,_possession_js__WEBPACK_IMPORTED_MODULE_3__.attachContinueInterceptor)();
+    attachContinueInterceptor();
 
     // Phrasing UI
-    (0,_phrasing_js__WEBPACK_IMPORTED_MODULE_4__.createInputAreaButton)();
-    (0,_phrasing_js__WEBPACK_IMPORTED_MODULE_4__.createHamburgerMenuItem)();
+    createInputAreaButton();
+    createHamburgerMenuItem();
 
     // Subscribe to events
-    const { eventSource, eventTypes } = (0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.getContext)();
+    const { eventSource, eventTypes } = getContext();
     eventSource.on(eventTypes.CHAT_CHANGED, onChatChanged);
     eventSource.on(eventTypes.GROUP_UPDATED, onGroupUpdatedHandler);
     eventSource.on(eventTypes.CHARACTER_PAGE_LOADED, onCharacterPageLoadedHandler);
-    eventSource.on(eventTypes.GENERATION_STARTED, onGenerationStarted);
-    eventSource.on(eventTypes.GENERATION_ENDED, onGenerationEnded);
+    eventSource.on(eventTypes.GENERATION_STARTED, src_onGenerationStarted);
+    eventSource.on(eventTypes.GENERATION_ENDED, src_onGenerationEnded);
     eventSource.on(eventTypes.GENERATION_STOPPED, onGenerationStopped);
     eventSource.on(eventTypes.GROUP_WRAPPER_FINISHED, onGroupWrapperFinishedHandler);
-    eventSource.on(eventTypes.MESSAGE_SENT, _possession_js__WEBPACK_IMPORTED_MODULE_3__.onMessageSent);
+    eventSource.on(eventTypes.MESSAGE_SENT, onMessageSent);
 
     // Slash commands
-    (0,_possession_js__WEBPACK_IMPORTED_MODULE_3__.registerPossessionSlashCommands)();
-    (0,_phrasing_js__WEBPACK_IMPORTED_MODULE_4__.registerPhrasingSlashCommand)();
+    registerPossessionSlashCommands();
+    registerPhrasingSlashCommand();
 
     // Initial state
-    (0,_possession_js__WEBPACK_IMPORTED_MODULE_3__.syncAllPossessionUI)();
-    (0,_phrasing_js__WEBPACK_IMPORTED_MODULE_4__.applyPhrasingEnabledState)();
-    (0,_phrasing_js__WEBPACK_IMPORTED_MODULE_4__.loadPromptTextarea)();
+    syncAllPossessionUI();
+    applyPhrasingEnabledState();
+    loadPromptTextarea();
 
     SSEDebug('Extension initialized');
 });
-
-})();
 
 
 //# sourceMappingURL=index.js.map
