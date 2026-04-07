@@ -8145,6 +8145,65 @@ function waitForGenerationEnd(timeoutMs = 5 * 60 * 1000) {
 // ─── Generation Context Preamble ───
 
 /**
+ * Collect every "active" character for the current chat.
+ *
+ * In a solo chat this is just the selected character (`ctx.characterId`).
+ * In a group chat this is every enabled member of the group, resolved by
+ * avatar (which is the unique on-disk filename — character `name` fields can
+ * collide). When two members share the same display name we disambiguate them
+ * with a `#N` suffix so the LLM can tell them apart.
+ *
+ * @param {object} ctx - SillyTavern context object.
+ * @returns {Array<{ displayName: string, char: object }>}
+ */
+function collectActiveCharacters(ctx) {
+    const characters = Array.isArray(ctx.characters) ? ctx.characters : [];
+    const results = [];
+    const seenAvatars = new Set();
+
+    const pushChar = (char) => {
+        if (!char || seenAvatars.has(char.avatar)) return;
+        seenAvatars.add(char.avatar);
+        results.push({ displayName: char.name || '', char });
+    };
+
+    // Group chat: walk enabled members.
+    const groupId = ctx.groupId;
+    if (groupId && Array.isArray(ctx.groups)) {
+        const group = ctx.groups.find(g => g.id == groupId);
+        if (group && Array.isArray(group.members)) {
+            const disabled = Array.isArray(group.disabled_members) ? group.disabled_members : [];
+            for (const avatar of group.members) {
+                if (disabled.includes(avatar)) continue;
+                const char = characters.find(c => c.avatar === avatar);
+                if (char) pushChar(char);
+            }
+        }
+    }
+
+    // Solo chat fallback (also covers groups where no member resolved).
+    if (!results.length) {
+        const char = characters[ctx.characterId];
+        if (char) pushChar(char);
+    }
+
+    // Disambiguate duplicate display names. Avatar filenames are unique on
+    // disk, but two characters in a group can share a `name`, so append a
+    // running counter to the second-and-later occurrences.
+    const nameCounts = new Map();
+    for (const entry of results) {
+        const base = entry.displayName || '(unnamed)';
+        const seen = nameCounts.get(base) || 0;
+        if (seen > 0) {
+            entry.displayName = `${base} #${seen + 1}`;
+        }
+        nameCounts.set(base, seen + 1);
+    }
+
+    return results;
+}
+
+/**
  * Returns the list of available World Info / lore book names known to ST.
  * Always returns a fresh array; safe to mutate.
  *
@@ -8185,15 +8244,19 @@ async function buildContextPreamble({
     if (includeChat) {
         const ctx = getContext();
 
-        // Active character card
-        const char = ctx.characters?.[ctx.characterId];
-        if (char) {
+        // Resolve the active character(s). In a group chat we walk every
+        // enabled member; in a solo chat we just take the current character.
+        const activeChars = collectActiveCharacters(ctx);
+        for (const { displayName, char } of activeChars) {
             const lines = [];
-            if (char.name) lines.push(`Name: ${char.name}`);
+            if (displayName) lines.push(`Name: ${displayName}`);
             if (char.description) lines.push(`Description: ${char.description}`);
             if (char.personality) lines.push(`Personality: ${char.personality}`);
             if (char.scenario) lines.push(`Scenario: ${char.scenario}`);
-            if (lines.length) sections.push(`[Active Character]\n${lines.join('\n')}`);
+            if (lines.length) {
+                const header = displayName ? `[Character — ${displayName}]` : '[Character]';
+                sections.push(`${header}\n${lines.join('\n')}`);
+            }
         }
 
         // User persona
