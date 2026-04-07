@@ -27,7 +27,7 @@ let debug = () => {};
 
 function toast(message, type = 'info') {
     if (!ctx.settings.possessionShowToast) return;
-    showToast(message, type, "Saint's Silly Extensions");
+    showToast(message, type, 'Saint\'s Silly Extensions');
 }
 
 // ─── Public Getters ───

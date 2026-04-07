@@ -1,0 +1,18 @@
+#!/bin/sh
+#
+# Pre-commit hook: build the extension and stage the resulting dist/ output
+# so the committed snapshot always contains an up-to-date build.
+#
+# Activated by `core.hooksPath = .githooks` (set automatically by the
+# `prepare` script in package.json on `npm install`).
+
+set -e
+
+echo "[pre-commit] Linting..."
+npm run lint
+
+echo "[pre-commit] Building Saints-Silly-Extensions..."
+npm run build
+
+# Re-stage the build output so it's included in this commit.
+git add dist

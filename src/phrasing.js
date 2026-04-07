@@ -359,7 +359,7 @@ function onSaveToChat() {
     const context = getContext();
 
     if (promptText && !promptText.includes('{{phrasingSeed}}')) {
-        toastr.warning("Warning: Prompt does not contain {{phrasingSeed}}. The AI won't receive your input text.", 'Phrasing!');
+        toastr.warning('Warning: Prompt does not contain {{phrasingSeed}}. The AI won\'t receive your input text.', 'Phrasing!');
     }
 
     if (!context.chatMetadata.phrasing) {
