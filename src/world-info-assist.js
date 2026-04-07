@@ -132,7 +132,7 @@ function injectControls(formEl) {
             <span class="wia-btn-label">Assist</span>
         </div>
         <div class="wia-btn wia-btn-continue menu_button interactable wia-hidden" title="Continue generation from where it left off">
-            <span class="fa-solid fa-forward"></span>
+            <span class="fa-solid fa-arrow-right"></span>
         </div>
         <div class="wia-btn wia-btn-retry menu_button interactable wia-hidden" title="Retry from your original guidance text">
             <span class="fa-solid fa-rotate-right"></span>

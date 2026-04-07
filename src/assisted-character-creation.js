@@ -799,7 +799,7 @@ function setFieldGeneratingUI(fieldKey, generating) {
         if (fieldStates[fieldKey]?.hasGenerated) {
             // Post-generation: show Continue button
             if (assistBtn) {
-                assistBtn.innerHTML = '<span class="fa-solid fa-forward"></span>';
+                assistBtn.innerHTML = '<span class="fa-solid fa-arrow-right"></span>';
                 assistBtn.title = 'Continue';
             }
             retryBtn?.classList.remove('acc-hidden');
