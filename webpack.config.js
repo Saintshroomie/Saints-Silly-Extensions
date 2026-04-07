@@ -29,7 +29,7 @@ const externalize = function ({ context, request }, callback) {
 
 module.exports = {
     entry: path.join(__dirname, 'src/index.js'),
-    devtool: false,
+    devtool: 'source-map',
     target: 'web',
     experiments: {
         outputModule: true,
