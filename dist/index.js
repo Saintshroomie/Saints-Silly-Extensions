@@ -1,3 +1,4 @@
+import { loadWorldInfo as __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_loadWorldInfo__, world_names as __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_world_names__ } from "../../../../world-info.js";
 import { groups as __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_groups__, selected_group as __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__ } from "../../../../group-chats.js";
 import { SlashCommandParser as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandParser_js_42c8b851_SlashCommandParser__ } from "../../../../slash-commands/SlashCommandParser.js";
 import { SlashCommand as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommand_js_1b0d5616_SlashCommand__ } from "../../../../slash-commands/SlashCommand.js";
@@ -6203,7 +6204,156 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Saint's Silly Extensions — Combin
 .wia-controls .wia-hidden {
     display: none !important;
 }
-`, "",{"version":3,"sources":["webpack://./src/style.css"],"names":[],"mappings":"AAAA,+CAA+C;;AAE/C;;oFAEoF;;AAEpF,0CAA0C;;AAE1C;IACI,oBAAoB;IACpB,mBAAmB;IACnB,gBAAgB;IAChB,eAAe;AACnB;;AAEA;IACI,WAAW;IACX,YAAY;IACZ,kBAAkB;IAClB,oDAAoD;IACpD,uBAAuB;IACvB,eAAe;IACf,iFAAiF;IACjF,kBAAkB;IAClB,cAAc;AAClB;;AAEA;IACI,kDAAkD;AACtD;;AAEA;IACI,kDAAkD;IAClD,gDAAgD;IAChD,mEAAmE;AACvE;;AAEA,2CAA2C;;AAE3C;IACI,YAAY;IACZ,gDAAgD;IAChD,eAAe;IACf,kBAAkB;AACtB;;AAEA;IACI,UAAU;AACd;;AAEA;IACI,UAAU;IACV,2CAA2C;AAC/C;;AAEA;IACI,WAAW;IACX,kBAAkB;IAClB,YAAY;IACZ,SAAS;IACT,2BAA2B;IAC3B,UAAU;IACV,WAAW;IACX,kBAAkB;IAClB,sDAAsD;AAC1D;;AAEA,gDAAgD;;AAEhD;IACI,sEAAsE;AAC1E;;AAEA,2DAA2D;;AAE3D;IACI,aAAa;IACb,mBAAmB;IACnB,uBAAuB;IACvB,eAAe;IACf,YAAY;IACZ,8BAA8B;IAC9B,YAAY;AAChB;;AAEA;IACI,UAAU;AACd;;AAEA;IACI,WAAW;IACX,YAAY;IACZ,kBAAkB;IAClB,iBAAiB;IACjB,oDAAoD;IACpD,mCAAmC;AACvC;;AAEA;IACI,kDAAkD;AACtD;;AAEA,mDAAmD;;AAEnD;IACI,wBAAwB;AAC5B;;AAEA;;oFAEoF;;AAEpF,2CAA2C;;AAE3C;IACI,eAAe;IACf,aAAa;IACb,mBAAmB;IACnB,uBAAuB;IACvB,YAAY;IACZ,gDAAgD;IAChD,YAAY;IACZ,gBAAgB;AACpB;;AAEA;IACI,UAAU;IACV,2CAA2C;AAC/C;;AAEA,8BAA8B;;AAE9B;IACI,eAAe;AACnB;;AAEA;IACI,iBAAiB;IACjB,UAAU;IACV,kBAAkB;AACtB;;AAEA,yCAAyC;;AAEzC;IACI,wBAAwB;AAC5B;;AAEA;;oFAEoF;;AAEpF;IACI,aAAa;IACb,sBAAsB;IACtB,QAAQ;IACR,cAAc;AAClB;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;AACZ;;AAEA;IACI,mBAAmB;IACnB,aAAa;IACb,mBAAmB;IACnB,QAAQ;AACZ;;AAEA;IACI,YAAY;IACZ,wDAAwD;IACxD,aAAa;AACjB;;AAEA;IACI,eAAe;IACf,kBAAkB;AACtB;;AAEA;IACI,WAAW;IACX,iBAAiB;IACjB,gBAAgB;IAChB,sBAAsB;IACtB,gBAAgB;IAChB,eAAe;AACnB;;AAEA;IACI,aAAa;IACb,QAAQ;IACR,eAAe;IACf,eAAe;AACnB;;AAEA;IACI,OAAO;IACP,YAAY;IACZ,kBAAkB;IAClB,mBAAmB;AACvB;;AAEA;;oFAEoF;;AAEpF;IACI,aAAa;IACb,sBAAsB;IACtB,QAAQ;IACR,eAAe;AACnB;;AAEA;IACI,aAAa;IACb,QAAQ;IACR,eAAe;IACf,eAAe;AACnB;;AAEA;IACI,OAAO;IACP,YAAY;IACZ,kBAAkB;IAClB,mBAAmB;AACvB;;AAEA;;oFAEoF;;AAEpF;IACI,eAAe;IACf,MAAM;IACN,OAAO;IACP,QAAQ;IACR,SAAS;IACT,8BAA8B;IAC9B,cAAc;AAClB;;AAEA;IACI,eAAe;IACf,QAAQ;IACR,SAAS;IACT,2BAA2B;IAC3B,mDAAmD;IACnD,oDAAoD;IACpD,kBAAkB;IAClB,UAAU;IACV,gBAAgB;IAChB,YAAY;IACZ,aAAa;IACb,sBAAsB;IACtB,yCAAyC;IACzC,cAAc;AAClB;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,8BAA8B;IAC9B,kBAAkB;IAClB,2DAA2D;IAC3D,cAAc;AAClB;;AAEA;IACI,SAAS;IACT,gBAAgB;AACpB;;AAEA;IACI,eAAe;IACf,YAAY;IACZ,8BAA8B;IAC9B,gBAAgB;IAChB,gBAAgB;AACpB;;AAEA;IACI,UAAU;AACd;;AAEA;IACI,aAAa;IACb,2BAA2B;IAC3B,YAAY;IACZ,aAAa;AACjB;;AAEA;IACI,mBAAmB;AACvB;;AAEA;IACI,WAAW;IACX,eAAe;IACf,gBAAgB;AACpB;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;IACR,iBAAiB;IACjB,mBAAmB;IACnB,4CAA4C;IAC5C,kBAAkB;IAClB,2CAA2C;IAC3C,gBAAgB;AACpB;;AAEA;IACI,aAAa;IACb,sBAAsB;IACtB,SAAS;AACb;;AAEA;IACI,aAAa;IACb,sBAAsB;IACtB,QAAQ;AACZ;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,8BAA8B;IAC9B,QAAQ;AACZ;;AAEA;IACI,iBAAiB;IACjB,gBAAgB;AACpB;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,SAAS;IACT,cAAc;AAClB;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;IACR,gBAAgB;IAChB,eAAe;IACf,YAAY;AAChB;;AAEA;IACI,UAAU;AACd;;AAEA;IACI,iBAAiB;AACrB;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;IACR,gBAAgB;IAChB,YAAY;AAChB;;AAEA;IACI,sBAAsB;IACtB,2BAA2B;IAC3B,4BAA4B;IAC5B,kBAAkB;IAClB,oBAAoB;IACpB,UAAU;AACd;;AAEA;IACI,WAAW;AACf;;AAEA;IACI,WAAW;IACX,gBAAgB;AACpB;;AAEA;IACI,YAAY;IACZ,mBAAmB;AACvB;;AAEA;IACI,aAAa;IACb,QAAQ;IACR,cAAc;IACd,mBAAmB;AACvB;;AAEA;IACI,WAAW;IACX,YAAY;IACZ,aAAa;IACb,mBAAmB;IACnB,uBAAuB;IACvB,iBAAiB;IACjB,UAAU;IACV,eAAe;AACnB;;AAEA;IACI,YAAY;IACZ,oBAAoB;AACxB;;AAEA;IACI,2CAA2C;AAC/C;;AAEA;IACI,wBAAwB;AAC5B;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,8BAA8B;IAC9B,kBAAkB;IAClB,wDAAwD;IACxD,QAAQ;IACR,cAAc;AAClB;;AAEA;IACI,aAAa;IACb,QAAQ;AACZ;;AAEA;IACI,2CAA2C;AAC/C;;AAEA;;IAEI,YAAY;IACZ,oBAAoB;AACxB;;AAEA;IACI,mBAAmB;AACvB;;AAEA,2CAA2C;AAC3C;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;AACZ;;AAEA;;oFAEoF;;AAEpF,mBAAmB;AACnB;IACI,eAAe;IACf,kBAAkB;AACtB;;AAEA;IACI,WAAW;IACX,iBAAiB;IACjB,gBAAgB;IAChB,sBAAsB;IACtB,gBAAgB;IAChB,eAAe;AACnB;;AAEA;IACI,aAAa;IACb,QAAQ;IACR,eAAe;IACf,eAAe;AACnB;;AAEA;IACI,OAAO;IACP,YAAY;IACZ,kBAAkB;IAClB,mBAAmB;AACvB;;AAEA,+DAA+D;AAC/D;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;IACR,eAAe;IACf,mBAAmB;AACvB;;AAEA;IACI,oBAAoB;IACpB,mBAAmB;IACnB,QAAQ;IACR,eAAe;IACf,iBAAiB;IACjB,gBAAgB;AACpB;;AAEA;IACI,2CAA2C;AAC/C;;AAEA;IACI,gBAAgB;AACpB;;AAEA;IACI,2CAA2C;IAC3C,cAAc;IACd,oBAAoB;IACpB,mBAAmB;IACnB,gBAAgB;AACpB;;AAEA;IACI,wBAAwB;AAC5B","sourcesContent":["/* Saint's Silly Extensions — Combined Styles */\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   POSSESSION STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Group Chat: Radio Button Toggle ── */\n\n.possession_radio_wrapper {\n    display: inline-flex;\n    align-items: center;\n    margin-left: 4px;\n    cursor: pointer;\n}\n\n.possession_radio {\n    width: 16px;\n    height: 16px;\n    border-radius: 50%;\n    border: 2px solid var(--SmartThemeBorderColor, #555);\n    background: transparent;\n    cursor: pointer;\n    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;\n    position: relative;\n    flex-shrink: 0;\n}\n\n.possession_radio:hover {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.possession_radio.possession_active {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n    background: var(--SmartThemeQuoteColor, #e8a23a);\n    box-shadow: inset 0 0 0 3px var(--SmartThemeBlurTintColor, #1a1a2e);\n}\n\n/* ── Solo Chat: Possess Toggle Button ── */\n\n#possession_solo_btn {\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    cursor: pointer;\n    position: relative;\n}\n\n#possession_solo_btn:hover {\n    opacity: 1;\n}\n\n#possession_solo_btn.possession_active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n#possession_solo_btn.possession_active::after {\n    content: '';\n    position: absolute;\n    bottom: -2px;\n    left: 50%;\n    transform: translateX(-50%);\n    width: 6px;\n    height: 6px;\n    border-radius: 50%;\n    background-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Group member highlight when possessed ── */\n\n.group_member.possession_possessed {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n/* ── Possession Impersonate Button (Character Avatar) ── */\n\n#possession_impersonate_btn {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease;\n    padding: 2px;\n}\n\n#possession_impersonate_btn:hover {\n    opacity: 1;\n}\n\n.possession_impersonate_avatar {\n    width: 26px;\n    height: 26px;\n    border-radius: 50%;\n    object-fit: cover;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    transition: border-color 0.15s ease;\n}\n\n#possession_impersonate_btn:hover .possession_impersonate_avatar {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hide controls when extension is disabled ── */\n\n.possession_hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PHRASING STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Input Area Button (next to Send) ── */\n\n#phrasing_send_button {\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    padding: 3px;\n    font-size: 1.2em;\n}\n\n#phrasing_send_button:hover {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hamburger Menu Item ── */\n\n#phrasing_menu_button {\n    cursor: pointer;\n}\n\n#phrasing_menu_button .fa-solid {\n    margin-right: 5px;\n    width: 1em;\n    text-align: center;\n}\n\n/* ── Hide buttons during generation ── */\n\n.phrasing-hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SETTINGS PANEL STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .inline-drawer-content {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n    padding: 8px 0;\n}\n\n#saints_silly_settings .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_section_header {\n    margin: 4px 0 2px 0;\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_divider {\n    border: none;\n    border-top: 1px solid var(--SmartThemeBorderColor, #555);\n    margin: 8px 0;\n}\n\n#saints_silly_settings .phrasing_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #phrasing_prompt_textarea {\n    width: 100%;\n    min-height: 120px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .acc-schema-selector {\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc-schema-buttons {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc-schema-buttons .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC MODAL STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#acc_modal_overlay {\n    position: fixed;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    background: rgba(0, 0, 0, 0.6);\n    z-index: 10000;\n}\n\n#acc_modal {\n    position: fixed;\n    top: 5vh;\n    left: 50%;\n    transform: translateX(-50%);\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 8px;\n    width: 90%;\n    max-width: 700px;\n    height: 90vh;\n    display: flex;\n    flex-direction: column;\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);\n    z-index: 10001;\n}\n\n#acc_modal .acc-modal-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    padding: 12px 16px;\n    border-bottom: 1px solid var(--SmartThemeBorderColor, #555);\n    flex-shrink: 0;\n}\n\n#acc_modal .acc-modal-header h3 {\n    margin: 0;\n    font-size: 1.1em;\n}\n\n.acc-close-btn {\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease;\n    font-size: 1.2em;\n    padding: 4px 8px;\n}\n\n.acc-close-btn:hover {\n    opacity: 1;\n}\n\n#acc_modal .acc-modal-body {\n    padding: 16px;\n    overflow-y: auto !important;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.acc-brief-section {\n    margin-bottom: 16px;\n}\n\n.acc-brief-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.acc-status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    background: var(--SmartThemeBodyColor, #222);\n    border-radius: 4px;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 0.9em;\n}\n\n.acc-fields-container {\n    display: flex;\n    flex-direction: column;\n    gap: 12px;\n}\n\n.acc-field-group {\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n}\n\n.acc-field-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n}\n\n.acc-field-label {\n    font-weight: bold;\n    font-size: 0.9em;\n}\n\n.acc-field-controls {\n    display: flex;\n    align-items: center;\n    gap: 10px;\n    flex-shrink: 0;\n}\n\n.acc-prose-toggle {\n    display: flex;\n    align-items: center;\n    gap: 4px;\n    font-size: 0.8em;\n    cursor: pointer;\n    opacity: 0.7;\n}\n\n.acc-prose-toggle:hover {\n    opacity: 1;\n}\n\n.acc-prose-label {\n    user-select: none;\n}\n\n.acc-token-label {\n    display: flex;\n    align-items: center;\n    gap: 4px;\n    font-size: 0.8em;\n    opacity: 0.7;\n}\n\n.acc-token-input {\n    width: 60px !important;\n    padding: 2px 4px !important;\n    font-size: 0.85em !important;\n    text-align: center;\n    pointer-events: auto;\n    opacity: 1;\n}\n\n.acc-input-wrap {\n    width: 100%;\n}\n\n.acc-field-input {\n    width: 100%;\n    resize: vertical;\n}\n\n.acc-field-input[disabled] {\n    opacity: 0.5;\n    cursor: not-allowed;\n}\n\n.acc-field-buttons {\n    display: flex;\n    gap: 4px;\n    flex-shrink: 0;\n    align-items: center;\n}\n\n.acc-btn {\n    width: 32px;\n    height: 32px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    font-size: 0.85em;\n    padding: 0;\n    cursor: pointer;\n}\n\n.acc-btn.acc-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.acc-btn-assist {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.acc-hidden {\n    display: none !important;\n}\n\n#acc_modal .acc-modal-footer {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    padding: 12px 16px;\n    border-top: 1px solid var(--SmartThemeBorderColor, #555);\n    gap: 8px;\n    flex-shrink: 0;\n}\n\n.acc-footer-right {\n    display: flex;\n    gap: 8px;\n}\n\n.acc-yolo-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.acc-yolo-btn.acc-disabled,\n.acc-done-btn.acc-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.acc-reverse-btn {\n    margin-bottom: 12px;\n}\n\n/* ACC Launch button in character creator */\n#acc_launch_btn {\n    display: flex;\n    align-items: center;\n    gap: 4px;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   WORLD INFO ASSIST STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Settings panel */\n#saints_silly_settings .wia_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #wia_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* Per-entry assist controls injected into each WI entry form */\n.wia-controls {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    flex-wrap: wrap;\n    margin: 6px 0 6px 0;\n}\n\n.wia-controls .wia-btn {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    cursor: pointer;\n    font-size: 0.85em;\n    padding: 4px 8px;\n}\n\n.wia-controls .wia-btn-assist {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.wia-controls .wia-btn-label {\n    font-weight: 500;\n}\n\n.wia-controls .wia-spinner {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 1em;\n    display: inline-flex;\n    align-items: center;\n    padding: 4px 6px;\n}\n\n.wia-controls .wia-hidden {\n    display: none !important;\n}\n"],"sourceRoot":""}]);
+
+/* Use Chat Context checkbox */
+.wia-controls .wia-context-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.85em;
+    cursor: pointer;
+    opacity: 0.85;
+    user-select: none;
+}
+
+.wia-controls .wia-context-toggle:hover {
+    opacity: 1;
+}
+
+/* Lore book multi-select picker (per-entry) */
+.wia-controls .wia-lorebook-picker {
+    position: relative;
+    font-size: 0.85em;
+}
+
+.wia-controls .wia-lorebook-picker > summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 4px 8px;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0.85;
+}
+
+.wia-controls .wia-lorebook-picker > summary::-webkit-details-marker {
+    display: none;
+}
+
+.wia-controls .wia-lorebook-picker > summary:hover {
+    opacity: 1;
+}
+
+.wia-controls .wia-lorebook-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 2px;
+    z-index: 50;
+    min-width: 220px;
+    max-height: 240px;
+    overflow-y: auto;
+    background: var(--SmartThemeBlurTintColor, #1a1a2e);
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 4px;
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.wia-controls .wia-lorebook-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.wia-controls .wia-lorebook-empty {
+    opacity: 0.6;
+    font-style: italic;
+}
+
+/* ── ACC modal: context preamble controls ── */
+
+.acc-context-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    padding: 8px 10px;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 4px;
+}
+
+.acc-context-section .checkbox_label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9em;
+    cursor: pointer;
+}
+
+.acc-lorebook-picker {
+    position: relative;
+    font-size: 0.9em;
+}
+
+.acc-lorebook-picker > summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 4px 8px;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0.85;
+}
+
+.acc-lorebook-picker > summary::-webkit-details-marker {
+    display: none;
+}
+
+.acc-lorebook-picker > summary:hover {
+    opacity: 1;
+}
+
+.acc-lorebook-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 2px;
+    z-index: 10002;
+    min-width: 240px;
+    max-height: 260px;
+    overflow-y: auto;
+    background: var(--SmartThemeBlurTintColor, #1a1a2e);
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 4px;
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.acc-lorebook-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.acc-lorebook-empty {
+    opacity: 0.6;
+    font-style: italic;
+}
+`, "",{"version":3,"sources":["webpack://./src/style.css"],"names":[],"mappings":"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","sourcesContent":["/* Saint's Silly Extensions — Combined Styles */\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   POSSESSION STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Group Chat: Radio Button Toggle ── */\n\n.possession_radio_wrapper {\n    display: inline-flex;\n    align-items: center;\n    margin-left: 4px;\n    cursor: pointer;\n}\n\n.possession_radio {\n    width: 16px;\n    height: 16px;\n    border-radius: 50%;\n    border: 2px solid var(--SmartThemeBorderColor, #555);\n    background: transparent;\n    cursor: pointer;\n    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;\n    position: relative;\n    flex-shrink: 0;\n}\n\n.possession_radio:hover {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.possession_radio.possession_active {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n    background: var(--SmartThemeQuoteColor, #e8a23a);\n    box-shadow: inset 0 0 0 3px var(--SmartThemeBlurTintColor, #1a1a2e);\n}\n\n/* ── Solo Chat: Possess Toggle Button ── */\n\n#possession_solo_btn {\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    cursor: pointer;\n    position: relative;\n}\n\n#possession_solo_btn:hover {\n    opacity: 1;\n}\n\n#possession_solo_btn.possession_active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n#possession_solo_btn.possession_active::after {\n    content: '';\n    position: absolute;\n    bottom: -2px;\n    left: 50%;\n    transform: translateX(-50%);\n    width: 6px;\n    height: 6px;\n    border-radius: 50%;\n    background-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Group member highlight when possessed ── */\n\n.group_member.possession_possessed {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n/* ── Possession Impersonate Button (Character Avatar) ── */\n\n#possession_impersonate_btn {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease;\n    padding: 2px;\n}\n\n#possession_impersonate_btn:hover {\n    opacity: 1;\n}\n\n.possession_impersonate_avatar {\n    width: 26px;\n    height: 26px;\n    border-radius: 50%;\n    object-fit: cover;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    transition: border-color 0.15s ease;\n}\n\n#possession_impersonate_btn:hover .possession_impersonate_avatar {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hide controls when extension is disabled ── */\n\n.possession_hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PHRASING STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Input Area Button (next to Send) ── */\n\n#phrasing_send_button {\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    padding: 3px;\n    font-size: 1.2em;\n}\n\n#phrasing_send_button:hover {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hamburger Menu Item ── */\n\n#phrasing_menu_button {\n    cursor: pointer;\n}\n\n#phrasing_menu_button .fa-solid {\n    margin-right: 5px;\n    width: 1em;\n    text-align: center;\n}\n\n/* ── Hide buttons during generation ── */\n\n.phrasing-hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SETTINGS PANEL STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .inline-drawer-content {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n    padding: 8px 0;\n}\n\n#saints_silly_settings .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_section_header {\n    margin: 4px 0 2px 0;\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_divider {\n    border: none;\n    border-top: 1px solid var(--SmartThemeBorderColor, #555);\n    margin: 8px 0;\n}\n\n#saints_silly_settings .phrasing_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #phrasing_prompt_textarea {\n    width: 100%;\n    min-height: 120px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .acc-schema-selector {\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc-schema-buttons {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc-schema-buttons .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC MODAL STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#acc_modal_overlay {\n    position: fixed;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    background: rgba(0, 0, 0, 0.6);\n    z-index: 10000;\n}\n\n#acc_modal {\n    position: fixed;\n    top: 5vh;\n    left: 50%;\n    transform: translateX(-50%);\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 8px;\n    width: 90%;\n    max-width: 700px;\n    height: 90vh;\n    display: flex;\n    flex-direction: column;\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);\n    z-index: 10001;\n}\n\n#acc_modal .acc-modal-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    padding: 12px 16px;\n    border-bottom: 1px solid var(--SmartThemeBorderColor, #555);\n    flex-shrink: 0;\n}\n\n#acc_modal .acc-modal-header h3 {\n    margin: 0;\n    font-size: 1.1em;\n}\n\n.acc-close-btn {\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease;\n    font-size: 1.2em;\n    padding: 4px 8px;\n}\n\n.acc-close-btn:hover {\n    opacity: 1;\n}\n\n#acc_modal .acc-modal-body {\n    padding: 16px;\n    overflow-y: auto !important;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.acc-brief-section {\n    margin-bottom: 16px;\n}\n\n.acc-brief-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.acc-status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    background: var(--SmartThemeBodyColor, #222);\n    border-radius: 4px;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 0.9em;\n}\n\n.acc-fields-container {\n    display: flex;\n    flex-direction: column;\n    gap: 12px;\n}\n\n.acc-field-group {\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n}\n\n.acc-field-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n}\n\n.acc-field-label {\n    font-weight: bold;\n    font-size: 0.9em;\n}\n\n.acc-field-controls {\n    display: flex;\n    align-items: center;\n    gap: 10px;\n    flex-shrink: 0;\n}\n\n.acc-prose-toggle {\n    display: flex;\n    align-items: center;\n    gap: 4px;\n    font-size: 0.8em;\n    cursor: pointer;\n    opacity: 0.7;\n}\n\n.acc-prose-toggle:hover {\n    opacity: 1;\n}\n\n.acc-prose-label {\n    user-select: none;\n}\n\n.acc-token-label {\n    display: flex;\n    align-items: center;\n    gap: 4px;\n    font-size: 0.8em;\n    opacity: 0.7;\n}\n\n.acc-token-input {\n    width: 60px !important;\n    padding: 2px 4px !important;\n    font-size: 0.85em !important;\n    text-align: center;\n    pointer-events: auto;\n    opacity: 1;\n}\n\n.acc-input-wrap {\n    width: 100%;\n}\n\n.acc-field-input {\n    width: 100%;\n    resize: vertical;\n}\n\n.acc-field-input[disabled] {\n    opacity: 0.5;\n    cursor: not-allowed;\n}\n\n.acc-field-buttons {\n    display: flex;\n    gap: 4px;\n    flex-shrink: 0;\n    align-items: center;\n}\n\n.acc-btn {\n    width: 32px;\n    height: 32px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    font-size: 0.85em;\n    padding: 0;\n    cursor: pointer;\n}\n\n.acc-btn.acc-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.acc-btn-assist {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.acc-hidden {\n    display: none !important;\n}\n\n#acc_modal .acc-modal-footer {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    padding: 12px 16px;\n    border-top: 1px solid var(--SmartThemeBorderColor, #555);\n    gap: 8px;\n    flex-shrink: 0;\n}\n\n.acc-footer-right {\n    display: flex;\n    gap: 8px;\n}\n\n.acc-yolo-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.acc-yolo-btn.acc-disabled,\n.acc-done-btn.acc-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.acc-reverse-btn {\n    margin-bottom: 12px;\n}\n\n/* ACC Launch button in character creator */\n#acc_launch_btn {\n    display: flex;\n    align-items: center;\n    gap: 4px;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   WORLD INFO ASSIST STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Settings panel */\n#saints_silly_settings .wia_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #wia_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* Per-entry assist controls injected into each WI entry form */\n.wia-controls {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    flex-wrap: wrap;\n    margin: 6px 0 6px 0;\n}\n\n.wia-controls .wia-btn {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    cursor: pointer;\n    font-size: 0.85em;\n    padding: 4px 8px;\n}\n\n.wia-controls .wia-btn-assist {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.wia-controls .wia-btn-label {\n    font-weight: 500;\n}\n\n.wia-controls .wia-spinner {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 1em;\n    display: inline-flex;\n    align-items: center;\n    padding: 4px 6px;\n}\n\n.wia-controls .wia-hidden {\n    display: none !important;\n}\n\n/* Use Chat Context checkbox */\n.wia-controls .wia-context-toggle {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    font-size: 0.85em;\n    cursor: pointer;\n    opacity: 0.85;\n    user-select: none;\n}\n\n.wia-controls .wia-context-toggle:hover {\n    opacity: 1;\n}\n\n/* Lore book multi-select picker (per-entry) */\n.wia-controls .wia-lorebook-picker {\n    position: relative;\n    font-size: 0.85em;\n}\n\n.wia-controls .wia-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.wia-controls .wia-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.wia-controls .wia-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.wia-controls .wia-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 50;\n    min-width: 220px;\n    max-height: 240px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);\n}\n\n.wia-controls .wia-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.wia-controls .wia-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* ── ACC modal: context preamble controls ── */\n\n.acc-context-section {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: wrap;\n    margin-bottom: 12px;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.acc-context-section .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.9em;\n    cursor: pointer;\n}\n\n.acc-lorebook-picker {\n    position: relative;\n    font-size: 0.9em;\n}\n\n.acc-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.acc-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.acc-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.acc-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 10002;\n    min-width: 240px;\n    max-height: 260px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\n}\n\n.acc-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.acc-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -7819,6 +7969,8 @@ var update = injectStylesIntoStyleTag_default()(style/* default */.A, options);
 var code = `<div id="saints_silly_settings" class="extension_settings"> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Saint's Silly Extensions</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content"> <h4 class="saints_section_header"> <span class="fa-solid fa-ghost"></span> Possession </h4> <label class="checkbox_label"> <input id="possession_enabled" type="checkbox"/> <span>Enable Possession</span> </label> <label class="checkbox_label"> <input id="possession_show_toast" type="checkbox"/> <span>Show Toast on Possess/Unpossess</span> </label> <label class="checkbox_label"> <input id="possession_debug_mode" type="checkbox"/> <span>Possession Debug Mode</span> </label> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-pen-fancy"></span> Phrasing! </h4> <label class="checkbox_label"> <input id="phrasing_enabled" type="checkbox" checked="checked"/> <span>Enable Phrasing!</span> </label> <label class="checkbox_label"> <input id="phrasing_debug_mode" type="checkbox"/> <span>Phrasing Debug Mode</span> </label> <div class="phrasing_prompt_section"> <label for="phrasing_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="phrasing_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Phrasing! prompt template..."></textarea> </div> <div class="phrasing_buttons_row"> <div class="menu_button" id="phrasing_restore_default"> <span class="fa-solid fa-rotate-left"></span> Restore Default </div> <div class="menu_button" id="phrasing_save_to_chat"> <span class="fa-solid fa-floppy-disk"></span> Save to Chat </div> </div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-wand-magic-sparkles"></span> Assisted Character Creation </h4> <label class="checkbox_label"> <input id="acc_enabled" type="checkbox"/> <span>Enable Assisted Character Creation</span> </label> <label class="checkbox_label"> <input id="acc_debug_mode" type="checkbox"/> <span>ACC Debug Mode</span> </label> <div class="acc-schema-selector"> <label for="acc_schema_select"><b>Active Schema:</b></label> <select id="acc_schema_select" class="text_pole"></select> </div> <div class="acc-schema-buttons"> <div class="menu_button" id="acc_import_schema"> <span class="fa-solid fa-file-import"></span> Import Schema </div> <div class="menu_button" id="acc_export_schema"> <span class="fa-solid fa-file-export"></span> Export Schema </div> <div class="menu_button" id="acc_delete_schema"> <span class="fa-solid fa-trash"></span> Delete Schema </div> </div> <input type="file" id="acc_schema_file_input" accept=".json" style="display:none"/> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-book-atlas"></span> World Info Assist </h4> <label class="checkbox_label"> <input id="wia_enabled" type="checkbox"/> <span>Enable World Info Assist</span> </label> <label class="checkbox_label"> <input id="wia_debug_mode" type="checkbox"/> <span>WI Assist Debug Mode</span> </label> <div class="wia_prompt_section"> <label for="wia_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="wia_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your World Info Assist prompt template..."></textarea> </div> <div class="wia_buttons_row"> <div class="menu_button" id="wia_restore_default"> <span class="fa-solid fa-rotate-left"></span> Restore Default </div> </div> </div> </div> </div> `;
 // Exports
 /* harmony default export */ const settings = (code);
+;// external "../../../../world-info.js"
+
 ;// ./src/utils.js
 /**
  * Shared utilities for SillyTavern extensions.
@@ -7830,7 +7982,10 @@ var code = `<div id="saints_silly_settings" class="extension_settings"> <div cla
  *   - Settings persistence
  *   - Message-editing helpers
  *   - Generation lifecycle helpers
+ *   - Generation context preamble (chat + lore books)
  */
+
+
 
 // ─── Context ───
 
@@ -7985,6 +8140,166 @@ function waitForGenerationEnd(timeoutMs = 5 * 60 * 1000) {
             eventSource.on(eventTypes.GENERATION_STOPPED, onEnd);
         }
     });
+}
+
+// ─── Generation Context Preamble ───
+
+/**
+ * Collect every "active" character for the current chat.
+ *
+ * In a solo chat this is just the selected character (`ctx.characterId`).
+ * In a group chat this is every enabled member of the group, resolved by
+ * avatar (which is the unique on-disk filename — character `name` fields can
+ * collide). When two members share the same display name we disambiguate them
+ * with a `#N` suffix so the LLM can tell them apart.
+ *
+ * @param {object} ctx - SillyTavern context object.
+ * @returns {Array<{ displayName: string, char: object }>}
+ */
+function collectActiveCharacters(ctx) {
+    const characters = Array.isArray(ctx.characters) ? ctx.characters : [];
+    const results = [];
+    const seenAvatars = new Set();
+
+    const pushChar = (char) => {
+        if (!char || seenAvatars.has(char.avatar)) return;
+        seenAvatars.add(char.avatar);
+        results.push({ displayName: char.name || '', char });
+    };
+
+    // Group chat: walk enabled members.
+    const groupId = ctx.groupId;
+    if (groupId && Array.isArray(ctx.groups)) {
+        const group = ctx.groups.find(g => g.id == groupId);
+        if (group && Array.isArray(group.members)) {
+            const disabled = Array.isArray(group.disabled_members) ? group.disabled_members : [];
+            for (const avatar of group.members) {
+                if (disabled.includes(avatar)) continue;
+                const char = characters.find(c => c.avatar === avatar);
+                if (char) pushChar(char);
+            }
+        }
+    }
+
+    // Solo chat fallback (also covers groups where no member resolved).
+    if (!results.length) {
+        const char = characters[ctx.characterId];
+        if (char) pushChar(char);
+    }
+
+    // Disambiguate duplicate display names. Avatar filenames are unique on
+    // disk, but two characters in a group can share a `name`, so append a
+    // running counter to the second-and-later occurrences.
+    const nameCounts = new Map();
+    for (const entry of results) {
+        const base = entry.displayName || '(unnamed)';
+        const seen = nameCounts.get(base) || 0;
+        if (seen > 0) {
+            entry.displayName = `${base} #${seen + 1}`;
+        }
+        nameCounts.set(base, seen + 1);
+    }
+
+    return results;
+}
+
+/**
+ * Returns the list of available World Info / lore book names known to ST.
+ * Always returns a fresh array; safe to mutate.
+ *
+ * @returns {string[]}
+ */
+function getAvailableLoreBookNames() {
+    if (Array.isArray(__WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_world_names__) && __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_world_names__.length) {
+        return __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_world_names__.slice();
+    }
+    // DOM fallback in case the host export is unavailable for some reason.
+    const selector = document.getElementById('world_info');
+    if (selector) {
+        return Array.from(selector.options)
+            .map(o => (o.textContent || '').trim())
+            .filter(Boolean);
+    }
+    return [];
+}
+
+/**
+ * Build a context preamble string suitable for prepending to a generation
+ * prompt. Combines (optionally) the current chat / character / persona and
+ * the active entries of any selected lore books.
+ *
+ * @param {object} opts
+ * @param {boolean} [opts.includeChat=false] - Include character card, persona, and recent chat messages.
+ * @param {string[]} [opts.loreBookNames=[]] - Names of lore books whose enabled entries to include.
+ * @param {number}  [opts.chatMessageLimit=20] - Max recent chat messages to include.
+ * @returns {Promise<string>} The composed preamble, or '' if nothing was included.
+ */
+async function buildContextPreamble({
+    includeChat = false,
+    loreBookNames = [],
+    chatMessageLimit = 20,
+} = {}) {
+    const sections = [];
+
+    if (includeChat) {
+        const ctx = getContext();
+
+        // Resolve the active character(s). In a group chat we walk every
+        // enabled member; in a solo chat we just take the current character.
+        const activeChars = collectActiveCharacters(ctx);
+        for (const { displayName, char } of activeChars) {
+            const lines = [];
+            if (displayName) lines.push(`Name: ${displayName}`);
+            if (char.description) lines.push(`Description: ${char.description}`);
+            if (char.personality) lines.push(`Personality: ${char.personality}`);
+            if (char.scenario) lines.push(`Scenario: ${char.scenario}`);
+            if (lines.length) {
+                const header = displayName ? `[Character — ${displayName}]` : '[Character]';
+                sections.push(`${header}\n${lines.join('\n')}`);
+            }
+        }
+
+        // User persona
+        const persona = ctx.powerUserSettings?.persona_description?.trim();
+        if (persona) sections.push(`[User Persona]\n${persona}`);
+
+        // Recent chat messages
+        const chat = Array.isArray(ctx.chat) ? ctx.chat : [];
+        if (chat.length) {
+            const recent = chat.slice(-chatMessageLimit);
+            const lines = recent.map(m => {
+                const who = m.name || (m.is_user ? (ctx.name1 || 'User') : (ctx.name2 || 'Character'));
+                const text = (m.mes || '').trim();
+                return text ? `${who}: ${text}` : '';
+            }).filter(Boolean);
+            if (lines.length) sections.push(`[Recent Chat]\n${lines.join('\n')}`);
+        }
+    }
+
+    if (Array.isArray(loreBookNames) && loreBookNames.length) {
+        for (const name of loreBookNames) {
+            if (!name) continue;
+            try {
+                const data = await __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_loadWorldInfo__(name);
+                if (!data?.entries) continue;
+                const entries = Object.values(data.entries)
+                    .filter(e => e && !e.disable && (e.content || '').trim())
+                    .map(e => {
+                        const label = (e.comment && e.comment.trim())
+                            || (Array.isArray(e.key) ? e.key.join(', ') : '');
+                        const content = e.content.trim();
+                        return label ? `- ${label}: ${content}` : `- ${content}`;
+                    });
+                if (entries.length) {
+                    sections.push(`[Lore Book: ${name}]\n${entries.join('\n')}`);
+                }
+            } catch (err) {
+                console.error(`Saints-Silly-Extensions: failed to load lore book "${name}":`, err);
+            }
+        }
+    }
+
+    return sections.join('\n\n');
 }
 
 ;// external "../../../../group-chats.js"
@@ -9854,6 +10169,17 @@ function openModal() {
         document.getElementById('acc_reverse_map_btn')?.addEventListener('click', handleReverseMap);
     }
 
+    // Lore book picker — update the summary count as books are toggled.
+    const updateLoreBookSummary = () => {
+        const label = document.getElementById('acc_lorebook_summary_label');
+        if (!label) return;
+        const checked = document.querySelectorAll('#acc_lorebook_list .acc-lorebook-cb:checked').length;
+        label.textContent = checked > 0 ? `Lore Books (${checked})` : 'Lore Books';
+    };
+    document.querySelectorAll('#acc_lorebook_list .acc-lorebook-cb').forEach(cb => {
+        cb.addEventListener('change', updateLoreBookSummary);
+    });
+
     // Wire per-field buttons
     for (const [key] of getOrderedFields(currentSchema)) {
         const assistBtn = document.getElementById(`acc_assist_${key}`);
@@ -9946,6 +10272,16 @@ function buildModalHTML(schema, existingDesc) {
         ? '<div id="acc_reverse_map_btn" class="menu_button interactable acc-reverse-btn"><span class="fa-solid fa-file-import"></span> Import from Existing</div>'
         : '';
 
+    const loreBookNames = getAvailableLoreBookNames();
+    const loreBookOptions = loreBookNames.length
+        ? loreBookNames.map(n => `
+            <label class="acc-lorebook-item checkbox_label">
+                <input type="checkbox" class="acc-lorebook-cb" value="${escapeAttr(n)}" />
+                <span>${escapeHTML(n)}</span>
+            </label>
+        `).join('')
+        : '<div class="acc-lorebook-empty">No lore books available.</div>';
+
     return `
         <div id="acc_modal" class="acc-modal">
             <div class="acc-modal-header">
@@ -9953,6 +10289,16 @@ function buildModalHTML(schema, existingDesc) {
                 <div id="acc_close_btn" class="acc-close-btn interactable"><span class="fa-solid fa-xmark"></span></div>
             </div>
             <div class="acc-modal-body">
+                <div class="acc-context-section">
+                    <label class="checkbox_label" title="Prepend the current chat / character context to every per-field generation">
+                        <input id="acc_use_chat_context" type="checkbox" />
+                        <span>Use Chat Context</span>
+                    </label>
+                    <details class="acc-lorebook-picker" title="Prepend active entries from the selected lore books">
+                        <summary><span class="fa-solid fa-book"></span> <span id="acc_lorebook_summary_label">Lore Books</span></summary>
+                        <div id="acc_lorebook_list" class="acc-lorebook-list">${loreBookOptions}</div>
+                    </details>
+                </div>
                 ${reverseMapBtn}
                 <div class="acc-brief-section">
                     <label for="acc_character_brief"><b>Character Brief:</b></label>
@@ -10019,7 +10365,8 @@ async function onAssistClick(fieldKey) {
 
     try {
         const brief = document.getElementById('acc_character_brief')?.value || '';
-        const result = await generateFieldValue(fieldKey, currentSchema, fieldStates, brief, isContinue);
+        const ctxOptions = readModalContextOptions();
+        const result = await generateFieldValue(fieldKey, currentSchema, fieldStates, brief, isContinue, ctxOptions);
 
         if (abortRequested) {
             assisted_character_creation_debug(`Generation for ${fieldKey} aborted, discarding result`);
@@ -10083,25 +10430,47 @@ function onResetClick(fieldKey) {
 
 // ─── LLM Generation ───
 
-async function generateFieldValue(fieldKey, schema, states, characterBrief, isContinue = false) {
+/**
+ * Read the modal-level "Use Chat Context" + selected lore books picker.
+ * @returns {{ includeChat: boolean, loreBookNames: string[] }}
+ */
+function readModalContextOptions() {
+    const includeChat = !!document.getElementById('acc_use_chat_context')?.checked;
+    const loreBookNames = Array.from(
+        document.querySelectorAll('#acc_lorebook_list .acc-lorebook-cb:checked'),
+    ).map(el => el.value);
+    return { includeChat, loreBookNames };
+}
+
+async function generateFieldValue(fieldKey, schema, states, characterBrief, isContinue = false, ctxOptions = null) {
     const field = schema.fields[fieldKey];
     const state = states[fieldKey];
     const isProse = state.prose;
     const responseLength = state.tokenOverride || field.responseLength || 200;
     const filledFields = buildFilledFieldsSummary(schema, states, fieldKey);
 
+    // Optional preamble assembled from chat / character / lore books.
+    let preambleBlock = '';
+    if (ctxOptions && (ctxOptions.includeChat || (ctxOptions.loreBookNames && ctxOptions.loreBookNames.length))) {
+        const preamble = await buildContextPreamble(ctxOptions);
+        if (preamble) {
+            preambleBlock = `Existing context to consider when generating (do not repeat verbatim):\n${preamble}\n\n`;
+            assisted_character_creation_debug(`[${fieldKey}] Context preamble length:`, preamble.length);
+        }
+    }
+
     let prompt;
     if (isContinue) {
         // Continue mode: ask to continue from where it left off
         const existingText = state.currentValue || '';
-        prompt = `Continue writing the "${field.label}" field for this character. Pick up exactly where the text left off.\n\nCharacter Brief:\n${characterBrief || '(no brief provided)'}\n\nOther fields already defined:\n${filledFields || '(none yet)'}\n\nText so far:\n${existingText}\n\nContinue:`;
+        prompt = `${preambleBlock}Continue writing the "${field.label}" field for this character. Pick up exactly where the text left off.\n\nCharacter Brief:\n${characterBrief || '(no brief provided)'}\n\nOther fields already defined:\n${filledFields || '(none yet)'}\n\nText so far:\n${existingText}\n\nContinue:`;
     } else {
         const seedText = state.currentValue || '';
         prompt = field.prompt
             .replace(/\{\{seedText\}\}/g, seedText || '(no user input)')
             .replace(/\{\{context\}\}/g, characterBrief || '(no brief provided)')
             .replace(/\{\{filledFields\}\}/g, filledFields || '(none yet)');
-        prompt += `\n\nRespond with only the value for "${field.label}":`;
+        prompt = `${preambleBlock}${prompt}\n\nRespond with only the value for "${field.label}":`;
     }
 
     const styleInstruction = isProse
@@ -10580,6 +10949,14 @@ function injectControls(formEl) {
             <span class="fa-solid fa-wand-magic-sparkles"></span>
             <span class="wia-btn-label">Assist</span>
         </div>
+        <label class="wia-context-toggle checkbox_label" title="Prepend the current chat / character context to the generation prompt">
+            <input type="checkbox" class="wia-context-cb" />
+            <span>Use Chat Context</span>
+        </label>
+        <details class="wia-lorebook-picker" title="Prepend active entries from the selected lore books">
+            <summary><span class="fa-solid fa-book"></span> <span class="wia-lorebook-summary-label">Lore Books</span></summary>
+            <div class="wia-lorebook-list"></div>
+        </details>
         <div class="wia-btn wia-btn-continue menu_button interactable wia-hidden" title="Continue generation from where it left off">
             <span class="fa-solid fa-arrow-right"></span>
         </div>
@@ -10606,7 +10983,73 @@ function injectControls(formEl) {
     retryBtn.addEventListener('click', () => onRetry(formEl, id));
     revertBtn.addEventListener('click', () => onRevert(formEl, id));
 
+    populateLoreBookPicker(controls);
+
     world_info_assist_debug('Injected controls for entry', id);
+}
+
+/**
+ * Fill the lore book picker with one checkbox per known book and wire up the
+ * summary label so it reflects the current selection count.
+ */
+function populateLoreBookPicker(controls) {
+    const picker = controls.querySelector('.wia-lorebook-picker');
+    const list = controls.querySelector('.wia-lorebook-list');
+    const summaryLabel = controls.querySelector('.wia-lorebook-summary-label');
+    if (!picker || !list || !summaryLabel) return;
+
+    const updateSummary = () => {
+        const checked = list.querySelectorAll('input[type="checkbox"]:checked').length;
+        summaryLabel.textContent = checked > 0 ? `Lore Books (${checked})` : 'Lore Books';
+    };
+
+    const render = () => {
+        const names = getAvailableLoreBookNames();
+        const previouslyChecked = new Set(
+            Array.from(list.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value),
+        );
+        list.innerHTML = '';
+        if (!names.length) {
+            const empty = document.createElement('div');
+            empty.className = 'wia-lorebook-empty';
+            empty.textContent = 'No lore books available.';
+            list.appendChild(empty);
+            updateSummary();
+            return;
+        }
+        for (const name of names) {
+            const label = document.createElement('label');
+            label.className = 'wia-lorebook-item checkbox_label';
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.value = name;
+            if (previouslyChecked.has(name)) cb.checked = true;
+            cb.addEventListener('change', updateSummary);
+            const span = document.createElement('span');
+            span.textContent = name;
+            label.appendChild(cb);
+            label.appendChild(span);
+            list.appendChild(label);
+        }
+        updateSummary();
+    };
+
+    // Re-render on open so newly added/removed books appear without a reload.
+    picker.addEventListener('toggle', () => {
+        if (picker.open) render();
+    });
+
+    render();
+}
+
+function readContextOptions(controls) {
+    if (!controls) return { includeChat: false, loreBookNames: [] };
+    const cb = controls.querySelector('.wia-context-cb');
+    const includeChat = !!cb?.checked;
+    const loreBookNames = Array.from(
+        controls.querySelectorAll('.wia-lorebook-list input[type="checkbox"]:checked'),
+    ).map(el => el.value);
+    return { includeChat, loreBookNames };
 }
 
 // ─── Helpers ───
@@ -10684,12 +11127,24 @@ async function onAssist(formEl, id, isContinue) {
             ? world_info_assist_moduleSettings.wiaPrompt
             : DEFAULT_WIA_PROMPT;
 
+        // Optional preamble assembled from chat / character / lore books.
+        const controls = formEl.querySelector('.wia-controls');
+        const ctxOptions = readContextOptions(controls);
+        let preamble = '';
+        if (ctxOptions.includeChat || ctxOptions.loreBookNames.length) {
+            preamble = await buildContextPreamble(ctxOptions);
+            world_info_assist_debug('Context preamble length:', preamble.length, 'options:', ctxOptions);
+        }
+        const preambleBlock = preamble
+            ? `Existing context to consider when generating (do not repeat verbatim):\n${preamble}\n\n`
+            : '';
+
         let userPrompt;
         let prefill;
 
         if (isContinue) {
             userPrompt =
-                `${promptTemplate}\n\n` +
+                `${preambleBlock}${promptTemplate}\n\n` +
                 `Guidance from the user:\n${seed || '(none provided)'}\n\n` +
                 `The entry so far:\n${currentText}\n\n` +
                 'Continue exactly where the entry left off. Do not repeat any text. ' +
@@ -10697,7 +11152,7 @@ async function onAssist(formEl, id, isContinue) {
             prefill = '';
         } else {
             userPrompt =
-                `${promptTemplate}\n\n` +
+                `${preambleBlock}${promptTemplate}\n\n` +
                 `Guidance from the user:\n${seed || '(no specific guidance — invent a fitting entry)'}\n\n` +
                 (title
                     ? `Respond on one line with only the value for "${title}":`

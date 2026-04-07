@@ -8,7 +8,10 @@
  *   - Settings persistence
  *   - Message-editing helpers
  *   - Generation lifecycle helpers
+ *   - Generation context preamble (chat + lore books)
  */
+
+import { loadWorldInfo, world_names } from '../../../../world-info.js';
 
 // ─── Context ───
 
@@ -163,4 +166,164 @@ export function waitForGenerationEnd(timeoutMs = 5 * 60 * 1000) {
             eventSource.on(eventTypes.GENERATION_STOPPED, onEnd);
         }
     });
+}
+
+// ─── Generation Context Preamble ───
+
+/**
+ * Collect every "active" character for the current chat.
+ *
+ * In a solo chat this is just the selected character (`ctx.characterId`).
+ * In a group chat this is every enabled member of the group, resolved by
+ * avatar (which is the unique on-disk filename — character `name` fields can
+ * collide). When two members share the same display name we disambiguate them
+ * with a `#N` suffix so the LLM can tell them apart.
+ *
+ * @param {object} ctx - SillyTavern context object.
+ * @returns {Array<{ displayName: string, char: object }>}
+ */
+function collectActiveCharacters(ctx) {
+    const characters = Array.isArray(ctx.characters) ? ctx.characters : [];
+    const results = [];
+    const seenAvatars = new Set();
+
+    const pushChar = (char) => {
+        if (!char || seenAvatars.has(char.avatar)) return;
+        seenAvatars.add(char.avatar);
+        results.push({ displayName: char.name || '', char });
+    };
+
+    // Group chat: walk enabled members.
+    const groupId = ctx.groupId;
+    if (groupId && Array.isArray(ctx.groups)) {
+        const group = ctx.groups.find(g => g.id == groupId);
+        if (group && Array.isArray(group.members)) {
+            const disabled = Array.isArray(group.disabled_members) ? group.disabled_members : [];
+            for (const avatar of group.members) {
+                if (disabled.includes(avatar)) continue;
+                const char = characters.find(c => c.avatar === avatar);
+                if (char) pushChar(char);
+            }
+        }
+    }
+
+    // Solo chat fallback (also covers groups where no member resolved).
+    if (!results.length) {
+        const char = characters[ctx.characterId];
+        if (char) pushChar(char);
+    }
+
+    // Disambiguate duplicate display names. Avatar filenames are unique on
+    // disk, but two characters in a group can share a `name`, so append a
+    // running counter to the second-and-later occurrences.
+    const nameCounts = new Map();
+    for (const entry of results) {
+        const base = entry.displayName || '(unnamed)';
+        const seen = nameCounts.get(base) || 0;
+        if (seen > 0) {
+            entry.displayName = `${base} #${seen + 1}`;
+        }
+        nameCounts.set(base, seen + 1);
+    }
+
+    return results;
+}
+
+/**
+ * Returns the list of available World Info / lore book names known to ST.
+ * Always returns a fresh array; safe to mutate.
+ *
+ * @returns {string[]}
+ */
+export function getAvailableLoreBookNames() {
+    if (Array.isArray(world_names) && world_names.length) {
+        return world_names.slice();
+    }
+    // DOM fallback in case the host export is unavailable for some reason.
+    const selector = document.getElementById('world_info');
+    if (selector) {
+        return Array.from(selector.options)
+            .map(o => (o.textContent || '').trim())
+            .filter(Boolean);
+    }
+    return [];
+}
+
+/**
+ * Build a context preamble string suitable for prepending to a generation
+ * prompt. Combines (optionally) the current chat / character / persona and
+ * the active entries of any selected lore books.
+ *
+ * @param {object} opts
+ * @param {boolean} [opts.includeChat=false] - Include character card, persona, and recent chat messages.
+ * @param {string[]} [opts.loreBookNames=[]] - Names of lore books whose enabled entries to include.
+ * @param {number}  [opts.chatMessageLimit=20] - Max recent chat messages to include.
+ * @returns {Promise<string>} The composed preamble, or '' if nothing was included.
+ */
+export async function buildContextPreamble({
+    includeChat = false,
+    loreBookNames = [],
+    chatMessageLimit = 20,
+} = {}) {
+    const sections = [];
+
+    if (includeChat) {
+        const ctx = getContext();
+
+        // Resolve the active character(s). In a group chat we walk every
+        // enabled member; in a solo chat we just take the current character.
+        const activeChars = collectActiveCharacters(ctx);
+        for (const { displayName, char } of activeChars) {
+            const lines = [];
+            if (displayName) lines.push(`Name: ${displayName}`);
+            if (char.description) lines.push(`Description: ${char.description}`);
+            if (char.personality) lines.push(`Personality: ${char.personality}`);
+            if (char.scenario) lines.push(`Scenario: ${char.scenario}`);
+            if (lines.length) {
+                const header = displayName ? `[Character — ${displayName}]` : '[Character]';
+                sections.push(`${header}\n${lines.join('\n')}`);
+            }
+        }
+
+        // User persona
+        const persona = ctx.powerUserSettings?.persona_description?.trim();
+        if (persona) sections.push(`[User Persona]\n${persona}`);
+
+        // Recent chat messages
+        const chat = Array.isArray(ctx.chat) ? ctx.chat : [];
+        if (chat.length) {
+            const recent = chat.slice(-chatMessageLimit);
+            const lines = recent.map(m => {
+                const who = m.name || (m.is_user ? (ctx.name1 || 'User') : (ctx.name2 || 'Character'));
+                const text = (m.mes || '').trim();
+                return text ? `${who}: ${text}` : '';
+            }).filter(Boolean);
+            if (lines.length) sections.push(`[Recent Chat]\n${lines.join('\n')}`);
+        }
+    }
+
+    if (Array.isArray(loreBookNames) && loreBookNames.length) {
+        for (const name of loreBookNames) {
+            if (!name) continue;
+            try {
+                const data = await loadWorldInfo(name);
+                if (!data?.entries) continue;
+                const entries = Object.values(data.entries)
+                    .filter(e => e && !e.disable && (e.content || '').trim())
+                    .map(e => {
+                        const label = (e.comment && e.comment.trim())
+                            || (Array.isArray(e.key) ? e.key.join(', ') : '');
+                        const content = e.content.trim();
+                        return label ? `- ${label}: ${content}` : `- ${content}`;
+                    });
+                if (entries.length) {
+                    sections.push(`[Lore Book: ${name}]\n${entries.join('\n')}`);
+                }
+            } catch (err) {
+                console.error(`Saints-Silly-Extensions: failed to load lore book "${name}":`, err);
+            }
+        }
+    }
+
+    return sections.join('\n\n');
 }

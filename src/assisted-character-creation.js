@@ -7,7 +7,12 @@
 
 import { generateRaw } from '../../../../../script.js';
 import { removeReasoningFromString } from '../../../../reasoning.js';
-import { createDebugLogger, toast } from './utils.js';
+import {
+    createDebugLogger,
+    toast,
+    buildContextPreamble,
+    getAvailableLoreBookNames,
+} from './utils.js';
 import { DEFAULT_SCHEMA, validateSchema, getOrderedFields } from './default-character-schema.js';
 import { tryParseCharacterData } from './schema-validation.js';
 
@@ -275,6 +280,17 @@ function openModal() {
         document.getElementById('acc_reverse_map_btn')?.addEventListener('click', handleReverseMap);
     }
 
+    // Lore book picker — update the summary count as books are toggled.
+    const updateLoreBookSummary = () => {
+        const label = document.getElementById('acc_lorebook_summary_label');
+        if (!label) return;
+        const checked = document.querySelectorAll('#acc_lorebook_list .acc-lorebook-cb:checked').length;
+        label.textContent = checked > 0 ? `Lore Books (${checked})` : 'Lore Books';
+    };
+    document.querySelectorAll('#acc_lorebook_list .acc-lorebook-cb').forEach(cb => {
+        cb.addEventListener('change', updateLoreBookSummary);
+    });
+
     // Wire per-field buttons
     for (const [key] of getOrderedFields(currentSchema)) {
         const assistBtn = document.getElementById(`acc_assist_${key}`);
@@ -367,6 +383,16 @@ function buildModalHTML(schema, existingDesc) {
         ? '<div id="acc_reverse_map_btn" class="menu_button interactable acc-reverse-btn"><span class="fa-solid fa-file-import"></span> Import from Existing</div>'
         : '';
 
+    const loreBookNames = getAvailableLoreBookNames();
+    const loreBookOptions = loreBookNames.length
+        ? loreBookNames.map(n => `
+            <label class="acc-lorebook-item checkbox_label">
+                <input type="checkbox" class="acc-lorebook-cb" value="${escapeAttr(n)}" />
+                <span>${escapeHTML(n)}</span>
+            </label>
+        `).join('')
+        : '<div class="acc-lorebook-empty">No lore books available.</div>';
+
     return `
         <div id="acc_modal" class="acc-modal">
             <div class="acc-modal-header">
@@ -374,6 +400,16 @@ function buildModalHTML(schema, existingDesc) {
                 <div id="acc_close_btn" class="acc-close-btn interactable"><span class="fa-solid fa-xmark"></span></div>
             </div>
             <div class="acc-modal-body">
+                <div class="acc-context-section">
+                    <label class="checkbox_label" title="Prepend the current chat / character context to every per-field generation">
+                        <input id="acc_use_chat_context" type="checkbox" />
+                        <span>Use Chat Context</span>
+                    </label>
+                    <details class="acc-lorebook-picker" title="Prepend active entries from the selected lore books">
+                        <summary><span class="fa-solid fa-book"></span> <span id="acc_lorebook_summary_label">Lore Books</span></summary>
+                        <div id="acc_lorebook_list" class="acc-lorebook-list">${loreBookOptions}</div>
+                    </details>
+                </div>
                 ${reverseMapBtn}
                 <div class="acc-brief-section">
                     <label for="acc_character_brief"><b>Character Brief:</b></label>
@@ -440,7 +476,8 @@ async function onAssistClick(fieldKey) {
 
     try {
         const brief = document.getElementById('acc_character_brief')?.value || '';
-        const result = await generateFieldValue(fieldKey, currentSchema, fieldStates, brief, isContinue);
+        const ctxOptions = readModalContextOptions();
+        const result = await generateFieldValue(fieldKey, currentSchema, fieldStates, brief, isContinue, ctxOptions);
 
         if (abortRequested) {
             debug(`Generation for ${fieldKey} aborted, discarding result`);
@@ -504,25 +541,47 @@ function onResetClick(fieldKey) {
 
 // ─── LLM Generation ───
 
-async function generateFieldValue(fieldKey, schema, states, characterBrief, isContinue = false) {
+/**
+ * Read the modal-level "Use Chat Context" + selected lore books picker.
+ * @returns {{ includeChat: boolean, loreBookNames: string[] }}
+ */
+function readModalContextOptions() {
+    const includeChat = !!document.getElementById('acc_use_chat_context')?.checked;
+    const loreBookNames = Array.from(
+        document.querySelectorAll('#acc_lorebook_list .acc-lorebook-cb:checked'),
+    ).map(el => el.value);
+    return { includeChat, loreBookNames };
+}
+
+async function generateFieldValue(fieldKey, schema, states, characterBrief, isContinue = false, ctxOptions = null) {
     const field = schema.fields[fieldKey];
     const state = states[fieldKey];
     const isProse = state.prose;
     const responseLength = state.tokenOverride || field.responseLength || 200;
     const filledFields = buildFilledFieldsSummary(schema, states, fieldKey);
 
+    // Optional preamble assembled from chat / character / lore books.
+    let preambleBlock = '';
+    if (ctxOptions && (ctxOptions.includeChat || (ctxOptions.loreBookNames && ctxOptions.loreBookNames.length))) {
+        const preamble = await buildContextPreamble(ctxOptions);
+        if (preamble) {
+            preambleBlock = `Existing context to consider when generating (do not repeat verbatim):\n${preamble}\n\n`;
+            debug(`[${fieldKey}] Context preamble length:`, preamble.length);
+        }
+    }
+
     let prompt;
     if (isContinue) {
         // Continue mode: ask to continue from where it left off
         const existingText = state.currentValue || '';
-        prompt = `Continue writing the "${field.label}" field for this character. Pick up exactly where the text left off.\n\nCharacter Brief:\n${characterBrief || '(no brief provided)'}\n\nOther fields already defined:\n${filledFields || '(none yet)'}\n\nText so far:\n${existingText}\n\nContinue:`;
+        prompt = `${preambleBlock}Continue writing the "${field.label}" field for this character. Pick up exactly where the text left off.\n\nCharacter Brief:\n${characterBrief || '(no brief provided)'}\n\nOther fields already defined:\n${filledFields || '(none yet)'}\n\nText so far:\n${existingText}\n\nContinue:`;
     } else {
         const seedText = state.currentValue || '';
         prompt = field.prompt
             .replace(/\{\{seedText\}\}/g, seedText || '(no user input)')
             .replace(/\{\{context\}\}/g, characterBrief || '(no brief provided)')
             .replace(/\{\{filledFields\}\}/g, filledFields || '(none yet)');
-        prompt += `\n\nRespond with only the value for "${field.label}":`;
+        prompt = `${preambleBlock}${prompt}\n\nRespond with only the value for "${field.label}":`;
     }
 
     const styleInstruction = isProse
