@@ -10554,6 +10554,11 @@ function removeAllControls() {
 
 function injectControls(formEl) {
     if (!world_info_assist_moduleSettings?.wiaEnabled) return;
+    // Skip the hidden template element that SillyTavern clones from —
+    // otherwise the template ends up with baked-in .wia-controls markup
+    // that clones inherit without their click handlers, permanently
+    // blocking injection on every live entry.
+    if (formEl.closest('#entry_edit_template')) return;
     if (formEl.querySelector('.wia-controls')) return;
 
     const contentTextarea = formEl.querySelector('textarea[name="content"]');
