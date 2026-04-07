@@ -167,7 +167,11 @@ function getContentTextarea(formEl) {
 }
 
 function getTitle(formEl) {
-    const commentInput = formEl.querySelector('textarea[name="comment"]');
+    // The title field (textarea[name="comment"]) lives in the entry's
+    // inline-drawer header, which is a sibling of `.world_entry_edit` —
+    // not a descendant. Walk up to the enclosing form before querying.
+    const formRoot = formEl.closest('form.world_entry_form') || formEl.closest('form') || formEl;
+    const commentInput = formRoot.querySelector('textarea[name="comment"], input[name="comment"]');
     return commentInput?.value?.trim() || '';
 }
 
