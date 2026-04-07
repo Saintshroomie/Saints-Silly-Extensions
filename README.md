@@ -169,3 +169,5 @@ Open **Extensions** > **Saint's Silly Extensions** in SillyTavern's settings pan
 ## License
 
 [GNU General Public License v3.0](LICENSE)
+
+Have fun!
