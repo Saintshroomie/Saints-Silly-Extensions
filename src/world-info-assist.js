@@ -251,7 +251,7 @@ async function onAssist(formEl, id, isContinue) {
                 `${promptTemplate}\n\n` +
                 `Guidance from the user:\n${seed || '(no specific guidance — invent a fitting entry)'}\n\n` +
                 (title
-                    ? `The subject of this entry is titled: "${title}". Use this exact title in the bracketed output.`
+                    ? `Respond on one line with only the value for "${title}":`
                     : 'No title was provided — invent a fitting subject name.');
             prefill = title ? `[${title}: ` : '[';
         }
