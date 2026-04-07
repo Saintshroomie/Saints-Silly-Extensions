@@ -10,7 +10,12 @@
 
 import { generateRaw } from '../../../../../script.js';
 import { removeReasoningFromString } from '../../../../reasoning.js';
-import { createDebugLogger, toast } from './utils.js';
+import {
+    createDebugLogger,
+    toast,
+    buildContextPreamble,
+    getAvailableLoreBookNames,
+} from './utils.js';
 
 // ─── Default Prompt ───
 
@@ -131,6 +136,14 @@ function injectControls(formEl) {
             <span class="fa-solid fa-wand-magic-sparkles"></span>
             <span class="wia-btn-label">Assist</span>
         </div>
+        <label class="wia-context-toggle checkbox_label" title="Prepend the current chat / character context to the generation prompt">
+            <input type="checkbox" class="wia-context-cb" />
+            <span>Use Chat Context</span>
+        </label>
+        <details class="wia-lorebook-picker" title="Prepend active entries from the selected lore books">
+            <summary><span class="fa-solid fa-book"></span> <span class="wia-lorebook-summary-label">Lore Books</span></summary>
+            <div class="wia-lorebook-list"></div>
+        </details>
         <div class="wia-btn wia-btn-continue menu_button interactable wia-hidden" title="Continue generation from where it left off">
             <span class="fa-solid fa-arrow-right"></span>
         </div>
@@ -157,7 +170,73 @@ function injectControls(formEl) {
     retryBtn.addEventListener('click', () => onRetry(formEl, id));
     revertBtn.addEventListener('click', () => onRevert(formEl, id));
 
+    populateLoreBookPicker(controls);
+
     debug('Injected controls for entry', id);
+}
+
+/**
+ * Fill the lore book picker with one checkbox per known book and wire up the
+ * summary label so it reflects the current selection count.
+ */
+function populateLoreBookPicker(controls) {
+    const picker = controls.querySelector('.wia-lorebook-picker');
+    const list = controls.querySelector('.wia-lorebook-list');
+    const summaryLabel = controls.querySelector('.wia-lorebook-summary-label');
+    if (!picker || !list || !summaryLabel) return;
+
+    const updateSummary = () => {
+        const checked = list.querySelectorAll('input[type="checkbox"]:checked').length;
+        summaryLabel.textContent = checked > 0 ? `Lore Books (${checked})` : 'Lore Books';
+    };
+
+    const render = () => {
+        const names = getAvailableLoreBookNames();
+        const previouslyChecked = new Set(
+            Array.from(list.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value),
+        );
+        list.innerHTML = '';
+        if (!names.length) {
+            const empty = document.createElement('div');
+            empty.className = 'wia-lorebook-empty';
+            empty.textContent = 'No lore books available.';
+            list.appendChild(empty);
+            updateSummary();
+            return;
+        }
+        for (const name of names) {
+            const label = document.createElement('label');
+            label.className = 'wia-lorebook-item checkbox_label';
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.value = name;
+            if (previouslyChecked.has(name)) cb.checked = true;
+            cb.addEventListener('change', updateSummary);
+            const span = document.createElement('span');
+            span.textContent = name;
+            label.appendChild(cb);
+            label.appendChild(span);
+            list.appendChild(label);
+        }
+        updateSummary();
+    };
+
+    // Re-render on open so newly added/removed books appear without a reload.
+    picker.addEventListener('toggle', () => {
+        if (picker.open) render();
+    });
+
+    render();
+}
+
+function readContextOptions(controls) {
+    if (!controls) return { includeChat: false, loreBookNames: [] };
+    const cb = controls.querySelector('.wia-context-cb');
+    const includeChat = !!cb?.checked;
+    const loreBookNames = Array.from(
+        controls.querySelectorAll('.wia-lorebook-list input[type="checkbox"]:checked'),
+    ).map(el => el.value);
+    return { includeChat, loreBookNames };
 }
 
 // ─── Helpers ───
@@ -235,12 +314,24 @@ async function onAssist(formEl, id, isContinue) {
             ? moduleSettings.wiaPrompt
             : DEFAULT_WIA_PROMPT;
 
+        // Optional preamble assembled from chat / character / lore books.
+        const controls = formEl.querySelector('.wia-controls');
+        const ctxOptions = readContextOptions(controls);
+        let preamble = '';
+        if (ctxOptions.includeChat || ctxOptions.loreBookNames.length) {
+            preamble = await buildContextPreamble(ctxOptions);
+            debug('Context preamble length:', preamble.length, 'options:', ctxOptions);
+        }
+        const preambleBlock = preamble
+            ? `Existing context to consider when generating (do not repeat verbatim):\n${preamble}\n\n`
+            : '';
+
         let userPrompt;
         let prefill;
 
         if (isContinue) {
             userPrompt =
-                `${promptTemplate}\n\n` +
+                `${preambleBlock}${promptTemplate}\n\n` +
                 `Guidance from the user:\n${seed || '(none provided)'}\n\n` +
                 `The entry so far:\n${currentText}\n\n` +
                 'Continue exactly where the entry left off. Do not repeat any text. ' +
@@ -248,7 +339,7 @@ async function onAssist(formEl, id, isContinue) {
             prefill = '';
         } else {
             userPrompt =
-                `${promptTemplate}\n\n` +
+                `${preambleBlock}${promptTemplate}\n\n` +
                 `Guidance from the user:\n${seed || '(no specific guidance — invent a fitting entry)'}\n\n` +
                 (title
                     ? `Respond on one line with only the value for "${title}":`

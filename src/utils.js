@@ -8,7 +8,10 @@
  *   - Settings persistence
  *   - Message-editing helpers
  *   - Generation lifecycle helpers
+ *   - Generation context preamble (chat + lore books)
  */
+
+import { loadWorldInfo, world_names } from '../../../../world-info.js';
 
 // ─── Context ───
 
@@ -163,4 +166,101 @@ export function waitForGenerationEnd(timeoutMs = 5 * 60 * 1000) {
             eventSource.on(eventTypes.GENERATION_STOPPED, onEnd);
         }
     });
+}
+
+// ─── Generation Context Preamble ───
+
+/**
+ * Returns the list of available World Info / lore book names known to ST.
+ * Always returns a fresh array; safe to mutate.
+ *
+ * @returns {string[]}
+ */
+export function getAvailableLoreBookNames() {
+    if (Array.isArray(world_names) && world_names.length) {
+        return world_names.slice();
+    }
+    // DOM fallback in case the host export is unavailable for some reason.
+    const selector = document.getElementById('world_info');
+    if (selector) {
+        return Array.from(selector.options)
+            .map(o => (o.textContent || '').trim())
+            .filter(Boolean);
+    }
+    return [];
+}
+
+/**
+ * Build a context preamble string suitable for prepending to a generation
+ * prompt. Combines (optionally) the current chat / character / persona and
+ * the active entries of any selected lore books.
+ *
+ * @param {object} opts
+ * @param {boolean} [opts.includeChat=false] - Include character card, persona, and recent chat messages.
+ * @param {string[]} [opts.loreBookNames=[]] - Names of lore books whose enabled entries to include.
+ * @param {number}  [opts.chatMessageLimit=20] - Max recent chat messages to include.
+ * @returns {Promise<string>} The composed preamble, or '' if nothing was included.
+ */
+export async function buildContextPreamble({
+    includeChat = false,
+    loreBookNames = [],
+    chatMessageLimit = 20,
+} = {}) {
+    const sections = [];
+
+    if (includeChat) {
+        const ctx = getContext();
+
+        // Active character card
+        const char = ctx.characters?.[ctx.characterId];
+        if (char) {
+            const lines = [];
+            if (char.name) lines.push(`Name: ${char.name}`);
+            if (char.description) lines.push(`Description: ${char.description}`);
+            if (char.personality) lines.push(`Personality: ${char.personality}`);
+            if (char.scenario) lines.push(`Scenario: ${char.scenario}`);
+            if (lines.length) sections.push(`[Active Character]\n${lines.join('\n')}`);
+        }
+
+        // User persona
+        const persona = ctx.powerUserSettings?.persona_description?.trim();
+        if (persona) sections.push(`[User Persona]\n${persona}`);
+
+        // Recent chat messages
+        const chat = Array.isArray(ctx.chat) ? ctx.chat : [];
+        if (chat.length) {
+            const recent = chat.slice(-chatMessageLimit);
+            const lines = recent.map(m => {
+                const who = m.name || (m.is_user ? (ctx.name1 || 'User') : (ctx.name2 || 'Character'));
+                const text = (m.mes || '').trim();
+                return text ? `${who}: ${text}` : '';
+            }).filter(Boolean);
+            if (lines.length) sections.push(`[Recent Chat]\n${lines.join('\n')}`);
+        }
+    }
+
+    if (Array.isArray(loreBookNames) && loreBookNames.length) {
+        for (const name of loreBookNames) {
+            if (!name) continue;
+            try {
+                const data = await loadWorldInfo(name);
+                if (!data?.entries) continue;
+                const entries = Object.values(data.entries)
+                    .filter(e => e && !e.disable && (e.content || '').trim())
+                    .map(e => {
+                        const label = (e.comment && e.comment.trim())
+                            || (Array.isArray(e.key) ? e.key.join(', ') : '');
+                        const content = e.content.trim();
+                        return label ? `- ${label}: ${content}` : `- ${content}`;
+                    });
+                if (entries.length) {
+                    sections.push(`[Lore Book: ${name}]\n${entries.join('\n')}`);
+                }
+            } catch (err) {
+                console.error(`Saints-Silly-Extensions: failed to load lore book "${name}":`, err);
+            }
+        }
+    }
+
+    return sections.join('\n\n');
 }
