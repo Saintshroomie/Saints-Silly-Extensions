@@ -344,7 +344,7 @@ async function onAssist(formEl, id, isContinue) {
                 (title
                     ? `Respond on one line with only the value for "${title}":`
                     : 'No title was provided — invent a fitting subject name.');
-            prefill = title ? `[${title}: ` : '[';
+            prefill = title ? `[${title}- ` : '[';
         }
 
         const systemPrompt =
