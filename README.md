@@ -29,19 +29,17 @@ Enrich your messages with LLM-generated narration, actions, and detail that stay
 
 ### Assisted Character Creation
 
-A modal-based character creator that adds an **Assist** button to SillyTavern's character creation page, letting you build character cards field-by-field with LLM help.
+A modal-based character creator that adds an **Assist** button to SillyTavern's character creation page, letting you draft a complete character description from a short brief.
 
-- **Schema-driven form** — Each field in the active schema becomes a row in the modal with its own input, controls, and per-field LLM prompt. The default schema covers Character Name, Age, Gender & Pronouns, Species/Race, Occupation, and more.
-- **Character Brief** — A top-level free-form description of your concept, setting, and key details. Used as context for every per-field generation.
-- **Per-field Assist** — Click the wand on any field to generate just that value. The field's seed text (anything you typed) and the Character Brief guide the result, and already-filled fields are passed in for consistency.
-- **Continue / Retry / Reset** — After a field generates, the Assist button becomes a Continue button (extends the current text), and Retry (re-generates from the original seed) and Reset (restores the seed text) buttons appear.
-- **Stop mid-generation** — Click the active field's button again while it's generating to stop and discard the result.
-- **Prose toggle** — Each field has a Prose checkbox. Off = brief comma-separated descriptors on a single line; On = descriptive multi-line prose. Prose state is persisted per-schema, per-field.
-- **Token override** — Each field has a per-generation max-token input that overrides the schema default for that field.
-- **Import from Existing** — When editing a character that already has a description, a button appears to reverse-map the existing description back into the form fields. Descriptions previously compiled by ACC are parsed directly from JSON; legacy prose descriptions are parsed via an LLM round-trip.
-- **Compiled output** — Clicking Done writes a structured JSON object of all filled fields into SillyTavern's description textarea, and also fills the character name field if set.
-- **Schema management** — The settings panel includes a schema selector plus Import, Export, and Delete buttons. Custom schemas are JSON files with field definitions, ordering, prompts, and default response lengths. The default schema cannot be deleted or overwritten.
-- **Generation lockout** — While any field is generating, all other field controls and the Done button are disabled to prevent overlapping requests.
+- **Character Brief** — Type a few sentences describing your concept, setting, and any anchor details.
+- **Generate** — One-shot full character description from the brief; replaces the textarea.
+- **Continue** — Extends the existing description, picking up where it leaves off.
+- **Checkpoint** — Saves the current textarea state as the Retry restore point. Use it to lock in edits you're happy with before continuing.
+- **Retry** — Restores to the last snapshot (auto-taken before Generate / Continue, or set manually with Checkpoint) and re-runs the last action. Useful when a roll went sideways.
+- **Editable output** — The description appears in a large textarea so you can tweak or rewrite it freely between actions.
+- **Optional context** — Tick **Use Chat Context** or pick lore books to prepend the current chat / character context and selected lore entries to the generation.
+- **Stop mid-generation** — Click the active button again while generating to stop and discard the result.
+- **Apply on Done** — Clicking Done copies the textarea contents into SillyTavern's description field. Cancel discards.
 
 ### World Info Assist
 
@@ -83,11 +81,12 @@ When Possession and Phrasing are used together, you can quickly take over charac
 ### How to Use Assisted Character Creation
 
 1. Open SillyTavern's **Create Character** page and click the **Assist** button (wand icon) in the character creation button row.
-2. Fill in the **Character Brief** at the top of the modal — a few sentences describing your concept, setting, and any anchor details.
-3. For each field, optionally type a seed (notes, keywords, partial text), then click the wand to generate a value. Toggle **Prose** if you want full sentences instead of comma-separated descriptors, or set a token override for longer/shorter output.
-4. Use **Continue** to extend a generated field, **Retry** to re-roll from your original seed, or **Reset** to discard the generation.
-5. When editing an existing character, click **Import from Existing** to reverse-map the current description back into the form fields.
-6. Click **Done** to write the compiled character into SillyTavern's description and name fields, or **Cancel** to discard.
+2. Fill in the **Character Brief** — a few sentences describing your concept, setting, and any anchor details.
+3. (Optional) Tick **Use Chat Context** and/or pick lore books to ground the generation in your current chat or world.
+4. Click **Generate**. The full description appears in the textarea below.
+5. Use **Continue** to extend the description, **Retry** to undo the last action and re-roll, or **Checkpoint** to lock in the current state as the restore point for the next Retry.
+6. Edit the textarea freely between actions.
+7. Click **Done** to copy the description into SillyTavern's description field, or **Cancel** to discard.
 
 ### How to Use World Info Assist
 
@@ -144,10 +143,6 @@ Open **Extensions** > **Saint's Silly Extensions** in SillyTavern's settings pan
 |---------|-------------|
 | Enable Assisted Character Creation | Toggle the ACC feature and its Assist button on the character page |
 | ACC Debug Mode | Log detailed ACC events, prompts, and generations to the browser console |
-| Active Schema | Select which character schema drives the modal form (default or any imported custom schema) |
-| Import Schema | Load a custom schema from a JSON file. Schemas define field labels, descriptions, ordering, prompts, and default response lengths |
-| Export Schema | Download the active schema as a JSON file |
-| Delete Schema | Remove the selected custom schema (the default schema cannot be deleted) |
 
 ### World Info Assist Settings
 
