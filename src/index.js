@@ -64,9 +64,6 @@ const defaultSettings = {
     phrasingDebugMode: false,
     accEnabled: true,
     accDebugMode: false,
-    accActiveSchemaName: 'Default Character Schema',
-    accCustomSchemas: {},
-    accProseStates: {},
     wiaEnabled: true,
     wiaDebugMode: false,
     wiaPrompt: DEFAULT_WIA_PROMPT,
@@ -162,7 +159,7 @@ jQuery(async () => {
         settings,
         possessionApi: { isPossessing, getPossessedCharName, postPossessedMessage },
     });
-    initACC({ settings, saveSettings });
+    initACC({ settings });
     initWIA({ settings });
 
     loadPossessionState();
