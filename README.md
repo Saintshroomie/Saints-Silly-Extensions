@@ -32,10 +32,13 @@ Enrich your messages with LLM-generated narration, actions, and detail that stay
 A modal-based character creator that adds an **Assist** button to SillyTavern's character creation page, letting you draft a complete character description from a short brief.
 
 - **Character Brief** — Type a few sentences describing your concept, setting, and any anchor details.
-- **One-shot generation** — Click **Generate Character Description** and the LLM writes a full character description in one pass.
-- **Editable output** — The generated description appears in a large textarea inside the modal so you can read, tweak, or rewrite it before applying.
+- **Generate** — One-shot full character description from the brief; replaces the textarea.
+- **Continue** — Extends the existing description, picking up where it leaves off.
+- **Checkpoint** — Saves the current textarea state as the Retry restore point. Use it to lock in edits you're happy with before continuing.
+- **Retry** — Restores to the last snapshot (auto-taken before Generate / Continue, or set manually with Checkpoint) and re-runs the last action. Useful when a roll went sideways.
+- **Editable output** — The description appears in a large textarea so you can tweak or rewrite it freely between actions.
 - **Optional context** — Tick **Use Chat Context** or pick lore books to prepend the current chat / character context and selected lore entries to the generation.
-- **Stop mid-generation** — Click the Generate button again while generating to stop and discard the result.
+- **Stop mid-generation** — Click the active button again while generating to stop and discard the result.
 - **Apply on Done** — Clicking Done copies the textarea contents into SillyTavern's description field. Cancel discards.
 
 ### World Info Assist
@@ -80,9 +83,10 @@ When Possession and Phrasing are used together, you can quickly take over charac
 1. Open SillyTavern's **Create Character** page and click the **Assist** button (wand icon) in the character creation button row.
 2. Fill in the **Character Brief** — a few sentences describing your concept, setting, and any anchor details.
 3. (Optional) Tick **Use Chat Context** and/or pick lore books to ground the generation in your current chat or world.
-4. Click **Generate Character Description**. The full description appears in the textarea below.
-5. Edit the result freely, or click Generate again to re-roll.
-6. Click **Done** to copy the description into SillyTavern's description field, or **Cancel** to discard.
+4. Click **Generate**. The full description appears in the textarea below.
+5. Use **Continue** to extend the description, **Retry** to undo the last action and re-roll, or **Checkpoint** to lock in the current state as the restore point for the next Retry.
+6. Edit the textarea freely between actions.
+7. Click **Done** to copy the description into SillyTavern's description field, or **Cancel** to discard.
 
 ### How to Use World Info Assist
 
