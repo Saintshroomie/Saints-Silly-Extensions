@@ -31,7 +31,9 @@ Enrich your messages with LLM-generated narration, actions, and detail that stay
 
 A modal-based character creator that adds an **Assist** button to SillyTavern's character creation page, letting you draft a complete character description from a short brief.
 
-- **Character Brief** — Type a few sentences describing your concept, setting, and any anchor details.
+- **Customizable prompt template** — A built-in prompt instructs the model to produce a structured, bracketed character sheet covering name, age, physical description, voice, clothing, equipment, personality, motivations, backstory, relationships, secrets, and more. Edit it freely in the settings panel and Restore Default at any time.
+- **Max Tokens control** — A token-count input in the modal sets the response length for each generation (default 1000). Persisted between sessions.
+- **Character Brief** — Type a few sentences describing your concept, setting, and any anchor details. The prompt template is sent first, followed by the brief.
 - **Generate** — One-shot full character description from the brief; replaces the textarea.
 - **Continue** — Extends the existing description, picking up where it leaves off.
 - **Checkpoint** — Saves the current textarea state as the Retry restore point. Use it to lock in edits you're happy with before continuing.
@@ -143,6 +145,8 @@ Open **Extensions** > **Saint's Silly Extensions** in SillyTavern's settings pan
 |---------|-------------|
 | Enable Assisted Character Creation | Toggle the ACC feature and its Assist button on the character page |
 | ACC Debug Mode | Log detailed ACC events, prompts, and generations to the browser console |
+| Prompt Template | Customize the prompt sent to the LLM for character generation. Sent first, followed by the user's Character Brief. |
+| Restore Default | Reset the prompt template back to the built-in default |
 
 ### World Info Assist Settings
 

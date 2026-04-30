@@ -205,6 +205,38 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════
+   ACC SETTINGS STYLES
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+#saints_silly_settings .acc_prompt_section {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+#saints_silly_settings #acc_prompt_textarea {
+    width: 100%;
+    min-height: 160px;
+    resize: vertical;
+    font-family: monospace;
+    font-size: 0.9em;
+    margin-top: 4px;
+}
+
+#saints_silly_settings .acc_buttons_row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+
+#saints_silly_settings .acc_buttons_row .menu_button {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
    ACC MODAL STYLES
    ═══════════════════════════════════════════════════════════════════════════════ */
 
@@ -284,7 +316,31 @@
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+    margin-bottom: 8px;
+}
+
+.acc-tokens-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
     margin-bottom: 12px;
+    font-size: 0.85em;
+    opacity: 0.85;
+}
+
+.acc-tokens-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    user-select: none;
+}
+
+.acc-tokens-input {
+    width: 80px !important;
+    padding: 2px 6px !important;
+    font-size: 0.9em !important;
+    text-align: center;
 }
 
 .acc-action-btn {

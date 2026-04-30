@@ -15,6 +15,87 @@ import {
     getAvailableLoreBookNames,
 } from './utils.js';
 
+// ─── Default Prompt ───
+
+export const DEFAULT_ACC_PROMPT = `[
+Role:
+You are an AI that produces detailed, concise character description sheets for text-based roleplaying games across any genre.
+
+General Input Rules:
+- User Input: A character concept, which may range from a single name or vague idea to a detailed brief.
+- Genre: User may specify a genre (fantasy, sci-fi, romance, horror, modern, etc.). If unspecified, infer from context or default to genre-neutral.
+- Inferences: Fill in all fields with plausible, internally consistent details. If the user provides partial info, honor it and build around it.
+
+General Output Rules:
+- Conciseness: Use sentence fragments, keywords, comma-separated descriptors, and shorthand. No full sentences. Maximum density of detail in minimum words.
+- Consistency: All fields must be internally coherent (age matches appearance, skills match background, etc.).
+- Genre Flexibility: Adapt field content to genre. E.g., "Equipment" might list a plasma rifle (sci-fi) or a lute (fantasy). Fields that are irrelevant to the genre/character should be marked "N/A" rather than omitted.
+- Specificity: Avoid vague defaults. Prefer "pale, freckled, sun-damaged across the nose" over "fair skin."
+- Gender: Characters should be male or female. Reserve non-binary/ambiguous gender only for non-humanoid entities (creatures, monsters, constructs, eldritch beings, etc.). Use he/him or she/her accordingly; use it/its or they/them only for non-humanoid entities.
+- No Commentary: Output the character sheet only. No preamble, no follow-up.
+
+Format Rules:
+- Use the exact bracket-and-semicolon format shown below.
+- Each field ends with a semicolon.
+- Multi-item fields use comma-separated lists.
+- Sub-fields use " | " as a delimiter within a value when needed.
+- Override Syntax: Fields marked with override syntax use the format {{ .<characterFirstName>FieldOverride ?? default value }}. The variable name is built from the character's first name in lower camelCase followed by the field name and "Override" (e.g., for a character named "Sable Voss" the clothing override is .sableClothingOverride; for "Elena" it is .elenaClothingOverride). This syntax applies only to the Clothing and Current Goal fields.
+
+Output Template:
+[
+Character Name: <Full name, aliases/titles in parentheses if any>;
+Age: <Number or approximate range, plus life-stage descriptor — e.g., "34, early middle-age">;
+Gender & Pronouns: <Gender identity, pronoun set>;
+Species/Race: <Human, elf, android, etc. — genre-dependent>;
+Physical Description: <Height, build, skin, hair, eyes, distinguishing marks — compact descriptors>;
+Voice & Speech: <Vocal quality, accent, speech patterns, verbal tics>;
+Style: <Overall aesthetic sensibility — color palette tendencies, fashion philosophy, the vibe they project through appearance>;
+Clothing: {{ .<characterFirstName>ClothingOverride ?? <Their most typical outfit — specific garments, materials, footwear, notable accessories> }};
+Equipment/Belongings: <Weapons, tools, keepsakes, tech — whatever they carry>;
+Personality Traits: <3–6 core traits, comma-separated>;
+Strengths: <3–5 key strengths — skills, talents, mental/social assets>;
+Weaknesses: <3–5 key flaws — vulnerabilities, bad habits, blind spots>;
+Fears & Insecurities: <1–3, concise>;
+Desires & Motivations: <Primary drive | secondary drive>;
+Backstory Summary: <3–5 sentence fragments covering origin, key events, current situation>;
+Relationships: <Notable connections — format: "Name (relation, status)" comma-separated>;
+Skills & Abilities: <Practical/magical/technical skills, comma-separated>;
+Mannerisms & Habits: <Physical tics, routines, comfort behaviors>;
+Moral Alignment & Values: <Core ethical stance, what they will/won't compromise on>;
+Secrets: <1–2 things they hide from others>;
+Quirks: <2–3 memorable oddities or endearing details>;
+Current Goal: {{ .<characterFirstName>GoalOverride ?? <Immediate objective at the start of play> }};
+]
+
+Output Example:
+[
+Character Name: Sable Voss ("The Thornwalker");
+Age: 28, young adult;
+Gender & Pronouns: Female, she/her;
+Species/Race: Half-elf;
+Physical Description: 5'9", wiry, deep brown skin, cropped silver-white hair, amber eyes with vertical pupils, thorn-vine scar wrapping left forearm to shoulder;
+Voice & Speech: Low, measured cadence — clipped sentences, avoids contractions, occasional Sylvan loanwords;
+Style: Rugged utilitarian — muted earth tones and deep greens, function over form, layered for movement not display, everything worn-in and trail-tested;
+Clothing: {{ .sableClothingOverride ?? Weathered dark green leather coat (hip-length, high collar), wrapped linen undershirt, canvas trousers tucked into knee-high iron-buckle boots, bone-toggle clasps at cuffs }};
+Equipment/Belongings: Curved hunting knife (ironwood handle), satchel of dried herbs and wound salves, enchanted compass that points toward strongest nearby magical source, dead mother's copper ring;
+Personality Traits: Guarded, resourceful, dry-witted, quietly compassionate, stubborn, slow to trust;
+Strengths: Expert tracker, herbalism/field medicine, preternatural patience, reads people well, resilient under pressure;
+Weaknesses: Emotionally avoidant, overreliance on self-sufficiency, holds grudges, poor with authority figures, neglects own injuries;
+Fears & Insecurities: Losing autonomy, becoming like her father, fear the scar is slowly spreading;
+Desires & Motivations: Find the source of the Thornblight corrupting the Greenmarch | prove she doesn't need anyone's protection;
+Backstory Summary: Raised in border village between human and elven lands — never fully accepted by either. Mother (elven healer) killed by Thornblight when Sable was 14. Father (human trapper) turned bitter, controlling. Left home at 17, survived as wilderness guide and unlicensed hedge-healer. Scar acquired two years ago from direct contact with Thornblight — hasn't told anyone it sometimes moves.;
+Relationships: Brennick Gale (former traveling partner, estranged after argument), Warden Ilsara (elven border authority, uneasy mutual respect), "Patch" (rescued one-eared fox, sole constant companion);
+Skills & Abilities: Wilderness survival, tracking (humanoid and beast), basic ward-magic (self-taught, unreliable), herbcraft, trap-setting, stealth movement;
+Mannerisms & Habits: Rubs thumb along scar when anxious, always sits facing the door, braids grass stalks when idle, smells herbs before using them even when familiar;
+Moral Alignment & Values: Chaotic good — protects the vulnerable, distrusts institutions, will break any law to do what's right but won't kill unarmed foes;
+Secrets: The thorn-scar pulses near corrupted creatures and may be bonding with her. Stole a restricted text from an elven archive to research it.;
+Quirks: Names all her knives, refuses to eat mushrooms (no stated reason), instinctively catches falling objects — unnervingly fast reflexes;
+Current Goal: {{ .sableGoalOverride ?? Reach the Greenmarch interior and locate the Thornblight's origin before the scar reaches her chest }};
+]
+]`;
+
+export const DEFAULT_ACC_RESPONSE_LENGTH = 1000;
+
 // ─── Module State ───
 
 let moduleSettings = null;
@@ -30,13 +111,16 @@ let restorePoint = null;       // textarea snapshot used by Retry
 
 /**
  * Initialize ACC module. Called once from index.js.
- * @param {object} opts - { settings }
+ * @param {object} opts - { settings, saveSettings }
  */
-export function initACC({ settings }) {
+export function initACC({ settings, saveSettings }) {
     moduleSettings = settings;
+    saveSettingsFn = saveSettings;
     debug = createDebugLogger('ACC', () => moduleSettings.accDebugMode);
     debug('Module initialized');
 }
+
+let saveSettingsFn = null;
 
 // ─── Character Page Integration ───
 
@@ -71,6 +155,8 @@ export function onCharacterPageLoaded() {
 export function bindACCSettings(saveSettings) {
     const enabledCb = document.getElementById('acc_enabled');
     const debugCb = document.getElementById('acc_debug_mode');
+    const promptArea = document.getElementById('acc_prompt_textarea');
+    const restoreBtn = document.getElementById('acc_restore_default_prompt');
 
     if (enabledCb) {
         enabledCb.checked = moduleSettings.accEnabled;
@@ -84,6 +170,21 @@ export function bindACCSettings(saveSettings) {
         debugCb.addEventListener('change', () => {
             moduleSettings.accDebugMode = debugCb.checked;
             saveSettings();
+        });
+    }
+    if (promptArea) {
+        promptArea.value = moduleSettings.accPrompt || DEFAULT_ACC_PROMPT;
+        promptArea.addEventListener('input', () => {
+            moduleSettings.accPrompt = promptArea.value;
+            saveSettings();
+        });
+    }
+    if (restoreBtn) {
+        restoreBtn.addEventListener('click', () => {
+            moduleSettings.accPrompt = DEFAULT_ACC_PROMPT;
+            if (promptArea) promptArea.value = DEFAULT_ACC_PROMPT;
+            saveSettings();
+            toast('ACC prompt restored to default.', 'success');
         });
     }
 }
@@ -128,6 +229,15 @@ function openModal() {
 
     const output = document.getElementById('acc_description_output');
     output?.addEventListener('input', refreshActionButtonStates);
+
+    const tokenInput = document.getElementById('acc_response_length');
+    tokenInput?.addEventListener('change', () => {
+        const parsed = parseInt(tokenInput.value, 10);
+        if (!isNaN(parsed) && parsed > 0) {
+            moduleSettings.accResponseLength = parsed;
+            saveSettingsFn?.();
+        }
+    });
 
     refreshActionButtonStates();
     debug('Modal opened');
@@ -192,6 +302,12 @@ function buildModalHTML() {
                     <div id="acc_retry_btn" class="menu_button interactable acc-action-btn acc-retry-btn" title="Restore to the last snapshot and re-run the last action">
                         <span class="fa-solid fa-rotate-right"></span> Retry
                     </div>
+                </div>
+                <div class="acc-tokens-row">
+                    <label class="acc-tokens-label" for="acc_response_length" title="Maximum tokens for each generation">
+                        <span class="fa-solid fa-coins"></span> Max Tokens:
+                    </label>
+                    <input id="acc_response_length" type="number" class="text_pole acc-tokens-input" min="50" max="8192" step="50" value="${getResponseLength()}" />
                 </div>
                 <div class="acc-status-bar acc-hidden" id="acc_status_bar">
                     <span class="fa-solid fa-spinner fa-spin"></span>
@@ -354,29 +470,49 @@ function needsSeparator(text) {
 
 async function generateDescription(brief, ctxOptions) {
     const preambleBlock = await buildPreambleBlock(ctxOptions);
-    const prompt = `${preambleBlock}Write a complete, detailed character description for use as a SillyTavern character card based on the following brief. Cover physical appearance, personality, background, mannerisms, motivations, and any other relevant details. Be vivid and specific.\n\nCharacter Brief:\n${brief}\n\nCharacter Description:`;
-    const systemPrompt = 'You are a character creation assistant. Write a complete, well-organized character description in natural prose. Do not include meta-commentary, headers like "Character Description:", or extra formatting around the response.';
+    const promptTemplate = getPromptTemplate();
+    const prompt = `${preambleBlock}${promptTemplate}\n\nCharacter Brief:\n${brief}`;
+    const systemPrompt = 'You are a character creation assistant. Follow the instructions and output format in the prompt exactly. Output only the character sheet — no preamble, no commentary.';
+    const responseLength = getResponseLength();
 
-    debug('Generating with brief length', brief.length);
+    debug('Generating with brief length', brief.length, 'tokens', responseLength);
     debug('System prompt:', systemPrompt);
     debug('Prompt:', prompt);
 
-    const result = await generateRaw({ prompt, systemPrompt, responseLength: 2000 });
+    const result = await generateRaw({ prompt, systemPrompt, responseLength });
     return removeReasoningFromString(result).trim();
 }
 
 async function generateContinuation(brief, existing, ctxOptions) {
     const preambleBlock = await buildPreambleBlock(ctxOptions);
+    const promptTemplate = getPromptTemplate();
     const briefBlock = brief ? `Character Brief:\n${brief}\n\n` : '';
-    const prompt = `${preambleBlock}Continue writing the character description below. Pick up exactly where the text leaves off, matching tone and style. Do not repeat what's already there and do not restart the description.\n\n${briefBlock}Description so far:\n${existing}\n\nContinuation:`;
-    const systemPrompt = 'You are a character creation assistant. Continue the existing character description seamlessly. Output only the continuation — no headers, no meta-commentary, no repetition of prior text.';
+    const prompt = `${preambleBlock}${promptTemplate}\n\n${briefBlock}Description so far:\n${existing}\n\nContinue exactly where the text leaves off. Do not repeat any text already present. Maintain the same format and style. Output only the continuation.`;
+    const systemPrompt = 'You are a character creation assistant. Continue the existing character sheet seamlessly in the same format. Output only the continuation — no headers, no meta-commentary, no repetition of prior text.';
+    const responseLength = getResponseLength();
 
-    debug('Continuing with existing length', existing.length);
+    debug('Continuing with existing length', existing.length, 'tokens', responseLength);
     debug('System prompt:', systemPrompt);
     debug('Prompt:', prompt);
 
-    const result = await generateRaw({ prompt, systemPrompt, responseLength: 1000 });
+    const result = await generateRaw({ prompt, systemPrompt, responseLength });
     return removeReasoningFromString(result).trim();
+}
+
+function getPromptTemplate() {
+    const stored = moduleSettings?.accPrompt;
+    return (typeof stored === 'string' && stored.trim()) ? stored : DEFAULT_ACC_PROMPT;
+}
+
+function getResponseLength() {
+    const input = document.getElementById('acc_response_length');
+    if (input) {
+        const parsed = parseInt(input.value, 10);
+        if (!isNaN(parsed) && parsed > 0) return parsed;
+    }
+    const setting = moduleSettings?.accResponseLength;
+    if (typeof setting === 'number' && setting > 0) return setting;
+    return DEFAULT_ACC_RESPONSE_LENGTH;
 }
 
 async function buildPreambleBlock(ctxOptions) {
