@@ -44,6 +44,8 @@ import {
     initACC,
     onCharacterPageLoaded as accOnCharacterPageLoaded,
     bindACCSettings,
+    DEFAULT_ACC_PROMPT,
+    DEFAULT_ACC_RESPONSE_LENGTH,
 } from './assisted-character-creation.js';
 import {
     initWIA,
@@ -64,6 +66,8 @@ const defaultSettings = {
     phrasingDebugMode: false,
     accEnabled: true,
     accDebugMode: false,
+    accPrompt: DEFAULT_ACC_PROMPT,
+    accResponseLength: DEFAULT_ACC_RESPONSE_LENGTH,
     wiaEnabled: true,
     wiaDebugMode: false,
     wiaPrompt: DEFAULT_WIA_PROMPT,
@@ -159,7 +163,7 @@ jQuery(async () => {
         settings,
         possessionApi: { isPossessing, getPossessedCharName, postPossessedMessage },
     });
-    initACC({ settings });
+    initACC({ settings, saveSettings });
     initWIA({ settings });
 
     loadPossessionState();
