@@ -29,6 +29,14 @@ const DEFAULT_PHRASING_PROMPT = `[Rewrite the following message. Preserve its me
 
 {{phrasingSeed}}]`;
 
+const DEFAULT_PHRASING_INVERSE_PROMPT = `[Rewrite the following message in a way that is WILDLY DIFFERENT from every previous variation listed below. Vary the tone, pacing, structure, imagery, sentence length, and word choice — take a fundamentally different angle. Preserve the underlying meaning, intent, and any dialogue. Do not continue the scene beyond what the original message describes.
+
+Previous variations to avoid resembling:
+{{phrasingSwipes}}
+
+Now produce a wildly different rewrite of:
+{{phrasingSeed}}]`;
+
 // ─── State ───
 
 let phrasingActive = false;
@@ -56,6 +64,19 @@ function getActivePrompt() {
     return chatPrompt || DEFAULT_PHRASING_PROMPT;
 }
 
+function getActiveInversePrompt() {
+    const context = getContext();
+    const chatPrompt = context.chatMetadata?.phrasing?.inversePrompt;
+    debug('getActiveInversePrompt — source:', chatPrompt ? 'chat metadata' : 'default');
+    return chatPrompt || DEFAULT_PHRASING_INVERSE_PROMPT;
+}
+
+function formatSwipesContext(swipes, speakerName) {
+    return swipes
+        .map((swipe, i) => `Variation ${i + 1}:\n${speakerName}: ${swipe}`)
+        .join('\n\n');
+}
+
 function formatSeedWithSpeaker(seedText, isUser, speakerName) {
     const context = getContext();
     let name;
@@ -70,10 +91,14 @@ function formatSeedWithSpeaker(seedText, isUser, speakerName) {
     return `${name}: ${seedText}`;
 }
 
-function assemblePrompt(seedText) {
-    debug('assemblePrompt — seed length:', seedText.length);
-    let prompt = getActivePrompt();
+function assemblePrompt(seedText, swipesContext = null) {
+    const useInverse = !!swipesContext;
+    debug('assemblePrompt — seed length:', seedText.length, '| mode:', useInverse ? 'inverse' : 'standard');
+    let prompt = useInverse ? getActiveInversePrompt() : getActivePrompt();
     prompt = prompt.replace(/\{\{phrasingSeed\}\}/g, seedText);
+    if (useInverse) {
+        prompt = prompt.replace(/\{\{phrasingSwipes\}\}/g, swipesContext);
+    }
     prompt = substituteParams(prompt);
     debug('assemblePrompt — final length:', prompt.length);
     return prompt;
@@ -237,7 +262,14 @@ async function doSwipeMode(messageIndex) {
             message.swipe_info = [{}];
         }
 
-        const assembled = assemblePrompt(seedText);
+        let swipesContext = null;
+        if (ctx.settings.phrasingInverseGuidance) {
+            const speakerName = message.name || (message.is_user ? context.name1 : context.name2);
+            swipesContext = formatSwipesContext(message.swipes, speakerName);
+            debug('doSwipeMode — inverse guidance ON, swipes included:', message.swipes.length);
+        }
+
+        const assembled = assemblePrompt(seedText, swipesContext);
         injectPhrasingPrompt(assembled);
 
         if (!message.extra) message.extra = {};
@@ -346,8 +378,10 @@ async function onInputPhrasingClick() {
 
 export function loadPromptTextarea() {
     const textarea = document.getElementById('phrasing_prompt_textarea');
-    if (!textarea) return;
-    textarea.value = getActivePrompt();
+    if (textarea) textarea.value = getActivePrompt();
+
+    const inverseTextarea = document.getElementById('phrasing_inverse_prompt_textarea');
+    if (inverseTextarea) inverseTextarea.value = getActiveInversePrompt();
 }
 
 function onSaveToChat() {
@@ -386,6 +420,47 @@ function onRestoreDefault() {
     }
     context.saveMetadata();
     toastr.info('Phrasing! prompt restored to default.', 'Phrasing!');
+}
+
+function onSaveInverseToChat() {
+    debug('onSaveInverseToChat — triggered');
+    const textarea = document.getElementById('phrasing_inverse_prompt_textarea');
+    if (!textarea) return;
+
+    const promptText = textarea.value.trim();
+    const context = getContext();
+
+    if (promptText && !promptText.includes('{{phrasingSeed}}')) {
+        toastr.warning('Warning: Inverse prompt does not contain {{phrasingSeed}}. The AI won\'t receive the message being rephrased.', 'Phrasing!');
+    }
+    if (promptText && !promptText.includes('{{phrasingSwipes}}')) {
+        toastr.warning('Warning: Inverse prompt does not contain {{phrasingSwipes}}. The AI won\'t see prior variations to differ from.', 'Phrasing!');
+    }
+
+    if (!context.chatMetadata.phrasing) {
+        context.chatMetadata.phrasing = {};
+    }
+
+    context.chatMetadata.phrasing.inversePrompt = promptText || null;
+    context.saveMetadata();
+    toastr.success('Phrasing! inverse prompt saved to chat.', 'Phrasing!');
+}
+
+function onRestoreInverseDefault() {
+    debug('onRestoreInverseDefault — triggered');
+    if (!confirm('Restore the default Inverse Guidance prompt? This will overwrite your current inverse prompt.')) return;
+
+    const textarea = document.getElementById('phrasing_inverse_prompt_textarea');
+    if (textarea) {
+        textarea.value = DEFAULT_PHRASING_INVERSE_PROMPT;
+    }
+
+    const context = getContext();
+    if (context.chatMetadata.phrasing) {
+        context.chatMetadata.phrasing.inversePrompt = null;
+    }
+    context.saveMetadata();
+    toastr.info('Phrasing! inverse prompt restored to default.', 'Phrasing!');
 }
 
 // ─── Generation Lifecycle ───
@@ -459,8 +534,20 @@ export function bindPhrasingSettings(saveSettings) {
         });
     }
 
+    const phrasingInverseGuidance = document.getElementById('phrasing_inverse_guidance');
+    if (phrasingInverseGuidance) {
+        phrasingInverseGuidance.checked = ctx.settings.phrasingInverseGuidance;
+        phrasingInverseGuidance.addEventListener('change', (e) => {
+            ctx.settings.phrasingInverseGuidance = e.target.checked;
+            saveSettings();
+            debug('inverseGuidance toggled to', ctx.settings.phrasingInverseGuidance);
+        });
+    }
+
     document.getElementById('phrasing_save_to_chat')?.addEventListener('click', onSaveToChat);
     document.getElementById('phrasing_restore_default')?.addEventListener('click', onRestoreDefault);
+    document.getElementById('phrasing_save_inverse_to_chat')?.addEventListener('click', onSaveInverseToChat);
+    document.getElementById('phrasing_restore_inverse_default')?.addEventListener('click', onRestoreInverseDefault);
 }
 
 // ─── Slash Command ───

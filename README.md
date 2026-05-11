@@ -25,6 +25,7 @@ Enrich your messages with LLM-generated narration, actions, and detail that stay
   - **Text in input** — Enriches your typed text
 - **Seed text reinjection** — Rephrased messages remember their original seed prompt, so if you Continue a rephrased message the seed is reinjected to guide the continue generation
 - **Custom prompts** — Customize the phrasing prompt per-chat or use the default template
+- **Inverse Guidance** — Optional mode that feeds every existing swipe of the target message into the prompt and asks the model to produce a swipe that is wildly different in tone, pacing, and approach. Comes with its own editable prompt template (with `{{phrasingSwipes}}` and `{{phrasingSeed}}` placeholders).
 - **Possession-aware** — When possessing a character, phrasing generates in that character's voice; otherwise it uses the standard ST impersonate feature
 
 ### Assisted Character Creation
@@ -137,7 +138,9 @@ Open **Extensions** > **Saint's Silly Extensions** in SillyTavern's settings pan
 |---------|-------------|
 | Enable Phrasing! | Toggle the phrasing feature on/off |
 | Debug Mode | Log detailed phrasing events to the browser console |
+| Inverse Guidance | When enabled, rephrasing a message includes all of its existing swipes in the prompt and asks the model to produce something wildly different |
 | Prompt Template | Customize the AI prompt used for enrichment (per-chat) |
+| Inverse Guidance Prompt Template | Customize the prompt used when Inverse Guidance is on. Supports `{{phrasingSeed}}` and `{{phrasingSwipes}}` placeholders. |
 
 ### Assisted Character Creation Settings
 
