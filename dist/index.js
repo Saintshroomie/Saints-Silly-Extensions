@@ -1150,7 +1150,7 @@ var update = injectStylesIntoStyleTag_default()(style/* default */.A, options);
 
 ;// ./src/settings.html
 // Module
-var code = `<div id="saints_silly_settings" class="extension_settings"> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Saint's Silly Extensions</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content"> <h4 class="saints_section_header"> <span class="fa-solid fa-ghost"></span> Possession </h4> <label class="checkbox_label"> <input id="possession_enabled" type="checkbox"/> <span>Enable Possession</span> </label> <label class="checkbox_label"> <input id="possession_show_toast" type="checkbox"/> <span>Show Toast on Possess/Unpossess</span> </label> <label class="checkbox_label"> <input id="possession_debug_mode" type="checkbox"/> <span>Possession Debug Mode</span> </label> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-pen-fancy"></span> Phrasing! </h4> <label class="checkbox_label"> <input id="phrasing_enabled" type="checkbox" checked="checked"/> <span>Enable Phrasing!</span> </label> <label class="checkbox_label"> <input id="phrasing_debug_mode" type="checkbox"/> <span>Phrasing Debug Mode</span> </label> <div class="phrasing_prompt_section"> <label for="phrasing_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="phrasing_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Phrasing! prompt template..."></textarea> </div> <div class="phrasing_buttons_row"> <div class="menu_button" id="phrasing_restore_default"> <span class="fa-solid fa-rotate-left"></span> Restore Default </div> <div class="menu_button" id="phrasing_save_to_chat"> <span class="fa-solid fa-floppy-disk"></span> Save to Chat </div> </div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-wand-magic-sparkles"></span> Assisted Character Creation </h4> <label class="checkbox_label"> <input id="acc_enabled" type="checkbox"/> <span>Enable Assisted Character Creation</span> </label> <label class="checkbox_label"> <input id="acc_debug_mode" type="checkbox"/> <span>ACC Debug Mode</span> </label> <div class="acc_prompt_section"> <label for="acc_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="acc_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your ACC prompt template..."></textarea> </div> <div class="acc_buttons_row"> <div class="menu_button" id="acc_restore_default_prompt"> <span class="fa-solid fa-rotate-left"></span> Restore Default </div> </div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-book-atlas"></span> World Info Assist </h4> <label class="checkbox_label"> <input id="wia_enabled" type="checkbox"/> <span>Enable World Info Assist</span> </label> <label class="checkbox_label"> <input id="wia_debug_mode" type="checkbox"/> <span>WI Assist Debug Mode</span> </label> <div class="wia_prompt_section"> <label for="wia_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="wia_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your World Info Assist prompt template..."></textarea> </div> <div class="wia_buttons_row"> <div class="menu_button" id="wia_restore_default"> <span class="fa-solid fa-rotate-left"></span> Restore Default </div> </div> </div> </div> </div> `;
+var code = `<div id="saints_silly_settings" class="extension_settings"> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Saint's Silly Extensions</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content"> <h4 class="saints_section_header"> <span class="fa-solid fa-ghost"></span> Possession </h4> <label class="checkbox_label"> <input id="possession_enabled" type="checkbox"/> <span>Enable Possession</span> </label> <label class="checkbox_label"> <input id="possession_show_toast" type="checkbox"/> <span>Show Toast on Possess/Unpossess</span> </label> <label class="checkbox_label"> <input id="possession_debug_mode" type="checkbox"/> <span>Possession Debug Mode</span> </label> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-pen-fancy"></span> Phrasing! </h4> <label class="checkbox_label"> <input id="phrasing_enabled" type="checkbox" checked="checked"/> <span>Enable Phrasing!</span> </label> <label class="checkbox_label"> <input id="phrasing_debug_mode" type="checkbox"/> <span>Phrasing Debug Mode</span> </label> <label class="checkbox_label" title="When enabled, rephrasing a message includes every existing swipe in the prompt and asks the model to produce something wildly different."> <input id="phrasing_inverse_guidance" type="checkbox"/> <span>Inverse Guidance</span> </label> <div class="phrasing_prompt_section"> <label for="phrasing_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="phrasing_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Phrasing! prompt template..."></textarea> </div> <div class="phrasing_buttons_row"> <div class="menu_button" id="phrasing_restore_default"> <span class="fa-solid fa-rotate-left"></span> Restore Default </div> <div class="menu_button" id="phrasing_save_to_chat"> <span class="fa-solid fa-floppy-disk"></span> Save to Chat </div> </div> <div class="phrasing_prompt_section"> <label for="phrasing_inverse_prompt_textarea"><b>Inverse Guidance Prompt Template:</b></label> <textarea id="phrasing_inverse_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Inverse Guidance prompt template..."></textarea> <small>Available placeholders: <code>{{phrasingSeed}}</code>, <code>{{phrasingSwipes}}</code></small> </div> <div class="phrasing_buttons_row"> <div class="menu_button" id="phrasing_restore_inverse_default"> <span class="fa-solid fa-rotate-left"></span> Restore Default </div> <div class="menu_button" id="phrasing_save_inverse_to_chat"> <span class="fa-solid fa-floppy-disk"></span> Save to Chat </div> </div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-wand-magic-sparkles"></span> Assisted Character Creation </h4> <label class="checkbox_label"> <input id="acc_enabled" type="checkbox"/> <span>Enable Assisted Character Creation</span> </label> <label class="checkbox_label"> <input id="acc_debug_mode" type="checkbox"/> <span>ACC Debug Mode</span> </label> <div class="acc_prompt_section"> <label for="acc_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="acc_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your ACC prompt template..."></textarea> </div> <div class="acc_buttons_row"> <div class="menu_button" id="acc_restore_default_prompt"> <span class="fa-solid fa-rotate-left"></span> Restore Default </div> </div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-book-atlas"></span> World Info Assist </h4> <label class="checkbox_label"> <input id="wia_enabled" type="checkbox"/> <span>Enable World Info Assist</span> </label> <label class="checkbox_label"> <input id="wia_debug_mode" type="checkbox"/> <span>WI Assist Debug Mode</span> </label> <div class="wia_prompt_section"> <label for="wia_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="wia_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your World Info Assist prompt template..."></textarea> </div> <div class="wia_buttons_row"> <div class="menu_button" id="wia_restore_default"> <span class="fa-solid fa-rotate-left"></span> Restore Default </div> </div> </div> </div> </div> `;
 // Exports
 /* harmony default export */ const settings = (code);
 ;// external "../../../../world-info.js"
@@ -2254,6 +2254,14 @@ const DEFAULT_PHRASING_PROMPT = `[Rewrite the following message. Preserve its me
 
 {{phrasingSeed}}]`;
 
+const DEFAULT_PHRASING_INVERSE_PROMPT = `[Rewrite the following message in a way that is WILDLY DIFFERENT from every previous variation listed below. Vary the tone, pacing, structure, imagery, sentence length, and word choice — take a fundamentally different angle. Preserve the underlying meaning, intent, and any dialogue. Do not continue the scene beyond what the original message describes.
+
+Previous variations to avoid resembling:
+{{phrasingSwipes}}
+
+Now produce a wildly different rewrite of:
+{{phrasingSeed}}]`;
+
 // ─── State ───
 
 let phrasingActive = false;
@@ -2281,6 +2289,19 @@ function getActivePrompt() {
     return chatPrompt || DEFAULT_PHRASING_PROMPT;
 }
 
+function getActiveInversePrompt() {
+    const context = getContext();
+    const chatPrompt = context.chatMetadata?.phrasing?.inversePrompt;
+    phrasing_debug('getActiveInversePrompt — source:', chatPrompt ? 'chat metadata' : 'default');
+    return chatPrompt || DEFAULT_PHRASING_INVERSE_PROMPT;
+}
+
+function formatSwipesContext(swipes, speakerName) {
+    return swipes
+        .map((swipe, i) => `Variation ${i + 1}:\n${speakerName}: ${swipe}`)
+        .join('\n\n');
+}
+
 function formatSeedWithSpeaker(seedText, isUser, speakerName) {
     const context = getContext();
     let name;
@@ -2295,10 +2316,14 @@ function formatSeedWithSpeaker(seedText, isUser, speakerName) {
     return `${name}: ${seedText}`;
 }
 
-function assemblePrompt(seedText) {
-    phrasing_debug('assemblePrompt — seed length:', seedText.length);
-    let prompt = getActivePrompt();
+function assemblePrompt(seedText, swipesContext = null) {
+    const useInverse = !!swipesContext;
+    phrasing_debug('assemblePrompt — seed length:', seedText.length, '| mode:', useInverse ? 'inverse' : 'standard');
+    let prompt = useInverse ? getActiveInversePrompt() : getActivePrompt();
     prompt = prompt.replace(/\{\{phrasingSeed\}\}/g, seedText);
+    if (useInverse) {
+        prompt = prompt.replace(/\{\{phrasingSwipes\}\}/g, swipesContext);
+    }
     prompt = __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParams__(prompt);
     phrasing_debug('assemblePrompt — final length:', prompt.length);
     return prompt;
@@ -2462,7 +2487,14 @@ async function doSwipeMode(messageIndex) {
             message.swipe_info = [{}];
         }
 
-        const assembled = assemblePrompt(seedText);
+        let swipesContext = null;
+        if (phrasing_ctx.settings.phrasingInverseGuidance) {
+            const speakerName = message.name || (message.is_user ? context.name1 : context.name2);
+            swipesContext = formatSwipesContext(message.swipes, speakerName);
+            phrasing_debug('doSwipeMode — inverse guidance ON, swipes included:', message.swipes.length);
+        }
+
+        const assembled = assemblePrompt(seedText, swipesContext);
         injectPhrasingPrompt(assembled);
 
         if (!message.extra) message.extra = {};
@@ -2571,8 +2603,10 @@ async function onInputPhrasingClick() {
 
 function loadPromptTextarea() {
     const textarea = document.getElementById('phrasing_prompt_textarea');
-    if (!textarea) return;
-    textarea.value = getActivePrompt();
+    if (textarea) textarea.value = getActivePrompt();
+
+    const inverseTextarea = document.getElementById('phrasing_inverse_prompt_textarea');
+    if (inverseTextarea) inverseTextarea.value = getActiveInversePrompt();
 }
 
 function onSaveToChat() {
@@ -2611,6 +2645,47 @@ function onRestoreDefault() {
     }
     context.saveMetadata();
     toastr.info('Phrasing! prompt restored to default.', 'Phrasing!');
+}
+
+function onSaveInverseToChat() {
+    phrasing_debug('onSaveInverseToChat — triggered');
+    const textarea = document.getElementById('phrasing_inverse_prompt_textarea');
+    if (!textarea) return;
+
+    const promptText = textarea.value.trim();
+    const context = getContext();
+
+    if (promptText && !promptText.includes('{{phrasingSeed}}')) {
+        toastr.warning('Warning: Inverse prompt does not contain {{phrasingSeed}}. The AI won\'t receive the message being rephrased.', 'Phrasing!');
+    }
+    if (promptText && !promptText.includes('{{phrasingSwipes}}')) {
+        toastr.warning('Warning: Inverse prompt does not contain {{phrasingSwipes}}. The AI won\'t see prior variations to differ from.', 'Phrasing!');
+    }
+
+    if (!context.chatMetadata.phrasing) {
+        context.chatMetadata.phrasing = {};
+    }
+
+    context.chatMetadata.phrasing.inversePrompt = promptText || null;
+    context.saveMetadata();
+    toastr.success('Phrasing! inverse prompt saved to chat.', 'Phrasing!');
+}
+
+function onRestoreInverseDefault() {
+    phrasing_debug('onRestoreInverseDefault — triggered');
+    if (!confirm('Restore the default Inverse Guidance prompt? This will overwrite your current inverse prompt.')) return;
+
+    const textarea = document.getElementById('phrasing_inverse_prompt_textarea');
+    if (textarea) {
+        textarea.value = DEFAULT_PHRASING_INVERSE_PROMPT;
+    }
+
+    const context = getContext();
+    if (context.chatMetadata.phrasing) {
+        context.chatMetadata.phrasing.inversePrompt = null;
+    }
+    context.saveMetadata();
+    toastr.info('Phrasing! inverse prompt restored to default.', 'Phrasing!');
 }
 
 // ─── Generation Lifecycle ───
@@ -2684,8 +2759,20 @@ function bindPhrasingSettings(saveSettings) {
         });
     }
 
+    const phrasingInverseGuidance = document.getElementById('phrasing_inverse_guidance');
+    if (phrasingInverseGuidance) {
+        phrasingInverseGuidance.checked = phrasing_ctx.settings.phrasingInverseGuidance;
+        phrasingInverseGuidance.addEventListener('change', (e) => {
+            phrasing_ctx.settings.phrasingInverseGuidance = e.target.checked;
+            saveSettings();
+            phrasing_debug('inverseGuidance toggled to', phrasing_ctx.settings.phrasingInverseGuidance);
+        });
+    }
+
     document.getElementById('phrasing_save_to_chat')?.addEventListener('click', onSaveToChat);
     document.getElementById('phrasing_restore_default')?.addEventListener('click', onRestoreDefault);
+    document.getElementById('phrasing_save_inverse_to_chat')?.addEventListener('click', onSaveInverseToChat);
+    document.getElementById('phrasing_restore_inverse_default')?.addEventListener('click', onRestoreInverseDefault);
 }
 
 // ─── Slash Command ───
@@ -3871,6 +3958,7 @@ const defaultSettings = {
     possessionDebugMode: false,
     phrasingEnabled: true,
     phrasingDebugMode: false,
+    phrasingInverseGuidance: false,
     accEnabled: true,
     accDebugMode: false,
     accPrompt: DEFAULT_ACC_PROMPT,

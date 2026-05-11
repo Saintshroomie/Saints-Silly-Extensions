@@ -43,6 +43,11 @@
                 <span>Phrasing Debug Mode</span>
             </label>
 
+            <label class="checkbox_label" title="When enabled, rephrasing a message includes every existing swipe in the prompt and asks the model to produce something wildly different.">
+                <input id="phrasing_inverse_guidance" type="checkbox" />
+                <span>Inverse Guidance</span>
+            </label>
+
             <div class="phrasing_prompt_section">
                 <label for="phrasing_prompt_textarea"><b>Prompt Template:</b></label>
                 <textarea id="phrasing_prompt_textarea" class="text_pole" rows="8"
@@ -54,6 +59,22 @@
                     <span class="fa-solid fa-rotate-left"></span> Restore Default
                 </div>
                 <div class="menu_button" id="phrasing_save_to_chat">
+                    <span class="fa-solid fa-floppy-disk"></span> Save to Chat
+                </div>
+            </div>
+
+            <div class="phrasing_prompt_section">
+                <label for="phrasing_inverse_prompt_textarea"><b>Inverse Guidance Prompt Template:</b></label>
+                <textarea id="phrasing_inverse_prompt_textarea" class="text_pole" rows="8"
+                    placeholder="Enter your Inverse Guidance prompt template..."></textarea>
+                <small>Available placeholders: <code>{{phrasingSeed}}</code>, <code>{{phrasingSwipes}}</code></small>
+            </div>
+
+            <div class="phrasing_buttons_row">
+                <div class="menu_button" id="phrasing_restore_inverse_default">
+                    <span class="fa-solid fa-rotate-left"></span> Restore Default
+                </div>
+                <div class="menu_button" id="phrasing_save_inverse_to_chat">
                     <span class="fa-solid fa-floppy-disk"></span> Save to Chat
                 </div>
             </div>

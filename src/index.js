@@ -64,6 +64,7 @@ const defaultSettings = {
     possessionDebugMode: false,
     phrasingEnabled: true,
     phrasingDebugMode: false,
+    phrasingInverseGuidance: false,
     accEnabled: true,
     accDebugMode: false,
     accPrompt: DEFAULT_ACC_PROMPT,
