@@ -1,9 +1,10 @@
 import { loadWorldInfo as __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_loadWorldInfo__, world_names as __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_world_names__ } from "../../../../world-info.js";
+import { extension_prompt_roles as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_roles__, extension_prompt_types as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_types__, generateRaw as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__, getMaxContextSize as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_getMaxContextSize__, setExtensionPrompt as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_setExtensionPrompt__, substituteParams as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParams__ } from "../../../../../script.js";
+import { getTokenCountAsync as __WEBPACK_EXTERNAL_MODULE__tokenizers_js_d5863f55_getTokenCountAsync__ } from "../../../../tokenizers.js";
 import { groups as __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_groups__, selected_group as __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__ } from "../../../../group-chats.js";
 import { SlashCommandParser as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandParser_js_42c8b851_SlashCommandParser__ } from "../../../../slash-commands/SlashCommandParser.js";
 import { SlashCommand as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommand_js_1b0d5616_SlashCommand__ } from "../../../../slash-commands/SlashCommand.js";
 import { ARGUMENT_TYPE as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandArgument_js_a42b9371_ARGUMENT_TYPE__, SlashCommandArgument as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandArgument_js_a42b9371_SlashCommandArgument__ } from "../../../../slash-commands/SlashCommandArgument.js";
-import { extension_prompt_roles as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_roles__, extension_prompt_types as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_types__, generateRaw as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__, setExtensionPrompt as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_setExtensionPrompt__, substituteParams as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParams__ } from "../../../../../script.js";
 import { removeReasoningFromString as __WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__ } from "../../../../reasoning.js";
 /******/ var __webpack_modules__ = ({
 
@@ -1155,6 +1156,10 @@ var code = `<div id="saints_silly_settings" class="extension_settings"> <div cla
 /* harmony default export */ const settings = (code);
 ;// external "../../../../world-info.js"
 
+;// external "../../../../../script.js"
+
+;// external "../../../../tokenizers.js"
+
 ;// ./src/utils.js
 /**
  * Shared utilities for SillyTavern extensions.
@@ -1168,6 +1173,8 @@ var code = `<div id="saints_silly_settings" class="extension_settings"> <div cla
  *   - Generation lifecycle helpers
  *   - Generation context preamble (chat + lore books)
  */
+
+
 
 
 
@@ -1407,29 +1414,71 @@ function getAvailableLoreBookNames() {
     return [];
 }
 
+// Tokens reserved on top of `responseLength` for the surrounding prompt
+// scaffolding (system prompt, "Existing context to consider…" header, task
+// instructions). Conservative — overshooting just leaves a little extra room.
+const PREAMBLE_BUDGET_RESERVE = 256;
+
+// Fallback message count when the tokenizer / max-context APIs are
+// unavailable. Matches the previous hardcoded behavior.
+const PREAMBLE_FALLBACK_MESSAGE_LIMIT = 20;
+
+/**
+ * Format a single chat message for inclusion in the preamble.
+ */
+function formatChatLine(m, ctx) {
+    const who = m.name || (m.is_user ? (ctx.name1 || 'User') : (ctx.name2 || 'Character'));
+    const text = (m.mes || '').trim();
+    return text ? `${who}: ${text}` : '';
+}
+
+/**
+ * Pack as many recent chat lines as the token budget allows, newest first,
+ * but return them in chronological order. Returns '' if nothing fits.
+ */
+async function packRecentChatLines(chat, ctx, chatBudget) {
+    if (!chat.length || chatBudget <= 0) return '';
+    const picked = [];
+    let used = 0;
+    // The eventual join uses '\n' between lines, so each additional line
+    // costs roughly its own tokens plus one separator.
+    for (let i = chat.length - 1; i >= 0; i--) {
+        const line = formatChatLine(chat[i], ctx);
+        if (!line) continue;
+        const cost = await __WEBPACK_EXTERNAL_MODULE__tokenizers_js_d5863f55_getTokenCountAsync__(line + '\n');
+        if (used + cost > chatBudget) break;
+        picked.push(line);
+        used += cost;
+    }
+    picked.reverse();
+    return picked.join('\n');
+}
+
 /**
  * Build a context preamble string suitable for prepending to a generation
  * prompt. Combines (optionally) the current chat / character / persona and
  * the active entries of any selected lore books.
  *
+ * Recent chat is packed to fit the model's remaining context budget
+ * (`getMaxContextSize() - responseLength - reserve`), after the non-chat
+ * sections have been counted. No fixed message cap.
+ *
  * @param {object} opts
  * @param {boolean} [opts.includeChat=false] - Include character card, persona, and recent chat messages.
  * @param {string[]} [opts.loreBookNames=[]] - Names of lore books whose enabled entries to include.
- * @param {number}  [opts.chatMessageLimit=20] - Max recent chat messages to include.
+ * @param {number}  [opts.responseLength=0] - Tokens reserved for the model's response; subtracted from the budget.
  * @returns {Promise<string>} The composed preamble, or '' if nothing was included.
  */
 async function buildContextPreamble({
     includeChat = false,
     loreBookNames = [],
-    chatMessageLimit = 20,
+    responseLength = 0,
 } = {}) {
     const sections = [];
+    const ctx = getContext();
 
+    // Non-chat sections first — they're prioritized over chat in the budget.
     if (includeChat) {
-        const ctx = getContext();
-
-        // Resolve the active character(s). In a group chat we walk every
-        // enabled member; in a solo chat we just take the current character.
         const activeChars = collectActiveCharacters(ctx);
         for (const { displayName, char } of activeChars) {
             const lines = [];
@@ -1443,21 +1492,8 @@ async function buildContextPreamble({
             }
         }
 
-        // User persona
         const persona = ctx.powerUserSettings?.persona_description?.trim();
         if (persona) sections.push(`[User Persona]\n${persona}`);
-
-        // Recent chat messages
-        const chat = Array.isArray(ctx.chat) ? ctx.chat : [];
-        if (chat.length) {
-            const recent = chat.slice(-chatMessageLimit);
-            const lines = recent.map(m => {
-                const who = m.name || (m.is_user ? (ctx.name1 || 'User') : (ctx.name2 || 'Character'));
-                const text = (m.mes || '').trim();
-                return text ? `${who}: ${text}` : '';
-            }).filter(Boolean);
-            if (lines.length) sections.push(`[Recent Chat]\n${lines.join('\n')}`);
-        }
     }
 
     if (Array.isArray(loreBookNames) && loreBookNames.length) {
@@ -1480,6 +1516,35 @@ async function buildContextPreamble({
             } catch (err) {
                 console.error(`Saints-Silly-Extensions: failed to load lore book "${name}":`, err);
             }
+        }
+    }
+
+    // Pack recent chat into whatever budget remains.
+    if (includeChat) {
+        const chat = Array.isArray(ctx.chat) ? ctx.chat : [];
+        if (chat.length) {
+            let recentBlock = '';
+            try {
+                const maxContext = __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_getMaxContextSize__();
+                if (!Number.isFinite(maxContext) || maxContext <= 0) {
+                    throw new Error(`getMaxContextSize returned ${maxContext}`);
+                }
+                const nonChatJoined = sections.join('\n\n');
+                const nonChatTokens = nonChatJoined
+                    ? await __WEBPACK_EXTERNAL_MODULE__tokenizers_js_d5863f55_getTokenCountAsync__(nonChatJoined)
+                    : 0;
+                const headerTokens = await __WEBPACK_EXTERNAL_MODULE__tokenizers_js_d5863f55_getTokenCountAsync__('[Recent Chat]\n');
+                const chatBudget = maxContext - responseLength - PREAMBLE_BUDGET_RESERVE
+                    - nonChatTokens - headerTokens;
+                const packed = await packRecentChatLines(chat, ctx, chatBudget);
+                if (packed) recentBlock = `[Recent Chat]\n${packed}`;
+            } catch (err) {
+                console.error('Saints-Silly-Extensions: token-budgeted chat packing failed; falling back to fixed limit.', err);
+                const recent = chat.slice(-PREAMBLE_FALLBACK_MESSAGE_LIMIT);
+                const lines = recent.map(m => formatChatLine(m, ctx)).filter(Boolean);
+                if (lines.length) recentBlock = `[Recent Chat]\n${lines.join('\n')}`;
+            }
+            if (recentBlock) sections.push(recentBlock);
         }
     }
 
@@ -2230,8 +2295,6 @@ function initPossession({ settings, phrasingApi: pApi }) {
     phrasingApi = pApi;
     debug = createDebugLogger('POSSESSION', () => settings.possessionDebugMode);
 }
-
-;// external "../../../../../script.js"
 
 ;// ./src/phrasing.js
 /**
@@ -3346,7 +3409,10 @@ function getResponseLength() {
 async function buildPreambleBlock(ctxOptions) {
     if (!ctxOptions) return '';
     if (!ctxOptions.includeChat && !(ctxOptions.loreBookNames && ctxOptions.loreBookNames.length)) return '';
-    const preamble = await buildContextPreamble(ctxOptions);
+    const preamble = await buildContextPreamble({
+        ...ctxOptions,
+        responseLength: getResponseLength(),
+    });
     if (!preamble) return '';
     assisted_character_creation_debug('Context preamble length:', preamble.length);
     return `Existing context to consider when generating (do not repeat verbatim):\n${preamble}\n\n`;
@@ -3510,6 +3576,11 @@ let observer = null;
 
 // Per-entry state, keyed by a stable id derived from the entry uid / DOM element
 const entryStates = new Map(); // id -> { originalSeed, hasGenerated, generating }
+
+// Tokens reserved for the model's response on every WIA generation. Used
+// both as the `responseLength` argument to `generateRaw` and as the
+// preamble's budget input so chat packing doesn't eat into response space.
+const WIA_RESPONSE_LENGTH = 600;
 
 // ─── Init ───
 
@@ -3778,7 +3849,10 @@ async function onAssist(formEl, id, isContinue) {
         const ctxOptions = readContextOptions(controls);
         let preamble = '';
         if (ctxOptions.includeChat || ctxOptions.loreBookNames.length) {
-            preamble = await buildContextPreamble(ctxOptions);
+            preamble = await buildContextPreamble({
+                ...ctxOptions,
+                responseLength: WIA_RESPONSE_LENGTH,
+            });
             world_info_assist_debug('Context preamble length:', preamble.length, 'options:', ctxOptions);
         }
         const preambleBlock = preamble
@@ -3818,7 +3892,7 @@ async function onAssist(formEl, id, isContinue) {
         const raw = await __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__({
             prompt: userPrompt,
             systemPrompt,
-            responseLength: 600,
+            responseLength: WIA_RESPONSE_LENGTH,
             ...(prefill ? { prefill } : {}),
         });
 

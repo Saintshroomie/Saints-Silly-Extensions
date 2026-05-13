@@ -518,7 +518,10 @@ function getResponseLength() {
 async function buildPreambleBlock(ctxOptions) {
     if (!ctxOptions) return '';
     if (!ctxOptions.includeChat && !(ctxOptions.loreBookNames && ctxOptions.loreBookNames.length)) return '';
-    const preamble = await buildContextPreamble(ctxOptions);
+    const preamble = await buildContextPreamble({
+        ...ctxOptions,
+        responseLength: getResponseLength(),
+    });
     if (!preamble) return '';
     debug('Context preamble length:', preamble.length);
     return `Existing context to consider when generating (do not repeat verbatim):\n${preamble}\n\n`;

@@ -52,6 +52,11 @@ let observer = null;
 // Per-entry state, keyed by a stable id derived from the entry uid / DOM element
 const entryStates = new Map(); // id -> { originalSeed, hasGenerated, generating }
 
+// Tokens reserved for the model's response on every WIA generation. Used
+// both as the `responseLength` argument to `generateRaw` and as the
+// preamble's budget input so chat packing doesn't eat into response space.
+const WIA_RESPONSE_LENGTH = 600;
+
 // ─── Init ───
 
 /**
@@ -319,7 +324,10 @@ async function onAssist(formEl, id, isContinue) {
         const ctxOptions = readContextOptions(controls);
         let preamble = '';
         if (ctxOptions.includeChat || ctxOptions.loreBookNames.length) {
-            preamble = await buildContextPreamble(ctxOptions);
+            preamble = await buildContextPreamble({
+                ...ctxOptions,
+                responseLength: WIA_RESPONSE_LENGTH,
+            });
             debug('Context preamble length:', preamble.length, 'options:', ctxOptions);
         }
         const preambleBlock = preamble
@@ -359,7 +367,7 @@ async function onAssist(formEl, id, isContinue) {
         const raw = await generateRaw({
             prompt: userPrompt,
             systemPrompt,
-            responseLength: 600,
+            responseLength: WIA_RESPONSE_LENGTH,
             ...(prefill ? { prefill } : {}),
         });
 

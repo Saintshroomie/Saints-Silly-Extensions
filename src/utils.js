@@ -12,6 +12,8 @@
  */
 
 import { loadWorldInfo, world_names } from '../../../../world-info.js';
+import { getMaxContextSize } from '../../../../../script.js';
+import { getTokenCountAsync } from '../../../../tokenizers.js';
 
 // ─── Context ───
 
@@ -249,29 +251,71 @@ export function getAvailableLoreBookNames() {
     return [];
 }
 
+// Tokens reserved on top of `responseLength` for the surrounding prompt
+// scaffolding (system prompt, "Existing context to consider…" header, task
+// instructions). Conservative — overshooting just leaves a little extra room.
+const PREAMBLE_BUDGET_RESERVE = 256;
+
+// Fallback message count when the tokenizer / max-context APIs are
+// unavailable. Matches the previous hardcoded behavior.
+const PREAMBLE_FALLBACK_MESSAGE_LIMIT = 20;
+
+/**
+ * Format a single chat message for inclusion in the preamble.
+ */
+function formatChatLine(m, ctx) {
+    const who = m.name || (m.is_user ? (ctx.name1 || 'User') : (ctx.name2 || 'Character'));
+    const text = (m.mes || '').trim();
+    return text ? `${who}: ${text}` : '';
+}
+
+/**
+ * Pack as many recent chat lines as the token budget allows, newest first,
+ * but return them in chronological order. Returns '' if nothing fits.
+ */
+async function packRecentChatLines(chat, ctx, chatBudget) {
+    if (!chat.length || chatBudget <= 0) return '';
+    const picked = [];
+    let used = 0;
+    // The eventual join uses '\n' between lines, so each additional line
+    // costs roughly its own tokens plus one separator.
+    for (let i = chat.length - 1; i >= 0; i--) {
+        const line = formatChatLine(chat[i], ctx);
+        if (!line) continue;
+        const cost = await getTokenCountAsync(line + '\n');
+        if (used + cost > chatBudget) break;
+        picked.push(line);
+        used += cost;
+    }
+    picked.reverse();
+    return picked.join('\n');
+}
+
 /**
  * Build a context preamble string suitable for prepending to a generation
  * prompt. Combines (optionally) the current chat / character / persona and
  * the active entries of any selected lore books.
  *
+ * Recent chat is packed to fit the model's remaining context budget
+ * (`getMaxContextSize() - responseLength - reserve`), after the non-chat
+ * sections have been counted. No fixed message cap.
+ *
  * @param {object} opts
  * @param {boolean} [opts.includeChat=false] - Include character card, persona, and recent chat messages.
  * @param {string[]} [opts.loreBookNames=[]] - Names of lore books whose enabled entries to include.
- * @param {number}  [opts.chatMessageLimit=20] - Max recent chat messages to include.
+ * @param {number}  [opts.responseLength=0] - Tokens reserved for the model's response; subtracted from the budget.
  * @returns {Promise<string>} The composed preamble, or '' if nothing was included.
  */
 export async function buildContextPreamble({
     includeChat = false,
     loreBookNames = [],
-    chatMessageLimit = 20,
+    responseLength = 0,
 } = {}) {
     const sections = [];
+    const ctx = getContext();
 
+    // Non-chat sections first — they're prioritized over chat in the budget.
     if (includeChat) {
-        const ctx = getContext();
-
-        // Resolve the active character(s). In a group chat we walk every
-        // enabled member; in a solo chat we just take the current character.
         const activeChars = collectActiveCharacters(ctx);
         for (const { displayName, char } of activeChars) {
             const lines = [];
@@ -285,21 +329,8 @@ export async function buildContextPreamble({
             }
         }
 
-        // User persona
         const persona = ctx.powerUserSettings?.persona_description?.trim();
         if (persona) sections.push(`[User Persona]\n${persona}`);
-
-        // Recent chat messages
-        const chat = Array.isArray(ctx.chat) ? ctx.chat : [];
-        if (chat.length) {
-            const recent = chat.slice(-chatMessageLimit);
-            const lines = recent.map(m => {
-                const who = m.name || (m.is_user ? (ctx.name1 || 'User') : (ctx.name2 || 'Character'));
-                const text = (m.mes || '').trim();
-                return text ? `${who}: ${text}` : '';
-            }).filter(Boolean);
-            if (lines.length) sections.push(`[Recent Chat]\n${lines.join('\n')}`);
-        }
     }
 
     if (Array.isArray(loreBookNames) && loreBookNames.length) {
@@ -322,6 +353,35 @@ export async function buildContextPreamble({
             } catch (err) {
                 console.error(`Saints-Silly-Extensions: failed to load lore book "${name}":`, err);
             }
+        }
+    }
+
+    // Pack recent chat into whatever budget remains.
+    if (includeChat) {
+        const chat = Array.isArray(ctx.chat) ? ctx.chat : [];
+        if (chat.length) {
+            let recentBlock = '';
+            try {
+                const maxContext = getMaxContextSize();
+                if (!Number.isFinite(maxContext) || maxContext <= 0) {
+                    throw new Error(`getMaxContextSize returned ${maxContext}`);
+                }
+                const nonChatJoined = sections.join('\n\n');
+                const nonChatTokens = nonChatJoined
+                    ? await getTokenCountAsync(nonChatJoined)
+                    : 0;
+                const headerTokens = await getTokenCountAsync('[Recent Chat]\n');
+                const chatBudget = maxContext - responseLength - PREAMBLE_BUDGET_RESERVE
+                    - nonChatTokens - headerTokens;
+                const packed = await packRecentChatLines(chat, ctx, chatBudget);
+                if (packed) recentBlock = `[Recent Chat]\n${packed}`;
+            } catch (err) {
+                console.error('Saints-Silly-Extensions: token-budgeted chat packing failed; falling back to fixed limit.', err);
+                const recent = chat.slice(-PREAMBLE_FALLBACK_MESSAGE_LIMIT);
+                const lines = recent.map(m => formatChatLine(m, ctx)).filter(Boolean);
+                if (lines.length) recentBlock = `[Recent Chat]\n${lines.join('\n')}`;
+            }
+            if (recentBlock) sections.push(recentBlock);
         }
     }
 
