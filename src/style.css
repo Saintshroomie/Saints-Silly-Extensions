@@ -644,3 +644,83 @@
     opacity: 0.6;
     font-style: italic;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   NARRATIVE GUIDANCE SETTINGS STYLES
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+#saints_silly_settings .saints_subsection_header {
+    margin: 12px 0 4px 0;
+    opacity: 0.85;
+}
+
+#saints_silly_settings .ng_prompt_section {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+#saints_silly_settings .ng_prompt_section textarea {
+    width: 100%;
+    resize: vertical;
+    font-family: monospace;
+    font-size: 0.9em;
+    margin-top: 4px;
+}
+
+#saints_silly_settings .ng_buttons_row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+
+#saints_silly_settings .ng_buttons_row .menu_button {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+    white-space: nowrap;
+}
+
+#saints_silly_settings .ng_inline_row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 6px 0;
+}
+
+#saints_silly_settings .ng_number_input {
+    width: 5em;
+    flex: 0 0 auto;
+}
+
+#saints_silly_settings .ng-lorebook-picker {
+    margin: 8px 0;
+}
+
+#saints_silly_settings .ng-lorebook-list {
+    margin-top: 4px;
+    padding: 6px 8px;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+#saints_silly_settings .ng-lorebook-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+#saints_silly_settings .ng-lorebook-empty {
+    opacity: 0.6;
+    font-style: italic;
+}
+
+#saints_silly_settings #ng_regenerate_now.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+}

@@ -53,6 +53,16 @@ import {
     bindWIASettings,
     DEFAULT_WIA_PROMPT,
 } from './world-info-assist.js';
+import {
+    initNarrativeGuidance,
+    bindNarrativeGuidanceSettings,
+    onNarrativeGuidanceChatChanged,
+    onNarrativeGuidanceMessageSent,
+    onNarrativeGuidanceMessageReceived,
+    DEFAULT_NG_GENERATION_PROMPT,
+    DEFAULT_NG_INJECTION_PROMPT,
+    DEFAULT_NG_TURN_COUNT,
+} from './narrative-guidance.js';
 
 // ─── Constants ───
 
@@ -72,6 +82,12 @@ const defaultSettings = {
     wiaEnabled: true,
     wiaDebugMode: false,
     wiaPrompt: DEFAULT_WIA_PROMPT,
+    narrativeGuidanceEnabled: false,
+    narrativeGuidanceDebugMode: false,
+    narrativeGuidanceGenerationPrompt: DEFAULT_NG_GENERATION_PROMPT,
+    narrativeGuidanceInjectionPrompt: DEFAULT_NG_INJECTION_PROMPT,
+    narrativeGuidanceDefaultTurnCount: DEFAULT_NG_TURN_COUNT,
+    narrativeGuidanceLoreBookNames: [],
 };
 
 // ─── State ───
@@ -104,6 +120,7 @@ function injectSettingsPanel() {
     bindPhrasingSettings(saveSettings);
     bindACCSettings(saveSettings);
     bindWIASettings(saveSettings);
+    bindNarrativeGuidanceSettings(saveSettings);
 }
 
 // ─── Merged Event Handlers ───
@@ -133,6 +150,7 @@ function onChatChanged() {
     loadPossessionState();
     syncAllPossessionUI();
     loadPromptTextarea();
+    onNarrativeGuidanceChatChanged();
     SSEDebug('Chat changed, state reloaded');
 }
 
@@ -166,6 +184,7 @@ jQuery(async () => {
     });
     initACC({ settings, saveSettings });
     initWIA({ settings });
+    initNarrativeGuidance({ settings });
 
     loadPossessionState();
     injectSettingsPanel();
@@ -189,7 +208,11 @@ jQuery(async () => {
     eventSource.on(eventTypes.GENERATION_ENDED, onGenerationEnded);
     eventSource.on(eventTypes.GENERATION_STOPPED, onGenerationStopped);
     eventSource.on(eventTypes.GROUP_WRAPPER_FINISHED, onGroupWrapperFinishedHandler);
-    eventSource.on(eventTypes.MESSAGE_SENT, onMessageSent);
+    eventSource.on(eventTypes.MESSAGE_SENT, async (idx) => {
+        onMessageSent(idx);
+        await onNarrativeGuidanceMessageSent(idx);
+    });
+    eventSource.on(eventTypes.MESSAGE_RECEIVED, onNarrativeGuidanceMessageReceived);
 
     // Slash commands
     registerPossessionSlashCommands();
