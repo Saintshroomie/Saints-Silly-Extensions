@@ -29,7 +29,6 @@ import {
 
 const NG_INJECTION_KEY = 'narrative_guidance';
 const NG_METADATA_KEY = 'narrativeGuidance';
-const NG_RESPONSE_LENGTH = 400;
 
 export const DEFAULT_NG_GENERATION_PROMPT =
     '[The following paragraph is based on the given context, and will guide the actions of the characters for the next several turns:';
@@ -40,6 +39,7 @@ export const DEFAULT_NG_INJECTION_PROMPT =
 export const DEFAULT_NG_TURN_COUNT = 10;
 export const DEFAULT_NG_INJECTION_DEPTH = 0;
 export const DEFAULT_NG_INJECTION_ROLE = 'system';
+export const DEFAULT_NG_RESPONSE_LENGTH = 400;
 
 // ─── Module State ───
 
@@ -144,17 +144,23 @@ async function regenGuidance(reason) {
 
     regenInProgress = true;
     setRegenButtonRunning(true);
+    showRegenOverlay();
     clearInjection();
     debug('regenGuidance — starting, reason:', reason);
 
     try {
+        const responseLength = Number.isFinite(moduleSettings.narrativeGuidanceResponseLength)
+            && moduleSettings.narrativeGuidanceResponseLength > 0
+            ? moduleSettings.narrativeGuidanceResponseLength
+            : DEFAULT_NG_RESPONSE_LENGTH;
         const state = loadChatState();
         const preamble = await buildContextPreamble({
             includeChat: true,
             loreBookNames: Array.isArray(moduleSettings.narrativeGuidanceLoreBookNames)
                 ? moduleSettings.narrativeGuidanceLoreBookNames
                 : [],
-            responseLength: NG_RESPONSE_LENGTH,
+            responseLength,
+            maxContextOverride: moduleSettings.narrativeGuidanceMaxContextOverride || 0,
         });
 
         const themesBlock = state.themes && state.themes.trim()
@@ -187,7 +193,7 @@ async function regenGuidance(reason) {
         const raw = await generateRaw({
             prompt: userPrompt,
             systemPrompt,
-            responseLength: NG_RESPONSE_LENGTH,
+            responseLength,
             prefill,
         });
 
@@ -216,7 +222,34 @@ async function regenGuidance(reason) {
     } finally {
         regenInProgress = false;
         setRegenButtonRunning(false);
+        hideRegenOverlay();
     }
+}
+
+// ─── Regeneration Overlay ───
+
+const NG_OVERLAY_ID = 'ng_regen_overlay';
+
+function showRegenOverlay() {
+    if (document.getElementById(NG_OVERLAY_ID)) return;
+    const overlay = document.createElement('div');
+    overlay.id = NG_OVERLAY_ID;
+    overlay.className = 'ng-regen-overlay';
+    overlay.innerHTML = `
+        <div class="ng-regen-overlay-card">
+            <div class="ng-regen-overlay-spinner"><span class="fa-solid fa-wand-sparkles fa-spin"></span></div>
+            <div class="ng-regen-overlay-title">Regenerating narrative guidance…</div>
+            <div class="ng-regen-overlay-subtitle">Please wait — input is paused until the new guidance is ready.</div>
+        </div>
+    `;
+    // Block keyboard activation of focused buttons (Enter / Space) while up.
+    overlay.addEventListener('keydown', (e) => { e.stopPropagation(); e.preventDefault(); });
+    document.body.appendChild(overlay);
+}
+
+function hideRegenOverlay() {
+    const overlay = document.getElementById(NG_OVERLAY_ID);
+    if (overlay) overlay.remove();
 }
 
 // ─── Event Handlers ───
@@ -407,6 +440,28 @@ export function bindNarrativeGuidanceSettings(saveSettings) {
                 moduleSettings.narrativeGuidanceDefaultTurnCount = n;
                 saveSettings();
             }
+        });
+    }
+
+    const responseLengthInput = document.getElementById('ng_response_length');
+    if (responseLengthInput) {
+        responseLengthInput.value = moduleSettings.narrativeGuidanceResponseLength || DEFAULT_NG_RESPONSE_LENGTH;
+        responseLengthInput.addEventListener('input', () => {
+            const n = parseInt(responseLengthInput.value, 10);
+            if (Number.isFinite(n) && n > 0) {
+                moduleSettings.narrativeGuidanceResponseLength = n;
+                saveSettings();
+            }
+        });
+    }
+
+    const maxContextInput = document.getElementById('ng_max_context_override');
+    if (maxContextInput) {
+        maxContextInput.value = moduleSettings.narrativeGuidanceMaxContextOverride || 0;
+        maxContextInput.addEventListener('input', () => {
+            const n = parseInt(maxContextInput.value, 10);
+            moduleSettings.narrativeGuidanceMaxContextOverride = Number.isFinite(n) && n > 0 ? n : 0;
+            saveSettings();
         });
     }
 

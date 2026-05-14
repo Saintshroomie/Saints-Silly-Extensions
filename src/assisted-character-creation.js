@@ -172,6 +172,15 @@ export function bindACCSettings(saveSettings) {
             saveSettings();
         });
     }
+    const maxContextInput = document.getElementById('acc_max_context_override');
+    if (maxContextInput) {
+        maxContextInput.value = moduleSettings.accMaxContextOverride || 0;
+        maxContextInput.addEventListener('input', () => {
+            const n = parseInt(maxContextInput.value, 10);
+            moduleSettings.accMaxContextOverride = Number.isFinite(n) && n > 0 ? n : 0;
+            saveSettings();
+        });
+    }
     if (promptArea) {
         promptArea.value = moduleSettings.accPrompt || DEFAULT_ACC_PROMPT;
         promptArea.addEventListener('input', () => {
@@ -521,6 +530,7 @@ async function buildPreambleBlock(ctxOptions) {
     const preamble = await buildContextPreamble({
         ...ctxOptions,
         responseLength: getResponseLength(),
+        maxContextOverride: moduleSettings?.accMaxContextOverride || 0,
     });
     if (!preamble) return '';
     debug('Context preamble length:', preamble.length);

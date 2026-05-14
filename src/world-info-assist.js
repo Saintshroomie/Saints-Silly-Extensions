@@ -327,6 +327,7 @@ async function onAssist(formEl, id, isContinue) {
             preamble = await buildContextPreamble({
                 ...ctxOptions,
                 responseLength: WIA_RESPONSE_LENGTH,
+                maxContextOverride: moduleSettings?.wiaMaxContextOverride || 0,
             });
             debug('Context preamble length:', preamble.length, 'options:', ctxOptions);
         }
@@ -465,6 +466,15 @@ export function bindWIASettings(saveSettings) {
         debugCb.checked = !!moduleSettings.wiaDebugMode;
         debugCb.addEventListener('change', () => {
             moduleSettings.wiaDebugMode = debugCb.checked;
+            saveSettings();
+        });
+    }
+    const maxContextInput = document.getElementById('wia_max_context_override');
+    if (maxContextInput) {
+        maxContextInput.value = moduleSettings.wiaMaxContextOverride || 0;
+        maxContextInput.addEventListener('input', () => {
+            const n = parseInt(maxContextInput.value, 10);
+            moduleSettings.wiaMaxContextOverride = Number.isFinite(n) && n > 0 ? n : 0;
             saveSettings();
         });
     }
