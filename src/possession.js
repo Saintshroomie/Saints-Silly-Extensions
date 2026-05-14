@@ -15,7 +15,14 @@ const POSSESSION_METADATA_KEY = 'possession';
 
 let possessedCharName = null;
 let possessedCharAvatar = null;
-let generationGuard = false;
+// Re-entry guard for executePossessedContinue. We trigger an inner
+// /continue (or click on #option_continue) inside that function which would
+// fire our own Continue interceptor again; the flag short-circuits the
+// nested intercept. Scoped to executePossessedContinue's try/finally rather
+// than tied to host generation events, because the host can emit unpaired
+// GENERATION_STARTED for quiet/background generations and would otherwise
+// strand the guard.
+let inPossessedContinue = false;
 
 /** @type {{ settings: object, saveSettings: function }} */
 let ctx = null;
@@ -38,10 +45,6 @@ export function isPossessing() {
 
 export function getPossessedCharName() {
     return possessedCharName;
-}
-
-export function isGenerationGuarded() {
-    return generationGuard;
 }
 
 // ─── Persistence ───
@@ -214,7 +217,10 @@ export function onMessageSent(messageIndex) {
 // ─── Continue Interception ───
 
 function handleContinueIntercept(event) {
-    if (!ctx.settings.possessionEnabled || !isPossessing() || generationGuard) return;
+    if (!ctx.settings.possessionEnabled || !isPossessing()) return;
+    if (inPossessedContinue) return;
+    const context = getContext();
+    if (context.isGenerating) return;
 
     const textarea = document.getElementById('send_textarea');
     const text = textarea?.value?.trim();
@@ -236,14 +242,19 @@ async function executePossessedContinue(text) {
         textarea.dispatchEvent(new Event('input', { bubbles: true }));
     }
 
-    await postPossessedMessage(text);
-    await new Promise(resolve => requestAnimationFrame(resolve));
+    inPossessedContinue = true;
+    try {
+        await postPossessedMessage(text);
+        await new Promise(resolve => requestAnimationFrame(resolve));
 
-    if (context.executeSlashCommandsWithOptions) {
-        await context.executeSlashCommandsWithOptions('/continue');
-    } else {
-        const continueBtn = document.getElementById('option_continue');
-        if (continueBtn) continueBtn.click();
+        if (context.executeSlashCommandsWithOptions) {
+            await context.executeSlashCommandsWithOptions('/continue');
+        } else {
+            const continueBtn = document.getElementById('option_continue');
+            if (continueBtn) continueBtn.click();
+        }
+    } finally {
+        inPossessedContinue = false;
     }
 }
 
@@ -483,7 +494,7 @@ function injectPossessionImpersonateButton() {
 
     btn.addEventListener('click', async () => {
         const context = getContext();
-        if (context.isGenerating || generationGuard) return;
+        if (context.isGenerating) return;
 
         debug('Possession impersonate clicked — triggering generation for', char.name);
 
@@ -575,14 +586,24 @@ export function syncAllPossessionUI() {
 }
 
 // ─── Generation Lifecycle ───
+//
+// We deliberately ignore host GENERATION_STARTED here. Some SillyTavern
+// features and other extensions emit GENERATION_STARTED for quiet/background
+// generations (auto-impersonate, summary, translation, etc.) without a
+// matching GENERATION_ENDED, which would otherwise strand the impersonate
+// button with `possession_hidden` and leave the re-entry guard stuck.
+// The possession impersonate button's click handler and the Continue
+// interceptor both guard on `context.isGenerating` directly, so leaving
+// the button visible during host generations is safe — clicks are no-ops.
+//
+// onGenerationEnded still re-syncs the UI as a safety net, which rebuilds
+// the impersonate button from scratch and clears any stranded class.
 
 export function onGenerationStarted() {
-    generationGuard = true;
-    hidePossessionImpersonateButton();
+    // No-op for UI; host events can arrive unpaired.
 }
 
 export function onGenerationEnded() {
-    generationGuard = false;
     syncAllPossessionUI();
 }
 

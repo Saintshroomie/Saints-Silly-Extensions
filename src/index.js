@@ -138,14 +138,14 @@ function injectSettingsPanel() {
 function onGenerationStarted() {
     possessionGenStarted();
     phrasingGenStarted();
-    SSEDebug('Generation started, guard ON');
+    SSEDebug('Generation started');
 }
 
 function onGenerationEnded() {
     possessionGenEnded();
     phrasingGenEnded();
     showPossessionImpersonateButton();
-    SSEDebug('Generation ended, guard OFF');
+    SSEDebug('Generation ended');
 }
 
 function onGenerationStopped() {
@@ -153,7 +153,7 @@ function onGenerationStopped() {
     possessionGenEnded();
     phrasingGenEnded();
     showPossessionImpersonateButton();
-    SSEDebug('Generation stopped, guard OFF');
+    SSEDebug('Generation stopped');
 }
 
 function onChatChanged() {

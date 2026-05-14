@@ -478,10 +478,20 @@ function onRestoreInverseDefault() {
 }
 
 // ─── Generation Lifecycle ───
+//
+// We deliberately do NOT hide the buttons on host GENERATION_STARTED. Some
+// SillyTavern features and other extensions emit GENERATION_STARTED for
+// quiet/background generations (auto-impersonate, summary, translation,
+// etc.) without a matching GENERATION_ENDED reaching our handler, which
+// would otherwise leave the Quill stranded with `phrasing-hidden`. Our own
+// Phrasing flow still hides the buttons explicitly in `onInputPhrasingClick`,
+// so visual feedback during a rephrase is preserved.
+//
+// onGenerationEnded is kept as a safety net: it always shows the buttons,
+// so any stranded hide cleared by a later generation cycle still recovers.
 
 export function onGenerationStarted() {
-    debug('onGenerationStarted — host event received');
-    hideAllPhrasingButtons();
+    debug('onGenerationStarted — host event received (ignored for button visibility)');
 }
 
 export function onGenerationEnded() {
