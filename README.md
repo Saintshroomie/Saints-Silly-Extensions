@@ -1,6 +1,6 @@
 # Saint's Silly Extensions
 
-A [SillyTavern](https://github.com/SillyTavern/SillyTavern) third-party extension that adds four integrated roleplay tools: **Possession**, **Phrasing**, **Assisted Character Creation**, and **World Info Assist**
+A [SillyTavern](https://github.com/SillyTavern/SillyTavern) third-party extension that adds five integrated roleplay tools: **Possession**, **Phrasing**, **Assisted Character Creation**, **World Info Assist**, and **Narrative Guidance**
 
 ## Features
 
@@ -55,6 +55,19 @@ Adds an **Assist** button to every World Info / lore book entry, letting you dra
 - **Editable prompt template** — The default prompt instructs the model to emit a `[ Subject: Description ]` world lore artifact with no commentary. You can edit it freely in the settings panel and Restore Default at any time.
 - **No schema** — Unlike Assisted Character Creation, World Info Assist has no schema. The prompt itself defines the desired output format.
 
+### Narrative Guidance
+
+Periodically asks the LLM for a short paragraph of story guidance based on the current chat, character cards, and selected lore books, then injects that paragraph as a system prompt before every AI turn until a per-chat turn counter expires — at which point it auto-regenerates.
+
+- **Per-chat state** — Active guidance, remaining turn count, and themes/ideas are persisted per chat (via `chatMetadata`) and reload automatically when switching chats.
+- **Auto-regenerate at zero** — When the turn counter hits zero on the AI's reply that decrements it, a new guidance paragraph is generated in the background so it's ready before your next send. A full-screen overlay masks the UI for the duration of the regeneration so you can't accidentally send a message mid-regen. Optional — turn it off to keep the counter purely as a manual prompt.
+- **Manual regenerate** — A **Regenerate Now** button in the settings panel forces a fresh generation at any time. The `-1` and `Reset` buttons next to the remaining-turn display let you nudge or reset the counter without regenerating.
+- **Editable everything** — The generation prompt (used as a prefill for a text-completion-style call), the injection template (with `{{guidance}}` placeholder), and the live guidance paragraph itself are all directly editable. Edits to the active guidance apply on the next AI turn.
+- **Themes / arcs input** — A per-chat textarea where you can offer themes, ideas, or general arcs for the model to weave into the next round of guidance.
+- **Injection controls** — Depth and Role inputs (mirroring SillyTavern's Author's Note) control where in the prompt the guidance is inserted and which role it speaks as.
+- **Lore book picker** — Pick which lore books to feed into the guidance generation's context preamble.
+- **Configurable token limits** — Set the response token limit for the generation, and optionally cap how much chat history feeds into the context preamble.
+
 ### How to Use Possession
 
 Possession allows you to "possess" an active character in your solo or group chat (more useful for group chats). When possessing, your messages will be sent as that character rather than your active persona.
@@ -98,6 +111,16 @@ When Possession and Phrasing are used together, you can quickly take over charac
 3. (Optional) Type any guidance into the content textarea — keywords, a rough idea, tone, canon notes, anything you want the model to consider.
 4. Click **Assist** to generate the entry. The result is written into the content textarea and saved automatically.
 5. Click **Continue** to extend the entry, **Retry** to re-roll from your original guidance text, or **Revert** to discard the generation and restore what you originally typed.
+
+### How to Use Narrative Guidance
+
+1. Open **Extensions** > **Saint's Silly Extensions** and find the **Narrative Guidance** section. Tick **Enable Narrative Guidance**.
+2. (Optional) Adjust **Turns Between Regenerations** (default 10). This is how many AI replies elapse between automatic regenerations.
+3. (Optional) Edit the **Themes / Story Arcs** textarea with anything you want the next round of guidance to weave in — ideas, arcs, "introduce a mysterious stranger", etc.
+4. (Optional) Tick lore books in the picker to fold their entries into the guidance generation's context.
+5. Send a message in your chat. With **Auto-Regenerate at Zero** on, the first generation kicks off automatically (the UI is masked while it runs) and the resulting paragraph fills the **Active Guidance** textarea.
+6. From there, every subsequent AI turn is steered by the active guidance until the counter hits zero, at which point fresh guidance is generated based on the now-updated chat context (and your latest themes).
+7. Click **Regenerate Now** at any time to force an immediate regeneration. Use **-1** and **Reset** to nudge the counter without regenerating. Edit the **Active Guidance** textarea directly to hand-tune the steering.
 
 
 ## Installation
@@ -148,6 +171,7 @@ Open **Extensions** > **Saint's Silly Extensions** in SillyTavern's settings pan
 |---------|-------------|
 | Enable Assisted Character Creation | Toggle the ACC feature and its Assist button on the character page |
 | ACC Debug Mode | Log detailed ACC events, prompts, and generations to the browser console |
+| Max Context Override | If > 0, caps how many tokens of chat context the preamble packer uses for ACC generations. 0 = use the model's full context size. |
 | Prompt Template | Customize the prompt sent to the LLM for character generation. Sent first, followed by the user's Character Brief. |
 | Restore Default | Reset the prompt template back to the built-in default |
 
@@ -157,8 +181,28 @@ Open **Extensions** > **Saint's Silly Extensions** in SillyTavern's settings pan
 |---------|-------------|
 | Enable World Info Assist | Toggle the WI Assist feature and inject/remove its per-entry Assist buttons |
 | WI Assist Debug Mode | Log detailed WI Assist events, prompts, and generations to the browser console |
+| Max Context Override | If > 0, caps how many tokens of chat context the preamble packer uses for WIA generations. 0 = use the model's full context size. |
 | Prompt Template | Customize the prompt sent to the LLM for World Info entry generation |
 | Restore Default | Reset the prompt template back to the built-in default |
+
+### Narrative Guidance Settings
+
+| Setting | Description |
+|---------|-------------|
+| Enable Narrative Guidance | Toggle the feature on/off |
+| Auto-Regenerate at Zero | When on, automatically regenerates guidance the moment the turn counter hits zero. When off, the counter still decrements but only **Regenerate Now** updates the guidance. |
+| Narrative Guidance Debug Mode | Log detailed Narrative Guidance events to the browser console |
+| Turns Between Regenerations | How many AI replies elapse between automatic regenerations (default 10) |
+| Response Token Limit | Maximum tokens the model may use for each guidance paragraph (default 400) |
+| Max Context Override | If > 0, caps how many tokens of chat context the preamble packer uses for guidance generations. 0 = use the model's full context size. |
+| Generation Prompt | Prefill text the LLM continues to produce the guidance paragraph |
+| Injection Prompt Template | Template injected before each AI turn. Supports the `{{guidance}}` placeholder. |
+| Depth | Number of recent chat messages to insert the guidance after (0 = at the bottom) |
+| Role | Role used when injecting the guidance (System / User / Assistant) |
+| Lore Books | Optional picker for lore books to feed into the guidance generation's context |
+| Themes / Story Arcs (per-chat) | Themes, ideas, or arcs for the model to weave into the next round of guidance |
+| Active Guidance (per-chat) | The currently active guidance paragraph. Edit directly to hand-tune steering; edits apply on the next AI turn. |
+| Turns Remaining / -1 / Reset / Regenerate Now | Manual controls over the per-chat counter and on-demand regeneration |
 
 ## Slash Commands
 
