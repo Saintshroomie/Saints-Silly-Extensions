@@ -135,7 +135,12 @@ function injectSettingsPanel() {
 
 // ─── Merged Event Handlers ───
 
-function onGenerationStarted() {
+function onGenerationStarted(_type, _options, dryRun) {
+    // SillyTavern's PromptManager fires GENERATION_STARTED for dry-run
+    // probes (token counts, prompt composition) on page load, CHAT_LOADED,
+    // CHARACTER_EDITED, etc. Those never emit ENDED/STOPPED, so reacting
+    // to them strands any button we hide here.
+    if (dryRun) return;
     possessionGenStarted();
     phrasingGenStarted();
     SSEDebug('Generation started');
@@ -160,7 +165,6 @@ function onChatChanged() {
     loadPossessionState();
     syncAllPossessionUI();
     loadPromptTextarea();
-    applyPhrasingEnabledState();
     onNarrativeGuidanceChatChanged();
     SSEDebug('Chat changed, state reloaded');
 }
