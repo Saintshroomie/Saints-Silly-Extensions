@@ -143,6 +143,16 @@ export function handlePhrasingSeedReinjection() {
 }
 
 // ─── Button Visibility ───
+//
+// Two orthogonal CSS classes drive visibility:
+//   - phrasing-hidden    transient hide during a generation; added on
+//                        GENERATION_STARTED, always cleared on GENERATION_ENDED
+//                        (regardless of the enabled setting).
+//   - phrasing-disabled  user has turned the feature off; toggled only by
+//                        applyPhrasingEnabledState.
+// Either class hides the button via display:none, so the two states never
+// have to stay in lock-step — an unbalanced hide/show pair can't strand the
+// button in a hidden state.
 
 export function hideAllPhrasingButtons() {
     document.querySelectorAll('.phrasing-trigger').forEach(el => {
@@ -151,18 +161,16 @@ export function hideAllPhrasingButtons() {
 }
 
 export function showAllPhrasingButtons() {
-    if (!ctx.settings.phrasingEnabled) return;
     document.querySelectorAll('.phrasing-trigger').forEach(el => {
         el.classList.remove('phrasing-hidden');
     });
 }
 
 export function applyPhrasingEnabledState() {
-    if (ctx.settings.phrasingEnabled) {
-        showAllPhrasingButtons();
-    } else {
-        hideAllPhrasingButtons();
-    }
+    const disabled = !ctx.settings.phrasingEnabled;
+    document.querySelectorAll('.phrasing-trigger').forEach(el => {
+        el.classList.toggle('phrasing-disabled', disabled);
+    });
 }
 
 // ─── Primary Flow (Input Enrichment) ───
