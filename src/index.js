@@ -62,6 +62,8 @@ import {
     DEFAULT_NG_GENERATION_PROMPT,
     DEFAULT_NG_INJECTION_PROMPT,
     DEFAULT_NG_TURN_COUNT,
+    DEFAULT_NG_INJECTION_DEPTH,
+    DEFAULT_NG_INJECTION_ROLE,
 } from './narrative-guidance.js';
 
 // ─── Constants ───
@@ -88,6 +90,8 @@ const defaultSettings = {
     narrativeGuidanceGenerationPrompt: DEFAULT_NG_GENERATION_PROMPT,
     narrativeGuidanceInjectionPrompt: DEFAULT_NG_INJECTION_PROMPT,
     narrativeGuidanceDefaultTurnCount: DEFAULT_NG_TURN_COUNT,
+    narrativeGuidanceInjectionDepth: DEFAULT_NG_INJECTION_DEPTH,
+    narrativeGuidanceInjectionRole: DEFAULT_NG_INJECTION_ROLE,
     narrativeGuidanceLoreBookNames: [],
 };
 
