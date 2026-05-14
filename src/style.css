@@ -140,9 +140,10 @@
     text-align: center;
 }
 
-/* ── Hide buttons during generation ── */
+/* ── Hide buttons during generation / when feature disabled ── */
 
-.phrasing-hidden {
+.phrasing-hidden,
+.phrasing-disabled {
     display: none !important;
 }
 
