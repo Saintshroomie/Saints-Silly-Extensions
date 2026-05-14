@@ -2574,22 +2574,28 @@ function handlePhrasingSeedReinjection() {
 // button in a hidden state.
 
 function hideAllPhrasingButtons() {
-    document.querySelectorAll('.phrasing-trigger').forEach(el => {
-        el.classList.add('phrasing-hidden');
-    });
+    const els = document.querySelectorAll('.phrasing-trigger');
+    els.forEach(el => el.classList.add('phrasing-hidden'));
+    phrasing_debug('hideAllPhrasingButtons — matched', els.length, 'element(s)');
 }
 
 function showAllPhrasingButtons() {
-    document.querySelectorAll('.phrasing-trigger').forEach(el => {
-        el.classList.remove('phrasing-hidden');
-    });
+    const els = document.querySelectorAll('.phrasing-trigger');
+    els.forEach(el => el.classList.remove('phrasing-hidden'));
+    phrasing_debug('showAllPhrasingButtons — matched', els.length, 'element(s)');
 }
 
 function applyPhrasingEnabledState() {
-    const disabled = !phrasing_ctx.settings.phrasingEnabled;
-    document.querySelectorAll('.phrasing-trigger').forEach(el => {
-        el.classList.toggle('phrasing-disabled', disabled);
+    const enabled = !!phrasing_ctx.settings.phrasingEnabled;
+    const els = document.querySelectorAll('.phrasing-trigger');
+    els.forEach(el => {
+        el.classList.toggle('phrasing-disabled', !enabled);
+        // When (re-)enabling, also clear any stranded transient hide so the
+        // user can always recover an orphaned phrasing-hidden by toggling
+        // the setting off and back on.
+        if (enabled) el.classList.remove('phrasing-hidden');
     });
+    phrasing_debug('applyPhrasingEnabledState — enabled:', enabled, '| matched', els.length, 'element(s)');
 }
 
 // ─── Primary Flow (Input Enrichment) ───
@@ -2893,10 +2899,12 @@ function onRestoreInverseDefault() {
 // ─── Generation Lifecycle ───
 
 function phrasing_onGenerationStarted() {
+    phrasing_debug('onGenerationStarted — host event received');
     hideAllPhrasingButtons();
 }
 
 function phrasing_onGenerationEnded() {
+    phrasing_debug('onGenerationEnded — host event received, phrasingActive:', phrasingActive);
     if (phrasingActive) {
         clearPhrasingInjection();
         phrasingActive = false;
