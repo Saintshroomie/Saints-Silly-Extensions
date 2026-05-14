@@ -15,13 +15,9 @@ const POSSESSION_METADATA_KEY = 'possession';
 
 let possessedCharName = null;
 let possessedCharAvatar = null;
-// Re-entry guard for executePossessedContinue. We trigger an inner
-// /continue (or click on #option_continue) inside that function which would
-// fire our own Continue interceptor again; the flag short-circuits the
-// nested intercept. Scoped to executePossessedContinue's try/finally rather
-// than tied to host generation events, because the host can emit unpaired
-// GENERATION_STARTED for quiet/background generations and would otherwise
-// strand the guard.
+// Re-entry guard: executePossessedContinue triggers an inner /continue
+// (or clicks #option_continue) that would fire our Continue interceptor
+// again. This flag short-circuits the nested intercept.
 let inPossessedContinue = false;
 
 /** @type {{ settings: object, saveSettings: function }} */
@@ -586,21 +582,9 @@ export function syncAllPossessionUI() {
 }
 
 // ─── Generation Lifecycle ───
-//
-// We deliberately ignore host GENERATION_STARTED here. Some SillyTavern
-// features and other extensions emit GENERATION_STARTED for quiet/background
-// generations (auto-impersonate, summary, translation, etc.) without a
-// matching GENERATION_ENDED, which would otherwise strand the impersonate
-// button with `possession_hidden` and leave the re-entry guard stuck.
-// The possession impersonate button's click handler and the Continue
-// interceptor both guard on `context.isGenerating` directly, so leaving
-// the button visible during host generations is safe — clicks are no-ops.
-//
-// onGenerationEnded still re-syncs the UI as a safety net, which rebuilds
-// the impersonate button from scratch and clears any stranded class.
 
 export function onGenerationStarted() {
-    // No-op for UI; host events can arrive unpaired.
+    hidePossessionImpersonateButton();
 }
 
 export function onGenerationEnded() {

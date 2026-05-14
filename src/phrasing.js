@@ -143,40 +143,26 @@ export function handlePhrasingSeedReinjection() {
 }
 
 // ─── Button Visibility ───
-//
-// Two orthogonal CSS classes drive visibility:
-//   - phrasing-hidden    transient hide during a generation; added on
-//                        GENERATION_STARTED, always cleared on GENERATION_ENDED
-//                        (regardless of the enabled setting).
-//   - phrasing-disabled  user has turned the feature off; toggled only by
-//                        applyPhrasingEnabledState.
-// Either class hides the button via display:none, so the two states never
-// have to stay in lock-step — an unbalanced hide/show pair can't strand the
-// button in a hidden state.
 
 export function hideAllPhrasingButtons() {
-    const els = document.querySelectorAll('.phrasing-trigger');
-    els.forEach(el => el.classList.add('phrasing-hidden'));
-    debug('hideAllPhrasingButtons — matched', els.length, 'element(s)');
+    document.querySelectorAll('.phrasing-trigger').forEach(el => {
+        el.classList.add('phrasing-hidden');
+    });
 }
 
 export function showAllPhrasingButtons() {
-    const els = document.querySelectorAll('.phrasing-trigger');
-    els.forEach(el => el.classList.remove('phrasing-hidden'));
-    debug('showAllPhrasingButtons — matched', els.length, 'element(s)');
+    if (!ctx.settings.phrasingEnabled) return;
+    document.querySelectorAll('.phrasing-trigger').forEach(el => {
+        el.classList.remove('phrasing-hidden');
+    });
 }
 
 export function applyPhrasingEnabledState() {
-    const enabled = !!ctx.settings.phrasingEnabled;
-    const els = document.querySelectorAll('.phrasing-trigger');
-    els.forEach(el => {
-        el.classList.toggle('phrasing-disabled', !enabled);
-        // When (re-)enabling, also clear any stranded transient hide so the
-        // user can always recover an orphaned phrasing-hidden by toggling
-        // the setting off and back on.
-        if (enabled) el.classList.remove('phrasing-hidden');
-    });
-    debug('applyPhrasingEnabledState — enabled:', enabled, '| matched', els.length, 'element(s)');
+    if (ctx.settings.phrasingEnabled) {
+        showAllPhrasingButtons();
+    } else {
+        hideAllPhrasingButtons();
+    }
 }
 
 // ─── Primary Flow (Input Enrichment) ───
@@ -478,24 +464,12 @@ function onRestoreInverseDefault() {
 }
 
 // ─── Generation Lifecycle ───
-//
-// We deliberately do NOT hide the buttons on host GENERATION_STARTED. Some
-// SillyTavern features and other extensions emit GENERATION_STARTED for
-// quiet/background generations (auto-impersonate, summary, translation,
-// etc.) without a matching GENERATION_ENDED reaching our handler, which
-// would otherwise leave the Quill stranded with `phrasing-hidden`. Our own
-// Phrasing flow still hides the buttons explicitly in `onInputPhrasingClick`,
-// so visual feedback during a rephrase is preserved.
-//
-// onGenerationEnded is kept as a safety net: it always shows the buttons,
-// so any stranded hide cleared by a later generation cycle still recovers.
 
 export function onGenerationStarted() {
-    debug('onGenerationStarted — host event received (ignored for button visibility)');
+    hideAllPhrasingButtons();
 }
 
 export function onGenerationEnded() {
-    debug('onGenerationEnded — host event received, phrasingActive:', phrasingActive);
     if (phrasingActive) {
         clearPhrasingInjection();
         phrasingActive = false;
