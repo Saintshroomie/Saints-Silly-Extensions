@@ -29,7 +29,6 @@ import {
 
 const NG_INJECTION_KEY = 'narrative_guidance';
 const NG_METADATA_KEY = 'narrativeGuidance';
-const NG_RESPONSE_LENGTH = 400;
 
 export const DEFAULT_NG_GENERATION_PROMPT =
     '[The following paragraph is based on the given context, and will guide the actions of the characters for the next several turns:';
@@ -40,6 +39,7 @@ export const DEFAULT_NG_INJECTION_PROMPT =
 export const DEFAULT_NG_TURN_COUNT = 10;
 export const DEFAULT_NG_INJECTION_DEPTH = 0;
 export const DEFAULT_NG_INJECTION_ROLE = 'system';
+export const DEFAULT_NG_RESPONSE_LENGTH = 400;
 
 // ─── Module State ───
 
@@ -149,13 +149,17 @@ async function regenGuidance(reason) {
     debug('regenGuidance — starting, reason:', reason);
 
     try {
+        const responseLength = Number.isFinite(moduleSettings.narrativeGuidanceResponseLength)
+            && moduleSettings.narrativeGuidanceResponseLength > 0
+            ? moduleSettings.narrativeGuidanceResponseLength
+            : DEFAULT_NG_RESPONSE_LENGTH;
         const state = loadChatState();
         const preamble = await buildContextPreamble({
             includeChat: true,
             loreBookNames: Array.isArray(moduleSettings.narrativeGuidanceLoreBookNames)
                 ? moduleSettings.narrativeGuidanceLoreBookNames
                 : [],
-            responseLength: NG_RESPONSE_LENGTH,
+            responseLength,
         });
 
         const themesBlock = state.themes && state.themes.trim()
@@ -188,7 +192,7 @@ async function regenGuidance(reason) {
         const raw = await generateRaw({
             prompt: userPrompt,
             systemPrompt,
-            responseLength: NG_RESPONSE_LENGTH,
+            responseLength,
             prefill,
         });
 
@@ -433,6 +437,18 @@ export function bindNarrativeGuidanceSettings(saveSettings) {
             const n = parseInt(turnCountInput.value, 10);
             if (Number.isFinite(n) && n > 0) {
                 moduleSettings.narrativeGuidanceDefaultTurnCount = n;
+                saveSettings();
+            }
+        });
+    }
+
+    const responseLengthInput = document.getElementById('ng_response_length');
+    if (responseLengthInput) {
+        responseLengthInput.value = moduleSettings.narrativeGuidanceResponseLength || DEFAULT_NG_RESPONSE_LENGTH;
+        responseLengthInput.addEventListener('input', () => {
+            const n = parseInt(responseLengthInput.value, 10);
+            if (Number.isFinite(n) && n > 0) {
+                moduleSettings.narrativeGuidanceResponseLength = n;
                 saveSettings();
             }
         });

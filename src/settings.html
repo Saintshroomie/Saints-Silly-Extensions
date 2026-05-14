@@ -164,6 +164,11 @@
                 <input id="ng_default_turn_count" type="number" min="1" step="1" class="text_pole ng_number_input" />
             </div>
 
+            <div class="ng_inline_row">
+                <label for="ng_response_length"><b>Response Token Limit:</b></label>
+                <input id="ng_response_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="Maximum number of tokens the model may use for each generated guidance paragraph." />
+            </div>
+
             <div class="ng_prompt_section">
                 <label for="ng_generation_prompt_textarea"><b>Generation Prompt (used as prefill):</b></label>
                 <textarea id="ng_generation_prompt_textarea" class="text_pole" rows="4"
