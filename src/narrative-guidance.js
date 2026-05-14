@@ -214,9 +214,14 @@ export function onNarrativeGuidanceChatChanged() {
 export async function onNarrativeGuidanceMessageSent(_messageIndex) {
     if (!moduleSettings?.narrativeGuidanceEnabled) return;
     if (regenInProgress) return;
+    if (!moduleSettings.narrativeGuidanceAutoRegen) {
+        reapplyInjection();
+        return;
+    }
     const state = loadChatState();
-    if (state.turnsRemaining <= 0 || !state.guidance) {
-        await regenGuidance('counter expired or no guidance');
+    if (!state.guidance) {
+        // First-turn bootstrap: block briefly so the next AI turn sees guidance.
+        await regenGuidance('no guidance yet');
     } else {
         reapplyInjection();
     }
@@ -240,6 +245,13 @@ export function onNarrativeGuidanceMessageReceived(messageIndex) {
     }
     msg.extra = { ...(msg.extra || {}), narrativeGuidanceCounted: true };
     debug('Counter decremented, turnsRemaining:', state.turnsRemaining);
+
+    if (state.turnsRemaining <= 0 && moduleSettings.narrativeGuidanceAutoRegen) {
+        // Fire-and-forget so the new guidance is in place before the user's next send.
+        regenGuidance('counter expired').catch(err => {
+            console.error('Narrative Guidance auto-regen failed:', err);
+        });
+    }
 }
 
 // ─── Settings Panel ───
@@ -349,6 +361,15 @@ export function bindNarrativeGuidanceSettings(saveSettings) {
             } else {
                 clearInjection();
             }
+        });
+    }
+
+    const autoRegenCb = document.getElementById('ng_auto_regen');
+    if (autoRegenCb) {
+        autoRegenCb.checked = !!moduleSettings.narrativeGuidanceAutoRegen;
+        autoRegenCb.addEventListener('change', () => {
+            moduleSettings.narrativeGuidanceAutoRegen = autoRegenCb.checked;
+            saveSettings();
         });
     }
 

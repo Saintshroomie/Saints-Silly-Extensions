@@ -83,6 +83,7 @@ const defaultSettings = {
     wiaDebugMode: false,
     wiaPrompt: DEFAULT_WIA_PROMPT,
     narrativeGuidanceEnabled: false,
+    narrativeGuidanceAutoRegen: true,
     narrativeGuidanceDebugMode: false,
     narrativeGuidanceGenerationPrompt: DEFAULT_NG_GENERATION_PROMPT,
     narrativeGuidanceInjectionPrompt: DEFAULT_NG_INJECTION_PROMPT,
