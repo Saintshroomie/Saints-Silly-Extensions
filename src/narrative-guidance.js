@@ -160,6 +160,7 @@ async function regenGuidance(reason) {
                 ? moduleSettings.narrativeGuidanceLoreBookNames
                 : [],
             responseLength,
+            maxContextOverride: moduleSettings.narrativeGuidanceMaxContextOverride || 0,
         });
 
         const themesBlock = state.themes && state.themes.trim()
@@ -451,6 +452,16 @@ export function bindNarrativeGuidanceSettings(saveSettings) {
                 moduleSettings.narrativeGuidanceResponseLength = n;
                 saveSettings();
             }
+        });
+    }
+
+    const maxContextInput = document.getElementById('ng_max_context_override');
+    if (maxContextInput) {
+        maxContextInput.value = moduleSettings.narrativeGuidanceMaxContextOverride || 0;
+        maxContextInput.addEventListener('input', () => {
+            const n = parseInt(maxContextInput.value, 10);
+            moduleSettings.narrativeGuidanceMaxContextOverride = Number.isFinite(n) && n > 0 ? n : 0;
+            saveSettings();
         });
     }
 

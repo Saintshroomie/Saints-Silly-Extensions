@@ -304,12 +304,14 @@ async function packRecentChatLines(chat, ctx, chatBudget) {
  * @param {boolean} [opts.includeChat=false] - Include character card, persona, and recent chat messages.
  * @param {string[]} [opts.loreBookNames=[]] - Names of lore books whose enabled entries to include.
  * @param {number}  [opts.responseLength=0] - Tokens reserved for the model's response; subtracted from the budget.
+ * @param {number}  [opts.maxContextOverride=0] - If > 0, use this as the max-context size instead of `getMaxContextSize()`. Lets callers cap how much chat history they pull in independently of the model's real window.
  * @returns {Promise<string>} The composed preamble, or '' if nothing was included.
  */
 export async function buildContextPreamble({
     includeChat = false,
     loreBookNames = [],
     responseLength = 0,
+    maxContextOverride = 0,
 } = {}) {
     const sections = [];
     const ctx = getContext();
@@ -362,9 +364,10 @@ export async function buildContextPreamble({
         if (chat.length) {
             let recentBlock = '';
             try {
-                const maxContext = getMaxContextSize();
+                const overrideValid = Number.isFinite(maxContextOverride) && maxContextOverride > 0;
+                const maxContext = overrideValid ? maxContextOverride : getMaxContextSize();
                 if (!Number.isFinite(maxContext) || maxContext <= 0) {
-                    throw new Error(`getMaxContextSize returned ${maxContext}`);
+                    throw new Error(`maxContext resolved to ${maxContext}`);
                 }
                 const nonChatJoined = sections.join('\n\n');
                 const nonChatTokens = nonChatJoined

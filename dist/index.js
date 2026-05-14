@@ -1278,7 +1278,7 @@ var update = injectStylesIntoStyleTag_default()(style/* default */.A, options);
 
 ;// ./src/settings.html
 // Module
-var code = `<div id="saints_silly_settings" class="extension_settings"> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Saint's Silly Extensions</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content"> <h4 class="saints_section_header"> <span class="fa-solid fa-ghost"></span> Possession </h4> <label class="checkbox_label"> <input id="possession_enabled" type="checkbox"/> <span>Enable Possession</span> </label> <label class="checkbox_label"> <input id="possession_show_toast" type="checkbox"/> <span>Show Toast on Possess/Unpossess</span> </label> <label class="checkbox_label"> <input id="possession_debug_mode" type="checkbox"/> <span>Possession Debug Mode</span> </label> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-pen-fancy"></span> Phrasing! </h4> <label class="checkbox_label"> <input id="phrasing_enabled" type="checkbox" checked="checked"/> <span>Enable Phrasing!</span> </label> <label class="checkbox_label"> <input id="phrasing_debug_mode" type="checkbox"/> <span>Phrasing Debug Mode</span> </label> <label class="checkbox_label" title="When enabled, rephrasing a message includes every existing swipe in the prompt and asks the model to produce something wildly different."> <input id="phrasing_inverse_guidance" type="checkbox"/> <span>Inverse Guidance</span> </label> <div class="phrasing_prompt_section"> <label for="phrasing_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="phrasing_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Phrasing! prompt template..."></textarea> </div> <div class="phrasing_buttons_row"> <div class="menu_button" id="phrasing_restore_default"> <span class="fa-solid fa-rotate-left"></span> Restore Default </div> <div class="menu_button" id="phrasing_save_to_chat"> <span class="fa-solid fa-floppy-disk"></span> Save to Chat </div> </div> <div class="phrasing_prompt_section"> <label for="phrasing_inverse_prompt_textarea"><b>Inverse Guidance Prompt Template:</b></label> <textarea id="phrasing_inverse_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Inverse Guidance prompt template..."></textarea> <small>Available placeholders: <code>{{phrasingSeed}}</code>, <code>{{phrasingSwipes}}</code></small> </div> <div class="phrasing_buttons_row"> <div class="menu_button" id="phrasing_restore_inverse_default"> <span class="fa-solid fa-rotate-left"></span> Restore Default </div> <div class="menu_button" id="phrasing_save_inverse_to_chat"> <span class="fa-solid fa-floppy-disk"></span> Save to Chat </div> </div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-wand-magic-sparkles"></span> Assisted Character Creation </h4> <label class="checkbox_label"> <input id="acc_enabled" type="checkbox"/> <span>Enable Assisted Character Creation</span> </label> <label class="checkbox_label"> <input id="acc_debug_mode" type="checkbox"/> <span>ACC Debug Mode</span> </label> <div class="acc_prompt_section"> <label for="acc_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="acc_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your ACC prompt template..."></textarea> </div> <div class="acc_buttons_row"> <div class="menu_button" id="acc_restore_default_prompt"> <span class="fa-solid fa-rotate-left"></span> Restore Default </div> </div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-book-atlas"></span> World Info Assist </h4> <label class="checkbox_label"> <input id="wia_enabled" type="checkbox"/> <span>Enable World Info Assist</span> </label> <label class="checkbox_label"> <input id="wia_debug_mode" type="checkbox"/> <span>WI Assist Debug Mode</span> </label> <div class="wia_prompt_section"> <label for="wia_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="wia_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your World Info Assist prompt template..."></textarea> </div> <div class="wia_buttons_row"> <div class="menu_button" id="wia_restore_default"> <span class="fa-solid fa-rotate-left"></span> Restore Default </div> </div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-compass"></span> Narrative Guidance </h4> <label class="checkbox_label"> <input id="ng_enabled" type="checkbox"/> <span>Enable Narrative Guidance</span> </label> <label class="checkbox_label" title="When on, regenerates guidance automatically when the turn counter hits zero. When off, only the Regenerate Now button updates the guidance."> <input id="ng_auto_regen" type="checkbox"/> <span>Auto-Regenerate at Zero</span> </label> <label class="checkbox_label"> <input id="ng_debug_mode" type="checkbox"/> <span>Narrative Guidance Debug Mode</span> </label> <div class="ng_inline_row"> <label for="ng_default_turn_count"><b>Turns Between Regenerations:</b></label> <input id="ng_default_turn_count" type="number" min="1" step="1" class="text_pole ng_number_input"/> </div> <div class="ng_inline_row"> <label for="ng_response_length"><b>Response Token Limit:</b></label> <input id="ng_response_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="Maximum number of tokens the model may use for each generated guidance paragraph."/> </div> <div class="ng_prompt_section"> <label for="ng_generation_prompt_textarea"><b>Generation Prompt (used as prefill):</b></label> <textarea id="ng_generation_prompt_textarea" class="text_pole" rows="4" placeholder="Enter the prefill that the LLM will continue..."></textarea> <small>The model's reply continues this text and becomes the active guidance.</small> </div> <div class="ng_buttons_row"> <div class="menu_button" id="ng_restore_generation_default"> <span class="fa-solid fa-rotate-left"></span> Restore Default </div> </div> <div class="ng_prompt_section"> <label for="ng_injection_prompt_textarea"><b>Injection Prompt Template:</b></label> <textarea id="ng_injection_prompt_textarea" class="text_pole" rows="3" placeholder="Template injected before each AI turn..."></textarea> <small>Available placeholder: <code>{{guidance}}</code></small> </div> <div class="ng_buttons_row"> <div class="menu_button" id="ng_restore_injection_default"> <span class="fa-solid fa-rotate-left"></span> Restore Default </div> </div> <div class="ng_inline_row"> <label for="ng_injection_depth"><b>Depth:</b></label> <input id="ng_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the guidance after (0 = bottom)."/> <label for="ng_injection_role"><b>Role:</b></label> <select id="ng_injection_role" class="text_pole ng_select_input" title="Role used when injecting the guidance into the prompt."> <option value="system">System</option> <option value="user">User</option> <option value="assistant">Assistant</option> </select> </div> <details id="ng_lorebooks_details" class="ng-lorebook-picker"> <summary><span class="fa-solid fa-book"></span> <span id="ng_lorebooks_summary_label">Lore Books</span></summary> <div id="ng_lorebooks_list" class="ng-lorebook-list"></div> </details> <h5 class="saints_subsection_header">Per-Chat</h5> <div class="ng_prompt_section"> <label for="ng_themes_textarea"><b>Themes / Story Arcs:</b></label> <textarea id="ng_themes_textarea" class="text_pole" rows="4" placeholder="Optional themes, ideas, or arcs for the AI to consider..."></textarea> </div> <div class="ng_prompt_section"> <label for="ng_active_guidance_textarea"><b>Active Guidance:</b></label> <textarea id="ng_active_guidance_textarea" class="text_pole" rows="6" placeholder="The currently active guidance paragraph. Edit freely; changes apply on the next AI turn."></textarea> </div> <div class="ng_inline_row"> <span><b>Turns Remaining:</b> <span id="ng_remaining_display">0</span></span> <div class="menu_button" id="ng_decrement_button" title="Decrement remaining by 1"> <span class="fa-solid fa-minus"></span> </div> <div class="menu_button" id="ng_reset_button" title="Reset remaining to default turn count"> <span class="fa-solid fa-rotate-right"></span> Reset </div> <div class="menu_button" id="ng_regenerate_now" title="Regenerate guidance now"> <span class="ng-regen-icon fa-solid fa-wand-sparkles"></span> Regenerate Now </div> </div> </div> </div> </div> `;
+var code = `<div id="saints_silly_settings" class="extension_settings"> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Saint's Silly Extensions</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content"> <h4 class="saints_section_header"> <span class="fa-solid fa-ghost"></span> Possession </h4> <label class="checkbox_label"> <input id="possession_enabled" type="checkbox"/> <span>Enable Possession</span> </label> <label class="checkbox_label"> <input id="possession_show_toast" type="checkbox"/> <span>Show Toast on Possess/Unpossess</span> </label> <label class="checkbox_label"> <input id="possession_debug_mode" type="checkbox"/> <span>Possession Debug Mode</span> </label> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-pen-fancy"></span> Phrasing! </h4> <label class="checkbox_label"> <input id="phrasing_enabled" type="checkbox" checked="checked"/> <span>Enable Phrasing!</span> </label> <label class="checkbox_label"> <input id="phrasing_debug_mode" type="checkbox"/> <span>Phrasing Debug Mode</span> </label> <label class="checkbox_label" title="When enabled, rephrasing a message includes every existing swipe in the prompt and asks the model to produce something wildly different."> <input id="phrasing_inverse_guidance" type="checkbox"/> <span>Inverse Guidance</span> </label> <div class="phrasing_prompt_section"> <label for="phrasing_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="phrasing_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Phrasing! prompt template..."></textarea> </div> <div class="phrasing_buttons_row"> <div class="menu_button" id="phrasing_restore_default"> <span class="fa-solid fa-rotate-left"></span> Restore Default </div> <div class="menu_button" id="phrasing_save_to_chat"> <span class="fa-solid fa-floppy-disk"></span> Save to Chat </div> </div> <div class="phrasing_prompt_section"> <label for="phrasing_inverse_prompt_textarea"><b>Inverse Guidance Prompt Template:</b></label> <textarea id="phrasing_inverse_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Inverse Guidance prompt template..."></textarea> <small>Available placeholders: <code>{{phrasingSeed}}</code>, <code>{{phrasingSwipes}}</code></small> </div> <div class="phrasing_buttons_row"> <div class="menu_button" id="phrasing_restore_inverse_default"> <span class="fa-solid fa-rotate-left"></span> Restore Default </div> <div class="menu_button" id="phrasing_save_inverse_to_chat"> <span class="fa-solid fa-floppy-disk"></span> Save to Chat </div> </div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-wand-magic-sparkles"></span> Assisted Character Creation </h4> <label class="checkbox_label"> <input id="acc_enabled" type="checkbox"/> <span>Enable Assisted Character Creation</span> </label> <label class="checkbox_label"> <input id="acc_debug_mode" type="checkbox"/> <span>ACC Debug Mode</span> </label> <div class="ng_inline_row"> <label for="acc_max_context_override"><b>Max Context Override:</b></label> <input id="acc_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for ACC generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="acc_prompt_section"> <label for="acc_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="acc_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your ACC prompt template..."></textarea> </div> <div class="acc_buttons_row"> <div class="menu_button" id="acc_restore_default_prompt"> <span class="fa-solid fa-rotate-left"></span> Restore Default </div> </div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-book-atlas"></span> World Info Assist </h4> <label class="checkbox_label"> <input id="wia_enabled" type="checkbox"/> <span>Enable World Info Assist</span> </label> <label class="checkbox_label"> <input id="wia_debug_mode" type="checkbox"/> <span>WI Assist Debug Mode</span> </label> <div class="ng_inline_row"> <label for="wia_max_context_override"><b>Max Context Override:</b></label> <input id="wia_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for World Info Assist generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="wia_prompt_section"> <label for="wia_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="wia_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your World Info Assist prompt template..."></textarea> </div> <div class="wia_buttons_row"> <div class="menu_button" id="wia_restore_default"> <span class="fa-solid fa-rotate-left"></span> Restore Default </div> </div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-compass"></span> Narrative Guidance </h4> <label class="checkbox_label"> <input id="ng_enabled" type="checkbox"/> <span>Enable Narrative Guidance</span> </label> <label class="checkbox_label" title="When on, regenerates guidance automatically when the turn counter hits zero. When off, only the Regenerate Now button updates the guidance."> <input id="ng_auto_regen" type="checkbox"/> <span>Auto-Regenerate at Zero</span> </label> <label class="checkbox_label"> <input id="ng_debug_mode" type="checkbox"/> <span>Narrative Guidance Debug Mode</span> </label> <div class="ng_inline_row"> <label for="ng_default_turn_count"><b>Turns Between Regenerations:</b></label> <input id="ng_default_turn_count" type="number" min="1" step="1" class="text_pole ng_number_input"/> </div> <div class="ng_inline_row"> <label for="ng_response_length"><b>Response Token Limit:</b></label> <input id="ng_response_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="Maximum number of tokens the model may use for each generated guidance paragraph."/> </div> <div class="ng_inline_row"> <label for="ng_max_context_override"><b>Max Context Override:</b></label> <input id="ng_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for Narrative Guidance generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_prompt_section"> <label for="ng_generation_prompt_textarea"><b>Generation Prompt (used as prefill):</b></label> <textarea id="ng_generation_prompt_textarea" class="text_pole" rows="4" placeholder="Enter the prefill that the LLM will continue..."></textarea> <small>The model's reply continues this text and becomes the active guidance.</small> </div> <div class="ng_buttons_row"> <div class="menu_button" id="ng_restore_generation_default"> <span class="fa-solid fa-rotate-left"></span> Restore Default </div> </div> <div class="ng_prompt_section"> <label for="ng_injection_prompt_textarea"><b>Injection Prompt Template:</b></label> <textarea id="ng_injection_prompt_textarea" class="text_pole" rows="3" placeholder="Template injected before each AI turn..."></textarea> <small>Available placeholder: <code>{{guidance}}</code></small> </div> <div class="ng_buttons_row"> <div class="menu_button" id="ng_restore_injection_default"> <span class="fa-solid fa-rotate-left"></span> Restore Default </div> </div> <div class="ng_inline_row"> <label for="ng_injection_depth"><b>Depth:</b></label> <input id="ng_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the guidance after (0 = bottom)."/> <label for="ng_injection_role"><b>Role:</b></label> <select id="ng_injection_role" class="text_pole ng_select_input" title="Role used when injecting the guidance into the prompt."> <option value="system">System</option> <option value="user">User</option> <option value="assistant">Assistant</option> </select> </div> <details id="ng_lorebooks_details" class="ng-lorebook-picker"> <summary><span class="fa-solid fa-book"></span> <span id="ng_lorebooks_summary_label">Lore Books</span></summary> <div id="ng_lorebooks_list" class="ng-lorebook-list"></div> </details> <h5 class="saints_subsection_header">Per-Chat</h5> <div class="ng_prompt_section"> <label for="ng_themes_textarea"><b>Themes / Story Arcs:</b></label> <textarea id="ng_themes_textarea" class="text_pole" rows="4" placeholder="Optional themes, ideas, or arcs for the AI to consider..."></textarea> </div> <div class="ng_prompt_section"> <label for="ng_active_guidance_textarea"><b>Active Guidance:</b></label> <textarea id="ng_active_guidance_textarea" class="text_pole" rows="6" placeholder="The currently active guidance paragraph. Edit freely; changes apply on the next AI turn."></textarea> </div> <div class="ng_inline_row"> <span><b>Turns Remaining:</b> <span id="ng_remaining_display">0</span></span> <div class="menu_button" id="ng_decrement_button" title="Decrement remaining by 1"> <span class="fa-solid fa-minus"></span> </div> <div class="menu_button" id="ng_reset_button" title="Reset remaining to default turn count"> <span class="fa-solid fa-rotate-right"></span> Reset </div> <div class="menu_button" id="ng_regenerate_now" title="Regenerate guidance now"> <span class="ng-regen-icon fa-solid fa-wand-sparkles"></span> Regenerate Now </div> </div> </div> </div> </div> `;
 // Exports
 /* harmony default export */ const settings = (code);
 ;// external "../../../../world-info.js"
@@ -1594,12 +1594,14 @@ async function packRecentChatLines(chat, ctx, chatBudget) {
  * @param {boolean} [opts.includeChat=false] - Include character card, persona, and recent chat messages.
  * @param {string[]} [opts.loreBookNames=[]] - Names of lore books whose enabled entries to include.
  * @param {number}  [opts.responseLength=0] - Tokens reserved for the model's response; subtracted from the budget.
+ * @param {number}  [opts.maxContextOverride=0] - If > 0, use this as the max-context size instead of `getMaxContextSize()`. Lets callers cap how much chat history they pull in independently of the model's real window.
  * @returns {Promise<string>} The composed preamble, or '' if nothing was included.
  */
 async function buildContextPreamble({
     includeChat = false,
     loreBookNames = [],
     responseLength = 0,
+    maxContextOverride = 0,
 } = {}) {
     const sections = [];
     const ctx = getContext();
@@ -1652,9 +1654,10 @@ async function buildContextPreamble({
         if (chat.length) {
             let recentBlock = '';
             try {
-                const maxContext = __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_getMaxContextSize__();
+                const overrideValid = Number.isFinite(maxContextOverride) && maxContextOverride > 0;
+                const maxContext = overrideValid ? maxContextOverride : __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_getMaxContextSize__();
                 if (!Number.isFinite(maxContext) || maxContext <= 0) {
-                    throw new Error(`getMaxContextSize returned ${maxContext}`);
+                    throw new Error(`maxContext resolved to ${maxContext}`);
                 }
                 const nonChatJoined = sections.join('\n\n');
                 const nonChatTokens = nonChatJoined
@@ -3190,6 +3193,15 @@ function bindACCSettings(saveSettings) {
             saveSettings();
         });
     }
+    const maxContextInput = document.getElementById('acc_max_context_override');
+    if (maxContextInput) {
+        maxContextInput.value = moduleSettings.accMaxContextOverride || 0;
+        maxContextInput.addEventListener('input', () => {
+            const n = parseInt(maxContextInput.value, 10);
+            moduleSettings.accMaxContextOverride = Number.isFinite(n) && n > 0 ? n : 0;
+            saveSettings();
+        });
+    }
     if (promptArea) {
         promptArea.value = moduleSettings.accPrompt || DEFAULT_ACC_PROMPT;
         promptArea.addEventListener('input', () => {
@@ -3539,6 +3551,7 @@ async function buildPreambleBlock(ctxOptions) {
     const preamble = await buildContextPreamble({
         ...ctxOptions,
         responseLength: getResponseLength(),
+        maxContextOverride: moduleSettings?.accMaxContextOverride || 0,
     });
     if (!preamble) return '';
     assisted_character_creation_debug('Context preamble length:', preamble.length);
@@ -3979,6 +3992,7 @@ async function onAssist(formEl, id, isContinue) {
             preamble = await buildContextPreamble({
                 ...ctxOptions,
                 responseLength: WIA_RESPONSE_LENGTH,
+                maxContextOverride: world_info_assist_moduleSettings?.wiaMaxContextOverride || 0,
             });
             world_info_assist_debug('Context preamble length:', preamble.length, 'options:', ctxOptions);
         }
@@ -4117,6 +4131,15 @@ function bindWIASettings(saveSettings) {
         debugCb.checked = !!world_info_assist_moduleSettings.wiaDebugMode;
         debugCb.addEventListener('change', () => {
             world_info_assist_moduleSettings.wiaDebugMode = debugCb.checked;
+            saveSettings();
+        });
+    }
+    const maxContextInput = document.getElementById('wia_max_context_override');
+    if (maxContextInput) {
+        maxContextInput.value = world_info_assist_moduleSettings.wiaMaxContextOverride || 0;
+        maxContextInput.addEventListener('input', () => {
+            const n = parseInt(maxContextInput.value, 10);
+            world_info_assist_moduleSettings.wiaMaxContextOverride = Number.isFinite(n) && n > 0 ? n : 0;
             saveSettings();
         });
     }
@@ -4288,6 +4311,7 @@ async function regenGuidance(reason) {
                 ? narrative_guidance_moduleSettings.narrativeGuidanceLoreBookNames
                 : [],
             responseLength,
+            maxContextOverride: narrative_guidance_moduleSettings.narrativeGuidanceMaxContextOverride || 0,
         });
 
         const themesBlock = state.themes && state.themes.trim()
@@ -4582,6 +4606,16 @@ function bindNarrativeGuidanceSettings(saveSettings) {
         });
     }
 
+    const maxContextInput = document.getElementById('ng_max_context_override');
+    if (maxContextInput) {
+        maxContextInput.value = narrative_guidance_moduleSettings.narrativeGuidanceMaxContextOverride || 0;
+        maxContextInput.addEventListener('input', () => {
+            const n = parseInt(maxContextInput.value, 10);
+            narrative_guidance_moduleSettings.narrativeGuidanceMaxContextOverride = Number.isFinite(n) && n > 0 ? n : 0;
+            saveSettings();
+        });
+    }
+
     const genArea = document.getElementById('ng_generation_prompt_textarea');
     if (genArea) {
         genArea.value = narrative_guidance_moduleSettings.narrativeGuidanceGenerationPrompt || DEFAULT_NG_GENERATION_PROMPT;
@@ -4730,9 +4764,11 @@ const defaultSettings = {
     accDebugMode: false,
     accPrompt: DEFAULT_ACC_PROMPT,
     accResponseLength: DEFAULT_ACC_RESPONSE_LENGTH,
+    accMaxContextOverride: 0,
     wiaEnabled: true,
     wiaDebugMode: false,
     wiaPrompt: DEFAULT_WIA_PROMPT,
+    wiaMaxContextOverride: 0,
     narrativeGuidanceEnabled: false,
     narrativeGuidanceAutoRegen: true,
     narrativeGuidanceDebugMode: false,
@@ -4740,6 +4776,7 @@ const defaultSettings = {
     narrativeGuidanceInjectionPrompt: DEFAULT_NG_INJECTION_PROMPT,
     narrativeGuidanceDefaultTurnCount: DEFAULT_NG_TURN_COUNT,
     narrativeGuidanceResponseLength: DEFAULT_NG_RESPONSE_LENGTH,
+    narrativeGuidanceMaxContextOverride: 0,
     narrativeGuidanceInjectionDepth: DEFAULT_NG_INJECTION_DEPTH,
     narrativeGuidanceInjectionRole: DEFAULT_NG_INJECTION_ROLE,
     narrativeGuidanceLoreBookNames: [],
