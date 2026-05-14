@@ -160,6 +160,7 @@ function onChatChanged() {
     loadPossessionState();
     syncAllPossessionUI();
     loadPromptTextarea();
+    applyPhrasingEnabledState();
     onNarrativeGuidanceChatChanged();
     SSEDebug('Chat changed, state reloaded');
 }
