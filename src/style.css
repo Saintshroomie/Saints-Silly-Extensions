@@ -694,6 +694,11 @@
     flex: 0 0 auto;
 }
 
+#saints_silly_settings .ng_select_input {
+    width: auto;
+    flex: 0 0 auto;
+}
+
 #saints_silly_settings .ng-lorebook-picker {
     margin: 8px 0;
 }

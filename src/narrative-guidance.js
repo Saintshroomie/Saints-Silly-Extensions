@@ -38,6 +38,8 @@ export const DEFAULT_NG_INJECTION_PROMPT =
     '[Guide the story in the following direction: {{guidance}}]';
 
 export const DEFAULT_NG_TURN_COUNT = 10;
+export const DEFAULT_NG_INJECTION_DEPTH = 0;
+export const DEFAULT_NG_INJECTION_ROLE = 'system';
 
 // ─── Module State ───
 
@@ -96,15 +98,29 @@ function reapplyInjection() {
     const tpl = moduleSettings.narrativeGuidanceInjectionPrompt || DEFAULT_NG_INJECTION_PROMPT;
     let body = tpl.replace(/\{\{guidance\}\}/g, state.guidance);
     body = substituteParams(body);
+    const depth = Number.isFinite(moduleSettings.narrativeGuidanceInjectionDepth)
+        && moduleSettings.narrativeGuidanceInjectionDepth >= 0
+        ? moduleSettings.narrativeGuidanceInjectionDepth
+        : 0;
+    const role = resolveInjectionRole(moduleSettings.narrativeGuidanceInjectionRole);
     setExtensionPrompt(
         NG_INJECTION_KEY,
         body,
         extension_prompt_types.IN_CHAT,
-        0,
+        depth,
         false,
-        extension_prompt_roles.SYSTEM,
+        role,
     );
-    debug('Injected guidance, body length:', body.length);
+    debug('Injected guidance — depth:', depth, 'role:', moduleSettings.narrativeGuidanceInjectionRole, 'body length:', body.length);
+}
+
+function resolveInjectionRole(name) {
+    switch ((name || 'system').toLowerCase()) {
+        case 'user': return extension_prompt_roles.USER;
+        case 'assistant': return extension_prompt_roles.ASSISTANT;
+        case 'system':
+        default: return extension_prompt_roles.SYSTEM;
+    }
 }
 
 // ─── Generation ───
@@ -431,6 +447,32 @@ export function bindNarrativeGuidanceSettings(saveSettings) {
         reapplyInjection();
         toast('Default injection prompt restored.', 'success');
     });
+
+    const depthInput = document.getElementById('ng_injection_depth');
+    if (depthInput) {
+        const initialDepth = Number.isFinite(moduleSettings.narrativeGuidanceInjectionDepth)
+            ? moduleSettings.narrativeGuidanceInjectionDepth
+            : DEFAULT_NG_INJECTION_DEPTH;
+        depthInput.value = initialDepth;
+        depthInput.addEventListener('input', () => {
+            const n = parseInt(depthInput.value, 10);
+            if (Number.isFinite(n) && n >= 0) {
+                moduleSettings.narrativeGuidanceInjectionDepth = n;
+                saveSettings();
+                reapplyInjection();
+            }
+        });
+    }
+
+    const roleSelect = document.getElementById('ng_injection_role');
+    if (roleSelect) {
+        roleSelect.value = moduleSettings.narrativeGuidanceInjectionRole || DEFAULT_NG_INJECTION_ROLE;
+        roleSelect.addEventListener('change', () => {
+            moduleSettings.narrativeGuidanceInjectionRole = roleSelect.value;
+            saveSettings();
+            reapplyInjection();
+        });
+    }
 
     const themesArea = document.getElementById('ng_themes_textarea');
     if (themesArea) {
