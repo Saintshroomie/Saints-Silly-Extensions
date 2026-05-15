@@ -6,13 +6,14 @@
  * and clicks Done to copy it into SillyTavern's description field.
  */
 
-import { generateRaw } from '../../../../../script.js';
 import { removeReasoningFromString } from '../../../../reasoning.js';
 import {
     createDebugLogger,
     toast,
     buildContextPreamble,
     getAvailableLoreBookNames,
+    streamingGenerate,
+    withSingleLineDisabled,
 } from './utils.js';
 
 // ─── Default Prompt ───
@@ -488,7 +489,12 @@ async function generateDescription(brief, ctxOptions) {
     debug('System prompt:', systemPrompt);
     debug('Prompt:', prompt);
 
-    const result = await generateRaw({ prompt, systemPrompt, responseLength });
+    const outputEl = document.getElementById('acc_description_output');
+    const result = await withSingleLineDisabled(() => streamingGenerate(
+        { prompt, systemPrompt, responseLength },
+        outputEl,
+        { append: false },
+    ));
     return removeReasoningFromString(result).trim();
 }
 
@@ -504,7 +510,12 @@ async function generateContinuation(brief, existing, ctxOptions) {
     debug('System prompt:', systemPrompt);
     debug('Prompt:', prompt);
 
-    const result = await generateRaw({ prompt, systemPrompt, responseLength });
+    const outputEl = document.getElementById('acc_description_output');
+    const result = await withSingleLineDisabled(() => streamingGenerate(
+        { prompt, systemPrompt, responseLength },
+        outputEl,
+        { append: true },
+    ));
     return removeReasoningFromString(result).trim();
 }
 

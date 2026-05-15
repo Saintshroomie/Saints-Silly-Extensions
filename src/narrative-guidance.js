@@ -10,7 +10,6 @@
  */
 
 import {
-    generateRaw,
     setExtensionPrompt,
     extension_prompt_types,
     extension_prompt_roles,
@@ -23,6 +22,8 @@ import {
     toast,
     buildContextPreamble,
     getAvailableLoreBookNames,
+    streamingGenerate,
+    withSingleLineDisabled,
 } from './utils.js';
 
 // ─── Constants ───
@@ -47,6 +48,7 @@ let moduleSettings = null;
 let saveSettingsCb = null;
 let debug = () => {};
 let regenInProgress = false;
+let ngLastGuidanceSnapshot = null; // guidance text before last regen, for Retry
 let saveTimer = null;
 
 // ─── Per-chat State ───
@@ -142,8 +144,12 @@ async function regenGuidance(reason) {
         return;
     }
 
+    // Snapshot current guidance before overwriting so Retry can restore it.
+    const preRegenState = loadChatState();
+    ngLastGuidanceSnapshot = preRegenState.guidance || '';
+
     regenInProgress = true;
-    setRegenButtonRunning(true);
+    setNGActionButtonsRunning(true);
     showRegenOverlay();
     clearInjection();
     debug('regenGuidance — starting, reason:', reason);
@@ -190,12 +196,12 @@ async function regenGuidance(reason) {
         debug('User prompt length:', userPrompt.length);
         debug('Prefill:', prefill);
 
-        const raw = await generateRaw({
-            prompt: userPrompt,
-            systemPrompt,
-            responseLength,
-            prefill,
-        });
+        const guidanceArea = document.getElementById('ng_active_guidance_textarea');
+        const raw = await withSingleLineDisabled(() => streamingGenerate(
+            { prompt: userPrompt, systemPrompt, responseLength, prefill },
+            guidanceArea,
+            { append: false },
+        ));
 
         const cleaned = stripBracketWrap(removeReasoningFromString(raw));
         if (!cleaned) {
@@ -221,8 +227,74 @@ async function regenGuidance(reason) {
         reapplyInjection();
     } finally {
         regenInProgress = false;
-        setRegenButtonRunning(false);
+        setNGActionButtonsRunning(false);
         hideRegenOverlay();
+    }
+}
+
+async function continueGuidance() {
+    if (regenInProgress) {
+        debug('continueGuidance — skipped (already running)');
+        return;
+    }
+    if (!moduleSettings?.narrativeGuidanceEnabled) {
+        debug('continueGuidance — skipped (disabled)');
+        return;
+    }
+    const state = loadChatState();
+    if (!state.guidance) {
+        toast('No active guidance to continue. Regenerate first.', 'warning');
+        return;
+    }
+
+    regenInProgress = true;
+    setNGActionButtonsRunning(true);
+    debug('continueGuidance — starting');
+
+    try {
+        const responseLength = Number.isFinite(moduleSettings.narrativeGuidanceResponseLength)
+            && moduleSettings.narrativeGuidanceResponseLength > 0
+            ? moduleSettings.narrativeGuidanceResponseLength
+            : DEFAULT_NG_RESPONSE_LENGTH;
+
+        const continuePrompt =
+            `The following narrative guidance paragraph is in progress:\n\n${state.guidance}\n\n` +
+            'Continue this paragraph seamlessly from where it left off. ' +
+            'Add 1–2 sentences extending the story direction, mood, or complications. ' +
+            'Do not repeat existing text. Output only the continuation — no brackets, no preamble.';
+
+        const systemPrompt =
+            'You are a story-direction assistant. Output only the continuation of the guidance. ' +
+            'No commentary, no preamble, no explanations.';
+
+        debug('Continue prompt length:', continuePrompt.length);
+
+        const guidanceArea = document.getElementById('ng_active_guidance_textarea');
+        const raw = await withSingleLineDisabled(() => streamingGenerate(
+            { prompt: continuePrompt, systemPrompt, responseLength },
+            guidanceArea,
+            { append: true },
+        ));
+
+        const continuation = removeReasoningFromString(raw).trim();
+        if (!continuation) throw new Error('Model returned empty continuation.');
+
+        ngLastGuidanceSnapshot = state.guidance;
+        const sep = state.guidance.endsWith(' ') || continuation.startsWith(' ') ? '' : ' ';
+        state.guidance = state.guidance + sep + continuation;
+        saveChatState(state);
+
+        refreshPanelFromState();
+        reapplyInjection();
+        toast('Narrative guidance continued.', 'success');
+        debug('continueGuidance — complete, added length:', continuation.length);
+    } catch (err) {
+        console.error('Narrative Guidance continue error:', err);
+        toast(`Continue failed: ${err.message}`, 'error');
+    } finally {
+        regenInProgress = false;
+        setNGActionButtonsRunning(false);
+        refreshNGActionButtonStates();
     }
 }
 
@@ -321,18 +393,31 @@ function refreshPanelFromState() {
         guidanceArea.value = state.guidance || '';
     }
     refreshRemainingDisplay(state.turnsRemaining);
+    refreshNGActionButtonStates();
 }
 
-function setRegenButtonRunning(running) {
-    const btn = document.getElementById('ng_regenerate_now');
-    if (!btn) return;
-    btn.classList.toggle('disabled', running);
-    const icon = btn.querySelector('.ng-regen-icon');
-    if (icon) {
-        icon.className = running
-            ? 'ng-regen-icon fa-solid fa-spinner fa-spin'
-            : 'ng-regen-icon fa-solid fa-wand-sparkles';
+function setNGActionButtonsRunning(running) {
+    const regenBtn = document.getElementById('ng_regenerate_now');
+    if (regenBtn) {
+        regenBtn.classList.toggle('disabled', running);
+        const icon = regenBtn.querySelector('.ng-regen-icon');
+        if (icon) {
+            icon.className = running
+                ? 'ng-regen-icon fa-solid fa-spinner fa-spin'
+                : 'ng-regen-icon fa-solid fa-wand-sparkles';
+        }
     }
+    document.getElementById('ng_continue_now')?.classList.toggle('disabled', running);
+    document.getElementById('ng_retry_now')?.classList.toggle('disabled', running);
+}
+
+function refreshNGActionButtonStates() {
+    if (regenInProgress) return;
+    const state = loadChatState();
+    document.getElementById('ng_retry_now')
+        ?.classList.toggle('disabled', ngLastGuidanceSnapshot === null);
+    document.getElementById('ng_continue_now')
+        ?.classList.toggle('disabled', !(state.guidance && state.guidance.trim()));
 }
 
 function populateLoreBookPicker() {
@@ -569,8 +654,28 @@ export function bindNarrativeGuidanceSettings(saveSettings) {
         await regenGuidance('manual');
     });
 
+    document.getElementById('ng_continue_now')?.addEventListener('click', async () => {
+        if (regenInProgress) return;
+        await continueGuidance();
+    });
+
+    document.getElementById('ng_retry_now')?.addEventListener('click', async () => {
+        if (regenInProgress) return;
+        if (ngLastGuidanceSnapshot === null) {
+            toast('Nothing to retry — no previous generation in this session.', 'warning');
+            return;
+        }
+        const state = loadChatState();
+        state.guidance = ngLastGuidanceSnapshot;
+        saveChatState(state);
+        refreshPanelFromState();
+        reapplyInjection();
+        await regenGuidance('retry');
+    });
+
     populateLoreBookPicker();
     refreshPanelFromState();
+    refreshNGActionButtonStates();
 }
 
 // ─── Init ───

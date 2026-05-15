@@ -52,6 +52,7 @@ import {
     startWIAObserver,
     bindWIASettings,
     DEFAULT_WIA_PROMPT,
+    DEFAULT_WIA_RESPONSE_LENGTH,
 } from './world-info-assist.js';
 import {
     initNarrativeGuidance,
@@ -86,6 +87,7 @@ const defaultSettings = {
     wiaEnabled: true,
     wiaDebugMode: false,
     wiaPrompt: DEFAULT_WIA_PROMPT,
+    wiaResponseLength: DEFAULT_WIA_RESPONSE_LENGTH,
     wiaMaxContextOverride: 0,
     narrativeGuidanceEnabled: false,
     narrativeGuidanceAutoRegen: true,

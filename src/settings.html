@@ -97,7 +97,7 @@
             </label>
 
             <div class="ng_inline_row">
-                <label for="acc_max_context_override"><b>Max Context Override:</b></label>
+                <label for="acc_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label>
                 <input id="acc_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for ACC generations. 0 = use the model's full context size." />
                 <small>0 = use model default</small>
             </div>
@@ -132,9 +132,14 @@
             </label>
 
             <div class="ng_inline_row">
-                <label for="wia_max_context_override"><b>Max Context Override:</b></label>
+                <label for="wia_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label>
                 <input id="wia_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for World Info Assist generations. 0 = use the model's full context size." />
                 <small>0 = use model default</small>
+            </div>
+
+            <div class="ng_inline_row">
+                <label for="wia_response_length"><b><span class="fa-solid fa-coins"></span> Response Token Limit:</b></label>
+                <input id="wia_response_length" type="number" min="50" max="8192" step="50" class="text_pole ng_number_input" title="Maximum tokens the model may use for each World Info Assist generation." />
             </div>
 
             <div class="wia_prompt_section">
@@ -182,7 +187,7 @@
             </div>
 
             <div class="ng_inline_row">
-                <label for="ng_max_context_override"><b>Max Context Override:</b></label>
+                <label for="ng_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label>
                 <input id="ng_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for Narrative Guidance generations. 0 = use the model's full context size." />
                 <small>0 = use model default</small>
             </div>
@@ -250,6 +255,12 @@
                 </div>
                 <div class="menu_button" id="ng_reset_button" title="Reset remaining to default turn count">
                     <span class="fa-solid fa-rotate-right"></span> Reset
+                </div>
+                <div class="menu_button disabled" id="ng_continue_now" title="Continue the current guidance paragraph">
+                    <span class="fa-solid fa-arrow-right"></span> Continue
+                </div>
+                <div class="menu_button disabled" id="ng_retry_now" title="Restore previous guidance and regenerate">
+                    <span class="fa-solid fa-rotate-right"></span> Retry
                 </div>
                 <div class="menu_button" id="ng_regenerate_now" title="Regenerate guidance now">
                     <span class="ng-regen-icon fa-solid fa-wand-sparkles"></span> Regenerate Now

@@ -568,6 +568,30 @@
     font-style: italic;
 }
 
+/* Per-entry token limit row */
+.wia-controls .wia-tokens-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85em;
+    opacity: 0.85;
+    margin-left: auto;
+}
+
+.wia-controls .wia-tokens-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    user-select: none;
+}
+
+.wia-controls .wia-tokens-input {
+    width: 72px !important;
+    padding: 2px 6px !important;
+    font-size: 0.9em !important;
+    text-align: center;
+}
+
 /* ── ACC modal: context preamble controls ── */
 
 .acc-context-section {
@@ -725,7 +749,9 @@
     font-style: italic;
 }
 
-#saints_silly_settings #ng_regenerate_now.disabled {
+#saints_silly_settings #ng_regenerate_now.disabled,
+#saints_silly_settings #ng_continue_now.disabled,
+#saints_silly_settings #ng_retry_now.disabled {
     opacity: 0.6;
     pointer-events: none;
 }
