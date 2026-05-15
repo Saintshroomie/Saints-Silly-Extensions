@@ -159,7 +159,6 @@ async function regenGuidance(reason) {
     regenInProgress = true;
     ngActiveAction = 'regen';
     setNGActionButtonsRunning(true);
-    showRegenOverlay();
     clearInjection();
     debug('regenGuidance — starting, reason:', reason);
 
@@ -242,7 +241,6 @@ async function regenGuidance(reason) {
         regenInProgress = false;
         ngActiveAction = null;
         setNGActionButtonsRunning(false);
-        hideRegenOverlay();
     }
 }
 
@@ -316,43 +314,6 @@ async function continueGuidance() {
         setNGActionButtonsRunning(false);
         refreshNGActionButtonStates();
     }
-}
-
-// ─── Regeneration Overlay ───
-
-const NG_OVERLAY_ID = 'ng_regen_overlay';
-
-function showRegenOverlay() {
-    if (document.getElementById(NG_OVERLAY_ID)) return;
-    const overlay = document.createElement('div');
-    overlay.id = NG_OVERLAY_ID;
-    overlay.className = 'ng-regen-overlay';
-    overlay.innerHTML = `
-        <div class="ng-regen-overlay-card">
-            <div class="ng-regen-overlay-spinner"><span class="fa-solid fa-wand-sparkles fa-spin"></span></div>
-            <div class="ng-regen-overlay-title">Regenerating narrative guidance…</div>
-            <div class="ng-regen-overlay-subtitle">Input is paused until the new guidance is ready.</div>
-            <div class="ng-regen-overlay-stop menu_button interactable" title="Cancel this generation">
-                <span class="fa-solid fa-stop"></span> Stop
-            </div>
-        </div>
-    `;
-    // Block keyboard activation of focused buttons (Enter / Space) while up.
-    overlay.addEventListener('keydown', (e) => { e.stopPropagation(); e.preventDefault(); });
-    overlay.querySelector('.ng-regen-overlay-stop')?.addEventListener('click', () => {
-        // abortAllGenerations triggers ST's GENERATION_STOPPED, which is
-        // what actually cancels the backend fetch (and lets ST's server
-        // POST /api/extra/abort to KoboldCpp). Without it, the LLM would
-        // keep generating to the response cap with the UI freed.
-        abortAllGenerations('ng-overlay-cancel');
-        debug('Stop requested via regen overlay');
-    });
-    document.body.appendChild(overlay);
-}
-
-function hideRegenOverlay() {
-    const overlay = document.getElementById(NG_OVERLAY_ID);
-    if (overlay) overlay.remove();
 }
 
 // ─── Event Handlers ───
