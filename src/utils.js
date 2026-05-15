@@ -12,7 +12,7 @@
  */
 
 import { loadWorldInfo, world_names } from '../../../../world-info.js';
-import { getMaxContextSize } from '../../../../../script.js';
+import { generateRaw, getMaxContextSize } from '../../../../../script.js';
 import { getTokenCountAsync } from '../../../../tokenizers.js';
 
 // ─── Context ───
@@ -168,6 +168,79 @@ export function waitForGenerationEnd(timeoutMs = 5 * 60 * 1000) {
             eventSource.on(eventTypes.GENERATION_STOPPED, onEnd);
         }
     });
+}
+
+// ─── Streaming Generation Helper ───
+
+/**
+ * Call generateRaw and optionally stream tokens into targetEl as they arrive.
+ * Uses the `onToken` callback if ST's generateRaw supports it; falls back
+ * gracefully to non-streaming if it doesn't.
+ *
+ * @param {object} params - generateRaw parameters (prompt, systemPrompt, responseLength, etc.)
+ * @param {HTMLTextAreaElement|null} targetEl - Field to stream into, or null for no streaming.
+ * @param {{ append?: boolean }} [opts]
+ * @returns {Promise<string>} The full generated text.
+ */
+export async function streamingGenerate(params, targetEl, { append = false } = {}) {
+    if (!targetEl) return generateRaw(params);
+
+    let accumulated = append ? (targetEl.value || '') : '';
+    let streamingWorked = false;
+
+    try {
+        const result = await generateRaw({
+            ...params,
+            onToken: (token) => {
+                accumulated += token;
+                targetEl.value = accumulated;
+                targetEl.scrollTop = targetEl.scrollHeight;
+                streamingWorked = true;
+            },
+        });
+        if (!streamingWorked && result) {
+            targetEl.value = append ? ((targetEl.value || '') + result) : result;
+        }
+        return result || accumulated;
+    } catch (err) {
+        // If ST rejected the unknown onToken param, retry without it.
+        const msg = (err?.message || '').toLowerCase();
+        if (msg.includes('ontoken') || msg.includes('unknown') || msg.includes('invalid param')) {
+            const fallback = await generateRaw(params);
+            if (fallback) targetEl.value = append ? ((targetEl.value || '') + fallback) : fallback;
+            return fallback;
+        }
+        throw err;
+    }
+}
+
+// ─── Single-Line Override ───
+
+/**
+ * Temporarily disable ST's "Generate Only One Line Per Request" power-user
+ * setting for the duration of fn, then restore it. Prevents silent generations
+ * (WIA, ACC, NG) from being truncated at the first newline when the user has
+ * that option active for normal chat.
+ *
+ * Checks multiple likely property names for robustness across ST versions.
+ *
+ * @template T
+ * @param {() => Promise<T>} fn - Async function to execute with single-line disabled.
+ * @returns {Promise<T>}
+ */
+export async function withSingleLineDisabled(fn) {
+    const ctx = getContext();
+    const pus = ctx.powerUserSettings;
+    const propName = pus
+        ? (['single_line', 'singleLine', 'single_line_auto_extend'].find(k => k in pus) ?? null)
+        : null;
+    const original = propName ? pus[propName] : undefined;
+    if (propName && original) pus[propName] = false;
+    try {
+        return await fn();
+    } finally {
+        if (propName && original !== undefined) pus[propName] = original;
+    }
 }
 
 // ─── Generation Context Preamble ───

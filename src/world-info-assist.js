@@ -8,13 +8,14 @@
  * (the entry's content) and using a free-form prompt instead of a schema.
  */
 
-import { generateRaw } from '../../../../../script.js';
 import { removeReasoningFromString } from '../../../../reasoning.js';
 import {
     createDebugLogger,
     toast,
     buildContextPreamble,
     getAvailableLoreBookNames,
+    streamingGenerate,
+    withSingleLineDisabled,
 } from './utils.js';
 
 // ─── Default Prompt ───
@@ -43,19 +44,22 @@ Example — World Lore:
 [ The Ashen Concord: A pact of five city-states after the Ember War to share river trade, standardize coinage, and outlaw pyromancy; prosperity rose while hedge mages went underground, fueling a decade of covert arson reprisals; ]
 ]`;
 
+export const DEFAULT_WIA_RESPONSE_LENGTH = 600;
+
 // ─── Module State ───
 
 let moduleSettings = null;
 let debug = () => {};
 let observer = null;
+let saveSettingsCb = null;
 
 // Per-entry state, keyed by a stable id derived from the entry uid / DOM element
 const entryStates = new Map(); // id -> { originalSeed, hasGenerated, generating }
 
-// Tokens reserved for the model's response on every WIA generation. Used
-// both as the `responseLength` argument to `generateRaw` and as the
-// preamble's budget input so chat packing doesn't eat into response space.
-const WIA_RESPONSE_LENGTH = 600;
+function getWIAResponseLength() {
+    const n = moduleSettings?.wiaResponseLength;
+    return (typeof n === 'number' && n > 0) ? n : DEFAULT_WIA_RESPONSE_LENGTH;
+}
 
 // ─── Init ───
 
@@ -159,6 +163,10 @@ function injectControls(formEl) {
             <span class="fa-solid fa-arrow-rotate-left"></span>
         </div>
         <div class="wia-spinner wia-hidden" title="Generating..."><span class="fa-solid fa-spinner fa-spin"></span></div>
+        <div class="wia-tokens-row">
+            <label class="wia-tokens-label"><span class="fa-solid fa-coins"></span> Max Tokens:</label>
+            <input type="number" class="text_pole wia-tokens-input" min="50" max="8192" step="50" />
+        </div>
     `;
 
     // Insert at the very top of the content form control so it's clearly
@@ -169,11 +177,27 @@ function injectControls(formEl) {
     const continueBtn = controls.querySelector('.wia-btn-continue');
     const retryBtn = controls.querySelector('.wia-btn-retry');
     const revertBtn = controls.querySelector('.wia-btn-revert');
+    const tokensInput = controls.querySelector('.wia-tokens-input');
 
     assistBtn.addEventListener('click', () => onAssist(formEl, id, false));
     continueBtn.addEventListener('click', () => onAssist(formEl, id, true));
     retryBtn.addEventListener('click', () => onRetry(formEl, id));
     revertBtn.addEventListener('click', () => onRevert(formEl, id));
+
+    if (tokensInput) {
+        tokensInput.value = getWIAResponseLength();
+        tokensInput.addEventListener('change', () => {
+            const n = parseInt(tokensInput.value, 10);
+            if (Number.isFinite(n) && n > 0) {
+                moduleSettings.wiaResponseLength = n;
+                saveSettingsCb?.();
+                // Sync all other visible token inputs to the new value.
+                document.querySelectorAll('.wia-tokens-input').forEach(el => {
+                    if (el !== tokensInput) el.value = n;
+                });
+            }
+        });
+    }
 
     populateLoreBookPicker(controls);
 
@@ -326,7 +350,7 @@ async function onAssist(formEl, id, isContinue) {
         if (ctxOptions.includeChat || ctxOptions.loreBookNames.length) {
             preamble = await buildContextPreamble({
                 ...ctxOptions,
-                responseLength: WIA_RESPONSE_LENGTH,
+                responseLength: getWIAResponseLength(),
                 maxContextOverride: moduleSettings?.wiaMaxContextOverride || 0,
             });
             debug('Context preamble length:', preamble.length, 'options:', ctxOptions);
@@ -365,12 +389,16 @@ async function onAssist(formEl, id, isContinue) {
         debug('User prompt:', userPrompt);
         debug('Prefill:', prefill);
 
-        const raw = await generateRaw({
-            prompt: userPrompt,
-            systemPrompt,
-            responseLength: WIA_RESPONSE_LENGTH,
-            ...(prefill ? { prefill } : {}),
-        });
+        const raw = await withSingleLineDisabled(() => streamingGenerate(
+            {
+                prompt: userPrompt,
+                systemPrompt,
+                responseLength: getWIAResponseLength(),
+                ...(prefill ? { prefill } : {}),
+            },
+            contentEl,
+            { append: isContinue },
+        ));
 
         let cleaned = removeReasoningFromString(raw).trim();
 
@@ -445,6 +473,8 @@ function onRevert(formEl, id) {
  * @param {function} saveSettings
  */
 export function bindWIASettings(saveSettings) {
+    saveSettingsCb = saveSettings;
+
     const enabledCb = document.getElementById('wia_enabled');
     const debugCb = document.getElementById('wia_debug_mode');
     const promptArea = document.getElementById('wia_prompt_textarea');
@@ -476,6 +506,18 @@ export function bindWIASettings(saveSettings) {
             const n = parseInt(maxContextInput.value, 10);
             moduleSettings.wiaMaxContextOverride = Number.isFinite(n) && n > 0 ? n : 0;
             saveSettings();
+        });
+    }
+    const responseLengthInput = document.getElementById('wia_response_length');
+    if (responseLengthInput) {
+        responseLengthInput.value = moduleSettings.wiaResponseLength || DEFAULT_WIA_RESPONSE_LENGTH;
+        responseLengthInput.addEventListener('input', () => {
+            const n = parseInt(responseLengthInput.value, 10);
+            if (Number.isFinite(n) && n > 0) {
+                moduleSettings.wiaResponseLength = n;
+                saveSettings();
+                document.querySelectorAll('.wia-tokens-input').forEach(el => { el.value = n; });
+            }
         });
     }
     if (promptArea) {
