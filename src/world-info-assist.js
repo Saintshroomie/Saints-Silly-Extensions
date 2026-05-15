@@ -17,6 +17,7 @@ import {
     streamingGenerate,
     withSingleLineDisabled,
 } from './utils.js';
+import { setupPromptTemplates } from './prompt-templates.js';
 
 // ─── Default Prompt ───
 
@@ -478,7 +479,6 @@ export function bindWIASettings(saveSettings) {
     const enabledCb = document.getElementById('wia_enabled');
     const debugCb = document.getElementById('wia_debug_mode');
     const promptArea = document.getElementById('wia_prompt_textarea');
-    const restoreBtn = document.getElementById('wia_restore_default');
 
     if (enabledCb) {
         enabledCb.checked = !!moduleSettings.wiaEnabled;
@@ -527,12 +527,13 @@ export function bindWIASettings(saveSettings) {
             saveSettings();
         });
     }
-    if (restoreBtn) {
-        restoreBtn.addEventListener('click', () => {
-            moduleSettings.wiaPrompt = DEFAULT_WIA_PROMPT;
-            if (promptArea) promptArea.value = DEFAULT_WIA_PROMPT;
-            saveSettings();
-            toast('Default World Info assist prompt restored.', 'success');
-        });
-    }
+
+    setupPromptTemplates({
+        promptKey: 'wiaPrompt',
+        defaultText: DEFAULT_WIA_PROMPT,
+        textareaId: 'wia_prompt_textarea',
+        containerId: 'wia_prompt_templates',
+        settings: moduleSettings,
+        saveSettings,
+    });
 }

@@ -756,6 +756,39 @@
     pointer-events: none;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════════
+   PROMPT TEMPLATE CONTROLS (shared, one row per prompt)
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+#saints_silly_settings .saints_template_controls {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+#saints_silly_settings .saints_template_select {
+    width: 100%;
+}
+
+#saints_silly_settings .saints_template_buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+#saints_silly_settings .saints_template_buttons .menu_button {
+    flex: 1 1 0;
+    min-width: 100px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+#saints_silly_settings .saints_template_buttons .menu_button.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
 .ng-regen-overlay {
     position: fixed;
     inset: 0;
