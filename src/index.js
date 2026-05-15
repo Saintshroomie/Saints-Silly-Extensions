@@ -9,6 +9,7 @@ import {
     loadExtensionSettings,
     saveExtensionSettings,
 } from './utils.js';
+import { installSilentGenerationStopListener } from './silent-generation.js';
 import {
     initPossession,
     isPossessing,
@@ -233,6 +234,11 @@ jQuery(async () => {
     // Phrasing UI
     createInputAreaButton();
     createHamburgerMenuItem();
+
+    // Wire up the global "stop button → abort silent generations" hook
+    // before subscribing any per-module handlers, so a stop event always
+    // unblocks in-flight silent jobs first.
+    installSilentGenerationStopListener();
 
     // Subscribe to events
     const { eventSource, eventTypes } = getContext();

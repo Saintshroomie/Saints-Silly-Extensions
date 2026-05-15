@@ -1346,6 +1346,217 @@ var code = `<div id="saints_silly_settings" class="extension_settings"> <div cla
 
 ;// external "../../../../tokenizers.js"
 
+;// ./src/silent-generation.js
+/* unused harmony import specifier */ var stStopGeneration;
+/**
+ * Silent Generation Manager
+ *
+ * SillyTavern's stop button reliably cancels normal user-input generations
+ * but not the "silent" / background ones extensions kick off through
+ * `generateRaw` / `generateQuietPrompt`. ST's `generateRawData()` does listen
+ * for `GENERATION_STOPPED` and aborts its local fetch, but two problems
+ * remain in practice:
+ *
+ *   1. The stop button (`#mes_stop`) is hidden whenever a modal is open or
+ *      the chat input is locked, so DOM-click-based "cancel" hacks no-op
+ *      exactly when extensions need them most.
+ *   2. Even when the underlying fetch is aborted, the `await` in extension
+ *      code can still hang on the streaming reader or post-processing
+ *      until the upstream call unwinds — so users see the UI sit there
+ *      and then dump the discarded result.
+ *
+ * This module centralizes cancellation for every silent generation an
+ * extension makes:
+ *
+ *   - Hooks `GENERATION_STOPPED` once at module load and aborts every
+ *     in-flight silent job.
+ *   - Hands each job its own AbortController and races the work against
+ *     that signal so the awaiting caller returns immediately on cancel,
+ *     even if upstream is still draining.
+ *   - Exposes `abortAllSilentGenerations()` for extension UIs (modal close
+ *     buttons, in-tool Cancel buttons) so they don't need to fight with
+ *     `#mes_stop`'s visibility.
+ *
+ * Callers that opt in via `runCancellableSilentGeneration` or the
+ * cancellation-aware `streamingGenerate` get AbortError-on-cancel for free.
+ */
+
+
+
+
+// ─── Module State ───
+
+const activeJobs = new Map(); // jobId -> { abortController, name }
+let nextJobId = 1;
+let stopListenerInstalled = false;
+
+// ─── Public API ───
+
+/**
+ * Install the one-shot GENERATION_STOPPED listener that aborts every active
+ * silent generation. Safe to call multiple times — only the first call wires
+ * up the listener. Should be called once during extension init.
+ */
+function installSilentGenerationStopListener() {
+    if (stopListenerInstalled) return;
+    const { eventSource, eventTypes } = getContext();
+    if (!eventSource || !eventTypes?.GENERATION_STOPPED) return;
+    eventSource.on(eventTypes.GENERATION_STOPPED, () => {
+        abortAllSilentGenerations('user-stop');
+    });
+    stopListenerInstalled = true;
+}
+
+/**
+ * Abort every in-flight silent generation. Used by the global stop listener
+ * and by extension UIs that close while a generation is running (e.g. the
+ * ACC modal's Cancel/X buttons).
+ *
+ * @param {string} [reason] - Reason recorded on the AbortError.
+ * @returns {number} The number of jobs aborted.
+ */
+function abortAllSilentGenerations(reason = 'aborted') {
+    let count = 0;
+    for (const [, job] of activeJobs) {
+        try {
+            job.abortController.abort(
+                new DOMException(`Silent generation aborted: ${reason}`, 'AbortError'),
+            );
+            count++;
+        } catch (_) { /* ignore */ }
+    }
+    return count;
+}
+
+/**
+ * Also tells SillyTavern to stop any non-silent generation that may be
+ * running in parallel — used by extension UIs that want a single "Cancel"
+ * button to stop both their own silent work and any normal chat
+ * generation it may have triggered.
+ *
+ * Safe to call when nothing is running; ST's `stopGeneration()` is a no-op
+ * in that case.
+ *
+ * @param {string} [reason]
+ */
+function abortAllGenerations(reason = 'aborted') {
+    abortAllSilentGenerations(reason);
+    try { stStopGeneration(); } catch (_) { /* ignore */ }
+}
+
+/**
+ * Whether at least one silent generation is currently in flight.
+ *
+ * @returns {boolean}
+ */
+function hasActiveSilentGenerations() {
+    return activeJobs.size > 0;
+}
+
+/**
+ * Run an async generation under the silent-generation cancellation system.
+ *
+ * The runner receives an AbortSignal. If the user clicks ST's stop button
+ * (or any caller invokes `abortAllSilentGenerations`), the signal aborts
+ * and the returned promise rejects with an AbortError immediately, without
+ * waiting for the upstream fetch / generator to unwind.
+ *
+ * @template T
+ * @param {object} opts
+ * @param {(signal: AbortSignal) => Promise<T>} opts.run - The work to perform.
+ * @param {string} [opts.name] - Debug name for the job.
+ * @returns {Promise<T>}
+ * @throws {DOMException} AbortError if cancelled.
+ */
+async function runCancellableSilentGeneration({ run, name = 'silent-gen' }) {
+    installSilentGenerationStopListener();
+
+    const jobId = nextJobId++;
+    const abortController = new AbortController();
+    activeJobs.set(jobId, { abortController, name });
+
+    let abortReject;
+    const abortPromise = new Promise((_, rej) => { abortReject = rej; });
+    const onAbort = () => {
+        const reason = abortController.signal.reason
+            || new DOMException('Silent generation aborted', 'AbortError');
+        abortReject(reason);
+    };
+    abortController.signal.addEventListener('abort', onAbort, { once: true });
+
+    try {
+        return await Promise.race([run(abortController.signal), abortPromise]);
+    } finally {
+        abortController.signal.removeEventListener('abort', onAbort);
+        activeJobs.delete(jobId);
+    }
+}
+
+/**
+ * `true` if the given error is a cancellation from this manager (or any
+ * AbortError propagated up from ST / fetch). Use this in catch blocks to
+ * suppress error toasts when the user deliberately cancelled.
+ *
+ * @param {unknown} err
+ * @returns {boolean}
+ */
+function isSilentGenerationAbort(err) {
+    if (!err) return false;
+    if (err.name === 'AbortError') return true;
+    const msg = (err.message || '').toLowerCase();
+    return msg.includes('aborted') || msg.includes('cancelled by stop event');
+}
+
+// ─── Streaming Helper ───
+
+/**
+ * Cancellable replacement for the old streamingGenerate(). Calls
+ * `generateRaw` with optional onToken streaming and plugs the call into
+ * the silent-generation cancel system. Throws AbortError on cancel.
+ *
+ * @param {object} params - generateRaw parameters.
+ * @param {HTMLTextAreaElement|null} targetEl - Element to stream into, or null.
+ * @param {{ append?: boolean, name?: string }} [opts]
+ * @returns {Promise<string>} The full generated text.
+ * @throws {DOMException} AbortError if cancelled.
+ */
+async function cancellableStreamingGenerate(params, targetEl, { append = false, name } = {}) {
+    return runCancellableSilentGeneration({
+        name: name || 'streamingGenerate',
+        run: async (_signal) => {
+            if (!targetEl) return __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__(params);
+
+            let accumulated = append ? (targetEl.value || '') : '';
+            let streamingWorked = false;
+
+            try {
+                const result = await __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__({
+                    ...params,
+                    onToken: (token) => {
+                        accumulated += token;
+                        targetEl.value = accumulated;
+                        targetEl.scrollTop = targetEl.scrollHeight;
+                        streamingWorked = true;
+                    },
+                });
+                if (!streamingWorked && result) {
+                    targetEl.value = append ? ((targetEl.value || '') + result) : result;
+                }
+                return result || accumulated;
+            } catch (err) {
+                // Fall back if ST rejected the unknown onToken param.
+                const msg = (err?.message || '').toLowerCase();
+                if (msg.includes('ontoken') || msg.includes('unknown') || msg.includes('invalid param')) {
+                    const fallback = await __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__(params);
+                    if (fallback) targetEl.value = append ? ((targetEl.value || '') + fallback) : fallback;
+                    return fallback;
+                }
+                throw err;
+            }
+        },
+    });
+}
+
 ;// ./src/utils.js
 /**
  * Shared utilities for SillyTavern extensions.
@@ -1359,6 +1570,7 @@ var code = `<div id="saints_silly_settings" class="extension_settings"> <div cla
  *   - Generation lifecycle helpers
  *   - Generation context preamble (chat + lore books)
  */
+
 
 
 
@@ -1523,44 +1735,20 @@ function waitForGenerationEnd(timeoutMs = 5 * 60 * 1000) {
 
 /**
  * Call generateRaw and optionally stream tokens into targetEl as they arrive.
- * Uses the `onToken` callback if ST's generateRaw supports it; falls back
- * gracefully to non-streaming if it doesn't.
+ *
+ * Routes through the silent-generation cancellation manager so the call can
+ * be aborted by ST's stop button or by `abortAllSilentGenerations()`. On
+ * cancel, this throws an AbortError (rather than returning the partial /
+ * discarded result) so callers can short-circuit cleanly.
  *
  * @param {object} params - generateRaw parameters (prompt, systemPrompt, responseLength, etc.)
  * @param {HTMLTextAreaElement|null} targetEl - Field to stream into, or null for no streaming.
- * @param {{ append?: boolean }} [opts]
+ * @param {{ append?: boolean, name?: string }} [opts]
  * @returns {Promise<string>} The full generated text.
+ * @throws {DOMException} AbortError if the generation was cancelled.
  */
-async function streamingGenerate(params, targetEl, { append = false } = {}) {
-    if (!targetEl) return __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__(params);
-
-    let accumulated = append ? (targetEl.value || '') : '';
-    let streamingWorked = false;
-
-    try {
-        const result = await __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__({
-            ...params,
-            onToken: (token) => {
-                accumulated += token;
-                targetEl.value = accumulated;
-                targetEl.scrollTop = targetEl.scrollHeight;
-                streamingWorked = true;
-            },
-        });
-        if (!streamingWorked && result) {
-            targetEl.value = append ? ((targetEl.value || '') + result) : result;
-        }
-        return result || accumulated;
-    } catch (err) {
-        // If ST rejected the unknown onToken param, retry without it.
-        const msg = (err?.message || '').toLowerCase();
-        if (msg.includes('ontoken') || msg.includes('unknown') || msg.includes('invalid param')) {
-            const fallback = await __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__(params);
-            if (fallback) targetEl.value = append ? ((targetEl.value || '') + fallback) : fallback;
-            return fallback;
-        }
-        throw err;
-    }
+async function streamingGenerate(params, targetEl, opts = {}) {
+    return cancellableStreamingGenerate(params, targetEl, opts);
 }
 
 // ─── Single-Line Override ───
@@ -3299,6 +3487,7 @@ function initPhrasing({ settings, possessionApi: pApi }) {
 
 
 
+
 // ─── Default Prompt ───
 
 const DEFAULT_ACC_PROMPT = `[
@@ -3741,7 +3930,9 @@ async function runGeneration(action, brief) {
         lastAction = action;
         assisted_character_creation_debug(`${action} complete, length:`, result.length);
     } catch (err) {
-        if (!abortRequested) {
+        if (isSilentGenerationAbort(err)) {
+            assisted_character_creation_debug(`${action} aborted via cancellation`);
+        } else if (!abortRequested) {
             console.error('ACC generation error:', err);
             toast(`Generation failed: ${err.message}`, 'error');
         }
@@ -3832,9 +4023,13 @@ async function buildPreambleBlock(ctxOptions) {
 }
 
 function stopGeneration() {
-    const stopBtn = document.getElementById('mes_stop');
-    if (stopBtn) stopBtn.click();
-    assisted_character_creation_debug('Stop generation triggered');
+    // The previous implementation clicked `#mes_stop`, but that button is
+    // hidden whenever the ACC modal is open (chat input is locked), so the
+    // click was a no-op and the silent generation kept running. Going
+    // straight to the silent-generation manager actually aborts the in-
+    // flight fetch and unblocks the awaiting runGeneration() call.
+    const aborted = abortAllSilentGenerations('acc-cancel');
+    assisted_character_creation_debug('Stop generation triggered, aborted jobs:', aborted);
 }
 
 // ─── Done ───
@@ -3950,6 +4145,7 @@ function escapeAttr(str) {
  * Assisted Character Creation tool, but operating on a single field
  * (the entry's content) and using a free-form prompt instead of a schema.
  */
+
 
 
 
@@ -4368,8 +4564,12 @@ async function onAssist(formEl, id, isContinue) {
         setUIState(formEl, 'generated');
         world_info_assist_debug('Generation complete for', id);
     } catch (err) {
-        console.error('WIA generation error:', err);
-        toast(`World Info assist failed: ${err.message}`, 'error');
+        if (isSilentGenerationAbort(err)) {
+            world_info_assist_debug('Generation cancelled for', id);
+        } else {
+            console.error('WIA generation error:', err);
+            toast(`World Info assist failed: ${err.message}`, 'error');
+        }
         state.generating = false;
         entryStates.set(id, state);
         setUIState(formEl, state.hasGenerated ? 'generated' : 'idle');
@@ -4485,6 +4685,7 @@ function bindWIASettings(saveSettings) {
  * `context.chatMetadata.narrativeGuidance`. Prompt templates and the
  * default turn count live in extension settings.
  */
+
 
 
 
@@ -4686,8 +4887,12 @@ async function regenGuidance(reason) {
         toast('Narrative guidance regenerated.', 'success');
         narrative_guidance_debug('regenGuidance — complete, length:', cleaned.length);
     } catch (err) {
-        console.error('Narrative Guidance generation error:', err);
-        toast(`Narrative guidance failed: ${err.message}`, 'error');
+        if (isSilentGenerationAbort(err)) {
+            narrative_guidance_debug('regenGuidance — cancelled by user');
+        } else {
+            console.error('Narrative Guidance generation error:', err);
+            toast(`Narrative guidance failed: ${err.message}`, 'error');
+        }
         // Restore whatever injection we had before clearing.
         reapplyInjection();
     } finally {
@@ -4754,8 +4959,12 @@ async function continueGuidance() {
         toast('Narrative guidance continued.', 'success');
         narrative_guidance_debug('continueGuidance — complete, added length:', continuation.length);
     } catch (err) {
-        console.error('Narrative Guidance continue error:', err);
-        toast(`Continue failed: ${err.message}`, 'error');
+        if (isSilentGenerationAbort(err)) {
+            narrative_guidance_debug('continueGuidance — cancelled by user');
+        } else {
+            console.error('Narrative Guidance continue error:', err);
+            toast(`Continue failed: ${err.message}`, 'error');
+        }
     } finally {
         regenInProgress = false;
         setNGActionButtonsRunning(false);
@@ -5171,6 +5380,7 @@ function initNarrativeGuidance({ settings }) {
 
 
 
+
 // ─── Constants ───
 
 const EXTENSION_NAME = 'Saints-Silly-Extensions';
@@ -5335,6 +5545,11 @@ jQuery(async () => {
     // Phrasing UI
     createInputAreaButton();
     createHamburgerMenuItem();
+
+    // Wire up the global "stop button → abort silent generations" hook
+    // before subscribing any per-module handlers, so a stop event always
+    // unblocks in-flight silent jobs first.
+    installSilentGenerationStopListener();
 
     // Subscribe to events
     const { eventSource, eventTypes } = getContext();

@@ -15,6 +15,10 @@ import {
     streamingGenerate,
     withSingleLineDisabled,
 } from './utils.js';
+import {
+    abortAllSilentGenerations,
+    isSilentGenerationAbort,
+} from './silent-generation.js';
 import { setupPromptTemplates } from './prompt-templates.js';
 
 // ─── Default Prompt ───
@@ -459,7 +463,9 @@ async function runGeneration(action, brief) {
         lastAction = action;
         debug(`${action} complete, length:`, result.length);
     } catch (err) {
-        if (!abortRequested) {
+        if (isSilentGenerationAbort(err)) {
+            debug(`${action} aborted via cancellation`);
+        } else if (!abortRequested) {
             console.error('ACC generation error:', err);
             toast(`Generation failed: ${err.message}`, 'error');
         }
@@ -550,9 +556,13 @@ async function buildPreambleBlock(ctxOptions) {
 }
 
 function stopGeneration() {
-    const stopBtn = document.getElementById('mes_stop');
-    if (stopBtn) stopBtn.click();
-    debug('Stop generation triggered');
+    // The previous implementation clicked `#mes_stop`, but that button is
+    // hidden whenever the ACC modal is open (chat input is locked), so the
+    // click was a no-op and the silent generation kept running. Going
+    // straight to the silent-generation manager actually aborts the in-
+    // flight fetch and unblocks the awaiting runGeneration() call.
+    const aborted = abortAllSilentGenerations('acc-cancel');
+    debug('Stop generation triggered, aborted jobs:', aborted);
 }
 
 // ─── Done ───

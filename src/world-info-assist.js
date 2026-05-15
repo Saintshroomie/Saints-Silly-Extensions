@@ -17,6 +17,7 @@ import {
     streamingGenerate,
     withSingleLineDisabled,
 } from './utils.js';
+import { isSilentGenerationAbort } from './silent-generation.js';
 import { setupPromptTemplates } from './prompt-templates.js';
 
 // ─── Default Prompt ───
@@ -432,8 +433,12 @@ async function onAssist(formEl, id, isContinue) {
         setUIState(formEl, 'generated');
         debug('Generation complete for', id);
     } catch (err) {
-        console.error('WIA generation error:', err);
-        toast(`World Info assist failed: ${err.message}`, 'error');
+        if (isSilentGenerationAbort(err)) {
+            debug('Generation cancelled for', id);
+        } else {
+            console.error('WIA generation error:', err);
+            toast(`World Info assist failed: ${err.message}`, 'error');
+        }
         state.generating = false;
         entryStates.set(id, state);
         setUIState(formEl, state.hasGenerated ? 'generated' : 'idle');

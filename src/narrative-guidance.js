@@ -25,6 +25,7 @@ import {
     streamingGenerate,
     withSingleLineDisabled,
 } from './utils.js';
+import { isSilentGenerationAbort } from './silent-generation.js';
 import { setupPromptTemplates } from './prompt-templates.js';
 
 // ─── Constants ───
@@ -222,8 +223,12 @@ async function regenGuidance(reason) {
         toast('Narrative guidance regenerated.', 'success');
         debug('regenGuidance — complete, length:', cleaned.length);
     } catch (err) {
-        console.error('Narrative Guidance generation error:', err);
-        toast(`Narrative guidance failed: ${err.message}`, 'error');
+        if (isSilentGenerationAbort(err)) {
+            debug('regenGuidance — cancelled by user');
+        } else {
+            console.error('Narrative Guidance generation error:', err);
+            toast(`Narrative guidance failed: ${err.message}`, 'error');
+        }
         // Restore whatever injection we had before clearing.
         reapplyInjection();
     } finally {
@@ -290,8 +295,12 @@ async function continueGuidance() {
         toast('Narrative guidance continued.', 'success');
         debug('continueGuidance — complete, added length:', continuation.length);
     } catch (err) {
-        console.error('Narrative Guidance continue error:', err);
-        toast(`Continue failed: ${err.message}`, 'error');
+        if (isSilentGenerationAbort(err)) {
+            debug('continueGuidance — cancelled by user');
+        } else {
+            console.error('Narrative Guidance continue error:', err);
+            toast(`Continue failed: ${err.message}`, 'error');
+        }
     } finally {
         regenInProgress = false;
         setNGActionButtonsRunning(false);
