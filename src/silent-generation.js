@@ -32,29 +32,74 @@
  */
 
 import { generateRaw, stopGeneration as stStopGeneration } from '../../../../../script.js';
-import { getContext } from './utils.js';
+import { getContext, createDebugLogger } from './utils.js';
 
 // ─── Module State ───
 
 const activeJobs = new Map(); // jobId -> { abortController, name }
 let nextJobId = 1;
 let stopListenerInstalled = false;
+let moduleSettings = null;
+let debug = () => {};
+
+// ─── Init ───
+
+/**
+ * Initialize the silent-generation manager. Wires up the debug logger
+ * against `settings.silentGenerationDebugMode` and installs the
+ * `GENERATION_STOPPED` listener. Called once from `index.js`.
+ *
+ * @param {object} opts
+ * @param {object} opts.settings - Shared mutable settings reference.
+ */
+export function initSilentGeneration({ settings }) {
+    moduleSettings = settings;
+    debug = createDebugLogger('SILENT-GEN', () => moduleSettings?.silentGenerationDebugMode);
+    installSilentGenerationStopListener();
+    debug('Module initialized');
+}
+
+/**
+ * Bind the silent-generation settings panel controls. Called from
+ * `injectSettingsPanel` in `index.js` after the HTML is injected.
+ *
+ * @param {() => void} saveSettings - Persist callback.
+ */
+export function bindSilentGenerationSettings(saveSettings) {
+    const debugCb = document.getElementById('silent_generation_debug_mode');
+    if (debugCb) {
+        debugCb.checked = !!moduleSettings?.silentGenerationDebugMode;
+        debugCb.addEventListener('change', () => {
+            if (moduleSettings) moduleSettings.silentGenerationDebugMode = debugCb.checked;
+            saveSettings();
+            debug('Debug mode toggled:', debugCb.checked);
+        });
+    }
+}
 
 // ─── Public API ───
 
 /**
  * Install the one-shot GENERATION_STOPPED listener that aborts every active
  * silent generation. Safe to call multiple times — only the first call wires
- * up the listener. Should be called once during extension init.
+ * up the listener. Normally invoked via `initSilentGeneration`.
  */
 export function installSilentGenerationStopListener() {
-    if (stopListenerInstalled) return;
+    if (stopListenerInstalled) {
+        debug('Stop listener already installed; skipping');
+        return;
+    }
     const { eventSource, eventTypes } = getContext();
-    if (!eventSource || !eventTypes?.GENERATION_STOPPED) return;
+    if (!eventSource || !eventTypes?.GENERATION_STOPPED) {
+        debug('Stop listener NOT installed — eventSource or GENERATION_STOPPED missing');
+        return;
+    }
     eventSource.on(eventTypes.GENERATION_STOPPED, () => {
+        debug('GENERATION_STOPPED received — aborting all silent jobs');
         abortAllSilentGenerations('user-stop');
     });
     stopListenerInstalled = true;
+    debug('Stop listener installed');
 }
 
 /**
@@ -70,15 +115,24 @@ export function installSilentGenerationStopListener() {
  * @returns {number} The number of jobs aborted.
  */
 export function abortAllSilentGenerations(reason = 'aborted') {
+    if (activeJobs.size === 0) {
+        debug('abortAllSilentGenerations called but no active jobs; reason:', reason);
+        return 0;
+    }
     let count = 0;
-    for (const [, job] of activeJobs) {
+    const jobNames = [];
+    for (const [jobId, job] of activeJobs) {
         try {
             job.abortController.abort(
                 new DOMException(`Silent generation aborted: ${reason}`, 'AbortError'),
             );
+            jobNames.push(`#${jobId}(${job.name})`);
             count++;
-        } catch (_) { /* ignore */ }
+        } catch (err) {
+            debug('Failed to abort job', jobId, err);
+        }
     }
+    debug(`Aborted ${count} silent job(s) — reason: ${reason} — jobs:`, jobNames.join(', '));
     return count;
 }
 
@@ -98,8 +152,14 @@ export function abortAllSilentGenerations(reason = 'aborted') {
  * @param {string} [reason]
  */
 export function abortAllGenerations(reason = 'aborted') {
+    debug('abortAllGenerations — reason:', reason);
     abortAllSilentGenerations(reason);
-    try { stStopGeneration(); } catch (_) { /* ignore */ }
+    try {
+        stStopGeneration();
+        debug('ST stopGeneration() invoked');
+    } catch (err) {
+        debug('ST stopGeneration() threw:', err);
+    }
 }
 
 /**
@@ -132,12 +192,15 @@ export async function runCancellableSilentGeneration({ run, name = 'silent-gen' 
     const jobId = nextJobId++;
     const abortController = new AbortController();
     activeJobs.set(jobId, { abortController, name });
+    const startedAt = Date.now();
+    debug(`Job #${jobId}(${name}) started — active jobs:`, activeJobs.size);
 
     let abortReject;
     const abortPromise = new Promise((_, rej) => { abortReject = rej; });
     const onAbort = () => {
         const reason = abortController.signal.reason
             || new DOMException('Silent generation aborted', 'AbortError');
+        debug(`Job #${jobId}(${name}) abort signal fired — reason:`, reason?.message || reason);
         abortReject(reason);
     };
     abortController.signal.addEventListener('abort', onAbort, { once: true });
@@ -147,13 +210,22 @@ export async function runCancellableSilentGeneration({ run, name = 'silent-gen' 
     // would surface as an unhandled promise rejection in the console.
     // Swallow it here; the result is already irrelevant by that point.
     const runPromise = run(abortController.signal);
-    runPromise.catch(() => { /* swallow abandoned-runner rejections */ });
+    runPromise.catch((err) => {
+        debug(`Job #${jobId}(${name}) abandoned-runner rejection (swallowed):`, err?.message || err);
+    });
 
     try {
-        return await Promise.race([runPromise, abortPromise]);
+        const result = await Promise.race([runPromise, abortPromise]);
+        debug(`Job #${jobId}(${name}) completed normally in ${Date.now() - startedAt}ms`);
+        return result;
+    } catch (err) {
+        const wasAbort = err?.name === 'AbortError';
+        debug(`Job #${jobId}(${name}) ${wasAbort ? 'aborted' : 'threw'} after ${Date.now() - startedAt}ms — ${err?.message || err}`);
+        throw err;
     } finally {
         abortController.signal.removeEventListener('abort', onAbort);
         activeJobs.delete(jobId);
+        debug(`Job #${jobId}(${name}) cleaned up — remaining active jobs:`, activeJobs.size);
     }
 }
 
@@ -186,13 +258,21 @@ export function isSilentGenerationAbort(err) {
  * @throws {DOMException} AbortError if cancelled.
  */
 export async function cancellableStreamingGenerate(params, targetEl, { append = false, name } = {}) {
+    const jobName = name || 'streamingGenerate';
+    const hasStream = !!targetEl;
+    debug(`cancellableStreamingGenerate — name: ${jobName}, streaming: ${hasStream}, append: ${append}, promptLen: ${params?.prompt?.length ?? 0}, responseLength: ${params?.responseLength ?? '(default)'}`);
+
     return runCancellableSilentGeneration({
-        name: name || 'streamingGenerate',
+        name: jobName,
         run: async (_signal) => {
-            if (!targetEl) return generateRaw(params);
+            if (!targetEl) {
+                debug(`${jobName} — no targetEl, calling generateRaw directly`);
+                return generateRaw(params);
+            }
 
             let accumulated = append ? (targetEl.value || '') : '';
             let streamingWorked = false;
+            let tokenCount = 0;
 
             try {
                 const result = await generateRaw({
@@ -202,8 +282,10 @@ export async function cancellableStreamingGenerate(params, targetEl, { append = 
                         targetEl.value = accumulated;
                         targetEl.scrollTop = targetEl.scrollHeight;
                         streamingWorked = true;
+                        tokenCount++;
                     },
                 });
+                debug(`${jobName} — generateRaw resolved, streamingWorked: ${streamingWorked}, tokens streamed: ${tokenCount}, final length: ${(result || accumulated).length}`);
                 if (!streamingWorked && result) {
                     targetEl.value = append ? ((targetEl.value || '') + result) : result;
                 }
@@ -212,10 +294,12 @@ export async function cancellableStreamingGenerate(params, targetEl, { append = 
                 // Fall back if ST rejected the unknown onToken param.
                 const msg = (err?.message || '').toLowerCase();
                 if (msg.includes('ontoken') || msg.includes('unknown') || msg.includes('invalid param')) {
+                    debug(`${jobName} — onToken unsupported, falling back to non-streaming generateRaw`);
                     const fallback = await generateRaw(params);
                     if (fallback) targetEl.value = append ? ((targetEl.value || '') + fallback) : fallback;
                     return fallback;
                 }
+                debug(`${jobName} — generateRaw rejected:`, err?.message || err);
                 throw err;
             }
         },

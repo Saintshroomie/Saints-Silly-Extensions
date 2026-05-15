@@ -9,7 +9,10 @@ import {
     loadExtensionSettings,
     saveExtensionSettings,
 } from './utils.js';
-import { installSilentGenerationStopListener } from './silent-generation.js';
+import {
+    initSilentGeneration,
+    bindSilentGenerationSettings,
+} from './silent-generation.js';
 import {
     initPossession,
     isPossessing,
@@ -104,6 +107,7 @@ const defaultSettings = {
     narrativeGuidanceInjectionDepth: DEFAULT_NG_INJECTION_DEPTH,
     narrativeGuidanceInjectionRole: DEFAULT_NG_INJECTION_ROLE,
     narrativeGuidanceLoreBookNames: [],
+    silentGenerationDebugMode: false,
     promptTemplates: {
         phrasingPrompt: {},
         phrasingInversePrompt: {},
@@ -153,6 +157,7 @@ function injectSettingsPanel() {
     bindACCSettings(saveSettings);
     bindWIASettings(saveSettings);
     bindNarrativeGuidanceSettings(saveSettings);
+    bindSilentGenerationSettings(saveSettings);
 }
 
 // ─── Merged Event Handlers ───
@@ -238,7 +243,7 @@ jQuery(async () => {
     // Wire up the global "stop button → abort silent generations" hook
     // before subscribing any per-module handlers, so a stop event always
     // unblocks in-flight silent jobs first.
-    installSilentGenerationStopListener();
+    initSilentGeneration({ settings });
 
     // Subscribe to events
     const { eventSource, eventTypes } = getContext();

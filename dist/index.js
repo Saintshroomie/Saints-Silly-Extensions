@@ -1342,7 +1342,7 @@ var update = injectStylesIntoStyleTag_default()(style/* default */.A, options);
 
 ;// ./src/settings.html
 // Module
-var code = `<div id="saints_silly_settings" class="extension_settings"> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Saint's Silly Extensions</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content"> <h4 class="saints_section_header"> <span class="fa-solid fa-ghost"></span> Possession </h4> <label class="checkbox_label"> <input id="possession_enabled" type="checkbox"/> <span>Enable Possession</span> </label> <label class="checkbox_label"> <input id="possession_show_toast" type="checkbox"/> <span>Show Toast on Possess/Unpossess</span> </label> <label class="checkbox_label"> <input id="possession_debug_mode" type="checkbox"/> <span>Possession Debug Mode</span> </label> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-pen-fancy"></span> Phrasing! </h4> <label class="checkbox_label"> <input id="phrasing_enabled" type="checkbox" checked="checked"/> <span>Enable Phrasing!</span> </label> <label class="checkbox_label"> <input id="phrasing_debug_mode" type="checkbox"/> <span>Phrasing Debug Mode</span> </label> <label class="checkbox_label" title="When enabled, rephrasing a message includes every existing swipe in the prompt and asks the model to produce something wildly different."> <input id="phrasing_inverse_guidance" type="checkbox"/> <span>Inverse Guidance</span> </label> <div class="phrasing_prompt_section"> <label for="phrasing_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="phrasing_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Phrasing! prompt template..."></textarea> </div> <div class="saints_template_controls" id="phrasing_prompt_templates"></div> <div class="phrasing_prompt_section"> <label for="phrasing_inverse_prompt_textarea"><b>Inverse Guidance Prompt Template:</b></label> <textarea id="phrasing_inverse_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Inverse Guidance prompt template..."></textarea> <small>Available placeholders: <code>{{phrasingSeed}}</code>, <code>{{phrasingSwipes}}</code></small> </div> <div class="saints_template_controls" id="phrasing_inverse_prompt_templates"></div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-wand-magic-sparkles"></span> Assisted Character Creation </h4> <label class="checkbox_label"> <input id="acc_enabled" type="checkbox"/> <span>Enable Assisted Character Creation</span> </label> <label class="checkbox_label"> <input id="acc_debug_mode" type="checkbox"/> <span>ACC Debug Mode</span> </label> <div class="ng_inline_row"> <label for="acc_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="acc_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for ACC generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="acc_prompt_section"> <label for="acc_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="acc_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your ACC prompt template..."></textarea> </div> <div class="saints_template_controls" id="acc_prompt_templates"></div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-book-atlas"></span> World Info Assist </h4> <label class="checkbox_label"> <input id="wia_enabled" type="checkbox"/> <span>Enable World Info Assist</span> </label> <label class="checkbox_label"> <input id="wia_debug_mode" type="checkbox"/> <span>WI Assist Debug Mode</span> </label> <div class="ng_inline_row"> <label for="wia_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="wia_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for World Info Assist generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="wia_response_length"><b><span class="fa-solid fa-coins"></span> Response Token Limit:</b></label> <input id="wia_response_length" type="number" min="50" max="8192" step="50" class="text_pole ng_number_input" title="Maximum tokens the model may use for each World Info Assist generation."/> </div> <div class="wia_prompt_section"> <label for="wia_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="wia_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your World Info Assist prompt template..."></textarea> </div> <div class="saints_template_controls" id="wia_prompt_templates"></div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-compass"></span> Narrative Guidance </h4> <label class="checkbox_label"> <input id="ng_enabled" type="checkbox"/> <span>Enable Narrative Guidance</span> </label> <label class="checkbox_label" title="When on, regenerates guidance automatically when the turn counter hits zero. When off, only the Regenerate Now button updates the guidance."> <input id="ng_auto_regen" type="checkbox"/> <span>Auto-Regenerate at Zero</span> </label> <label class="checkbox_label"> <input id="ng_debug_mode" type="checkbox"/> <span>Narrative Guidance Debug Mode</span> </label> <div class="ng_inline_row"> <label for="ng_default_turn_count"><b>Turns Between Regenerations:</b></label> <input id="ng_default_turn_count" type="number" min="1" step="1" class="text_pole ng_number_input"/> </div> <div class="ng_inline_row"> <label for="ng_response_length"><b>Response Token Limit:</b></label> <input id="ng_response_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="Maximum number of tokens the model may use for each generated guidance paragraph."/> </div> <div class="ng_inline_row"> <label for="ng_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="ng_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for Narrative Guidance generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_prompt_section"> <label for="ng_generation_prompt_textarea"><b>Generation Prompt (used as prefill):</b></label> <textarea id="ng_generation_prompt_textarea" class="text_pole" rows="4" placeholder="Enter the prefill that the LLM will continue..."></textarea> <small>The model's reply continues this text and becomes the active guidance.</small> </div> <div class="saints_template_controls" id="ng_generation_prompt_templates"></div> <div class="ng_prompt_section"> <label for="ng_injection_prompt_textarea"><b>Injection Prompt Template:</b></label> <textarea id="ng_injection_prompt_textarea" class="text_pole" rows="3" placeholder="Template injected before each AI turn..."></textarea> <small>Available placeholder: <code>{{guidance}}</code></small> </div> <div class="saints_template_controls" id="ng_injection_prompt_templates"></div> <div class="ng_inline_row"> <label for="ng_injection_depth"><b>Depth:</b></label> <input id="ng_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the guidance after (0 = bottom)."/> <label for="ng_injection_role"><b>Role:</b></label> <select id="ng_injection_role" class="text_pole ng_select_input" title="Role used when injecting the guidance into the prompt."> <option value="system">System</option> <option value="user">User</option> <option value="assistant">Assistant</option> </select> </div> <details id="ng_lorebooks_details" class="ng-lorebook-picker"> <summary><span class="fa-solid fa-book"></span> <span id="ng_lorebooks_summary_label">Lore Books</span></summary> <div id="ng_lorebooks_list" class="ng-lorebook-list"></div> </details> <h5 class="saints_subsection_header">Per-Chat</h5> <div class="ng_prompt_section"> <label for="ng_themes_textarea"><b>Themes / Story Arcs:</b></label> <textarea id="ng_themes_textarea" class="text_pole" rows="4" placeholder="Optional themes, ideas, or arcs for the AI to consider..."></textarea> </div> <div class="ng_prompt_section"> <label for="ng_active_guidance_textarea"><b>Active Guidance:</b></label> <textarea id="ng_active_guidance_textarea" class="text_pole" rows="6" placeholder="The currently active guidance paragraph. Edit freely; changes apply on the next AI turn."></textarea> </div> <div class="ng_inline_row"> <span><b>Turns Remaining:</b> <span id="ng_remaining_display">0</span></span> <div class="menu_button" id="ng_decrement_button" title="Decrement remaining by 1"> <span class="fa-solid fa-minus"></span> </div> <div class="menu_button" id="ng_reset_button" title="Reset remaining to default turn count"> <span class="fa-solid fa-rotate-right"></span> Reset </div> <div class="menu_button disabled" id="ng_continue_now" title="Continue the current guidance paragraph"> <span class="fa-solid fa-arrow-right"></span> Continue </div> <div class="menu_button disabled" id="ng_retry_now" title="Restore previous guidance and regenerate"> <span class="fa-solid fa-rotate-right"></span> Retry </div> <div class="menu_button" id="ng_regenerate_now" title="Regenerate guidance now"> <span class="ng-regen-icon fa-solid fa-wand-sparkles"></span> Regenerate Now </div> </div> </div> </div> </div> `;
+var code = `<div id="saints_silly_settings" class="extension_settings"> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Saint's Silly Extensions</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content"> <h4 class="saints_section_header"> <span class="fa-solid fa-ghost"></span> Possession </h4> <label class="checkbox_label"> <input id="possession_enabled" type="checkbox"/> <span>Enable Possession</span> </label> <label class="checkbox_label"> <input id="possession_show_toast" type="checkbox"/> <span>Show Toast on Possess/Unpossess</span> </label> <label class="checkbox_label"> <input id="possession_debug_mode" type="checkbox"/> <span>Possession Debug Mode</span> </label> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-pen-fancy"></span> Phrasing! </h4> <label class="checkbox_label"> <input id="phrasing_enabled" type="checkbox" checked="checked"/> <span>Enable Phrasing!</span> </label> <label class="checkbox_label"> <input id="phrasing_debug_mode" type="checkbox"/> <span>Phrasing Debug Mode</span> </label> <label class="checkbox_label" title="When enabled, rephrasing a message includes every existing swipe in the prompt and asks the model to produce something wildly different."> <input id="phrasing_inverse_guidance" type="checkbox"/> <span>Inverse Guidance</span> </label> <div class="phrasing_prompt_section"> <label for="phrasing_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="phrasing_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Phrasing! prompt template..."></textarea> </div> <div class="saints_template_controls" id="phrasing_prompt_templates"></div> <div class="phrasing_prompt_section"> <label for="phrasing_inverse_prompt_textarea"><b>Inverse Guidance Prompt Template:</b></label> <textarea id="phrasing_inverse_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Inverse Guidance prompt template..."></textarea> <small>Available placeholders: <code>{{phrasingSeed}}</code>, <code>{{phrasingSwipes}}</code></small> </div> <div class="saints_template_controls" id="phrasing_inverse_prompt_templates"></div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-wand-magic-sparkles"></span> Assisted Character Creation </h4> <label class="checkbox_label"> <input id="acc_enabled" type="checkbox"/> <span>Enable Assisted Character Creation</span> </label> <label class="checkbox_label"> <input id="acc_debug_mode" type="checkbox"/> <span>ACC Debug Mode</span> </label> <div class="ng_inline_row"> <label for="acc_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="acc_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for ACC generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="acc_prompt_section"> <label for="acc_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="acc_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your ACC prompt template..."></textarea> </div> <div class="saints_template_controls" id="acc_prompt_templates"></div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-book-atlas"></span> World Info Assist </h4> <label class="checkbox_label"> <input id="wia_enabled" type="checkbox"/> <span>Enable World Info Assist</span> </label> <label class="checkbox_label"> <input id="wia_debug_mode" type="checkbox"/> <span>WI Assist Debug Mode</span> </label> <div class="ng_inline_row"> <label for="wia_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="wia_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for World Info Assist generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="wia_response_length"><b><span class="fa-solid fa-coins"></span> Response Token Limit:</b></label> <input id="wia_response_length" type="number" min="50" max="8192" step="50" class="text_pole ng_number_input" title="Maximum tokens the model may use for each World Info Assist generation."/> </div> <div class="wia_prompt_section"> <label for="wia_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="wia_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your World Info Assist prompt template..."></textarea> </div> <div class="saints_template_controls" id="wia_prompt_templates"></div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-compass"></span> Narrative Guidance </h4> <label class="checkbox_label"> <input id="ng_enabled" type="checkbox"/> <span>Enable Narrative Guidance</span> </label> <label class="checkbox_label" title="When on, regenerates guidance automatically when the turn counter hits zero. When off, only the Regenerate Now button updates the guidance."> <input id="ng_auto_regen" type="checkbox"/> <span>Auto-Regenerate at Zero</span> </label> <label class="checkbox_label"> <input id="ng_debug_mode" type="checkbox"/> <span>Narrative Guidance Debug Mode</span> </label> <div class="ng_inline_row"> <label for="ng_default_turn_count"><b>Turns Between Regenerations:</b></label> <input id="ng_default_turn_count" type="number" min="1" step="1" class="text_pole ng_number_input"/> </div> <div class="ng_inline_row"> <label for="ng_response_length"><b>Response Token Limit:</b></label> <input id="ng_response_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="Maximum number of tokens the model may use for each generated guidance paragraph."/> </div> <div class="ng_inline_row"> <label for="ng_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="ng_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for Narrative Guidance generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_prompt_section"> <label for="ng_generation_prompt_textarea"><b>Generation Prompt (used as prefill):</b></label> <textarea id="ng_generation_prompt_textarea" class="text_pole" rows="4" placeholder="Enter the prefill that the LLM will continue..."></textarea> <small>The model's reply continues this text and becomes the active guidance.</small> </div> <div class="saints_template_controls" id="ng_generation_prompt_templates"></div> <div class="ng_prompt_section"> <label for="ng_injection_prompt_textarea"><b>Injection Prompt Template:</b></label> <textarea id="ng_injection_prompt_textarea" class="text_pole" rows="3" placeholder="Template injected before each AI turn..."></textarea> <small>Available placeholder: <code>{{guidance}}</code></small> </div> <div class="saints_template_controls" id="ng_injection_prompt_templates"></div> <div class="ng_inline_row"> <label for="ng_injection_depth"><b>Depth:</b></label> <input id="ng_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the guidance after (0 = bottom)."/> <label for="ng_injection_role"><b>Role:</b></label> <select id="ng_injection_role" class="text_pole ng_select_input" title="Role used when injecting the guidance into the prompt."> <option value="system">System</option> <option value="user">User</option> <option value="assistant">Assistant</option> </select> </div> <details id="ng_lorebooks_details" class="ng-lorebook-picker"> <summary><span class="fa-solid fa-book"></span> <span id="ng_lorebooks_summary_label">Lore Books</span></summary> <div id="ng_lorebooks_list" class="ng-lorebook-list"></div> </details> <h5 class="saints_subsection_header">Per-Chat</h5> <div class="ng_prompt_section"> <label for="ng_themes_textarea"><b>Themes / Story Arcs:</b></label> <textarea id="ng_themes_textarea" class="text_pole" rows="4" placeholder="Optional themes, ideas, or arcs for the AI to consider..."></textarea> </div> <div class="ng_prompt_section"> <label for="ng_active_guidance_textarea"><b>Active Guidance:</b></label> <textarea id="ng_active_guidance_textarea" class="text_pole" rows="6" placeholder="The currently active guidance paragraph. Edit freely; changes apply on the next AI turn."></textarea> </div> <div class="ng_inline_row"> <span><b>Turns Remaining:</b> <span id="ng_remaining_display">0</span></span> <div class="menu_button" id="ng_decrement_button" title="Decrement remaining by 1"> <span class="fa-solid fa-minus"></span> </div> <div class="menu_button" id="ng_reset_button" title="Reset remaining to default turn count"> <span class="fa-solid fa-rotate-right"></span> Reset </div> <div class="menu_button disabled" id="ng_continue_now" title="Continue the current guidance paragraph"> <span class="fa-solid fa-arrow-right"></span> Continue </div> <div class="menu_button disabled" id="ng_retry_now" title="Restore previous guidance and regenerate"> <span class="fa-solid fa-rotate-right"></span> Retry </div> <div class="menu_button" id="ng_regenerate_now" title="Regenerate guidance now"> <span class="ng-regen-icon fa-solid fa-wand-sparkles"></span> Regenerate Now </div> </div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-bug"></span> Diagnostics </h4> <label class="checkbox_label" title="Log silent-generation lifecycle (job start/abort/completion, stop-listener events, stream token counts) to the browser console. Useful when diagnosing stop-button behavior across backends."> <input id="silent_generation_debug_mode" type="checkbox"/> <span>Silent Generation Debug Mode</span> </label> </div> </div> </div> `;
 // Exports
 /* harmony default export */ const settings = (code);
 ;// external "../../../../world-info.js"
@@ -1393,22 +1393,67 @@ var code = `<div id="saints_silly_settings" class="extension_settings"> <div cla
 const activeJobs = new Map(); // jobId -> { abortController, name }
 let nextJobId = 1;
 let stopListenerInstalled = false;
+let moduleSettings = null;
+let debug = () => {};
+
+// ─── Init ───
+
+/**
+ * Initialize the silent-generation manager. Wires up the debug logger
+ * against `settings.silentGenerationDebugMode` and installs the
+ * `GENERATION_STOPPED` listener. Called once from `index.js`.
+ *
+ * @param {object} opts
+ * @param {object} opts.settings - Shared mutable settings reference.
+ */
+function initSilentGeneration({ settings }) {
+    moduleSettings = settings;
+    debug = createDebugLogger('SILENT-GEN', () => moduleSettings?.silentGenerationDebugMode);
+    installSilentGenerationStopListener();
+    debug('Module initialized');
+}
+
+/**
+ * Bind the silent-generation settings panel controls. Called from
+ * `injectSettingsPanel` in `index.js` after the HTML is injected.
+ *
+ * @param {() => void} saveSettings - Persist callback.
+ */
+function bindSilentGenerationSettings(saveSettings) {
+    const debugCb = document.getElementById('silent_generation_debug_mode');
+    if (debugCb) {
+        debugCb.checked = !!moduleSettings?.silentGenerationDebugMode;
+        debugCb.addEventListener('change', () => {
+            if (moduleSettings) moduleSettings.silentGenerationDebugMode = debugCb.checked;
+            saveSettings();
+            debug('Debug mode toggled:', debugCb.checked);
+        });
+    }
+}
 
 // ─── Public API ───
 
 /**
  * Install the one-shot GENERATION_STOPPED listener that aborts every active
  * silent generation. Safe to call multiple times — only the first call wires
- * up the listener. Should be called once during extension init.
+ * up the listener. Normally invoked via `initSilentGeneration`.
  */
 function installSilentGenerationStopListener() {
-    if (stopListenerInstalled) return;
+    if (stopListenerInstalled) {
+        debug('Stop listener already installed; skipping');
+        return;
+    }
     const { eventSource, eventTypes } = getContext();
-    if (!eventSource || !eventTypes?.GENERATION_STOPPED) return;
+    if (!eventSource || !eventTypes?.GENERATION_STOPPED) {
+        debug('Stop listener NOT installed — eventSource or GENERATION_STOPPED missing');
+        return;
+    }
     eventSource.on(eventTypes.GENERATION_STOPPED, () => {
+        debug('GENERATION_STOPPED received — aborting all silent jobs');
         abortAllSilentGenerations('user-stop');
     });
     stopListenerInstalled = true;
+    debug('Stop listener installed');
 }
 
 /**
@@ -1424,15 +1469,24 @@ function installSilentGenerationStopListener() {
  * @returns {number} The number of jobs aborted.
  */
 function abortAllSilentGenerations(reason = 'aborted') {
+    if (activeJobs.size === 0) {
+        debug('abortAllSilentGenerations called but no active jobs; reason:', reason);
+        return 0;
+    }
     let count = 0;
-    for (const [, job] of activeJobs) {
+    const jobNames = [];
+    for (const [jobId, job] of activeJobs) {
         try {
             job.abortController.abort(
                 new DOMException(`Silent generation aborted: ${reason}`, 'AbortError'),
             );
+            jobNames.push(`#${jobId}(${job.name})`);
             count++;
-        } catch (_) { /* ignore */ }
+        } catch (err) {
+            debug('Failed to abort job', jobId, err);
+        }
     }
+    debug(`Aborted ${count} silent job(s) — reason: ${reason} — jobs:`, jobNames.join(', '));
     return count;
 }
 
@@ -1452,8 +1506,14 @@ function abortAllSilentGenerations(reason = 'aborted') {
  * @param {string} [reason]
  */
 function abortAllGenerations(reason = 'aborted') {
+    debug('abortAllGenerations — reason:', reason);
     abortAllSilentGenerations(reason);
-    try { __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_stopGeneration__(); } catch (_) { /* ignore */ }
+    try {
+        __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_stopGeneration__();
+        debug('ST stopGeneration() invoked');
+    } catch (err) {
+        debug('ST stopGeneration() threw:', err);
+    }
 }
 
 /**
@@ -1486,12 +1546,15 @@ async function runCancellableSilentGeneration({ run, name = 'silent-gen' }) {
     const jobId = nextJobId++;
     const abortController = new AbortController();
     activeJobs.set(jobId, { abortController, name });
+    const startedAt = Date.now();
+    debug(`Job #${jobId}(${name}) started — active jobs:`, activeJobs.size);
 
     let abortReject;
     const abortPromise = new Promise((_, rej) => { abortReject = rej; });
     const onAbort = () => {
         const reason = abortController.signal.reason
             || new DOMException('Silent generation aborted', 'AbortError');
+        debug(`Job #${jobId}(${name}) abort signal fired — reason:`, reason?.message || reason);
         abortReject(reason);
     };
     abortController.signal.addEventListener('abort', onAbort, { once: true });
@@ -1501,13 +1564,22 @@ async function runCancellableSilentGeneration({ run, name = 'silent-gen' }) {
     // would surface as an unhandled promise rejection in the console.
     // Swallow it here; the result is already irrelevant by that point.
     const runPromise = run(abortController.signal);
-    runPromise.catch(() => { /* swallow abandoned-runner rejections */ });
+    runPromise.catch((err) => {
+        debug(`Job #${jobId}(${name}) abandoned-runner rejection (swallowed):`, err?.message || err);
+    });
 
     try {
-        return await Promise.race([runPromise, abortPromise]);
+        const result = await Promise.race([runPromise, abortPromise]);
+        debug(`Job #${jobId}(${name}) completed normally in ${Date.now() - startedAt}ms`);
+        return result;
+    } catch (err) {
+        const wasAbort = err?.name === 'AbortError';
+        debug(`Job #${jobId}(${name}) ${wasAbort ? 'aborted' : 'threw'} after ${Date.now() - startedAt}ms — ${err?.message || err}`);
+        throw err;
     } finally {
         abortController.signal.removeEventListener('abort', onAbort);
         activeJobs.delete(jobId);
+        debug(`Job #${jobId}(${name}) cleaned up — remaining active jobs:`, activeJobs.size);
     }
 }
 
@@ -1540,13 +1612,21 @@ function isSilentGenerationAbort(err) {
  * @throws {DOMException} AbortError if cancelled.
  */
 async function cancellableStreamingGenerate(params, targetEl, { append = false, name } = {}) {
+    const jobName = name || 'streamingGenerate';
+    const hasStream = !!targetEl;
+    debug(`cancellableStreamingGenerate — name: ${jobName}, streaming: ${hasStream}, append: ${append}, promptLen: ${params?.prompt?.length ?? 0}, responseLength: ${params?.responseLength ?? '(default)'}`);
+
     return runCancellableSilentGeneration({
-        name: name || 'streamingGenerate',
+        name: jobName,
         run: async (_signal) => {
-            if (!targetEl) return __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__(params);
+            if (!targetEl) {
+                debug(`${jobName} — no targetEl, calling generateRaw directly`);
+                return __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__(params);
+            }
 
             let accumulated = append ? (targetEl.value || '') : '';
             let streamingWorked = false;
+            let tokenCount = 0;
 
             try {
                 const result = await __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__({
@@ -1556,8 +1636,10 @@ async function cancellableStreamingGenerate(params, targetEl, { append = false, 
                         targetEl.value = accumulated;
                         targetEl.scrollTop = targetEl.scrollHeight;
                         streamingWorked = true;
+                        tokenCount++;
                     },
                 });
+                debug(`${jobName} — generateRaw resolved, streamingWorked: ${streamingWorked}, tokens streamed: ${tokenCount}, final length: ${(result || accumulated).length}`);
                 if (!streamingWorked && result) {
                     targetEl.value = append ? ((targetEl.value || '') + result) : result;
                 }
@@ -1566,10 +1648,12 @@ async function cancellableStreamingGenerate(params, targetEl, { append = false, 
                 // Fall back if ST rejected the unknown onToken param.
                 const msg = (err?.message || '').toLowerCase();
                 if (msg.includes('ontoken') || msg.includes('unknown') || msg.includes('invalid param')) {
+                    debug(`${jobName} — onToken unsupported, falling back to non-streaming generateRaw`);
                     const fallback = await __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__(params);
                     if (fallback) targetEl.value = append ? ((targetEl.value || '') + fallback) : fallback;
                     return fallback;
                 }
+                debug(`${jobName} — generateRaw rejected:`, err?.message || err);
                 throw err;
             }
         },
@@ -2057,7 +2141,7 @@ let ctx = null;
 /** @type {{ handlePhrasingSeedReinjection: function, isPhrasing: function }} */
 let phrasingApi = null;
 
-let debug = () => {};
+let possession_debug = () => {};
 
 function possession_toast(message, type = 'info') {
     if (!ctx.settings.possessionShowToast) return;
@@ -2083,7 +2167,7 @@ function savePossessionState() {
         avatar: possessedCharAvatar,
     };
     context.saveMetadata();
-    debug('Saved possession state:', possessedCharName, '| avatar:', possessedCharAvatar);
+    possession_debug('Saved possession state:', possessedCharName, '| avatar:', possessedCharAvatar);
 }
 
 function loadPossessionState() {
@@ -2096,7 +2180,7 @@ function loadPossessionState() {
         possessedCharName = saved;
         possessedCharAvatar = null;
     }
-    debug('Loaded possession state:', possessedCharName, '| avatar:', possessedCharAvatar);
+    possession_debug('Loaded possession state:', possessedCharName, '| avatar:', possessedCharAvatar);
 }
 
 // ─── Character Utilities ───
@@ -2132,7 +2216,7 @@ function validatePossessedCharInGroup() {
         return char && char.name === possessedCharName;
     });
     if (!isMember) {
-        debug('Possessed character removed from group, clearing');
+        possession_debug('Possessed character removed from group, clearing');
         possession_toast(`${possessedCharName} was removed from the group. Possession cleared.`, 'warning');
         setPossession(null);
     }
@@ -2171,10 +2255,10 @@ function setPossession(charName, charAvatar) {
     if (previous !== charName) {
         if (charName) {
             possession_toast(`Possessing ${charName}`, 'success');
-            debug('Now possessing:', charName);
+            possession_debug('Now possessing:', charName);
         } else if (previous) {
             possession_toast('Possession cleared', 'info');
-            debug('Possession cleared');
+            possession_debug('Possession cleared');
         }
     }
 }
@@ -2209,7 +2293,7 @@ async function postPossessedMessage(text) {
     }
 
     await context.saveChat();
-    debug('Posted possessed message at index', messageIndex);
+    possession_debug('Posted possessed message at index', messageIndex);
     return messageIndex;
 }
 
@@ -2226,7 +2310,7 @@ function onMessageSent(messageIndex) {
     const char = getPossessedCharacter();
     if (!char) return;
 
-    debug('Converting user message to possessed character message at index', messageIndex);
+    possession_debug('Converting user message to possessed character message at index', messageIndex);
 
     message.is_user = false;
     message.name = char.name;
@@ -2238,7 +2322,7 @@ function onMessageSent(messageIndex) {
         message.is_name = true;
     }
 
-    debug('Converted message — name:', char.name);
+    possession_debug('Converted message — name:', char.name);
 }
 
 // ─── Continue Interception ───
@@ -2256,7 +2340,7 @@ function handleContinueIntercept(event) {
     event.stopImmediatePropagation();
     event.preventDefault();
 
-    debug('Intercepted Continue with text:', text.substring(0, 50) + '...');
+    possession_debug('Intercepted Continue with text:', text.substring(0, 50) + '...');
     executePossessedContinue(text);
 }
 
@@ -2294,7 +2378,7 @@ function attachContinueInterceptor() {
 
         handleContinueIntercept(event);
     }, { capture: true });
-    debug('Attached continue interceptor');
+    possession_debug('Attached continue interceptor');
 }
 
 // ─── UI: Group Radio Buttons ───
@@ -2465,7 +2549,7 @@ function injectSoloButton() {
     });
 
     target.appendChild(btn);
-    debug('Injected solo possess button');
+    possession_debug('Injected solo possess button');
 }
 
 function syncSoloButton() {
@@ -2486,7 +2570,7 @@ function hideImpersonateButtons() {
     const quickBtn = document.getElementById('mes_impersonate');
     if (menuBtn) menuBtn.classList.add('possession_hidden');
     if (quickBtn) quickBtn.classList.add('possession_hidden');
-    debug('Impersonate buttons hidden');
+    possession_debug('Impersonate buttons hidden');
 }
 
 function showImpersonateButtons() {
@@ -2494,7 +2578,7 @@ function showImpersonateButtons() {
     const quickBtn = document.getElementById('mes_impersonate');
     if (menuBtn) menuBtn.classList.remove('possession_hidden');
     if (quickBtn) quickBtn.classList.remove('possession_hidden');
-    debug('Impersonate buttons shown');
+    possession_debug('Impersonate buttons shown');
 }
 
 // ─── UI: Possession Impersonate Button (Character Avatar) ───
@@ -2523,7 +2607,7 @@ function injectPossessionImpersonateButton() {
         const context = getContext();
         if (context.isGenerating) return;
 
-        debug('Possession impersonate clicked — triggering generation for', char.name);
+        possession_debug('Possession impersonate clicked — triggering generation for', char.name);
 
         if (__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__) {
             const radios = document.querySelectorAll('.possession_radio');
@@ -2543,7 +2627,7 @@ function injectPossessionImpersonateButton() {
                     break;
                 }
             }
-            debug('Speak button not found, falling back to /trigger');
+            possession_debug('Speak button not found, falling back to /trigger');
             if (context.executeSlashCommandsWithOptions) {
                 await context.executeSlashCommandsWithOptions(`/trigger ${char.name}`);
             }
@@ -2564,7 +2648,7 @@ function injectPossessionImpersonateButton() {
         sendForm.appendChild(btn);
     }
 
-    debug('Injected possession impersonate button for', char.name);
+    possession_debug('Injected possession impersonate button for', char.name);
 }
 
 function removePossessionImpersonateButton() {
@@ -2670,7 +2754,7 @@ function bindPossessionSettings(saveSettings) {
         possessionDebugMode.addEventListener('change', (e) => {
             ctx.settings.possessionDebugMode = e.target.checked;
             saveSettings();
-            debug('debugMode toggled to', ctx.settings.possessionDebugMode);
+            possession_debug('debugMode toggled to', ctx.settings.possessionDebugMode);
         });
     }
 }
@@ -2754,7 +2838,7 @@ function registerPossessionSlashCommands() {
         helpString: 'Clear the currently possessed character, returning to normal mode.',
     }));
 
-    debug('Registered possession slash commands');
+    possession_debug('Registered possession slash commands');
 }
 
 // ─── Init ───
@@ -2767,7 +2851,7 @@ function registerPossessionSlashCommands() {
 function initPossession({ settings, phrasingApi: pApi }) {
     ctx = { settings };
     phrasingApi = pApi;
-    debug = createDebugLogger('POSSESSION', () => settings.possessionDebugMode);
+    possession_debug = createDebugLogger('POSSESSION', () => settings.possessionDebugMode);
 }
 
 ;// ./src/prompt-templates.js
@@ -3590,7 +3674,7 @@ const DEFAULT_ACC_RESPONSE_LENGTH = 1000;
 
 // ─── Module State ───
 
-let moduleSettings = null;
+let assisted_character_creation_moduleSettings = null;
 let assisted_character_creation_debug = () => {};
 
 let isGenerating = false;
@@ -3606,9 +3690,9 @@ let restorePoint = null;       // textarea snapshot used by Retry
  * @param {object} opts - { settings, saveSettings }
  */
 function initACC({ settings, saveSettings }) {
-    moduleSettings = settings;
+    assisted_character_creation_moduleSettings = settings;
     saveSettingsFn = saveSettings;
-    assisted_character_creation_debug = createDebugLogger('ACC', () => moduleSettings.accDebugMode);
+    assisted_character_creation_debug = createDebugLogger('ACC', () => assisted_character_creation_moduleSettings.accDebugMode);
     assisted_character_creation_debug('Module initialized');
 }
 
@@ -3620,7 +3704,7 @@ let saveSettingsFn = null;
  * Called on CHARACTER_PAGE_LOADED. Injects the ACC launch button.
  */
 function assisted_character_creation_onCharacterPageLoaded() {
-    if (!moduleSettings.accEnabled) return;
+    if (!assisted_character_creation_moduleSettings.accEnabled) return;
     if (document.getElementById('acc_launch_btn')) return;
 
     const btnRow = document.querySelector('#form_create .ch_creation_btn_row');
@@ -3650,32 +3734,32 @@ function bindACCSettings(saveSettings) {
     const promptArea = document.getElementById('acc_prompt_textarea');
 
     if (enabledCb) {
-        enabledCb.checked = moduleSettings.accEnabled;
+        enabledCb.checked = assisted_character_creation_moduleSettings.accEnabled;
         enabledCb.addEventListener('change', () => {
-            moduleSettings.accEnabled = enabledCb.checked;
+            assisted_character_creation_moduleSettings.accEnabled = enabledCb.checked;
             saveSettings();
         });
     }
     if (debugCb) {
-        debugCb.checked = moduleSettings.accDebugMode;
+        debugCb.checked = assisted_character_creation_moduleSettings.accDebugMode;
         debugCb.addEventListener('change', () => {
-            moduleSettings.accDebugMode = debugCb.checked;
+            assisted_character_creation_moduleSettings.accDebugMode = debugCb.checked;
             saveSettings();
         });
     }
     const maxContextInput = document.getElementById('acc_max_context_override');
     if (maxContextInput) {
-        maxContextInput.value = moduleSettings.accMaxContextOverride || 0;
+        maxContextInput.value = assisted_character_creation_moduleSettings.accMaxContextOverride || 0;
         maxContextInput.addEventListener('input', () => {
             const n = parseInt(maxContextInput.value, 10);
-            moduleSettings.accMaxContextOverride = Number.isFinite(n) && n > 0 ? n : 0;
+            assisted_character_creation_moduleSettings.accMaxContextOverride = Number.isFinite(n) && n > 0 ? n : 0;
             saveSettings();
         });
     }
     if (promptArea) {
-        promptArea.value = moduleSettings.accPrompt || DEFAULT_ACC_PROMPT;
+        promptArea.value = assisted_character_creation_moduleSettings.accPrompt || DEFAULT_ACC_PROMPT;
         promptArea.addEventListener('input', () => {
-            moduleSettings.accPrompt = promptArea.value;
+            assisted_character_creation_moduleSettings.accPrompt = promptArea.value;
             saveSettings();
         });
     }
@@ -3685,7 +3769,7 @@ function bindACCSettings(saveSettings) {
         defaultText: DEFAULT_ACC_PROMPT,
         textareaId: 'acc_prompt_textarea',
         containerId: 'acc_prompt_templates',
-        settings: moduleSettings,
+        settings: assisted_character_creation_moduleSettings,
         saveSettings,
     });
 }
@@ -3735,7 +3819,7 @@ function openModal() {
     tokenInput?.addEventListener('change', () => {
         const parsed = parseInt(tokenInput.value, 10);
         if (!isNaN(parsed) && parsed > 0) {
-            moduleSettings.accResponseLength = parsed;
+            assisted_character_creation_moduleSettings.accResponseLength = parsed;
             saveSettingsFn?.();
         }
     });
@@ -4013,7 +4097,7 @@ async function generateContinuation(brief, existing, ctxOptions) {
 }
 
 function getPromptTemplate() {
-    const stored = moduleSettings?.accPrompt;
+    const stored = assisted_character_creation_moduleSettings?.accPrompt;
     return (typeof stored === 'string' && stored.trim()) ? stored : DEFAULT_ACC_PROMPT;
 }
 
@@ -4023,7 +4107,7 @@ function getResponseLength() {
         const parsed = parseInt(input.value, 10);
         if (!isNaN(parsed) && parsed > 0) return parsed;
     }
-    const setting = moduleSettings?.accResponseLength;
+    const setting = assisted_character_creation_moduleSettings?.accResponseLength;
     if (typeof setting === 'number' && setting > 0) return setting;
     return DEFAULT_ACC_RESPONSE_LENGTH;
 }
@@ -4034,7 +4118,7 @@ async function buildPreambleBlock(ctxOptions) {
     const preamble = await buildContextPreamble({
         ...ctxOptions,
         responseLength: getResponseLength(),
-        maxContextOverride: moduleSettings?.accMaxContextOverride || 0,
+        maxContextOverride: assisted_character_creation_moduleSettings?.accMaxContextOverride || 0,
     });
     if (!preamble) return '';
     assisted_character_creation_debug('Context preamble length:', preamble.length);
@@ -5550,6 +5634,7 @@ const defaultSettings = {
     narrativeGuidanceInjectionDepth: DEFAULT_NG_INJECTION_DEPTH,
     narrativeGuidanceInjectionRole: DEFAULT_NG_INJECTION_ROLE,
     narrativeGuidanceLoreBookNames: [],
+    silentGenerationDebugMode: false,
     promptTemplates: {
         phrasingPrompt: {},
         phrasingInversePrompt: {},
@@ -5599,6 +5684,7 @@ function injectSettingsPanel() {
     bindACCSettings(saveSettings);
     bindWIASettings(saveSettings);
     bindNarrativeGuidanceSettings(saveSettings);
+    bindSilentGenerationSettings(saveSettings);
 }
 
 // ─── Merged Event Handlers ───
@@ -5684,7 +5770,7 @@ jQuery(async () => {
     // Wire up the global "stop button → abort silent generations" hook
     // before subscribing any per-module handlers, so a stop event always
     // unblocks in-flight silent jobs first.
-    installSilentGenerationStopListener();
+    initSilentGeneration({ settings: src_settings });
 
     // Subscribe to events
     const { eventSource, eventTypes } = getContext();
