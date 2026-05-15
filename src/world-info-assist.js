@@ -26,28 +26,47 @@ import { setupPromptTemplates } from './prompt-templates.js';
 // ─── Default Prompt ───
 
 export const DEFAULT_WIA_PROMPT = `[
-The next reply will be an out of story generated World Lore Description. This is a setting reference entry that codifies key facts about an event, person, place, institution, or artifact so they remain consistent and reusable. It should prioritize clear, canonical details over narrative dramatization.
+The next reply will be an out-of-story World Lore Description: a setting reference entry codifying key facts about an event, person, place, institution, or artifact so they remain consistent and reusable.
+
+Write as a worldbook gazetteer entry, NOT as a story excerpt. Treat the reader as a setting researcher who needs canonical facts, not a vivid scene.
 
 General Input Rules:
 * Guidance (optional): IP/canon, tone/genre, tags, audience, era, length, style notes.
 
 Defaults:
-* Tone: Genre-appropriate, neutral-evocative.
+* Voice: Encyclopedic reference style. Declarative facts. No narration, no metaphor, no in-character voice.
+* Tone: Genre-appropriate but neutral.
 * Canon: Respect canon when named or implied.
 * Length: 1–3 crisp sentences per entry (unless the user requests more).
 
 Output Format (use exactly as written):
-[ <Name of the Subject>: <Detailed Description of the Event, Person, Place, or Thing> ]
+[ <Name of the Subject>: <Detailed factual description — type, founders/origin/dates, function/purpose, defining properties, current status> ]
 
 Format Rules:
-
 * Return only the World Lore Description artifact.
 * Follow schema verbatim (brackets, colon, spacing).
 * No extra commentary.
 
+Anti-patterns — do NOT write like a story:
+* No narrative verbs ("rose", "fell", "swept across", "fueled", "burned bright").
+* No dramatic phrasing ("…and so it was that…", "fueling a decade of…").
+* No metaphor ("a kingdom of glass and ash", "a serpent of a road").
+* No in-character voice or address to the reader.
+* No multi-clause story arcs strung with semicolons; favor noun phrases and short factual clauses.
+
 Example — World Lore:
-[ The Ashen Concord: A pact of five city-states after the Ember War to share river trade, standardize coinage, and outlaw pyromancy; prosperity rose while hedge mages went underground, fueling a decade of covert arson reprisals; ]
+[ The Ashen Concord: Five-member city-state pact, signed 47 AB after the Ember War; covers river-trade routes, standardized coinage (the Concord drachma), and a continent-wide ban on pyromancy; enforcement body is the Cinder Court at Vellis; pyromancers operate covertly as the Hedge League; remains nominally active but strained by ongoing arson reprisals. ]
 ]`;
+
+// Prefills are configured as named templates (like prompts). They are passed
+// to the model as an assistant-prefix so the reply continues from them, and
+// are also prepended to the final text inserted into the entry field on
+// success — the user sees prefill + model output as one block.
+export const DEFAULT_WIA_PREFILL_TITLED =
+    '[Factual world-lore reference entry — encyclopedic, declarative, no narrative voice.\n\n{{title}}: ';
+
+export const DEFAULT_WIA_PREFILL_UNTITLED =
+    '[Factual world-lore reference entry — encyclopedic, declarative, no narrative voice.\n\n';
 
 export const DEFAULT_WIA_RESPONSE_LENGTH = 600;
 
@@ -66,6 +85,20 @@ const entryStates = new Map(); // id -> { originalSeed, hasGenerated, generating
 function getWIAResponseLength() {
     const n = moduleSettings?.wiaResponseLength;
     return (typeof n === 'number' && n > 0) ? n : DEFAULT_WIA_RESPONSE_LENGTH;
+}
+
+function resolveWIAPrefill(title) {
+    const trimmedTitle = (title || '').trim();
+    if (trimmedTitle) {
+        const tpl = (typeof moduleSettings?.wiaPrefillTitled === 'string' && moduleSettings.wiaPrefillTitled)
+            ? moduleSettings.wiaPrefillTitled
+            : DEFAULT_WIA_PREFILL_TITLED;
+        return tpl.replace(/\{\{title\}\}/g, trimmedTitle);
+    }
+    const tpl = (typeof moduleSettings?.wiaPrefillUntitled === 'string' && moduleSettings.wiaPrefillUntitled)
+        ? moduleSettings.wiaPrefillUntitled
+        : DEFAULT_WIA_PREFILL_UNTITLED;
+    return tpl;
 }
 
 // ─── Init ───
@@ -427,9 +460,9 @@ async function onAssist(formEl, id, isContinue) {
                 `${preambleBlock}${promptTemplate}\n\n` +
                 `Guidance from the user:\n${seed || '(no specific guidance — invent a fitting entry)'}\n\n` +
                 (title
-                    ? `Respond on one line with only the value for "${title}":`
-                    : 'No title was provided — invent a fitting subject name.');
-            prefill = title ? `[${title}- ` : '[';
+                    ? `Write the entry for "${title}". The reply has been prefilled with the opening bracket, a tone anchor, and the subject name — continue from where the prefill ends with the factual description, then close the bracket.`
+                    : 'No title was provided — invent a fitting subject name. The reply has been prefilled with the opening bracket and a tone anchor — continue from where the prefill ends with the subject name, colon, factual description, then close the bracket.');
+            prefill = resolveWIAPrefill(title);
         }
 
         const systemPrompt =
@@ -464,13 +497,9 @@ async function onAssist(formEl, id, isContinue) {
                     : ' ';
             contentEl.value = currentText + sep + cleaned;
         } else {
-            // If the model didn't echo the prefill back, prepend it so the
-            // entry always starts in the desired format.
-            let finalText = cleaned;
-            if (prefill && !finalText.startsWith('[')) {
-                finalText = prefill + finalText;
-            }
-            contentEl.value = finalText;
+            // The prefill is always preserved in the final entry text — the
+            // user sees prefill + model output as one block.
+            contentEl.value = (prefill || '') + cleaned;
         }
 
         // Notify SillyTavern that the entry has changed so it gets persisted.
@@ -590,6 +619,40 @@ export function bindWIASettings(saveSettings) {
         defaultText: DEFAULT_WIA_PROMPT,
         textareaId: 'wia_prompt_textarea',
         containerId: 'wia_prompt_templates',
+        settings: moduleSettings,
+        saveSettings,
+    });
+
+    const prefillTitledArea = document.getElementById('wia_prefill_titled_textarea');
+    if (prefillTitledArea) {
+        prefillTitledArea.value = moduleSettings.wiaPrefillTitled || DEFAULT_WIA_PREFILL_TITLED;
+        prefillTitledArea.addEventListener('input', () => {
+            moduleSettings.wiaPrefillTitled = prefillTitledArea.value;
+            saveSettings();
+        });
+    }
+    setupPromptTemplates({
+        promptKey: 'wiaPrefillTitled',
+        defaultText: DEFAULT_WIA_PREFILL_TITLED,
+        textareaId: 'wia_prefill_titled_textarea',
+        containerId: 'wia_prefill_titled_templates',
+        settings: moduleSettings,
+        saveSettings,
+    });
+
+    const prefillUntitledArea = document.getElementById('wia_prefill_untitled_textarea');
+    if (prefillUntitledArea) {
+        prefillUntitledArea.value = moduleSettings.wiaPrefillUntitled || DEFAULT_WIA_PREFILL_UNTITLED;
+        prefillUntitledArea.addEventListener('input', () => {
+            moduleSettings.wiaPrefillUntitled = prefillUntitledArea.value;
+            saveSettings();
+        });
+    }
+    setupPromptTemplates({
+        promptKey: 'wiaPrefillUntitled',
+        defaultText: DEFAULT_WIA_PREFILL_UNTITLED,
+        textareaId: 'wia_prefill_untitled_textarea',
+        containerId: 'wia_prefill_untitled_templates',
         settings: moduleSettings,
         saveSettings,
     });

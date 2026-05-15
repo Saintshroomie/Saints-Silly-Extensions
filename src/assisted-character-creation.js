@@ -38,7 +38,8 @@ General Output Rules:
 - Genre Flexibility: Adapt field content to genre. E.g., "Equipment" might list a plasma rifle (sci-fi) or a lute (fantasy). Fields that are irrelevant to the genre/character should be marked "N/A" rather than omitted.
 - Specificity: Avoid vague defaults. Prefer "pale, freckled, sun-damaged across the nose" over "fair skin."
 - Gender: Characters should be male or female. Reserve non-binary/ambiguous gender only for non-humanoid entities (creatures, monsters, constructs, eldritch beings, etc.). Use he/him or she/her accordingly; use it/its or they/them only for non-humanoid entities.
-- No Commentary: Output the character sheet only. No preamble, no follow-up.
+- No Commentary: Output the character sheet only. Begin directly with the opening "[". No preamble ("Here is...", "Sure!", "Of course..."), no acknowledgements, no follow-up after the closing "]".
+- Prefill: The assistant turn is prefilled with the schema opening (e.g. "[\nCharacter Name: "). Continue from where the prefill ends — never repeat or echo it.
 
 Format Rules:
 - Use the exact bracket-and-semicolon format shown below.
@@ -99,6 +100,12 @@ Quirks: Names all her knives, refuses to eat mushrooms (no stated reason), insti
 Current Goal: {{ .sableGoalOverride ?? Reach the Greenmarch interior and locate the Thornblight's origin before the scar reaches her chest }};
 ]
 ]`;
+
+// Prefill is configured as a named template (like the prompt). It is passed
+// to the model as an assistant-prefix so the reply continues from it, and
+// is also prepended to the final text inserted into the description
+// textarea — the user sees prefill + model output as one block.
+export const DEFAULT_ACC_PREFILL = '[\nCharacter Name: ';
 
 export const DEFAULT_ACC_RESPONSE_LENGTH = 1000;
 
@@ -199,6 +206,23 @@ export function bindACCSettings(saveSettings) {
         defaultText: DEFAULT_ACC_PROMPT,
         textareaId: 'acc_prompt_textarea',
         containerId: 'acc_prompt_templates',
+        settings: moduleSettings,
+        saveSettings,
+    });
+
+    const prefillArea = document.getElementById('acc_prefill_textarea');
+    if (prefillArea) {
+        prefillArea.value = moduleSettings.accPrefill || DEFAULT_ACC_PREFILL;
+        prefillArea.addEventListener('input', () => {
+            moduleSettings.accPrefill = prefillArea.value;
+            saveSettings();
+        });
+    }
+    setupPromptTemplates({
+        promptKey: 'accPrefill',
+        defaultText: DEFAULT_ACC_PREFILL,
+        textareaId: 'acc_prefill_textarea',
+        containerId: 'acc_prefill_templates',
         settings: moduleSettings,
         saveSettings,
     });
@@ -491,18 +515,21 @@ async function generateDescription(brief, ctxOptions) {
     const prompt = `${preambleBlock}${promptTemplate}\n\nCharacter Brief:\n${brief}`;
     const systemPrompt = 'You are a character creation assistant. Follow the instructions and output format in the prompt exactly. Output only the character sheet — no preamble, no commentary.';
     const responseLength = getResponseLength();
+    const prefill = getPrefill();
 
     debug('Generating with brief length', brief.length, 'tokens', responseLength);
     debug('System prompt:', systemPrompt);
     debug('Prompt:', prompt);
+    debug('Prefill:', prefill);
 
     const outputEl = document.getElementById('acc_description_output');
     const result = await withSingleLineDisabled(() => streamingGenerate(
-        { prompt, systemPrompt, responseLength },
+        { prompt, systemPrompt, responseLength, ...(prefill ? { prefill } : {}) },
         outputEl,
         { append: false },
     ));
-    return removeReasoningFromString(result).trim();
+    const cleaned = removeReasoningFromString(result).trim();
+    return (prefill || '') + cleaned;
 }
 
 async function generateContinuation(brief, existing, ctxOptions) {
@@ -529,6 +556,11 @@ async function generateContinuation(brief, existing, ctxOptions) {
 function getPromptTemplate() {
     const stored = moduleSettings?.accPrompt;
     return (typeof stored === 'string' && stored.trim()) ? stored : DEFAULT_ACC_PROMPT;
+}
+
+function getPrefill() {
+    const stored = moduleSettings?.accPrefill;
+    return (typeof stored === 'string' && stored.length > 0) ? stored : DEFAULT_ACC_PREFILL;
 }
 
 function getResponseLength() {

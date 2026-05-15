@@ -81,6 +81,15 @@
 
             <div class="saints_template_controls" id="acc_prompt_templates"></div>
 
+            <div class="acc_prompt_section">
+                <label for="acc_prefill_textarea"><b>Prefill Template:</b></label>
+                <textarea id="acc_prefill_textarea" class="text_pole" rows="3"
+                    placeholder="Assistant-prefix the model continues. Also prepended to the description on success."></textarea>
+                <small>Passed to the model as an assistant prefix and kept at the top of the generated description.</small>
+            </div>
+
+            <div class="saints_template_controls" id="acc_prefill_templates"></div>
+
             <hr class="saints_divider" />
 
             <!-- World Info Assist Settings -->
@@ -111,6 +120,24 @@
             </div>
 
             <div class="saints_template_controls" id="wia_prompt_templates"></div>
+
+            <div class="wia_prompt_section">
+                <label for="wia_prefill_titled_textarea"><b>Prefill Template — Titled Entry:</b></label>
+                <textarea id="wia_prefill_titled_textarea" class="text_pole" rows="3"
+                    placeholder="Assistant-prefix used when the entry has a title."></textarea>
+                <small>Available placeholder: <code>{{title}}</code>. Used as the assistant prefix and prepended to the entry on success.</small>
+            </div>
+
+            <div class="saints_template_controls" id="wia_prefill_titled_templates"></div>
+
+            <div class="wia_prompt_section">
+                <label for="wia_prefill_untitled_textarea"><b>Prefill Template — Untitled Entry:</b></label>
+                <textarea id="wia_prefill_untitled_textarea" class="text_pole" rows="3"
+                    placeholder="Assistant-prefix used when the entry has no title yet."></textarea>
+                <small>Used as the assistant prefix and prepended to the entry on success.</small>
+            </div>
+
+            <div class="saints_template_controls" id="wia_prefill_untitled_templates"></div>
 
             <hr class="saints_divider" />
 

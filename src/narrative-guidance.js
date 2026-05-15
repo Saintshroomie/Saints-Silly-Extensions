@@ -106,7 +106,11 @@ function reapplyInjection() {
         return;
     }
     const tpl = moduleSettings.narrativeGuidanceInjectionPrompt || DEFAULT_NG_INJECTION_PROMPT;
-    let body = tpl.replace(/\{\{guidance\}\}/g, state.guidance);
+    // state.guidance retains the generation prefill (so the textarea shows
+    // it). Strip outer brackets here so {{guidance}} substitutes cleanly
+    // into whatever injection template the user has configured.
+    const guidanceForInjection = stripBracketWrap(state.guidance);
+    let body = tpl.replace(/\{\{guidance\}\}/g, guidanceForInjection);
     body = substituteParams(body);
     const depth = Number.isFinite(moduleSettings.narrativeGuidanceInjectionDepth)
         && moduleSettings.narrativeGuidanceInjectionDepth >= 0
@@ -211,12 +215,16 @@ async function regenGuidance(reason) {
             { append: false },
         ));
 
-        const cleaned = stripBracketWrap(removeReasoningFromString(raw));
+        // Preserve the prefill in the stored guidance so the active-guidance
+        // textarea shows prefill + model output as one block. The bracket
+        // wrappers are stripped only at injection time (see reapplyInjection)
+        // so the injected payload doesn't end up nested inside two brackets.
+        const cleaned = removeReasoningFromString(raw).trim();
         if (!cleaned) {
             throw new Error('Model returned empty guidance.');
         }
 
-        state.guidance = cleaned;
+        state.guidance = (prefill || '') + cleaned;
         const defaultTurns = Number.isFinite(moduleSettings.narrativeGuidanceDefaultTurnCount)
             && moduleSettings.narrativeGuidanceDefaultTurnCount > 0
             ? moduleSettings.narrativeGuidanceDefaultTurnCount
