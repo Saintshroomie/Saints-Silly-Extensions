@@ -27,7 +27,7 @@ import {
 } from './utils.js';
 import {
     isSilentGenerationAbort,
-    abortAllSilentGenerations,
+    abortAllGenerations,
 } from './silent-generation.js';
 import { setupPromptTemplates } from './prompt-templates.js';
 
@@ -340,7 +340,11 @@ function showRegenOverlay() {
     // Block keyboard activation of focused buttons (Enter / Space) while up.
     overlay.addEventListener('keydown', (e) => { e.stopPropagation(); e.preventDefault(); });
     overlay.querySelector('.ng-regen-overlay-stop')?.addEventListener('click', () => {
-        abortAllSilentGenerations('ng-overlay-cancel');
+        // abortAllGenerations triggers ST's GENERATION_STOPPED, which is
+        // what actually cancels the backend fetch (and lets ST's server
+        // POST /api/extra/abort to KoboldCpp). Without it, the LLM would
+        // keep generating to the response cap with the UI freed.
+        abortAllGenerations('ng-overlay-cancel');
         debug('Stop requested via regen overlay');
     });
     document.body.appendChild(overlay);
@@ -718,7 +722,7 @@ export function bindNarrativeGuidanceSettings(saveSettings) {
         // button is disabled in the UI).
         if (regenInProgress) {
             if (ngActiveAction === 'regen') {
-                abortAllSilentGenerations('ng-cancel');
+                abortAllGenerations('ng-cancel');
                 debug('Stop requested via regenerate button');
             }
             return;
@@ -729,7 +733,7 @@ export function bindNarrativeGuidanceSettings(saveSettings) {
     document.getElementById('ng_continue_now')?.addEventListener('click', async () => {
         if (regenInProgress) {
             if (ngActiveAction === 'continue') {
-                abortAllSilentGenerations('ng-cancel');
+                abortAllGenerations('ng-cancel');
                 debug('Stop requested via continue button');
             }
             return;

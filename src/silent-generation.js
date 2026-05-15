@@ -58,9 +58,13 @@ export function installSilentGenerationStopListener() {
 }
 
 /**
- * Abort every in-flight silent generation. Used by the global stop listener
- * and by extension UIs that close while a generation is running (e.g. the
- * ACC modal's Cancel/X buttons).
+ * Abort every in-flight silent generation by aborting our own local
+ * AbortControllers. This frees the awaiting extension code (the
+ * `Promise.race` against the abort signal resolves) but does NOT cancel
+ * the underlying `generateRaw` fetch — only ST's `GENERATION_STOPPED`
+ * event does that. Used by the global stop listener (where the event is
+ * the trigger) and as a building block for `abortAllGenerations`. Most
+ * extension UI code should call `abortAllGenerations` instead.
  *
  * @param {string} [reason] - Reason recorded on the AbortError.
  * @returns {number} The number of jobs aborted.
@@ -79,13 +83,17 @@ export function abortAllSilentGenerations(reason = 'aborted') {
 }
 
 /**
- * Also tells SillyTavern to stop any non-silent generation that may be
- * running in parallel — used by extension UIs that want a single "Cancel"
- * button to stop both their own silent work and any normal chat
- * generation it may have triggered.
+ * The "real" cancel path that extension UIs should use. Aborts our own
+ * local controllers AND calls ST's exported `stopGeneration()`, which
+ * emits `GENERATION_STOPPED`. That event is what ST's `generateRawData`
+ * listens for to abort its own fetch — once the fetch aborts, the
+ * connection to ST's Node server closes, and ST's server-side handler
+ * propagates the abort upstream (e.g. POSTs `/api/extra/abort` to
+ * KoboldCpp). Without this call, only the frontend UI frees up and the
+ * LLM backend keeps generating to the response cap.
  *
- * Safe to call when nothing is running; ST's `stopGeneration()` is a no-op
- * in that case.
+ * Safe to call when nothing is running; ST's `stopGeneration()` is a
+ * no-op in that case.
  *
  * @param {string} [reason]
  */
@@ -134,8 +142,15 @@ export async function runCancellableSilentGeneration({ run, name = 'silent-gen' 
     };
     abortController.signal.addEventListener('abort', onAbort, { once: true });
 
+    // If the abort race wins, the run() promise is abandoned but keeps
+    // executing — its eventual rejection (when ST's fetch finally aborts)
+    // would surface as an unhandled promise rejection in the console.
+    // Swallow it here; the result is already irrelevant by that point.
+    const runPromise = run(abortController.signal);
+    runPromise.catch(() => { /* swallow abandoned-runner rejections */ });
+
     try {
-        return await Promise.race([run(abortController.signal), abortPromise]);
+        return await Promise.race([runPromise, abortPromise]);
     } finally {
         abortController.signal.removeEventListener('abort', onAbort);
         activeJobs.delete(jobId);

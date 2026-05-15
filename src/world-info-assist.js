@@ -19,7 +19,7 @@ import {
 } from './utils.js';
 import {
     isSilentGenerationAbort,
-    abortAllSilentGenerations,
+    abortAllGenerations,
 } from './silent-generation.js';
 import { setupPromptTemplates } from './prompt-templates.js';
 
@@ -362,7 +362,11 @@ async function onAssist(formEl, id, isContinue) {
     // Stop. Clicks on the other button (which is hidden anyway) are ignored.
     if (state.generating) {
         if (state.activeAction === action) {
-            abortAllSilentGenerations('wia-cancel');
+            // Use abortAllGenerations (not abortAllSilentGenerations) so
+            // ST's GENERATION_STOPPED event fires and actually cancels the
+            // backend fetch — otherwise KoboldCpp etc. keep generating to
+            // the response cap while only the UI frees up.
+            abortAllGenerations('wia-cancel');
             debug('Stop requested for', id);
         }
         return;

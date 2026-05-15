@@ -16,7 +16,7 @@ import {
     withSingleLineDisabled,
 } from './utils.js';
 import {
-    abortAllSilentGenerations,
+    abortAllGenerations,
     isSilentGenerationAbort,
 } from './silent-generation.js';
 import { setupPromptTemplates } from './prompt-templates.js';
@@ -556,13 +556,14 @@ async function buildPreambleBlock(ctxOptions) {
 }
 
 function stopGeneration() {
-    // The previous implementation clicked `#mes_stop`, but that button is
-    // hidden whenever the ACC modal is open (chat input is locked), so the
-    // click was a no-op and the silent generation kept running. Going
-    // straight to the silent-generation manager actually aborts the in-
-    // flight fetch and unblocks the awaiting runGeneration() call.
-    const aborted = abortAllSilentGenerations('acc-cancel');
-    debug('Stop generation triggered, aborted jobs:', aborted);
+    // Route through abortAllGenerations() so that ST's GENERATION_STOPPED
+    // event also fires. That's what triggers generateRawData() to abort
+    // its fetch, close the connection, and let ST's server propagate the
+    // abort to the backend (e.g. POST /api/extra/abort to KoboldCpp).
+    // Aborting only our local controllers would free the UI but leave the
+    // LLM generating to the response cap.
+    abortAllGenerations('acc-cancel');
+    debug('Stop generation triggered');
 }
 
 // ─── Done ───

@@ -1,5 +1,5 @@
 import { loadWorldInfo as __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_loadWorldInfo__, world_names as __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_world_names__ } from "../../../../world-info.js";
-import { extension_prompt_roles as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_roles__, extension_prompt_types as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_types__, generateRaw as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__, getMaxContextSize as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_getMaxContextSize__, setExtensionPrompt as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_setExtensionPrompt__, substituteParams as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParams__ } from "../../../../../script.js";
+import { extension_prompt_roles as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_roles__, extension_prompt_types as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_types__, generateRaw as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__, getMaxContextSize as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_getMaxContextSize__, setExtensionPrompt as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_setExtensionPrompt__, stopGeneration as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_stopGeneration__, substituteParams as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParams__ } from "../../../../../script.js";
 import { getTokenCountAsync as __WEBPACK_EXTERNAL_MODULE__tokenizers_js_d5863f55_getTokenCountAsync__ } from "../../../../tokenizers.js";
 import { groups as __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_groups__, selected_group as __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__ } from "../../../../group-chats.js";
 import { SlashCommandParser as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandParser_js_42c8b851_SlashCommandParser__ } from "../../../../slash-commands/SlashCommandParser.js";
@@ -1352,7 +1352,6 @@ var code = `<div id="saints_silly_settings" class="extension_settings"> <div cla
 ;// external "../../../../tokenizers.js"
 
 ;// ./src/silent-generation.js
-/* unused harmony import specifier */ var stStopGeneration;
 /**
  * Silent Generation Manager
  *
@@ -1413,9 +1412,13 @@ function installSilentGenerationStopListener() {
 }
 
 /**
- * Abort every in-flight silent generation. Used by the global stop listener
- * and by extension UIs that close while a generation is running (e.g. the
- * ACC modal's Cancel/X buttons).
+ * Abort every in-flight silent generation by aborting our own local
+ * AbortControllers. This frees the awaiting extension code (the
+ * `Promise.race` against the abort signal resolves) but does NOT cancel
+ * the underlying `generateRaw` fetch — only ST's `GENERATION_STOPPED`
+ * event does that. Used by the global stop listener (where the event is
+ * the trigger) and as a building block for `abortAllGenerations`. Most
+ * extension UI code should call `abortAllGenerations` instead.
  *
  * @param {string} [reason] - Reason recorded on the AbortError.
  * @returns {number} The number of jobs aborted.
@@ -1434,19 +1437,23 @@ function abortAllSilentGenerations(reason = 'aborted') {
 }
 
 /**
- * Also tells SillyTavern to stop any non-silent generation that may be
- * running in parallel — used by extension UIs that want a single "Cancel"
- * button to stop both their own silent work and any normal chat
- * generation it may have triggered.
+ * The "real" cancel path that extension UIs should use. Aborts our own
+ * local controllers AND calls ST's exported `stopGeneration()`, which
+ * emits `GENERATION_STOPPED`. That event is what ST's `generateRawData`
+ * listens for to abort its own fetch — once the fetch aborts, the
+ * connection to ST's Node server closes, and ST's server-side handler
+ * propagates the abort upstream (e.g. POSTs `/api/extra/abort` to
+ * KoboldCpp). Without this call, only the frontend UI frees up and the
+ * LLM backend keeps generating to the response cap.
  *
- * Safe to call when nothing is running; ST's `stopGeneration()` is a no-op
- * in that case.
+ * Safe to call when nothing is running; ST's `stopGeneration()` is a
+ * no-op in that case.
  *
  * @param {string} [reason]
  */
 function abortAllGenerations(reason = 'aborted') {
     abortAllSilentGenerations(reason);
-    try { stStopGeneration(); } catch (_) { /* ignore */ }
+    try { __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_stopGeneration__(); } catch (_) { /* ignore */ }
 }
 
 /**
@@ -1489,8 +1496,15 @@ async function runCancellableSilentGeneration({ run, name = 'silent-gen' }) {
     };
     abortController.signal.addEventListener('abort', onAbort, { once: true });
 
+    // If the abort race wins, the run() promise is abandoned but keeps
+    // executing — its eventual rejection (when ST's fetch finally aborts)
+    // would surface as an unhandled promise rejection in the console.
+    // Swallow it here; the result is already irrelevant by that point.
+    const runPromise = run(abortController.signal);
+    runPromise.catch(() => { /* swallow abandoned-runner rejections */ });
+
     try {
-        return await Promise.race([run(abortController.signal), abortPromise]);
+        return await Promise.race([runPromise, abortPromise]);
     } finally {
         abortController.signal.removeEventListener('abort', onAbort);
         activeJobs.delete(jobId);
@@ -4028,13 +4042,14 @@ async function buildPreambleBlock(ctxOptions) {
 }
 
 function stopGeneration() {
-    // The previous implementation clicked `#mes_stop`, but that button is
-    // hidden whenever the ACC modal is open (chat input is locked), so the
-    // click was a no-op and the silent generation kept running. Going
-    // straight to the silent-generation manager actually aborts the in-
-    // flight fetch and unblocks the awaiting runGeneration() call.
-    const aborted = abortAllSilentGenerations('acc-cancel');
-    assisted_character_creation_debug('Stop generation triggered, aborted jobs:', aborted);
+    // Route through abortAllGenerations() so that ST's GENERATION_STOPPED
+    // event also fires. That's what triggers generateRawData() to abort
+    // its fetch, close the connection, and let ST's server propagate the
+    // abort to the backend (e.g. POST /api/extra/abort to KoboldCpp).
+    // Aborting only our local controllers would free the UI but leave the
+    // LLM generating to the response cap.
+    abortAllGenerations('acc-cancel');
+    assisted_character_creation_debug('Stop generation triggered');
 }
 
 // ─── Done ───
@@ -4495,7 +4510,11 @@ async function onAssist(formEl, id, isContinue) {
     // Stop. Clicks on the other button (which is hidden anyway) are ignored.
     if (state.generating) {
         if (state.activeAction === action) {
-            abortAllSilentGenerations('wia-cancel');
+            // Use abortAllGenerations (not abortAllSilentGenerations) so
+            // ST's GENERATION_STOPPED event fires and actually cancels the
+            // backend fetch — otherwise KoboldCpp etc. keep generating to
+            // the response cap while only the UI frees up.
+            abortAllGenerations('wia-cancel');
             world_info_assist_debug('Stop requested for', id);
         }
         return;
@@ -5051,7 +5070,11 @@ function showRegenOverlay() {
     // Block keyboard activation of focused buttons (Enter / Space) while up.
     overlay.addEventListener('keydown', (e) => { e.stopPropagation(); e.preventDefault(); });
     overlay.querySelector('.ng-regen-overlay-stop')?.addEventListener('click', () => {
-        abortAllSilentGenerations('ng-overlay-cancel');
+        // abortAllGenerations triggers ST's GENERATION_STOPPED, which is
+        // what actually cancels the backend fetch (and lets ST's server
+        // POST /api/extra/abort to KoboldCpp). Without it, the LLM would
+        // keep generating to the response cap with the UI freed.
+        abortAllGenerations('ng-overlay-cancel');
         narrative_guidance_debug('Stop requested via regen overlay');
     });
     document.body.appendChild(overlay);
@@ -5429,7 +5452,7 @@ function bindNarrativeGuidanceSettings(saveSettings) {
         // button is disabled in the UI).
         if (regenInProgress) {
             if (ngActiveAction === 'regen') {
-                abortAllSilentGenerations('ng-cancel');
+                abortAllGenerations('ng-cancel');
                 narrative_guidance_debug('Stop requested via regenerate button');
             }
             return;
@@ -5440,7 +5463,7 @@ function bindNarrativeGuidanceSettings(saveSettings) {
     document.getElementById('ng_continue_now')?.addEventListener('click', async () => {
         if (regenInProgress) {
             if (ngActiveAction === 'continue') {
-                abortAllSilentGenerations('ng-cancel');
+                abortAllGenerations('ng-cancel');
                 narrative_guidance_debug('Stop requested via continue button');
             }
             return;
