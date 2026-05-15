@@ -54,14 +54,7 @@
                     placeholder="Enter your Phrasing! prompt template..."></textarea>
             </div>
 
-            <div class="phrasing_buttons_row">
-                <div class="menu_button" id="phrasing_restore_default">
-                    <span class="fa-solid fa-rotate-left"></span> Restore Default
-                </div>
-                <div class="menu_button" id="phrasing_save_to_chat">
-                    <span class="fa-solid fa-floppy-disk"></span> Save to Chat
-                </div>
-            </div>
+            <div class="saints_template_controls" id="phrasing_prompt_templates"></div>
 
             <div class="phrasing_prompt_section">
                 <label for="phrasing_inverse_prompt_textarea"><b>Inverse Guidance Prompt Template:</b></label>
@@ -70,14 +63,7 @@
                 <small>Available placeholders: <code>{{phrasingSeed}}</code>, <code>{{phrasingSwipes}}</code></small>
             </div>
 
-            <div class="phrasing_buttons_row">
-                <div class="menu_button" id="phrasing_restore_inverse_default">
-                    <span class="fa-solid fa-rotate-left"></span> Restore Default
-                </div>
-                <div class="menu_button" id="phrasing_save_inverse_to_chat">
-                    <span class="fa-solid fa-floppy-disk"></span> Save to Chat
-                </div>
-            </div>
+            <div class="saints_template_controls" id="phrasing_inverse_prompt_templates"></div>
 
             <hr class="saints_divider" />
 
@@ -108,11 +94,7 @@
                     placeholder="Enter your ACC prompt template..."></textarea>
             </div>
 
-            <div class="acc_buttons_row">
-                <div class="menu_button" id="acc_restore_default_prompt">
-                    <span class="fa-solid fa-rotate-left"></span> Restore Default
-                </div>
-            </div>
+            <div class="saints_template_controls" id="acc_prompt_templates"></div>
 
             <hr class="saints_divider" />
 
@@ -148,11 +130,7 @@
                     placeholder="Enter your World Info Assist prompt template..."></textarea>
             </div>
 
-            <div class="wia_buttons_row">
-                <div class="menu_button" id="wia_restore_default">
-                    <span class="fa-solid fa-rotate-left"></span> Restore Default
-                </div>
-            </div>
+            <div class="saints_template_controls" id="wia_prompt_templates"></div>
 
             <hr class="saints_divider" />
 
@@ -199,11 +177,7 @@
                 <small>The model's reply continues this text and becomes the active guidance.</small>
             </div>
 
-            <div class="ng_buttons_row">
-                <div class="menu_button" id="ng_restore_generation_default">
-                    <span class="fa-solid fa-rotate-left"></span> Restore Default
-                </div>
-            </div>
+            <div class="saints_template_controls" id="ng_generation_prompt_templates"></div>
 
             <div class="ng_prompt_section">
                 <label for="ng_injection_prompt_textarea"><b>Injection Prompt Template:</b></label>
@@ -212,11 +186,7 @@
                 <small>Available placeholder: <code>{{guidance}}</code></small>
             </div>
 
-            <div class="ng_buttons_row">
-                <div class="menu_button" id="ng_restore_injection_default">
-                    <span class="fa-solid fa-rotate-left"></span> Restore Default
-                </div>
-            </div>
+            <div class="saints_template_controls" id="ng_injection_prompt_templates"></div>
 
             <div class="ng_inline_row">
                 <label for="ng_injection_depth"><b>Depth:</b></label>

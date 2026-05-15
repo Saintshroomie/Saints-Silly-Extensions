@@ -25,6 +25,7 @@ import {
     streamingGenerate,
     withSingleLineDisabled,
 } from './utils.js';
+import { setupPromptTemplates } from './prompt-templates.js';
 
 // ─── Constants ───
 
@@ -559,11 +560,13 @@ export function bindNarrativeGuidanceSettings(saveSettings) {
         });
     }
 
-    document.getElementById('ng_restore_generation_default')?.addEventListener('click', () => {
-        moduleSettings.narrativeGuidanceGenerationPrompt = DEFAULT_NG_GENERATION_PROMPT;
-        if (genArea) genArea.value = DEFAULT_NG_GENERATION_PROMPT;
-        saveSettings();
-        toast('Default generation prompt restored.', 'success');
+    setupPromptTemplates({
+        promptKey: 'narrativeGuidanceGenerationPrompt',
+        defaultText: DEFAULT_NG_GENERATION_PROMPT,
+        textareaId: 'ng_generation_prompt_textarea',
+        containerId: 'ng_generation_prompt_templates',
+        settings: moduleSettings,
+        saveSettings,
     });
 
     const injectArea = document.getElementById('ng_injection_prompt_textarea');
@@ -580,12 +583,13 @@ export function bindNarrativeGuidanceSettings(saveSettings) {
         });
     }
 
-    document.getElementById('ng_restore_injection_default')?.addEventListener('click', () => {
-        moduleSettings.narrativeGuidanceInjectionPrompt = DEFAULT_NG_INJECTION_PROMPT;
-        if (injectArea) injectArea.value = DEFAULT_NG_INJECTION_PROMPT;
-        saveSettings();
-        reapplyInjection();
-        toast('Default injection prompt restored.', 'success');
+    setupPromptTemplates({
+        promptKey: 'narrativeGuidanceInjectionPrompt',
+        defaultText: DEFAULT_NG_INJECTION_PROMPT,
+        textareaId: 'ng_injection_prompt_textarea',
+        containerId: 'ng_injection_prompt_templates',
+        settings: moduleSettings,
+        saveSettings,
     });
 
     const depthInput = document.getElementById('ng_injection_depth');

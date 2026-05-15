@@ -32,13 +32,14 @@ import {
     isPhrasing,
     handlePhrasingSeedReinjection,
     applyPhrasingEnabledState,
-    loadPromptTextarea,
     createInputAreaButton,
     createHamburgerMenuItem,
     bindPhrasingSettings,
     registerPhrasingSlashCommand,
     onGenerationStarted as phrasingGenStarted,
     onGenerationEnded as phrasingGenEnded,
+    DEFAULT_PHRASING_PROMPT,
+    DEFAULT_PHRASING_INVERSE_PROMPT,
 } from './phrasing.js';
 import {
     initACC,
@@ -79,6 +80,8 @@ const defaultSettings = {
     phrasingEnabled: true,
     phrasingDebugMode: false,
     phrasingInverseGuidance: false,
+    phrasingPrompt: DEFAULT_PHRASING_PROMPT,
+    phrasingInversePrompt: DEFAULT_PHRASING_INVERSE_PROMPT,
     accEnabled: true,
     accDebugMode: false,
     accPrompt: DEFAULT_ACC_PROMPT,
@@ -100,6 +103,22 @@ const defaultSettings = {
     narrativeGuidanceInjectionDepth: DEFAULT_NG_INJECTION_DEPTH,
     narrativeGuidanceInjectionRole: DEFAULT_NG_INJECTION_ROLE,
     narrativeGuidanceLoreBookNames: [],
+    promptTemplates: {
+        phrasingPrompt: {},
+        phrasingInversePrompt: {},
+        accPrompt: {},
+        wiaPrompt: {},
+        narrativeGuidanceGenerationPrompt: {},
+        narrativeGuidanceInjectionPrompt: {},
+    },
+    activePromptTemplate: {
+        phrasingPrompt: '__default__',
+        phrasingInversePrompt: '__default__',
+        accPrompt: '__default__',
+        wiaPrompt: '__default__',
+        narrativeGuidanceGenerationPrompt: '__default__',
+        narrativeGuidanceInjectionPrompt: '__default__',
+    },
 };
 
 // ─── State ───
@@ -166,7 +185,6 @@ function onGenerationStopped() {
 function onChatChanged() {
     loadPossessionState();
     syncAllPossessionUI();
-    loadPromptTextarea();
     onNarrativeGuidanceChatChanged();
     SSEDebug('Chat changed, state reloaded');
 }
@@ -238,7 +256,6 @@ jQuery(async () => {
     // Initial state
     syncAllPossessionUI();
     applyPhrasingEnabledState();
-    loadPromptTextarea();
 
     SSEDebug('Extension initialized');
 });

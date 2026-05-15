@@ -24,7 +24,7 @@ Enrich your messages with LLM-generated narration, actions, and detail that stay
   - **Editing a message** — Confirms the edit, then rephrases that message
   - **Text in input** — Enriches your typed text
 - **Seed text reinjection** — Rephrased messages remember their original seed prompt, so if you Continue a rephrased message the seed is reinjected to guide the continue generation
-- **Custom prompts** — Customize the phrasing prompt per-chat or use the default template
+- **Custom prompts** — Customize the phrasing prompt and save any number of named template variants (see Prompt Templates below)
 - **Inverse Guidance** — Optional mode that feeds every existing swipe of the target message into the prompt and asks the model to produce a swipe that is wildly different in tone, pacing, and approach. Comes with its own editable prompt template (with `{{phrasingSwipes}}` and `{{phrasingSeed}}` placeholders).
 - **Possession-aware** — When possessing a character, phrasing generates in that character's voice; otherwise it uses the standard ST impersonate feature
 
@@ -32,7 +32,7 @@ Enrich your messages with LLM-generated narration, actions, and detail that stay
 
 A modal-based character creator that adds an **Assist** button to SillyTavern's character creation page, letting you draft a complete character description from a short brief.
 
-- **Customizable prompt template** — A built-in prompt instructs the model to produce a structured, bracketed character sheet covering name, age, physical description, voice, clothing, equipment, personality, motivations, backstory, relationships, secrets, and more. Edit it freely in the settings panel and Restore Default at any time.
+- **Customizable prompt template** — A built-in prompt instructs the model to produce a structured, bracketed character sheet covering name, age, physical description, voice, clothing, equipment, personality, motivations, backstory, relationships, secrets, and more. Edit it freely in the settings panel; save named variants and switch between them via the template dropdown (see Prompt Templates below).
 - **Max Tokens control** — A token-count input in the modal sets the response length for each generation (default 1000). Persisted between sessions.
 - **Character Brief** — Type a few sentences describing your concept, setting, and any anchor details. The prompt template is sent first, followed by the brief.
 - **Generate** — One-shot full character description from the brief; replaces the textarea.
@@ -52,7 +52,7 @@ Adds an **Assist** button to every World Info / lore book entry, letting you dra
 - **Title-aware priming** — If the entry has a title (the comment field), generation is primed with `[Title: ` so the model continues in the exact bracketed format. If the title is empty, generation is primed with just `[`.
 - **Guidance from the content field** — Whatever you've typed into the entry's content textarea is used as guidance for the generation, so you can sketch a rough idea and let the LLM flesh it out.
 - **Continue / Retry / Revert** — After a generation, the Assist button is replaced by Continue (extends the current entry), Retry (re-rolls from your original guidance text), and Revert (restores your original guidance text and discards the generation).
-- **Editable prompt template** — The default prompt instructs the model to emit a `[ Subject: Description ]` world lore artifact with no commentary. You can edit it freely in the settings panel and Restore Default at any time.
+- **Editable prompt template** — The default prompt instructs the model to emit a `[ Subject: Description ]` world lore artifact with no commentary. You can edit it freely in the settings panel; save named variants and switch between them via the template dropdown (see Prompt Templates below).
 - **No schema** — Unlike Assisted Character Creation, World Info Assist has no schema. The prompt itself defines the desired output format.
 
 ### Narrative Guidance
@@ -162,8 +162,8 @@ Open **Extensions** > **Saint's Silly Extensions** in SillyTavern's settings pan
 | Enable Phrasing! | Toggle the phrasing feature on/off |
 | Debug Mode | Log detailed phrasing events to the browser console |
 | Inverse Guidance | When enabled, rephrasing a message includes all of its existing swipes in the prompt and asks the model to produce something wildly different |
-| Prompt Template | Customize the AI prompt used for enrichment (per-chat) |
-| Inverse Guidance Prompt Template | Customize the prompt used when Inverse Guidance is on. Supports `{{phrasingSeed}}` and `{{phrasingSwipes}}` placeholders. |
+| Prompt Template | Customize the AI prompt used for enrichment. Save named variants via the template dropdown below the textarea. |
+| Inverse Guidance Prompt Template | Customize the prompt used when Inverse Guidance is on. Supports `{{phrasingSeed}}` and `{{phrasingSwipes}}` placeholders. Save named variants via the template dropdown below the textarea. |
 
 ### Assisted Character Creation Settings
 
@@ -172,8 +172,7 @@ Open **Extensions** > **Saint's Silly Extensions** in SillyTavern's settings pan
 | Enable Assisted Character Creation | Toggle the ACC feature and its Assist button on the character page |
 | ACC Debug Mode | Log detailed ACC events, prompts, and generations to the browser console |
 | Max Context Override | If > 0, caps how many tokens of chat context the preamble packer uses for ACC generations. 0 = use the model's full context size. |
-| Prompt Template | Customize the prompt sent to the LLM for character generation. Sent first, followed by the user's Character Brief. |
-| Restore Default | Reset the prompt template back to the built-in default |
+| Prompt Template | Customize the prompt sent to the LLM for character generation. Sent first, followed by the user's Character Brief. Save named variants via the template dropdown below the textarea. |
 
 ### World Info Assist Settings
 
@@ -182,8 +181,7 @@ Open **Extensions** > **Saint's Silly Extensions** in SillyTavern's settings pan
 | Enable World Info Assist | Toggle the WI Assist feature and inject/remove its per-entry Assist buttons |
 | WI Assist Debug Mode | Log detailed WI Assist events, prompts, and generations to the browser console |
 | Max Context Override | If > 0, caps how many tokens of chat context the preamble packer uses for WIA generations. 0 = use the model's full context size. |
-| Prompt Template | Customize the prompt sent to the LLM for World Info entry generation |
-| Restore Default | Reset the prompt template back to the built-in default |
+| Prompt Template | Customize the prompt sent to the LLM for World Info entry generation. Save named variants via the template dropdown below the textarea. |
 
 ### Narrative Guidance Settings
 
@@ -203,6 +201,20 @@ Open **Extensions** > **Saint's Silly Extensions** in SillyTavern's settings pan
 | Themes / Story Arcs (per-chat) | Themes, ideas, or arcs for the model to weave into the next round of guidance |
 | Active Guidance (per-chat) | The currently active guidance paragraph. Edit directly to hand-tune steering; edits apply on the next AI turn. |
 | Turns Remaining / -1 / Reset / Regenerate Now | Manual controls over the per-chat counter and on-demand regeneration |
+
+### Prompt Templates
+
+Every editable prompt in the settings panel (Phrasing standard, Phrasing inverse, Assisted Character Creation, World Info Assist, Narrative Guidance generation, Narrative Guidance injection) has its own template dropdown directly below the textarea, plus four actions:
+
+| Control | Description |
+|---------|-------------|
+| Dropdown | Pick a saved template to load it into the textarea. The first entry, **Default**, is always present and non-deletable — it loads the built-in default text. |
+| Save as New | Save the current textarea content as a new named template. |
+| Update | Overwrite the currently selected template with the textarea content. Disabled when Default is selected. |
+| Rename | Rename the currently selected template. Disabled when Default is selected. |
+| Delete | Delete the currently selected template; selection falls back to Default. Disabled when Default is selected. |
+
+Templates persist at the extension-settings level and are shared across all chats. Phrasing! no longer offers a "Save to Chat" prompt-override; templates supersede it.
 
 ## Slash Commands
 

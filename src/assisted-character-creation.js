@@ -15,6 +15,7 @@ import {
     streamingGenerate,
     withSingleLineDisabled,
 } from './utils.js';
+import { setupPromptTemplates } from './prompt-templates.js';
 
 // ─── Default Prompt ───
 
@@ -157,7 +158,6 @@ export function bindACCSettings(saveSettings) {
     const enabledCb = document.getElementById('acc_enabled');
     const debugCb = document.getElementById('acc_debug_mode');
     const promptArea = document.getElementById('acc_prompt_textarea');
-    const restoreBtn = document.getElementById('acc_restore_default_prompt');
 
     if (enabledCb) {
         enabledCb.checked = moduleSettings.accEnabled;
@@ -189,14 +189,15 @@ export function bindACCSettings(saveSettings) {
             saveSettings();
         });
     }
-    if (restoreBtn) {
-        restoreBtn.addEventListener('click', () => {
-            moduleSettings.accPrompt = DEFAULT_ACC_PROMPT;
-            if (promptArea) promptArea.value = DEFAULT_ACC_PROMPT;
-            saveSettings();
-            toast('ACC prompt restored to default.', 'success');
-        });
-    }
+
+    setupPromptTemplates({
+        promptKey: 'accPrompt',
+        defaultText: DEFAULT_ACC_PROMPT,
+        textareaId: 'acc_prompt_textarea',
+        containerId: 'acc_prompt_templates',
+        settings: moduleSettings,
+        saveSettings,
+    });
 }
 
 // ─── Modal ───

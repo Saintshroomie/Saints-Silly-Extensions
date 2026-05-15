@@ -19,17 +19,18 @@ import {
     getEditingMessageIndex,
     waitForGenerationEnd,
 } from './utils.js';
+import { setupPromptTemplates } from './prompt-templates.js';
 
 // ─── Constants ───
 
 const PHRASING_INJECTION_KEY = 'phrasing_instruction';
 const PHRASING_SEED_EXTRA_KEY = 'phrasing_seed';
 
-const DEFAULT_PHRASING_PROMPT = `[Rewrite the following message. Preserve its meaning, intent, and any dialogue, but enrich it with narration, action, and detail consistent with the character and the current scene. Do not continue the scene beyond what the original message describes.
+export const DEFAULT_PHRASING_PROMPT = `[Rewrite the following message. Preserve its meaning, intent, and any dialogue, but enrich it with narration, action, and detail consistent with the character and the current scene. Do not continue the scene beyond what the original message describes.
 
 {{phrasingSeed}}]`;
 
-const DEFAULT_PHRASING_INVERSE_PROMPT = `[Rewrite the following message in a way that is WILDLY DIFFERENT from every previous variation listed below. Vary the tone, pacing, structure, imagery, sentence length, and word choice — take a fundamentally different angle. Preserve the underlying meaning, intent, and any dialogue. Do not continue the scene beyond what the original message describes.
+export const DEFAULT_PHRASING_INVERSE_PROMPT = `[Rewrite the following message in a way that is WILDLY DIFFERENT from every previous variation listed below. Vary the tone, pacing, structure, imagery, sentence length, and word choice — take a fundamentally different angle. Preserve the underlying meaning, intent, and any dialogue. Do not continue the scene beyond what the original message describes.
 
 Previous variations to avoid resembling:
 {{phrasingSwipes}}
@@ -58,17 +59,11 @@ export function isPhrasing() {
 // ─── Prompt Management ───
 
 function getActivePrompt() {
-    const context = getContext();
-    const chatPrompt = context.chatMetadata?.phrasing?.prompt;
-    debug('getActivePrompt — source:', chatPrompt ? 'chat metadata' : 'default');
-    return chatPrompt || DEFAULT_PHRASING_PROMPT;
+    return ctx.settings.phrasingPrompt || DEFAULT_PHRASING_PROMPT;
 }
 
 function getActiveInversePrompt() {
-    const context = getContext();
-    const chatPrompt = context.chatMetadata?.phrasing?.inversePrompt;
-    debug('getActiveInversePrompt — source:', chatPrompt ? 'chat metadata' : 'default');
-    return chatPrompt || DEFAULT_PHRASING_INVERSE_PROMPT;
+    return ctx.settings.phrasingInversePrompt || DEFAULT_PHRASING_INVERSE_PROMPT;
 }
 
 function formatSwipesContext(swipes, speakerName) {
@@ -374,95 +369,6 @@ async function onInputPhrasingClick() {
     }
 }
 
-// ─── Prompt Settings UI ───
-
-export function loadPromptTextarea() {
-    const textarea = document.getElementById('phrasing_prompt_textarea');
-    if (textarea) textarea.value = getActivePrompt();
-
-    const inverseTextarea = document.getElementById('phrasing_inverse_prompt_textarea');
-    if (inverseTextarea) inverseTextarea.value = getActiveInversePrompt();
-}
-
-function onSaveToChat() {
-    debug('onSaveToChat — triggered');
-    const textarea = document.getElementById('phrasing_prompt_textarea');
-    if (!textarea) return;
-
-    const promptText = textarea.value.trim();
-    const context = getContext();
-
-    if (promptText && !promptText.includes('{{phrasingSeed}}')) {
-        toastr.warning('Warning: Prompt does not contain {{phrasingSeed}}. The AI won\'t receive your input text.', 'Phrasing!');
-    }
-
-    if (!context.chatMetadata.phrasing) {
-        context.chatMetadata.phrasing = {};
-    }
-
-    context.chatMetadata.phrasing.prompt = promptText || null;
-    context.saveMetadata();
-    toastr.success('Phrasing! prompt saved to chat.', 'Phrasing!');
-}
-
-function onRestoreDefault() {
-    debug('onRestoreDefault — triggered');
-    if (!confirm('Restore the default Phrasing! prompt? This will overwrite your current prompt.')) return;
-
-    const textarea = document.getElementById('phrasing_prompt_textarea');
-    if (textarea) {
-        textarea.value = DEFAULT_PHRASING_PROMPT;
-    }
-
-    const context = getContext();
-    if (context.chatMetadata.phrasing) {
-        context.chatMetadata.phrasing.prompt = null;
-    }
-    context.saveMetadata();
-    toastr.info('Phrasing! prompt restored to default.', 'Phrasing!');
-}
-
-function onSaveInverseToChat() {
-    debug('onSaveInverseToChat — triggered');
-    const textarea = document.getElementById('phrasing_inverse_prompt_textarea');
-    if (!textarea) return;
-
-    const promptText = textarea.value.trim();
-    const context = getContext();
-
-    if (promptText && !promptText.includes('{{phrasingSeed}}')) {
-        toastr.warning('Warning: Inverse prompt does not contain {{phrasingSeed}}. The AI won\'t receive the message being rephrased.', 'Phrasing!');
-    }
-    if (promptText && !promptText.includes('{{phrasingSwipes}}')) {
-        toastr.warning('Warning: Inverse prompt does not contain {{phrasingSwipes}}. The AI won\'t see prior variations to differ from.', 'Phrasing!');
-    }
-
-    if (!context.chatMetadata.phrasing) {
-        context.chatMetadata.phrasing = {};
-    }
-
-    context.chatMetadata.phrasing.inversePrompt = promptText || null;
-    context.saveMetadata();
-    toastr.success('Phrasing! inverse prompt saved to chat.', 'Phrasing!');
-}
-
-function onRestoreInverseDefault() {
-    debug('onRestoreInverseDefault — triggered');
-    if (!confirm('Restore the default Inverse Guidance prompt? This will overwrite your current inverse prompt.')) return;
-
-    const textarea = document.getElementById('phrasing_inverse_prompt_textarea');
-    if (textarea) {
-        textarea.value = DEFAULT_PHRASING_INVERSE_PROMPT;
-    }
-
-    const context = getContext();
-    if (context.chatMetadata.phrasing) {
-        context.chatMetadata.phrasing.inversePrompt = null;
-    }
-    context.saveMetadata();
-    toastr.info('Phrasing! inverse prompt restored to default.', 'Phrasing!');
-}
-
 // ─── Generation Lifecycle ───
 
 export function onGenerationStarted() {
@@ -544,10 +450,40 @@ export function bindPhrasingSettings(saveSettings) {
         });
     }
 
-    document.getElementById('phrasing_save_to_chat')?.addEventListener('click', onSaveToChat);
-    document.getElementById('phrasing_restore_default')?.addEventListener('click', onRestoreDefault);
-    document.getElementById('phrasing_save_inverse_to_chat')?.addEventListener('click', onSaveInverseToChat);
-    document.getElementById('phrasing_restore_inverse_default')?.addEventListener('click', onRestoreInverseDefault);
+    const phrasingPromptArea = document.getElementById('phrasing_prompt_textarea');
+    if (phrasingPromptArea) {
+        phrasingPromptArea.value = ctx.settings.phrasingPrompt || DEFAULT_PHRASING_PROMPT;
+        phrasingPromptArea.addEventListener('input', () => {
+            ctx.settings.phrasingPrompt = phrasingPromptArea.value;
+            saveSettings();
+        });
+    }
+
+    const phrasingInverseArea = document.getElementById('phrasing_inverse_prompt_textarea');
+    if (phrasingInverseArea) {
+        phrasingInverseArea.value = ctx.settings.phrasingInversePrompt || DEFAULT_PHRASING_INVERSE_PROMPT;
+        phrasingInverseArea.addEventListener('input', () => {
+            ctx.settings.phrasingInversePrompt = phrasingInverseArea.value;
+            saveSettings();
+        });
+    }
+
+    setupPromptTemplates({
+        promptKey: 'phrasingPrompt',
+        defaultText: DEFAULT_PHRASING_PROMPT,
+        textareaId: 'phrasing_prompt_textarea',
+        containerId: 'phrasing_prompt_templates',
+        settings: ctx.settings,
+        saveSettings,
+    });
+    setupPromptTemplates({
+        promptKey: 'phrasingInversePrompt',
+        defaultText: DEFAULT_PHRASING_INVERSE_PROMPT,
+        textareaId: 'phrasing_inverse_prompt_textarea',
+        containerId: 'phrasing_inverse_prompt_templates',
+        settings: ctx.settings,
+        saveSettings,
+    });
 }
 
 // ─── Slash Command ───
