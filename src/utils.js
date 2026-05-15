@@ -12,8 +12,9 @@
  */
 
 import { loadWorldInfo, world_names } from '../../../../world-info.js';
-import { generateRaw, getMaxContextSize } from '../../../../../script.js';
+import { getMaxContextSize } from '../../../../../script.js';
 import { getTokenCountAsync } from '../../../../tokenizers.js';
+import { cancellableStreamingGenerate } from './silent-generation.js';
 
 // ─── Context ───
 
@@ -174,44 +175,20 @@ export function waitForGenerationEnd(timeoutMs = 5 * 60 * 1000) {
 
 /**
  * Call generateRaw and optionally stream tokens into targetEl as they arrive.
- * Uses the `onToken` callback if ST's generateRaw supports it; falls back
- * gracefully to non-streaming if it doesn't.
+ *
+ * Routes through the silent-generation cancellation manager so the call can
+ * be aborted by ST's stop button or by `abortAllSilentGenerations()`. On
+ * cancel, this throws an AbortError (rather than returning the partial /
+ * discarded result) so callers can short-circuit cleanly.
  *
  * @param {object} params - generateRaw parameters (prompt, systemPrompt, responseLength, etc.)
  * @param {HTMLTextAreaElement|null} targetEl - Field to stream into, or null for no streaming.
- * @param {{ append?: boolean }} [opts]
+ * @param {{ append?: boolean, name?: string }} [opts]
  * @returns {Promise<string>} The full generated text.
+ * @throws {DOMException} AbortError if the generation was cancelled.
  */
-export async function streamingGenerate(params, targetEl, { append = false } = {}) {
-    if (!targetEl) return generateRaw(params);
-
-    let accumulated = append ? (targetEl.value || '') : '';
-    let streamingWorked = false;
-
-    try {
-        const result = await generateRaw({
-            ...params,
-            onToken: (token) => {
-                accumulated += token;
-                targetEl.value = accumulated;
-                targetEl.scrollTop = targetEl.scrollHeight;
-                streamingWorked = true;
-            },
-        });
-        if (!streamingWorked && result) {
-            targetEl.value = append ? ((targetEl.value || '') + result) : result;
-        }
-        return result || accumulated;
-    } catch (err) {
-        // If ST rejected the unknown onToken param, retry without it.
-        const msg = (err?.message || '').toLowerCase();
-        if (msg.includes('ontoken') || msg.includes('unknown') || msg.includes('invalid param')) {
-            const fallback = await generateRaw(params);
-            if (fallback) targetEl.value = append ? ((targetEl.value || '') + fallback) : fallback;
-            return fallback;
-        }
-        throw err;
-    }
+export async function streamingGenerate(params, targetEl, opts = {}) {
+    return cancellableStreamingGenerate(params, targetEl, opts);
 }
 
 // ─── Single-Line Override ───

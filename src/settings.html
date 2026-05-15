@@ -2,7 +2,7 @@
     <div class="inline-drawer">
         <div class="inline-drawer-toggle inline-drawer-header">
             <b>Saint's Silly Extensions</b>
-            <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+            <div class="inline-drawer-icon fa-solid fa-circle-chevron-up up"></div>
         </div>
         <div class="inline-drawer-content">
 
@@ -21,11 +21,6 @@
                 <span>Show Toast on Possess/Unpossess</span>
             </label>
 
-            <label class="checkbox_label">
-                <input id="possession_debug_mode" type="checkbox" />
-                <span>Possession Debug Mode</span>
-            </label>
-
             <hr class="saints_divider" />
 
             <!-- Phrasing Settings -->
@@ -36,11 +31,6 @@
             <label class="checkbox_label">
                 <input id="phrasing_enabled" type="checkbox" checked />
                 <span>Enable Phrasing!</span>
-            </label>
-
-            <label class="checkbox_label">
-                <input id="phrasing_debug_mode" type="checkbox" />
-                <span>Phrasing Debug Mode</span>
             </label>
 
             <label class="checkbox_label" title="When enabled, rephrasing a message includes every existing swipe in the prompt and asks the model to produce something wildly different.">
@@ -77,11 +67,6 @@
                 <span>Enable Assisted Character Creation</span>
             </label>
 
-            <label class="checkbox_label">
-                <input id="acc_debug_mode" type="checkbox" />
-                <span>ACC Debug Mode</span>
-            </label>
-
             <div class="ng_inline_row">
                 <label for="acc_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label>
                 <input id="acc_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for ACC generations. 0 = use the model's full context size." />
@@ -106,11 +91,6 @@
             <label class="checkbox_label">
                 <input id="wia_enabled" type="checkbox" />
                 <span>Enable World Info Assist</span>
-            </label>
-
-            <label class="checkbox_label">
-                <input id="wia_debug_mode" type="checkbox" />
-                <span>WI Assist Debug Mode</span>
             </label>
 
             <div class="ng_inline_row">
@@ -147,11 +127,6 @@
             <label class="checkbox_label" title="When on, regenerates guidance automatically when the turn counter hits zero. When off, only the Regenerate Now button updates the guidance.">
                 <input id="ng_auto_regen" type="checkbox" />
                 <span>Auto-Regenerate at Zero</span>
-            </label>
-
-            <label class="checkbox_label">
-                <input id="ng_debug_mode" type="checkbox" />
-                <span>Narrative Guidance Debug Mode</span>
             </label>
 
             <div class="ng_inline_row">
@@ -236,6 +211,43 @@
                     <span class="ng-regen-icon fa-solid fa-wand-sparkles"></span> Regenerate Now
                 </div>
             </div>
+
+            <hr class="saints_divider" />
+
+            <!-- Diagnostics -->
+            <h4 class="saints_section_header">
+                <span class="fa-solid fa-bug"></span> Diagnostics
+            </h4>
+
+            <label class="checkbox_label" title="Log detailed Possession events to the browser console.">
+                <input id="possession_debug_mode" type="checkbox" />
+                <span>Possession Debug Mode</span>
+            </label>
+
+            <label class="checkbox_label" title="Log detailed Phrasing events to the browser console.">
+                <input id="phrasing_debug_mode" type="checkbox" />
+                <span>Phrasing Debug Mode</span>
+            </label>
+
+            <label class="checkbox_label" title="Log detailed Assisted Character Creation events, prompts, and generations to the browser console.">
+                <input id="acc_debug_mode" type="checkbox" />
+                <span>ACC Debug Mode</span>
+            </label>
+
+            <label class="checkbox_label" title="Log detailed World Info Assist events, prompts, and generations to the browser console.">
+                <input id="wia_debug_mode" type="checkbox" />
+                <span>WI Assist Debug Mode</span>
+            </label>
+
+            <label class="checkbox_label" title="Log detailed Narrative Guidance events to the browser console.">
+                <input id="ng_debug_mode" type="checkbox" />
+                <span>Narrative Guidance Debug Mode</span>
+            </label>
+
+            <label class="checkbox_label" title="Log silent-generation lifecycle (job start/abort/completion, stop-listener events, stream token counts) to the browser console. Useful when diagnosing stop-button behavior across backends.">
+                <input id="silent_generation_debug_mode" type="checkbox" />
+                <span>Silent Generation Debug Mode</span>
+            </label>
 
         </div>
     </div>

@@ -1,5 +1,5 @@
 import { loadWorldInfo as __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_loadWorldInfo__, world_names as __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_world_names__ } from "../../../../world-info.js";
-import { extension_prompt_roles as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_roles__, extension_prompt_types as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_types__, generateRaw as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__, getMaxContextSize as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_getMaxContextSize__, setExtensionPrompt as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_setExtensionPrompt__, substituteParams as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParams__ } from "../../../../../script.js";
+import { extension_prompt_roles as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_roles__, extension_prompt_types as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_types__, generateRaw as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__, getMaxContextSize as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_getMaxContextSize__, setExtensionPrompt as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_setExtensionPrompt__, stopGeneration as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_stopGeneration__, substituteParams as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParams__ } from "../../../../../script.js";
 import { getTokenCountAsync as __WEBPACK_EXTERNAL_MODULE__tokenizers_js_d5863f55_getTokenCountAsync__ } from "../../../../tokenizers.js";
 import { groups as __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_groups__, selected_group as __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__ } from "../../../../group-chats.js";
 import { SlashCommandParser as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandParser_js_42c8b851_SlashCommandParser__ } from "../../../../slash-commands/SlashCommandParser.js";
@@ -814,48 +814,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Saint's Silly Extensions — Combin
     pointer-events: none;
 }
 
-.ng-regen-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 100000;
-    background: rgba(0, 0, 0, 0.55);
-    backdrop-filter: blur(2px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: wait;
-}
-
-.ng-regen-overlay-card {
-    background: var(--SmartThemeBlurTintColor, #1a1a1a);
-    color: var(--SmartThemeBodyColor, #eee);
-    border: 1px solid var(--SmartThemeBorderColor, #555);
-    border-radius: 8px;
-    padding: 24px 32px;
-    max-width: 420px;
-    text-align: center;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-}
-
-.ng-regen-overlay-spinner {
-    font-size: 2em;
-    opacity: 0.9;
-}
-
-.ng-regen-overlay-title {
-    font-size: 1.05em;
-    font-weight: bold;
-}
-
-.ng-regen-overlay-subtitle {
-    font-size: 0.9em;
-    opacity: 0.75;
-}
-`, "",{"version":3,"sources":["webpack://./src/style.css"],"names":[],"mappings":"AAAA,+CAA+C;;AAE/C;;oFAEoF;;AAEpF,0CAA0C;;AAE1C;IACI,oBAAoB;IACpB,mBAAmB;IACnB,gBAAgB;IAChB,eAAe;AACnB;;AAEA;IACI,WAAW;IACX,YAAY;IACZ,kBAAkB;IAClB,oDAAoD;IACpD,uBAAuB;IACvB,eAAe;IACf,iFAAiF;IACjF,kBAAkB;IAClB,cAAc;AAClB;;AAEA;IACI,kDAAkD;AACtD;;AAEA;IACI,kDAAkD;IAClD,gDAAgD;IAChD,mEAAmE;AACvE;;AAEA,2CAA2C;;AAE3C;IACI,YAAY;IACZ,gDAAgD;IAChD,eAAe;IACf,kBAAkB;AACtB;;AAEA;IACI,UAAU;AACd;;AAEA;IACI,UAAU;IACV,2CAA2C;AAC/C;;AAEA;IACI,WAAW;IACX,kBAAkB;IAClB,YAAY;IACZ,SAAS;IACT,2BAA2B;IAC3B,UAAU;IACV,WAAW;IACX,kBAAkB;IAClB,sDAAsD;AAC1D;;AAEA,gDAAgD;;AAEhD;IACI,sEAAsE;AAC1E;;AAEA,2DAA2D;;AAE3D;IACI,aAAa;IACb,mBAAmB;IACnB,uBAAuB;IACvB,eAAe;IACf,YAAY;IACZ,8BAA8B;IAC9B,YAAY;AAChB;;AAEA;IACI,UAAU;AACd;;AAEA;IACI,WAAW;IACX,YAAY;IACZ,kBAAkB;IAClB,iBAAiB;IACjB,oDAAoD;IACpD,mCAAmC;AACvC;;AAEA;IACI,kDAAkD;AACtD;;AAEA,mDAAmD;;AAEnD;IACI,wBAAwB;AAC5B;;AAEA;;oFAEoF;;AAEpF,2CAA2C;;AAE3C;IACI,eAAe;IACf,aAAa;IACb,mBAAmB;IACnB,uBAAuB;IACvB,YAAY;IACZ,gDAAgD;IAChD,YAAY;IACZ,gBAAgB;AACpB;;AAEA;IACI,UAAU;IACV,2CAA2C;AAC/C;;AAEA,8BAA8B;;AAE9B;IACI,eAAe;AACnB;;AAEA;IACI,iBAAiB;IACjB,UAAU;IACV,kBAAkB;AACtB;;AAEA,yCAAyC;;AAEzC;IACI,wBAAwB;AAC5B;;AAEA;;oFAEoF;;AAEpF;IACI,aAAa;IACb,sBAAsB;IACtB,QAAQ;IACR,cAAc;AAClB;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;AACZ;;AAEA;IACI,mBAAmB;IACnB,aAAa;IACb,mBAAmB;IACnB,QAAQ;AACZ;;AAEA;IACI,YAAY;IACZ,wDAAwD;IACxD,aAAa;AACjB;;AAEA;IACI,eAAe;IACf,kBAAkB;AACtB;;AAEA;IACI,WAAW;IACX,iBAAiB;IACjB,gBAAgB;IAChB,sBAAsB;IACtB,gBAAgB;IAChB,eAAe;AACnB;;AAEA;IACI,aAAa;IACb,QAAQ;IACR,eAAe;IACf,eAAe;AACnB;;AAEA;IACI,OAAO;IACP,YAAY;IACZ,kBAAkB;IAClB,mBAAmB;AACvB;;AAEA;;oFAEoF;;AAEpF;IACI,eAAe;IACf,kBAAkB;AACtB;;AAEA;IACI,WAAW;IACX,iBAAiB;IACjB,gBAAgB;IAChB,sBAAsB;IACtB,gBAAgB;IAChB,eAAe;AACnB;;AAEA;IACI,aAAa;IACb,QAAQ;IACR,eAAe;IACf,eAAe;AACnB;;AAEA;IACI,OAAO;IACP,YAAY;IACZ,kBAAkB;IAClB,mBAAmB;AACvB;;AAEA;;oFAEoF;;AAEpF;IACI,eAAe;IACf,MAAM;IACN,OAAO;IACP,QAAQ;IACR,SAAS;IACT,8BAA8B;IAC9B,cAAc;AAClB;;AAEA;IACI,eAAe;IACf,QAAQ;IACR,SAAS;IACT,2BAA2B;IAC3B,mDAAmD;IACnD,oDAAoD;IACpD,kBAAkB;IAClB,UAAU;IACV,gBAAgB;IAChB,YAAY;IACZ,aAAa;IACb,sBAAsB;IACtB,yCAAyC;IACzC,cAAc;AAClB;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,8BAA8B;IAC9B,kBAAkB;IAClB,2DAA2D;IAC3D,cAAc;AAClB;;AAEA;IACI,SAAS;IACT,gBAAgB;AACpB;;AAEA;IACI,eAAe;IACf,YAAY;IACZ,8BAA8B;IAC9B,gBAAgB;IAChB,gBAAgB;AACpB;;AAEA;IACI,UAAU;AACd;;AAEA;IACI,aAAa;IACb,2BAA2B;IAC3B,YAAY;IACZ,aAAa;IACb,aAAa;IACb,sBAAsB;AAC1B;;AAEA;IACI,mBAAmB;AACvB;;AAEA;IACI,WAAW;IACX,eAAe;IACf,gBAAgB;AACpB;;AAEA;IACI,aAAa;IACb,eAAe;IACf,QAAQ;IACR,kBAAkB;AACtB;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,yBAAyB;IACzB,QAAQ;IACR,mBAAmB;IACnB,iBAAiB;IACjB,aAAa;AACjB;;AAEA;IACI,oBAAoB;IACpB,mBAAmB;IACnB,QAAQ;IACR,iBAAiB;AACrB;;AAEA;IACI,sBAAsB;IACtB,2BAA2B;IAC3B,2BAA2B;IAC3B,kBAAkB;AACtB;;AAEA;IACI,WAAW;IACX,gBAAgB;IAChB,kBAAkB;IAClB,mBAAmB;AACvB;;AAEA;IACI,YAAY;IACZ,oBAAoB;AACxB;;AAEA;IACI,2CAA2C;AAC/C;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;IACR,iBAAiB;IACjB,mBAAmB;IACnB,4CAA4C;IAC5C,kBAAkB;IAClB,2CAA2C;IAC3C,gBAAgB;AACpB;;AAEA;IACI,aAAa;IACb,sBAAsB;IACtB,YAAY;IACZ,aAAa;AACjB;;AAEA;IACI,kBAAkB;AACtB;;AAEA;IACI,WAAW;IACX,YAAY;IACZ,iBAAiB;IACjB,gBAAgB;AACpB;;AAEA;IACI,YAAY;IACZ,mBAAmB;AACvB;;AAEA;IACI,wBAAwB;AAC5B;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,yBAAyB;IACzB,kBAAkB;IAClB,wDAAwD;IACxD,QAAQ;IACR,cAAc;AAClB;;AAEA;IACI,aAAa;IACb,QAAQ;AACZ;;AAEA;IACI,YAAY;IACZ,oBAAoB;AACxB;;AAEA,2CAA2C;AAC3C;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;AACZ;;AAEA;;oFAEoF;;AAEpF,mBAAmB;AACnB;IACI,eAAe;IACf,kBAAkB;AACtB;;AAEA;IACI,WAAW;IACX,iBAAiB;IACjB,gBAAgB;IAChB,sBAAsB;IACtB,gBAAgB;IAChB,eAAe;AACnB;;AAEA;IACI,aAAa;IACb,QAAQ;IACR,eAAe;IACf,eAAe;AACnB;;AAEA;IACI,OAAO;IACP,YAAY;IACZ,kBAAkB;IAClB,mBAAmB;AACvB;;AAEA,+DAA+D;AAC/D;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;IACR,eAAe;IACf,mBAAmB;AACvB;;AAEA;IACI,oBAAoB;IACpB,mBAAmB;IACnB,QAAQ;IACR,eAAe;IACf,iBAAiB;IACjB,gBAAgB;AACpB;;AAEA;IACI,2CAA2C;AAC/C;;AAEA;IACI,gBAAgB;AACpB;;AAEA;IACI,2CAA2C;IAC3C,cAAc;IACd,oBAAoB;IACpB,mBAAmB;IACnB,gBAAgB;AACpB;;AAEA;IACI,wBAAwB;AAC5B;;AAEA,8BAA8B;AAC9B;IACI,oBAAoB;IACpB,mBAAmB;IACnB,QAAQ;IACR,iBAAiB;IACjB,eAAe;IACf,aAAa;IACb,iBAAiB;AACrB;;AAEA;IACI,UAAU;AACd;;AAEA,8CAA8C;AAC9C;IACI,kBAAkB;IAClB,iBAAiB;AACrB;;AAEA;IACI,eAAe;IACf,gBAAgB;IAChB,gBAAgB;IAChB,oDAAoD;IACpD,kBAAkB;IAClB,oBAAoB;IACpB,mBAAmB;IACnB,QAAQ;IACR,aAAa;AACjB;;AAEA;IACI,aAAa;AACjB;;AAEA;IACI,UAAU;AACd;;AAEA;IACI,kBAAkB;IAClB,SAAS;IACT,OAAO;IACP,eAAe;IACf,WAAW;IACX,gBAAgB;IAChB,iBAAiB;IACjB,gBAAgB;IAChB,mDAAmD;IACnD,oDAAoD;IACpD,kBAAkB;IAClB,gBAAgB;IAChB,aAAa;IACb,sBAAsB;IACtB,QAAQ;IACR,yCAAyC;AAC7C;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;IACR,eAAe;AACnB;;AAEA;IACI,YAAY;IACZ,kBAAkB;AACtB;;AAEA,8BAA8B;AAC9B;IACI,oBAAoB;IACpB,mBAAmB;IACnB,QAAQ;IACR,iBAAiB;IACjB,aAAa;IACb,iBAAiB;AACrB;;AAEA;IACI,oBAAoB;IACpB,mBAAmB;IACnB,QAAQ;IACR,iBAAiB;AACrB;;AAEA;IACI,sBAAsB;IACtB,2BAA2B;IAC3B,2BAA2B;IAC3B,kBAAkB;AACtB;;AAEA,+CAA+C;;AAE/C;IACI,aAAa;IACb,mBAAmB;IACnB,SAAS;IACT,eAAe;IACf,mBAAmB;IACnB,iBAAiB;IACjB,oDAAoD;IACpD,kBAAkB;AACtB;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;IACR,gBAAgB;IAChB,eAAe;AACnB;;AAEA;IACI,kBAAkB;IAClB,gBAAgB;AACpB;;AAEA;IACI,eAAe;IACf,gBAAgB;IAChB,gBAAgB;IAChB,oDAAoD;IACpD,kBAAkB;IAClB,oBAAoB;IACpB,mBAAmB;IACnB,QAAQ;IACR,aAAa;AACjB;;AAEA;IACI,aAAa;AACjB;;AAEA;IACI,UAAU;AACd;;AAEA;IACI,kBAAkB;IAClB,SAAS;IACT,OAAO;IACP,eAAe;IACf,cAAc;IACd,gBAAgB;IAChB,iBAAiB;IACjB,gBAAgB;IAChB,mDAAmD;IACnD,oDAAoD;IACpD,kBAAkB;IAClB,gBAAgB;IAChB,aAAa;IACb,sBAAsB;IACtB,QAAQ;IACR,yCAAyC;AAC7C;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;IACR,eAAe;AACnB;;AAEA;IACI,YAAY;IACZ,kBAAkB;AACtB;;AAEA;;oFAEoF;;AAEpF;IACI,oBAAoB;IACpB,aAAa;AACjB;;AAEA;IACI,eAAe;IACf,kBAAkB;AACtB;;AAEA;IACI,WAAW;IACX,gBAAgB;IAChB,sBAAsB;IACtB,gBAAgB;IAChB,eAAe;AACnB;;AAEA;IACI,aAAa;IACb,QAAQ;IACR,eAAe;IACf,eAAe;AACnB;;AAEA;IACI,OAAO;IACP,YAAY;IACZ,kBAAkB;IAClB,mBAAmB;AACvB;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;IACR,eAAe;IACf,aAAa;AACjB;;AAEA;IACI,UAAU;IACV,cAAc;AAClB;;AAEA;IACI,WAAW;IACX,cAAc;AAClB;;AAEA;IACI,aAAa;AACjB;;AAEA;IACI,eAAe;IACf,gBAAgB;IAChB,oDAAoD;IACpD,kBAAkB;IAClB,aAAa;IACb,sBAAsB;IACtB,QAAQ;AACZ;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;IACR,eAAe;AACnB;;AAEA;IACI,YAAY;IACZ,kBAAkB;AACtB;;AAEA;;;IAGI,YAAY;IACZ,oBAAoB;AACxB;;AAEA;;oFAEoF;;AAEpF;IACI,aAAa;IACb,sBAAsB;IACtB,QAAQ;IACR,eAAe;AACnB;;AAEA;IACI,WAAW;AACf;;AAEA;IACI,aAAa;IACb,QAAQ;IACR,eAAe;AACnB;;AAEA;IACI,WAAW;IACX,gBAAgB;IAChB,kBAAkB;IAClB,mBAAmB;AACvB;;AAEA;IACI,YAAY;IACZ,oBAAoB;AACxB;;AAEA;IACI,eAAe;IACf,QAAQ;IACR,eAAe;IACf,+BAA+B;IAC/B,0BAA0B;IAC1B,aAAa;IACb,mBAAmB;IACnB,uBAAuB;IACvB,YAAY;AAChB;;AAEA;IACI,mDAAmD;IACnD,uCAAuC;IACvC,oDAAoD;IACpD,kBAAkB;IAClB,kBAAkB;IAClB,gBAAgB;IAChB,kBAAkB;IAClB,yCAAyC;IACzC,aAAa;IACb,sBAAsB;IACtB,mBAAmB;IACnB,SAAS;AACb;;AAEA;IACI,cAAc;IACd,YAAY;AAChB;;AAEA;IACI,iBAAiB;IACjB,iBAAiB;AACrB;;AAEA;IACI,gBAAgB;IAChB,aAAa;AACjB","sourcesContent":["/* Saint's Silly Extensions — Combined Styles */\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   POSSESSION STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Group Chat: Radio Button Toggle ── */\n\n.possession_radio_wrapper {\n    display: inline-flex;\n    align-items: center;\n    margin-left: 4px;\n    cursor: pointer;\n}\n\n.possession_radio {\n    width: 16px;\n    height: 16px;\n    border-radius: 50%;\n    border: 2px solid var(--SmartThemeBorderColor, #555);\n    background: transparent;\n    cursor: pointer;\n    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;\n    position: relative;\n    flex-shrink: 0;\n}\n\n.possession_radio:hover {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.possession_radio.possession_active {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n    background: var(--SmartThemeQuoteColor, #e8a23a);\n    box-shadow: inset 0 0 0 3px var(--SmartThemeBlurTintColor, #1a1a2e);\n}\n\n/* ── Solo Chat: Possess Toggle Button ── */\n\n#possession_solo_btn {\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    cursor: pointer;\n    position: relative;\n}\n\n#possession_solo_btn:hover {\n    opacity: 1;\n}\n\n#possession_solo_btn.possession_active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n#possession_solo_btn.possession_active::after {\n    content: '';\n    position: absolute;\n    bottom: -2px;\n    left: 50%;\n    transform: translateX(-50%);\n    width: 6px;\n    height: 6px;\n    border-radius: 50%;\n    background-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Group member highlight when possessed ── */\n\n.group_member.possession_possessed {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n/* ── Possession Impersonate Button (Character Avatar) ── */\n\n#possession_impersonate_btn {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease;\n    padding: 2px;\n}\n\n#possession_impersonate_btn:hover {\n    opacity: 1;\n}\n\n.possession_impersonate_avatar {\n    width: 26px;\n    height: 26px;\n    border-radius: 50%;\n    object-fit: cover;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    transition: border-color 0.15s ease;\n}\n\n#possession_impersonate_btn:hover .possession_impersonate_avatar {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hide controls when extension is disabled ── */\n\n.possession_hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PHRASING STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Input Area Button (next to Send) ── */\n\n#phrasing_send_button {\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    padding: 3px;\n    font-size: 1.2em;\n}\n\n#phrasing_send_button:hover {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hamburger Menu Item ── */\n\n#phrasing_menu_button {\n    cursor: pointer;\n}\n\n#phrasing_menu_button .fa-solid {\n    margin-right: 5px;\n    width: 1em;\n    text-align: center;\n}\n\n/* ── Hide buttons during generation ── */\n\n.phrasing-hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SETTINGS PANEL STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .inline-drawer-content {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n    padding: 8px 0;\n}\n\n#saints_silly_settings .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_section_header {\n    margin: 4px 0 2px 0;\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_divider {\n    border: none;\n    border-top: 1px solid var(--SmartThemeBorderColor, #555);\n    margin: 8px 0;\n}\n\n#saints_silly_settings .phrasing_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #phrasing_prompt_textarea {\n    width: 100%;\n    min-height: 120px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .acc_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #acc_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC MODAL STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#acc_modal_overlay {\n    position: fixed;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    background: rgba(0, 0, 0, 0.6);\n    z-index: 10000;\n}\n\n#acc_modal {\n    position: fixed;\n    top: 5vh;\n    left: 50%;\n    transform: translateX(-50%);\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 8px;\n    width: 90%;\n    max-width: 700px;\n    height: 90vh;\n    display: flex;\n    flex-direction: column;\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);\n    z-index: 10001;\n}\n\n#acc_modal .acc-modal-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    padding: 12px 16px;\n    border-bottom: 1px solid var(--SmartThemeBorderColor, #555);\n    flex-shrink: 0;\n}\n\n#acc_modal .acc-modal-header h3 {\n    margin: 0;\n    font-size: 1.1em;\n}\n\n.acc-close-btn {\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease;\n    font-size: 1.2em;\n    padding: 4px 8px;\n}\n\n.acc-close-btn:hover {\n    opacity: 1;\n}\n\n#acc_modal .acc-modal-body {\n    padding: 16px;\n    overflow-y: auto !important;\n    flex: 1 1 0%;\n    min-height: 0;\n    display: flex;\n    flex-direction: column;\n}\n\n.acc-brief-section {\n    margin-bottom: 12px;\n}\n\n.acc-brief-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.acc-action-row {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    margin-bottom: 8px;\n}\n\n.acc-tokens-row {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 6px;\n    margin-bottom: 12px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.acc-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.acc-tokens-input {\n    width: 80px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n.acc-action-btn {\n    flex: 1 1 0;\n    min-width: 110px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n.acc-action-btn.acc-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.acc-generate-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.acc-status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    background: var(--SmartThemeBodyColor, #222);\n    border-radius: 4px;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 0.9em;\n}\n\n.acc-description-section {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.acc-description-section label {\n    margin-bottom: 4px;\n}\n\n.acc-description-output {\n    width: 100%;\n    flex: 1 1 0%;\n    min-height: 200px;\n    resize: vertical;\n}\n\n.acc-description-output[disabled] {\n    opacity: 0.5;\n    cursor: not-allowed;\n}\n\n.acc-hidden {\n    display: none !important;\n}\n\n#acc_modal .acc-modal-footer {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    padding: 12px 16px;\n    border-top: 1px solid var(--SmartThemeBorderColor, #555);\n    gap: 8px;\n    flex-shrink: 0;\n}\n\n.acc-footer-right {\n    display: flex;\n    gap: 8px;\n}\n\n.acc-done-btn.acc-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n/* ACC Launch button in character creator */\n#acc_launch_btn {\n    display: flex;\n    align-items: center;\n    gap: 4px;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   WORLD INFO ASSIST STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Settings panel */\n#saints_silly_settings .wia_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #wia_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* Per-entry assist controls injected into each WI entry form */\n.wia-controls {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    flex-wrap: wrap;\n    margin: 6px 0 6px 0;\n}\n\n.wia-controls .wia-btn {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    cursor: pointer;\n    font-size: 0.85em;\n    padding: 4px 8px;\n}\n\n.wia-controls .wia-btn-assist {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.wia-controls .wia-btn-label {\n    font-weight: 500;\n}\n\n.wia-controls .wia-spinner {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 1em;\n    display: inline-flex;\n    align-items: center;\n    padding: 4px 6px;\n}\n\n.wia-controls .wia-hidden {\n    display: none !important;\n}\n\n/* Use Chat Context checkbox */\n.wia-controls .wia-context-toggle {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    font-size: 0.85em;\n    cursor: pointer;\n    opacity: 0.85;\n    user-select: none;\n}\n\n.wia-controls .wia-context-toggle:hover {\n    opacity: 1;\n}\n\n/* Lore book multi-select picker (per-entry) */\n.wia-controls .wia-lorebook-picker {\n    position: relative;\n    font-size: 0.85em;\n}\n\n.wia-controls .wia-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.wia-controls .wia-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.wia-controls .wia-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.wia-controls .wia-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 50;\n    min-width: 220px;\n    max-height: 240px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);\n}\n\n.wia-controls .wia-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.wia-controls .wia-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Per-entry token limit row */\n.wia-controls .wia-tokens-row {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.85em;\n    opacity: 0.85;\n    margin-left: auto;\n}\n\n.wia-controls .wia-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.wia-controls .wia-tokens-input {\n    width: 72px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n/* ── ACC modal: context preamble controls ── */\n\n.acc-context-section {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: wrap;\n    margin-bottom: 12px;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.acc-context-section .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.9em;\n    cursor: pointer;\n}\n\n.acc-lorebook-picker {\n    position: relative;\n    font-size: 0.9em;\n}\n\n.acc-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.acc-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.acc-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.acc-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 10002;\n    min-width: 240px;\n    max-height: 260px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\n}\n\n.acc-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.acc-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   NARRATIVE GUIDANCE SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_subsection_header {\n    margin: 12px 0 4px 0;\n    opacity: 0.85;\n}\n\n#saints_silly_settings .ng_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings .ng_prompt_section textarea {\n    width: 100%;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .ng_inline_row {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin: 6px 0;\n}\n\n#saints_silly_settings .ng_number_input {\n    width: 5em;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng_select_input {\n    width: auto;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng-lorebook-picker {\n    margin: 8px 0;\n}\n\n#saints_silly_settings .ng-lorebook-list {\n    margin-top: 4px;\n    padding: 6px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n}\n\n#saints_silly_settings .ng-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n#saints_silly_settings .ng-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n#saints_silly_settings #ng_regenerate_now.disabled,\n#saints_silly_settings #ng_continue_now.disabled,\n#saints_silly_settings #ng_retry_now.disabled {\n    opacity: 0.6;\n    pointer-events: none;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PROMPT TEMPLATE CONTROLS (shared, one row per prompt)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_template_controls {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin-top: 6px;\n}\n\n#saints_silly_settings .saints_template_select {\n    width: 100%;\n}\n\n#saints_silly_settings .saints_template_buttons {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button {\n    flex: 1 1 0;\n    min-width: 100px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button.disabled {\n    opacity: 0.5;\n    pointer-events: none;\n}\n\n.ng-regen-overlay {\n    position: fixed;\n    inset: 0;\n    z-index: 100000;\n    background: rgba(0, 0, 0, 0.55);\n    backdrop-filter: blur(2px);\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    cursor: wait;\n}\n\n.ng-regen-overlay-card {\n    background: var(--SmartThemeBlurTintColor, #1a1a1a);\n    color: var(--SmartThemeBodyColor, #eee);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 8px;\n    padding: 24px 32px;\n    max-width: 420px;\n    text-align: center;\n    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    gap: 10px;\n}\n\n.ng-regen-overlay-spinner {\n    font-size: 2em;\n    opacity: 0.9;\n}\n\n.ng-regen-overlay-title {\n    font-size: 1.05em;\n    font-weight: bold;\n}\n\n.ng-regen-overlay-subtitle {\n    font-size: 0.9em;\n    opacity: 0.75;\n}\n"],"sourceRoot":""}]);
+`, "",{"version":3,"sources":["webpack://./src/style.css"],"names":[],"mappings":"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","sourcesContent":["/* Saint's Silly Extensions — Combined Styles */\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   POSSESSION STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Group Chat: Radio Button Toggle ── */\n\n.possession_radio_wrapper {\n    display: inline-flex;\n    align-items: center;\n    margin-left: 4px;\n    cursor: pointer;\n}\n\n.possession_radio {\n    width: 16px;\n    height: 16px;\n    border-radius: 50%;\n    border: 2px solid var(--SmartThemeBorderColor, #555);\n    background: transparent;\n    cursor: pointer;\n    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;\n    position: relative;\n    flex-shrink: 0;\n}\n\n.possession_radio:hover {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.possession_radio.possession_active {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n    background: var(--SmartThemeQuoteColor, #e8a23a);\n    box-shadow: inset 0 0 0 3px var(--SmartThemeBlurTintColor, #1a1a2e);\n}\n\n/* ── Solo Chat: Possess Toggle Button ── */\n\n#possession_solo_btn {\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    cursor: pointer;\n    position: relative;\n}\n\n#possession_solo_btn:hover {\n    opacity: 1;\n}\n\n#possession_solo_btn.possession_active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n#possession_solo_btn.possession_active::after {\n    content: '';\n    position: absolute;\n    bottom: -2px;\n    left: 50%;\n    transform: translateX(-50%);\n    width: 6px;\n    height: 6px;\n    border-radius: 50%;\n    background-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Group member highlight when possessed ── */\n\n.group_member.possession_possessed {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n/* ── Possession Impersonate Button (Character Avatar) ── */\n\n#possession_impersonate_btn {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease;\n    padding: 2px;\n}\n\n#possession_impersonate_btn:hover {\n    opacity: 1;\n}\n\n.possession_impersonate_avatar {\n    width: 26px;\n    height: 26px;\n    border-radius: 50%;\n    object-fit: cover;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    transition: border-color 0.15s ease;\n}\n\n#possession_impersonate_btn:hover .possession_impersonate_avatar {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hide controls when extension is disabled ── */\n\n.possession_hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PHRASING STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Input Area Button (next to Send) ── */\n\n#phrasing_send_button {\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    padding: 3px;\n    font-size: 1.2em;\n}\n\n#phrasing_send_button:hover {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hamburger Menu Item ── */\n\n#phrasing_menu_button {\n    cursor: pointer;\n}\n\n#phrasing_menu_button .fa-solid {\n    margin-right: 5px;\n    width: 1em;\n    text-align: center;\n}\n\n/* ── Hide buttons during generation ── */\n\n.phrasing-hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SETTINGS PANEL STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .inline-drawer-content {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n    padding: 8px 0;\n}\n\n#saints_silly_settings .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_section_header {\n    margin: 4px 0 2px 0;\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_divider {\n    border: none;\n    border-top: 1px solid var(--SmartThemeBorderColor, #555);\n    margin: 8px 0;\n}\n\n#saints_silly_settings .phrasing_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #phrasing_prompt_textarea {\n    width: 100%;\n    min-height: 120px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .acc_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #acc_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC MODAL STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#acc_modal_overlay {\n    position: fixed;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    background: rgba(0, 0, 0, 0.6);\n    z-index: 10000;\n}\n\n#acc_modal {\n    position: fixed;\n    top: 5vh;\n    left: 50%;\n    transform: translateX(-50%);\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 8px;\n    width: 90%;\n    max-width: 700px;\n    height: 90vh;\n    display: flex;\n    flex-direction: column;\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);\n    z-index: 10001;\n}\n\n#acc_modal .acc-modal-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    padding: 12px 16px;\n    border-bottom: 1px solid var(--SmartThemeBorderColor, #555);\n    flex-shrink: 0;\n}\n\n#acc_modal .acc-modal-header h3 {\n    margin: 0;\n    font-size: 1.1em;\n}\n\n.acc-close-btn {\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease;\n    font-size: 1.2em;\n    padding: 4px 8px;\n}\n\n.acc-close-btn:hover {\n    opacity: 1;\n}\n\n#acc_modal .acc-modal-body {\n    padding: 16px;\n    overflow-y: auto !important;\n    flex: 1 1 0%;\n    min-height: 0;\n    display: flex;\n    flex-direction: column;\n}\n\n.acc-brief-section {\n    margin-bottom: 12px;\n}\n\n.acc-brief-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.acc-action-row {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    margin-bottom: 8px;\n}\n\n.acc-tokens-row {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 6px;\n    margin-bottom: 12px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.acc-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.acc-tokens-input {\n    width: 80px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n.acc-action-btn {\n    flex: 1 1 0;\n    min-width: 110px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n.acc-action-btn.acc-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.acc-generate-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.acc-status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    background: var(--SmartThemeBodyColor, #222);\n    border-radius: 4px;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 0.9em;\n}\n\n.acc-description-section {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.acc-description-section label {\n    margin-bottom: 4px;\n}\n\n.acc-description-output {\n    width: 100%;\n    flex: 1 1 0%;\n    min-height: 200px;\n    resize: vertical;\n}\n\n.acc-description-output[disabled] {\n    opacity: 0.5;\n    cursor: not-allowed;\n}\n\n.acc-hidden {\n    display: none !important;\n}\n\n#acc_modal .acc-modal-footer {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    padding: 12px 16px;\n    border-top: 1px solid var(--SmartThemeBorderColor, #555);\n    gap: 8px;\n    flex-shrink: 0;\n}\n\n.acc-footer-right {\n    display: flex;\n    gap: 8px;\n}\n\n.acc-done-btn.acc-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n/* ACC Launch button in character creator */\n#acc_launch_btn {\n    display: flex;\n    align-items: center;\n    gap: 4px;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   WORLD INFO ASSIST STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Settings panel */\n#saints_silly_settings .wia_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #wia_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* Per-entry assist controls injected into each WI entry form */\n.wia-controls {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    flex-wrap: wrap;\n    margin: 6px 0 6px 0;\n}\n\n.wia-controls .wia-btn {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    cursor: pointer;\n    font-size: 0.85em;\n    padding: 4px 8px;\n}\n\n.wia-controls .wia-btn-assist {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.wia-controls .wia-btn-label {\n    font-weight: 500;\n}\n\n.wia-controls .wia-spinner {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 1em;\n    display: inline-flex;\n    align-items: center;\n    padding: 4px 6px;\n}\n\n.wia-controls .wia-hidden {\n    display: none !important;\n}\n\n/* Use Chat Context checkbox */\n.wia-controls .wia-context-toggle {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    font-size: 0.85em;\n    cursor: pointer;\n    opacity: 0.85;\n    user-select: none;\n}\n\n.wia-controls .wia-context-toggle:hover {\n    opacity: 1;\n}\n\n/* Lore book multi-select picker (per-entry) */\n.wia-controls .wia-lorebook-picker {\n    position: relative;\n    font-size: 0.85em;\n}\n\n.wia-controls .wia-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.wia-controls .wia-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.wia-controls .wia-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.wia-controls .wia-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 50;\n    min-width: 220px;\n    max-height: 240px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);\n}\n\n.wia-controls .wia-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.wia-controls .wia-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Per-entry token limit row */\n.wia-controls .wia-tokens-row {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.85em;\n    opacity: 0.85;\n    margin-left: auto;\n}\n\n.wia-controls .wia-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.wia-controls .wia-tokens-input {\n    width: 72px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n/* ── ACC modal: context preamble controls ── */\n\n.acc-context-section {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: wrap;\n    margin-bottom: 12px;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.acc-context-section .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.9em;\n    cursor: pointer;\n}\n\n.acc-lorebook-picker {\n    position: relative;\n    font-size: 0.9em;\n}\n\n.acc-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.acc-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.acc-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.acc-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 10002;\n    min-width: 240px;\n    max-height: 260px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\n}\n\n.acc-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.acc-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   NARRATIVE GUIDANCE SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_subsection_header {\n    margin: 12px 0 4px 0;\n    opacity: 0.85;\n}\n\n#saints_silly_settings .ng_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings .ng_prompt_section textarea {\n    width: 100%;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .ng_inline_row {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin: 6px 0;\n}\n\n#saints_silly_settings .ng_number_input {\n    width: 5em;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng_select_input {\n    width: auto;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng-lorebook-picker {\n    margin: 8px 0;\n}\n\n#saints_silly_settings .ng-lorebook-list {\n    margin-top: 4px;\n    padding: 6px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n}\n\n#saints_silly_settings .ng-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n#saints_silly_settings .ng-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n#saints_silly_settings #ng_regenerate_now.disabled,\n#saints_silly_settings #ng_continue_now.disabled,\n#saints_silly_settings #ng_retry_now.disabled {\n    opacity: 0.6;\n    pointer-events: none;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PROMPT TEMPLATE CONTROLS (shared, one row per prompt)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_template_controls {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin-top: 6px;\n}\n\n#saints_silly_settings .saints_template_select {\n    width: 100%;\n}\n\n#saints_silly_settings .saints_template_buttons {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button {\n    flex: 1 1 0;\n    min-width: 100px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button.disabled {\n    opacity: 0.5;\n    pointer-events: none;\n}\n\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -1337,7 +1296,7 @@ var update = injectStylesIntoStyleTag_default()(style/* default */.A, options);
 
 ;// ./src/settings.html
 // Module
-var code = `<div id="saints_silly_settings" class="extension_settings"> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Saint's Silly Extensions</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content"> <h4 class="saints_section_header"> <span class="fa-solid fa-ghost"></span> Possession </h4> <label class="checkbox_label"> <input id="possession_enabled" type="checkbox"/> <span>Enable Possession</span> </label> <label class="checkbox_label"> <input id="possession_show_toast" type="checkbox"/> <span>Show Toast on Possess/Unpossess</span> </label> <label class="checkbox_label"> <input id="possession_debug_mode" type="checkbox"/> <span>Possession Debug Mode</span> </label> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-pen-fancy"></span> Phrasing! </h4> <label class="checkbox_label"> <input id="phrasing_enabled" type="checkbox" checked="checked"/> <span>Enable Phrasing!</span> </label> <label class="checkbox_label"> <input id="phrasing_debug_mode" type="checkbox"/> <span>Phrasing Debug Mode</span> </label> <label class="checkbox_label" title="When enabled, rephrasing a message includes every existing swipe in the prompt and asks the model to produce something wildly different."> <input id="phrasing_inverse_guidance" type="checkbox"/> <span>Inverse Guidance</span> </label> <div class="phrasing_prompt_section"> <label for="phrasing_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="phrasing_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Phrasing! prompt template..."></textarea> </div> <div class="saints_template_controls" id="phrasing_prompt_templates"></div> <div class="phrasing_prompt_section"> <label for="phrasing_inverse_prompt_textarea"><b>Inverse Guidance Prompt Template:</b></label> <textarea id="phrasing_inverse_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Inverse Guidance prompt template..."></textarea> <small>Available placeholders: <code>{{phrasingSeed}}</code>, <code>{{phrasingSwipes}}</code></small> </div> <div class="saints_template_controls" id="phrasing_inverse_prompt_templates"></div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-wand-magic-sparkles"></span> Assisted Character Creation </h4> <label class="checkbox_label"> <input id="acc_enabled" type="checkbox"/> <span>Enable Assisted Character Creation</span> </label> <label class="checkbox_label"> <input id="acc_debug_mode" type="checkbox"/> <span>ACC Debug Mode</span> </label> <div class="ng_inline_row"> <label for="acc_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="acc_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for ACC generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="acc_prompt_section"> <label for="acc_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="acc_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your ACC prompt template..."></textarea> </div> <div class="saints_template_controls" id="acc_prompt_templates"></div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-book-atlas"></span> World Info Assist </h4> <label class="checkbox_label"> <input id="wia_enabled" type="checkbox"/> <span>Enable World Info Assist</span> </label> <label class="checkbox_label"> <input id="wia_debug_mode" type="checkbox"/> <span>WI Assist Debug Mode</span> </label> <div class="ng_inline_row"> <label for="wia_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="wia_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for World Info Assist generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="wia_response_length"><b><span class="fa-solid fa-coins"></span> Response Token Limit:</b></label> <input id="wia_response_length" type="number" min="50" max="8192" step="50" class="text_pole ng_number_input" title="Maximum tokens the model may use for each World Info Assist generation."/> </div> <div class="wia_prompt_section"> <label for="wia_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="wia_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your World Info Assist prompt template..."></textarea> </div> <div class="saints_template_controls" id="wia_prompt_templates"></div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-compass"></span> Narrative Guidance </h4> <label class="checkbox_label"> <input id="ng_enabled" type="checkbox"/> <span>Enable Narrative Guidance</span> </label> <label class="checkbox_label" title="When on, regenerates guidance automatically when the turn counter hits zero. When off, only the Regenerate Now button updates the guidance."> <input id="ng_auto_regen" type="checkbox"/> <span>Auto-Regenerate at Zero</span> </label> <label class="checkbox_label"> <input id="ng_debug_mode" type="checkbox"/> <span>Narrative Guidance Debug Mode</span> </label> <div class="ng_inline_row"> <label for="ng_default_turn_count"><b>Turns Between Regenerations:</b></label> <input id="ng_default_turn_count" type="number" min="1" step="1" class="text_pole ng_number_input"/> </div> <div class="ng_inline_row"> <label for="ng_response_length"><b>Response Token Limit:</b></label> <input id="ng_response_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="Maximum number of tokens the model may use for each generated guidance paragraph."/> </div> <div class="ng_inline_row"> <label for="ng_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="ng_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for Narrative Guidance generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_prompt_section"> <label for="ng_generation_prompt_textarea"><b>Generation Prompt (used as prefill):</b></label> <textarea id="ng_generation_prompt_textarea" class="text_pole" rows="4" placeholder="Enter the prefill that the LLM will continue..."></textarea> <small>The model's reply continues this text and becomes the active guidance.</small> </div> <div class="saints_template_controls" id="ng_generation_prompt_templates"></div> <div class="ng_prompt_section"> <label for="ng_injection_prompt_textarea"><b>Injection Prompt Template:</b></label> <textarea id="ng_injection_prompt_textarea" class="text_pole" rows="3" placeholder="Template injected before each AI turn..."></textarea> <small>Available placeholder: <code>{{guidance}}</code></small> </div> <div class="saints_template_controls" id="ng_injection_prompt_templates"></div> <div class="ng_inline_row"> <label for="ng_injection_depth"><b>Depth:</b></label> <input id="ng_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the guidance after (0 = bottom)."/> <label for="ng_injection_role"><b>Role:</b></label> <select id="ng_injection_role" class="text_pole ng_select_input" title="Role used when injecting the guidance into the prompt."> <option value="system">System</option> <option value="user">User</option> <option value="assistant">Assistant</option> </select> </div> <details id="ng_lorebooks_details" class="ng-lorebook-picker"> <summary><span class="fa-solid fa-book"></span> <span id="ng_lorebooks_summary_label">Lore Books</span></summary> <div id="ng_lorebooks_list" class="ng-lorebook-list"></div> </details> <h5 class="saints_subsection_header">Per-Chat</h5> <div class="ng_prompt_section"> <label for="ng_themes_textarea"><b>Themes / Story Arcs:</b></label> <textarea id="ng_themes_textarea" class="text_pole" rows="4" placeholder="Optional themes, ideas, or arcs for the AI to consider..."></textarea> </div> <div class="ng_prompt_section"> <label for="ng_active_guidance_textarea"><b>Active Guidance:</b></label> <textarea id="ng_active_guidance_textarea" class="text_pole" rows="6" placeholder="The currently active guidance paragraph. Edit freely; changes apply on the next AI turn."></textarea> </div> <div class="ng_inline_row"> <span><b>Turns Remaining:</b> <span id="ng_remaining_display">0</span></span> <div class="menu_button" id="ng_decrement_button" title="Decrement remaining by 1"> <span class="fa-solid fa-minus"></span> </div> <div class="menu_button" id="ng_reset_button" title="Reset remaining to default turn count"> <span class="fa-solid fa-rotate-right"></span> Reset </div> <div class="menu_button disabled" id="ng_continue_now" title="Continue the current guidance paragraph"> <span class="fa-solid fa-arrow-right"></span> Continue </div> <div class="menu_button disabled" id="ng_retry_now" title="Restore previous guidance and regenerate"> <span class="fa-solid fa-rotate-right"></span> Retry </div> <div class="menu_button" id="ng_regenerate_now" title="Regenerate guidance now"> <span class="ng-regen-icon fa-solid fa-wand-sparkles"></span> Regenerate Now </div> </div> </div> </div> </div> `;
+var code = `<div id="saints_silly_settings" class="extension_settings"> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Saint's Silly Extensions</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-up up"></div> </div> <div class="inline-drawer-content"> <h4 class="saints_section_header"> <span class="fa-solid fa-ghost"></span> Possession </h4> <label class="checkbox_label"> <input id="possession_enabled" type="checkbox"/> <span>Enable Possession</span> </label> <label class="checkbox_label"> <input id="possession_show_toast" type="checkbox"/> <span>Show Toast on Possess/Unpossess</span> </label> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-pen-fancy"></span> Phrasing! </h4> <label class="checkbox_label"> <input id="phrasing_enabled" type="checkbox" checked="checked"/> <span>Enable Phrasing!</span> </label> <label class="checkbox_label" title="When enabled, rephrasing a message includes every existing swipe in the prompt and asks the model to produce something wildly different."> <input id="phrasing_inverse_guidance" type="checkbox"/> <span>Inverse Guidance</span> </label> <div class="phrasing_prompt_section"> <label for="phrasing_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="phrasing_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Phrasing! prompt template..."></textarea> </div> <div class="saints_template_controls" id="phrasing_prompt_templates"></div> <div class="phrasing_prompt_section"> <label for="phrasing_inverse_prompt_textarea"><b>Inverse Guidance Prompt Template:</b></label> <textarea id="phrasing_inverse_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Inverse Guidance prompt template..."></textarea> <small>Available placeholders: <code>{{phrasingSeed}}</code>, <code>{{phrasingSwipes}}</code></small> </div> <div class="saints_template_controls" id="phrasing_inverse_prompt_templates"></div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-wand-magic-sparkles"></span> Assisted Character Creation </h4> <label class="checkbox_label"> <input id="acc_enabled" type="checkbox"/> <span>Enable Assisted Character Creation</span> </label> <div class="ng_inline_row"> <label for="acc_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="acc_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for ACC generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="acc_prompt_section"> <label for="acc_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="acc_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your ACC prompt template..."></textarea> </div> <div class="saints_template_controls" id="acc_prompt_templates"></div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-book-atlas"></span> World Info Assist </h4> <label class="checkbox_label"> <input id="wia_enabled" type="checkbox"/> <span>Enable World Info Assist</span> </label> <div class="ng_inline_row"> <label for="wia_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="wia_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for World Info Assist generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="wia_response_length"><b><span class="fa-solid fa-coins"></span> Response Token Limit:</b></label> <input id="wia_response_length" type="number" min="50" max="8192" step="50" class="text_pole ng_number_input" title="Maximum tokens the model may use for each World Info Assist generation."/> </div> <div class="wia_prompt_section"> <label for="wia_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="wia_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your World Info Assist prompt template..."></textarea> </div> <div class="saints_template_controls" id="wia_prompt_templates"></div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-compass"></span> Narrative Guidance </h4> <label class="checkbox_label"> <input id="ng_enabled" type="checkbox"/> <span>Enable Narrative Guidance</span> </label> <label class="checkbox_label" title="When on, regenerates guidance automatically when the turn counter hits zero. When off, only the Regenerate Now button updates the guidance."> <input id="ng_auto_regen" type="checkbox"/> <span>Auto-Regenerate at Zero</span> </label> <div class="ng_inline_row"> <label for="ng_default_turn_count"><b>Turns Between Regenerations:</b></label> <input id="ng_default_turn_count" type="number" min="1" step="1" class="text_pole ng_number_input"/> </div> <div class="ng_inline_row"> <label for="ng_response_length"><b>Response Token Limit:</b></label> <input id="ng_response_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="Maximum number of tokens the model may use for each generated guidance paragraph."/> </div> <div class="ng_inline_row"> <label for="ng_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="ng_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for Narrative Guidance generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_prompt_section"> <label for="ng_generation_prompt_textarea"><b>Generation Prompt (used as prefill):</b></label> <textarea id="ng_generation_prompt_textarea" class="text_pole" rows="4" placeholder="Enter the prefill that the LLM will continue..."></textarea> <small>The model's reply continues this text and becomes the active guidance.</small> </div> <div class="saints_template_controls" id="ng_generation_prompt_templates"></div> <div class="ng_prompt_section"> <label for="ng_injection_prompt_textarea"><b>Injection Prompt Template:</b></label> <textarea id="ng_injection_prompt_textarea" class="text_pole" rows="3" placeholder="Template injected before each AI turn..."></textarea> <small>Available placeholder: <code>{{guidance}}</code></small> </div> <div class="saints_template_controls" id="ng_injection_prompt_templates"></div> <div class="ng_inline_row"> <label for="ng_injection_depth"><b>Depth:</b></label> <input id="ng_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the guidance after (0 = bottom)."/> <label for="ng_injection_role"><b>Role:</b></label> <select id="ng_injection_role" class="text_pole ng_select_input" title="Role used when injecting the guidance into the prompt."> <option value="system">System</option> <option value="user">User</option> <option value="assistant">Assistant</option> </select> </div> <details id="ng_lorebooks_details" class="ng-lorebook-picker"> <summary><span class="fa-solid fa-book"></span> <span id="ng_lorebooks_summary_label">Lore Books</span></summary> <div id="ng_lorebooks_list" class="ng-lorebook-list"></div> </details> <h5 class="saints_subsection_header">Per-Chat</h5> <div class="ng_prompt_section"> <label for="ng_themes_textarea"><b>Themes / Story Arcs:</b></label> <textarea id="ng_themes_textarea" class="text_pole" rows="4" placeholder="Optional themes, ideas, or arcs for the AI to consider..."></textarea> </div> <div class="ng_prompt_section"> <label for="ng_active_guidance_textarea"><b>Active Guidance:</b></label> <textarea id="ng_active_guidance_textarea" class="text_pole" rows="6" placeholder="The currently active guidance paragraph. Edit freely; changes apply on the next AI turn."></textarea> </div> <div class="ng_inline_row"> <span><b>Turns Remaining:</b> <span id="ng_remaining_display">0</span></span> <div class="menu_button" id="ng_decrement_button" title="Decrement remaining by 1"> <span class="fa-solid fa-minus"></span> </div> <div class="menu_button" id="ng_reset_button" title="Reset remaining to default turn count"> <span class="fa-solid fa-rotate-right"></span> Reset </div> <div class="menu_button disabled" id="ng_continue_now" title="Continue the current guidance paragraph"> <span class="fa-solid fa-arrow-right"></span> Continue </div> <div class="menu_button disabled" id="ng_retry_now" title="Restore previous guidance and regenerate"> <span class="fa-solid fa-rotate-right"></span> Retry </div> <div class="menu_button" id="ng_regenerate_now" title="Regenerate guidance now"> <span class="ng-regen-icon fa-solid fa-wand-sparkles"></span> Regenerate Now </div> </div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-bug"></span> Diagnostics </h4> <label class="checkbox_label" title="Log detailed Possession events to the browser console."> <input id="possession_debug_mode" type="checkbox"/> <span>Possession Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Phrasing events to the browser console."> <input id="phrasing_debug_mode" type="checkbox"/> <span>Phrasing Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Assisted Character Creation events, prompts, and generations to the browser console."> <input id="acc_debug_mode" type="checkbox"/> <span>ACC Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed World Info Assist events, prompts, and generations to the browser console."> <input id="wia_debug_mode" type="checkbox"/> <span>WI Assist Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Narrative Guidance events to the browser console."> <input id="ng_debug_mode" type="checkbox"/> <span>Narrative Guidance Debug Mode</span> </label> <label class="checkbox_label" title="Log silent-generation lifecycle (job start/abort/completion, stop-listener events, stream token counts) to the browser console. Useful when diagnosing stop-button behavior across backends."> <input id="silent_generation_debug_mode" type="checkbox"/> <span>Silent Generation Debug Mode</span> </label> </div> </div> </div> `;
 // Exports
 /* harmony default export */ const settings = (code);
 ;// external "../../../../world-info.js"
@@ -1345,6 +1304,315 @@ var code = `<div id="saints_silly_settings" class="extension_settings"> <div cla
 ;// external "../../../../../script.js"
 
 ;// external "../../../../tokenizers.js"
+
+;// ./src/silent-generation.js
+/**
+ * Silent Generation Manager
+ *
+ * SillyTavern's stop button reliably cancels normal user-input generations
+ * but not the "silent" / background ones extensions kick off through
+ * `generateRaw` / `generateQuietPrompt`. ST's `generateRawData()` does listen
+ * for `GENERATION_STOPPED` and aborts its local fetch, but two problems
+ * remain in practice:
+ *
+ *   1. The stop button (`#mes_stop`) is hidden whenever a modal is open or
+ *      the chat input is locked, so DOM-click-based "cancel" hacks no-op
+ *      exactly when extensions need them most.
+ *   2. Even when the underlying fetch is aborted, the `await` in extension
+ *      code can still hang on the streaming reader or post-processing
+ *      until the upstream call unwinds — so users see the UI sit there
+ *      and then dump the discarded result.
+ *
+ * This module centralizes cancellation for every silent generation an
+ * extension makes:
+ *
+ *   - Hooks `GENERATION_STOPPED` once at module load and aborts every
+ *     in-flight silent job.
+ *   - Hands each job its own AbortController and races the work against
+ *     that signal so the awaiting caller returns immediately on cancel,
+ *     even if upstream is still draining.
+ *   - Exposes `abortAllSilentGenerations()` for extension UIs (modal close
+ *     buttons, in-tool Cancel buttons) so they don't need to fight with
+ *     `#mes_stop`'s visibility.
+ *
+ * Callers that opt in via `runCancellableSilentGeneration` or the
+ * cancellation-aware `streamingGenerate` get AbortError-on-cancel for free.
+ */
+
+
+
+
+// ─── Module State ───
+
+const activeJobs = new Map(); // jobId -> { abortController, name }
+let nextJobId = 1;
+let stopListenerInstalled = false;
+let moduleSettings = null;
+let debug = () => {};
+
+// ─── Init ───
+
+/**
+ * Initialize the silent-generation manager. Wires up the debug logger
+ * against `settings.silentGenerationDebugMode` and installs the
+ * `GENERATION_STOPPED` listener. Called once from `index.js`.
+ *
+ * @param {object} opts
+ * @param {object} opts.settings - Shared mutable settings reference.
+ */
+function initSilentGeneration({ settings }) {
+    moduleSettings = settings;
+    debug = createDebugLogger('SILENT-GEN', () => moduleSettings?.silentGenerationDebugMode);
+    installSilentGenerationStopListener();
+    debug('Module initialized');
+}
+
+/**
+ * Bind the silent-generation settings panel controls. Called from
+ * `injectSettingsPanel` in `index.js` after the HTML is injected.
+ *
+ * @param {() => void} saveSettings - Persist callback.
+ */
+function bindSilentGenerationSettings(saveSettings) {
+    const debugCb = document.getElementById('silent_generation_debug_mode');
+    if (debugCb) {
+        debugCb.checked = !!moduleSettings?.silentGenerationDebugMode;
+        debugCb.addEventListener('change', () => {
+            if (moduleSettings) moduleSettings.silentGenerationDebugMode = debugCb.checked;
+            saveSettings();
+            debug('Debug mode toggled:', debugCb.checked);
+        });
+    }
+}
+
+// ─── Public API ───
+
+/**
+ * Install the one-shot GENERATION_STOPPED listener that aborts every active
+ * silent generation. Safe to call multiple times — only the first call wires
+ * up the listener. Normally invoked via `initSilentGeneration`.
+ */
+function installSilentGenerationStopListener() {
+    if (stopListenerInstalled) {
+        debug('Stop listener already installed; skipping');
+        return;
+    }
+    const { eventSource, eventTypes } = getContext();
+    if (!eventSource || !eventTypes?.GENERATION_STOPPED) {
+        debug('Stop listener NOT installed — eventSource or GENERATION_STOPPED missing');
+        return;
+    }
+    eventSource.on(eventTypes.GENERATION_STOPPED, () => {
+        debug('GENERATION_STOPPED received — aborting all silent jobs');
+        abortAllSilentGenerations('user-stop');
+    });
+    stopListenerInstalled = true;
+    debug('Stop listener installed');
+}
+
+/**
+ * Abort every in-flight silent generation by aborting our own local
+ * AbortControllers. This frees the awaiting extension code (the
+ * `Promise.race` against the abort signal resolves) but does NOT cancel
+ * the underlying `generateRaw` fetch — only ST's `GENERATION_STOPPED`
+ * event does that. Used by the global stop listener (where the event is
+ * the trigger) and as a building block for `abortAllGenerations`. Most
+ * extension UI code should call `abortAllGenerations` instead.
+ *
+ * @param {string} [reason] - Reason recorded on the AbortError.
+ * @returns {number} The number of jobs aborted.
+ */
+function abortAllSilentGenerations(reason = 'aborted') {
+    if (activeJobs.size === 0) {
+        debug('abortAllSilentGenerations called but no active jobs; reason:', reason);
+        return 0;
+    }
+    let count = 0;
+    const jobNames = [];
+    for (const [jobId, job] of activeJobs) {
+        try {
+            job.abortController.abort(
+                new DOMException(`Silent generation aborted: ${reason}`, 'AbortError'),
+            );
+            jobNames.push(`#${jobId}(${job.name})`);
+            count++;
+        } catch (err) {
+            debug('Failed to abort job', jobId, err);
+        }
+    }
+    debug(`Aborted ${count} silent job(s) — reason: ${reason} — jobs:`, jobNames.join(', '));
+    return count;
+}
+
+/**
+ * The "real" cancel path that extension UIs should use. Aborts our own
+ * local controllers AND calls ST's exported `stopGeneration()`, which
+ * emits `GENERATION_STOPPED`. That event is what ST's `generateRawData`
+ * listens for to abort its own fetch — once the fetch aborts, the
+ * connection to ST's Node server closes, and ST's server-side handler
+ * propagates the abort upstream (e.g. POSTs `/api/extra/abort` to
+ * KoboldCpp). Without this call, only the frontend UI frees up and the
+ * LLM backend keeps generating to the response cap.
+ *
+ * Safe to call when nothing is running; ST's `stopGeneration()` is a
+ * no-op in that case.
+ *
+ * @param {string} [reason]
+ */
+function abortAllGenerations(reason = 'aborted') {
+    debug('abortAllGenerations — reason:', reason);
+    abortAllSilentGenerations(reason);
+    try {
+        __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_stopGeneration__();
+        debug('ST stopGeneration() invoked');
+    } catch (err) {
+        debug('ST stopGeneration() threw:', err);
+    }
+}
+
+/**
+ * Whether at least one silent generation is currently in flight.
+ *
+ * @returns {boolean}
+ */
+function hasActiveSilentGenerations() {
+    return activeJobs.size > 0;
+}
+
+/**
+ * Run an async generation under the silent-generation cancellation system.
+ *
+ * The runner receives an AbortSignal. If the user clicks ST's stop button
+ * (or any caller invokes `abortAllSilentGenerations`), the signal aborts
+ * and the returned promise rejects with an AbortError immediately, without
+ * waiting for the upstream fetch / generator to unwind.
+ *
+ * @template T
+ * @param {object} opts
+ * @param {(signal: AbortSignal) => Promise<T>} opts.run - The work to perform.
+ * @param {string} [opts.name] - Debug name for the job.
+ * @returns {Promise<T>}
+ * @throws {DOMException} AbortError if cancelled.
+ */
+async function runCancellableSilentGeneration({ run, name = 'silent-gen' }) {
+    installSilentGenerationStopListener();
+
+    const jobId = nextJobId++;
+    const abortController = new AbortController();
+    activeJobs.set(jobId, { abortController, name });
+    const startedAt = Date.now();
+    debug(`Job #${jobId}(${name}) started — active jobs:`, activeJobs.size);
+
+    let abortReject;
+    const abortPromise = new Promise((_, rej) => { abortReject = rej; });
+    const onAbort = () => {
+        const reason = abortController.signal.reason
+            || new DOMException('Silent generation aborted', 'AbortError');
+        debug(`Job #${jobId}(${name}) abort signal fired — reason:`, reason?.message || reason);
+        abortReject(reason);
+    };
+    abortController.signal.addEventListener('abort', onAbort, { once: true });
+
+    // If the abort race wins, the run() promise is abandoned but keeps
+    // executing — its eventual rejection (when ST's fetch finally aborts)
+    // would surface as an unhandled promise rejection in the console.
+    // Swallow it here; the result is already irrelevant by that point.
+    const runPromise = run(abortController.signal);
+    runPromise.catch((err) => {
+        debug(`Job #${jobId}(${name}) abandoned-runner rejection (swallowed):`, err?.message || err);
+    });
+
+    try {
+        const result = await Promise.race([runPromise, abortPromise]);
+        debug(`Job #${jobId}(${name}) completed normally in ${Date.now() - startedAt}ms`);
+        return result;
+    } catch (err) {
+        const wasAbort = err?.name === 'AbortError';
+        debug(`Job #${jobId}(${name}) ${wasAbort ? 'aborted' : 'threw'} after ${Date.now() - startedAt}ms — ${err?.message || err}`);
+        throw err;
+    } finally {
+        abortController.signal.removeEventListener('abort', onAbort);
+        activeJobs.delete(jobId);
+        debug(`Job #${jobId}(${name}) cleaned up — remaining active jobs:`, activeJobs.size);
+    }
+}
+
+/**
+ * `true` if the given error is a cancellation from this manager (or any
+ * AbortError propagated up from ST / fetch). Use this in catch blocks to
+ * suppress error toasts when the user deliberately cancelled.
+ *
+ * @param {unknown} err
+ * @returns {boolean}
+ */
+function isSilentGenerationAbort(err) {
+    if (!err) return false;
+    if (err.name === 'AbortError') return true;
+    const msg = (err.message || '').toLowerCase();
+    return msg.includes('aborted') || msg.includes('cancelled by stop event');
+}
+
+// ─── Streaming Helper ───
+
+/**
+ * Cancellable replacement for the old streamingGenerate(). Calls
+ * `generateRaw` with optional onToken streaming and plugs the call into
+ * the silent-generation cancel system. Throws AbortError on cancel.
+ *
+ * @param {object} params - generateRaw parameters.
+ * @param {HTMLTextAreaElement|null} targetEl - Element to stream into, or null.
+ * @param {{ append?: boolean, name?: string }} [opts]
+ * @returns {Promise<string>} The full generated text.
+ * @throws {DOMException} AbortError if cancelled.
+ */
+async function cancellableStreamingGenerate(params, targetEl, { append = false, name } = {}) {
+    const jobName = name || 'streamingGenerate';
+    const hasStream = !!targetEl;
+    debug(`cancellableStreamingGenerate — name: ${jobName}, streaming: ${hasStream}, append: ${append}, promptLen: ${params?.prompt?.length ?? 0}, responseLength: ${params?.responseLength ?? '(default)'}`);
+
+    return runCancellableSilentGeneration({
+        name: jobName,
+        run: async (_signal) => {
+            if (!targetEl) {
+                debug(`${jobName} — no targetEl, calling generateRaw directly`);
+                return __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__(params);
+            }
+
+            let accumulated = append ? (targetEl.value || '') : '';
+            let streamingWorked = false;
+            let tokenCount = 0;
+
+            try {
+                const result = await __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__({
+                    ...params,
+                    onToken: (token) => {
+                        accumulated += token;
+                        targetEl.value = accumulated;
+                        targetEl.scrollTop = targetEl.scrollHeight;
+                        streamingWorked = true;
+                        tokenCount++;
+                    },
+                });
+                debug(`${jobName} — generateRaw resolved, streamingWorked: ${streamingWorked}, tokens streamed: ${tokenCount}, final length: ${(result || accumulated).length}`);
+                if (!streamingWorked && result) {
+                    targetEl.value = append ? ((targetEl.value || '') + result) : result;
+                }
+                return result || accumulated;
+            } catch (err) {
+                // Fall back if ST rejected the unknown onToken param.
+                const msg = (err?.message || '').toLowerCase();
+                if (msg.includes('ontoken') || msg.includes('unknown') || msg.includes('invalid param')) {
+                    debug(`${jobName} — onToken unsupported, falling back to non-streaming generateRaw`);
+                    const fallback = await __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__(params);
+                    if (fallback) targetEl.value = append ? ((targetEl.value || '') + fallback) : fallback;
+                    return fallback;
+                }
+                debug(`${jobName} — generateRaw rejected:`, err?.message || err);
+                throw err;
+            }
+        },
+    });
+}
 
 ;// ./src/utils.js
 /**
@@ -1359,6 +1627,7 @@ var code = `<div id="saints_silly_settings" class="extension_settings"> <div cla
  *   - Generation lifecycle helpers
  *   - Generation context preamble (chat + lore books)
  */
+
 
 
 
@@ -1523,44 +1792,20 @@ function waitForGenerationEnd(timeoutMs = 5 * 60 * 1000) {
 
 /**
  * Call generateRaw and optionally stream tokens into targetEl as they arrive.
- * Uses the `onToken` callback if ST's generateRaw supports it; falls back
- * gracefully to non-streaming if it doesn't.
+ *
+ * Routes through the silent-generation cancellation manager so the call can
+ * be aborted by ST's stop button or by `abortAllSilentGenerations()`. On
+ * cancel, this throws an AbortError (rather than returning the partial /
+ * discarded result) so callers can short-circuit cleanly.
  *
  * @param {object} params - generateRaw parameters (prompt, systemPrompt, responseLength, etc.)
  * @param {HTMLTextAreaElement|null} targetEl - Field to stream into, or null for no streaming.
- * @param {{ append?: boolean }} [opts]
+ * @param {{ append?: boolean, name?: string }} [opts]
  * @returns {Promise<string>} The full generated text.
+ * @throws {DOMException} AbortError if the generation was cancelled.
  */
-async function streamingGenerate(params, targetEl, { append = false } = {}) {
-    if (!targetEl) return __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__(params);
-
-    let accumulated = append ? (targetEl.value || '') : '';
-    let streamingWorked = false;
-
-    try {
-        const result = await __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__({
-            ...params,
-            onToken: (token) => {
-                accumulated += token;
-                targetEl.value = accumulated;
-                targetEl.scrollTop = targetEl.scrollHeight;
-                streamingWorked = true;
-            },
-        });
-        if (!streamingWorked && result) {
-            targetEl.value = append ? ((targetEl.value || '') + result) : result;
-        }
-        return result || accumulated;
-    } catch (err) {
-        // If ST rejected the unknown onToken param, retry without it.
-        const msg = (err?.message || '').toLowerCase();
-        if (msg.includes('ontoken') || msg.includes('unknown') || msg.includes('invalid param')) {
-            const fallback = await __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__(params);
-            if (fallback) targetEl.value = append ? ((targetEl.value || '') + fallback) : fallback;
-            return fallback;
-        }
-        throw err;
-    }
+async function streamingGenerate(params, targetEl, opts = {}) {
+    return cancellableStreamingGenerate(params, targetEl, opts);
 }
 
 // ─── Single-Line Override ───
@@ -1850,7 +2095,7 @@ let ctx = null;
 /** @type {{ handlePhrasingSeedReinjection: function, isPhrasing: function }} */
 let phrasingApi = null;
 
-let debug = () => {};
+let possession_debug = () => {};
 
 function possession_toast(message, type = 'info') {
     if (!ctx.settings.possessionShowToast) return;
@@ -1876,7 +2121,7 @@ function savePossessionState() {
         avatar: possessedCharAvatar,
     };
     context.saveMetadata();
-    debug('Saved possession state:', possessedCharName, '| avatar:', possessedCharAvatar);
+    possession_debug('Saved possession state:', possessedCharName, '| avatar:', possessedCharAvatar);
 }
 
 function loadPossessionState() {
@@ -1889,7 +2134,7 @@ function loadPossessionState() {
         possessedCharName = saved;
         possessedCharAvatar = null;
     }
-    debug('Loaded possession state:', possessedCharName, '| avatar:', possessedCharAvatar);
+    possession_debug('Loaded possession state:', possessedCharName, '| avatar:', possessedCharAvatar);
 }
 
 // ─── Character Utilities ───
@@ -1925,7 +2170,7 @@ function validatePossessedCharInGroup() {
         return char && char.name === possessedCharName;
     });
     if (!isMember) {
-        debug('Possessed character removed from group, clearing');
+        possession_debug('Possessed character removed from group, clearing');
         possession_toast(`${possessedCharName} was removed from the group. Possession cleared.`, 'warning');
         setPossession(null);
     }
@@ -1964,10 +2209,10 @@ function setPossession(charName, charAvatar) {
     if (previous !== charName) {
         if (charName) {
             possession_toast(`Possessing ${charName}`, 'success');
-            debug('Now possessing:', charName);
+            possession_debug('Now possessing:', charName);
         } else if (previous) {
             possession_toast('Possession cleared', 'info');
-            debug('Possession cleared');
+            possession_debug('Possession cleared');
         }
     }
 }
@@ -2002,7 +2247,7 @@ async function postPossessedMessage(text) {
     }
 
     await context.saveChat();
-    debug('Posted possessed message at index', messageIndex);
+    possession_debug('Posted possessed message at index', messageIndex);
     return messageIndex;
 }
 
@@ -2019,7 +2264,7 @@ function onMessageSent(messageIndex) {
     const char = getPossessedCharacter();
     if (!char) return;
 
-    debug('Converting user message to possessed character message at index', messageIndex);
+    possession_debug('Converting user message to possessed character message at index', messageIndex);
 
     message.is_user = false;
     message.name = char.name;
@@ -2031,7 +2276,7 @@ function onMessageSent(messageIndex) {
         message.is_name = true;
     }
 
-    debug('Converted message — name:', char.name);
+    possession_debug('Converted message — name:', char.name);
 }
 
 // ─── Continue Interception ───
@@ -2049,7 +2294,7 @@ function handleContinueIntercept(event) {
     event.stopImmediatePropagation();
     event.preventDefault();
 
-    debug('Intercepted Continue with text:', text.substring(0, 50) + '...');
+    possession_debug('Intercepted Continue with text:', text.substring(0, 50) + '...');
     executePossessedContinue(text);
 }
 
@@ -2087,7 +2332,7 @@ function attachContinueInterceptor() {
 
         handleContinueIntercept(event);
     }, { capture: true });
-    debug('Attached continue interceptor');
+    possession_debug('Attached continue interceptor');
 }
 
 // ─── UI: Group Radio Buttons ───
@@ -2258,7 +2503,7 @@ function injectSoloButton() {
     });
 
     target.appendChild(btn);
-    debug('Injected solo possess button');
+    possession_debug('Injected solo possess button');
 }
 
 function syncSoloButton() {
@@ -2279,7 +2524,7 @@ function hideImpersonateButtons() {
     const quickBtn = document.getElementById('mes_impersonate');
     if (menuBtn) menuBtn.classList.add('possession_hidden');
     if (quickBtn) quickBtn.classList.add('possession_hidden');
-    debug('Impersonate buttons hidden');
+    possession_debug('Impersonate buttons hidden');
 }
 
 function showImpersonateButtons() {
@@ -2287,7 +2532,7 @@ function showImpersonateButtons() {
     const quickBtn = document.getElementById('mes_impersonate');
     if (menuBtn) menuBtn.classList.remove('possession_hidden');
     if (quickBtn) quickBtn.classList.remove('possession_hidden');
-    debug('Impersonate buttons shown');
+    possession_debug('Impersonate buttons shown');
 }
 
 // ─── UI: Possession Impersonate Button (Character Avatar) ───
@@ -2316,7 +2561,7 @@ function injectPossessionImpersonateButton() {
         const context = getContext();
         if (context.isGenerating) return;
 
-        debug('Possession impersonate clicked — triggering generation for', char.name);
+        possession_debug('Possession impersonate clicked — triggering generation for', char.name);
 
         if (__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__) {
             const radios = document.querySelectorAll('.possession_radio');
@@ -2336,7 +2581,7 @@ function injectPossessionImpersonateButton() {
                     break;
                 }
             }
-            debug('Speak button not found, falling back to /trigger');
+            possession_debug('Speak button not found, falling back to /trigger');
             if (context.executeSlashCommandsWithOptions) {
                 await context.executeSlashCommandsWithOptions(`/trigger ${char.name}`);
             }
@@ -2357,7 +2602,7 @@ function injectPossessionImpersonateButton() {
         sendForm.appendChild(btn);
     }
 
-    debug('Injected possession impersonate button for', char.name);
+    possession_debug('Injected possession impersonate button for', char.name);
 }
 
 function removePossessionImpersonateButton() {
@@ -2463,7 +2708,7 @@ function bindPossessionSettings(saveSettings) {
         possessionDebugMode.addEventListener('change', (e) => {
             ctx.settings.possessionDebugMode = e.target.checked;
             saveSettings();
-            debug('debugMode toggled to', ctx.settings.possessionDebugMode);
+            possession_debug('debugMode toggled to', ctx.settings.possessionDebugMode);
         });
     }
 }
@@ -2547,7 +2792,7 @@ function registerPossessionSlashCommands() {
         helpString: 'Clear the currently possessed character, returning to normal mode.',
     }));
 
-    debug('Registered possession slash commands');
+    possession_debug('Registered possession slash commands');
 }
 
 // ─── Init ───
@@ -2560,7 +2805,7 @@ function registerPossessionSlashCommands() {
 function initPossession({ settings, phrasingApi: pApi }) {
     ctx = { settings };
     phrasingApi = pApi;
-    debug = createDebugLogger('POSSESSION', () => settings.possessionDebugMode);
+    possession_debug = createDebugLogger('POSSESSION', () => settings.possessionDebugMode);
 }
 
 ;// ./src/prompt-templates.js
@@ -3299,6 +3544,7 @@ function initPhrasing({ settings, possessionApi: pApi }) {
 
 
 
+
 // ─── Default Prompt ───
 
 const DEFAULT_ACC_PROMPT = `[
@@ -3382,7 +3628,7 @@ const DEFAULT_ACC_RESPONSE_LENGTH = 1000;
 
 // ─── Module State ───
 
-let moduleSettings = null;
+let assisted_character_creation_moduleSettings = null;
 let assisted_character_creation_debug = () => {};
 
 let isGenerating = false;
@@ -3398,9 +3644,9 @@ let restorePoint = null;       // textarea snapshot used by Retry
  * @param {object} opts - { settings, saveSettings }
  */
 function initACC({ settings, saveSettings }) {
-    moduleSettings = settings;
+    assisted_character_creation_moduleSettings = settings;
     saveSettingsFn = saveSettings;
-    assisted_character_creation_debug = createDebugLogger('ACC', () => moduleSettings.accDebugMode);
+    assisted_character_creation_debug = createDebugLogger('ACC', () => assisted_character_creation_moduleSettings.accDebugMode);
     assisted_character_creation_debug('Module initialized');
 }
 
@@ -3412,7 +3658,7 @@ let saveSettingsFn = null;
  * Called on CHARACTER_PAGE_LOADED. Injects the ACC launch button.
  */
 function assisted_character_creation_onCharacterPageLoaded() {
-    if (!moduleSettings.accEnabled) return;
+    if (!assisted_character_creation_moduleSettings.accEnabled) return;
     if (document.getElementById('acc_launch_btn')) return;
 
     const btnRow = document.querySelector('#form_create .ch_creation_btn_row');
@@ -3442,32 +3688,32 @@ function bindACCSettings(saveSettings) {
     const promptArea = document.getElementById('acc_prompt_textarea');
 
     if (enabledCb) {
-        enabledCb.checked = moduleSettings.accEnabled;
+        enabledCb.checked = assisted_character_creation_moduleSettings.accEnabled;
         enabledCb.addEventListener('change', () => {
-            moduleSettings.accEnabled = enabledCb.checked;
+            assisted_character_creation_moduleSettings.accEnabled = enabledCb.checked;
             saveSettings();
         });
     }
     if (debugCb) {
-        debugCb.checked = moduleSettings.accDebugMode;
+        debugCb.checked = assisted_character_creation_moduleSettings.accDebugMode;
         debugCb.addEventListener('change', () => {
-            moduleSettings.accDebugMode = debugCb.checked;
+            assisted_character_creation_moduleSettings.accDebugMode = debugCb.checked;
             saveSettings();
         });
     }
     const maxContextInput = document.getElementById('acc_max_context_override');
     if (maxContextInput) {
-        maxContextInput.value = moduleSettings.accMaxContextOverride || 0;
+        maxContextInput.value = assisted_character_creation_moduleSettings.accMaxContextOverride || 0;
         maxContextInput.addEventListener('input', () => {
             const n = parseInt(maxContextInput.value, 10);
-            moduleSettings.accMaxContextOverride = Number.isFinite(n) && n > 0 ? n : 0;
+            assisted_character_creation_moduleSettings.accMaxContextOverride = Number.isFinite(n) && n > 0 ? n : 0;
             saveSettings();
         });
     }
     if (promptArea) {
-        promptArea.value = moduleSettings.accPrompt || DEFAULT_ACC_PROMPT;
+        promptArea.value = assisted_character_creation_moduleSettings.accPrompt || DEFAULT_ACC_PROMPT;
         promptArea.addEventListener('input', () => {
-            moduleSettings.accPrompt = promptArea.value;
+            assisted_character_creation_moduleSettings.accPrompt = promptArea.value;
             saveSettings();
         });
     }
@@ -3477,7 +3723,7 @@ function bindACCSettings(saveSettings) {
         defaultText: DEFAULT_ACC_PROMPT,
         textareaId: 'acc_prompt_textarea',
         containerId: 'acc_prompt_templates',
-        settings: moduleSettings,
+        settings: assisted_character_creation_moduleSettings,
         saveSettings,
     });
 }
@@ -3527,7 +3773,7 @@ function openModal() {
     tokenInput?.addEventListener('change', () => {
         const parsed = parseInt(tokenInput.value, 10);
         if (!isNaN(parsed) && parsed > 0) {
-            moduleSettings.accResponseLength = parsed;
+            assisted_character_creation_moduleSettings.accResponseLength = parsed;
             saveSettingsFn?.();
         }
     });
@@ -3741,7 +3987,9 @@ async function runGeneration(action, brief) {
         lastAction = action;
         assisted_character_creation_debug(`${action} complete, length:`, result.length);
     } catch (err) {
-        if (!abortRequested) {
+        if (isSilentGenerationAbort(err)) {
+            assisted_character_creation_debug(`${action} aborted via cancellation`);
+        } else if (!abortRequested) {
             console.error('ACC generation error:', err);
             toast(`Generation failed: ${err.message}`, 'error');
         }
@@ -3803,7 +4051,7 @@ async function generateContinuation(brief, existing, ctxOptions) {
 }
 
 function getPromptTemplate() {
-    const stored = moduleSettings?.accPrompt;
+    const stored = assisted_character_creation_moduleSettings?.accPrompt;
     return (typeof stored === 'string' && stored.trim()) ? stored : DEFAULT_ACC_PROMPT;
 }
 
@@ -3813,7 +4061,7 @@ function getResponseLength() {
         const parsed = parseInt(input.value, 10);
         if (!isNaN(parsed) && parsed > 0) return parsed;
     }
-    const setting = moduleSettings?.accResponseLength;
+    const setting = assisted_character_creation_moduleSettings?.accResponseLength;
     if (typeof setting === 'number' && setting > 0) return setting;
     return DEFAULT_ACC_RESPONSE_LENGTH;
 }
@@ -3824,7 +4072,7 @@ async function buildPreambleBlock(ctxOptions) {
     const preamble = await buildContextPreamble({
         ...ctxOptions,
         responseLength: getResponseLength(),
-        maxContextOverride: moduleSettings?.accMaxContextOverride || 0,
+        maxContextOverride: assisted_character_creation_moduleSettings?.accMaxContextOverride || 0,
     });
     if (!preamble) return '';
     assisted_character_creation_debug('Context preamble length:', preamble.length);
@@ -3832,8 +4080,13 @@ async function buildPreambleBlock(ctxOptions) {
 }
 
 function stopGeneration() {
-    const stopBtn = document.getElementById('mes_stop');
-    if (stopBtn) stopBtn.click();
+    // Route through abortAllGenerations() so that ST's GENERATION_STOPPED
+    // event also fires. That's what triggers generateRawData() to abort
+    // its fetch, close the connection, and let ST's server propagate the
+    // abort to the backend (e.g. POST /api/extra/abort to KoboldCpp).
+    // Aborting only our local controllers would free the UI but leave the
+    // LLM generating to the response cap.
+    abortAllGenerations('acc-cancel');
     assisted_character_creation_debug('Stop generation triggered');
 }
 
@@ -3955,6 +4208,7 @@ function escapeAttr(str) {
 
 
 
+
 // ─── Default Prompt ───
 
 const DEFAULT_WIA_PROMPT = `[
@@ -3990,8 +4244,10 @@ let world_info_assist_debug = () => {};
 let observer = null;
 let saveSettingsCb = null;
 
-// Per-entry state, keyed by a stable id derived from the entry uid / DOM element
-const entryStates = new Map(); // id -> { originalSeed, hasGenerated, generating }
+// Per-entry state, keyed by a stable id derived from the entry uid / DOM element.
+// `activeAction` is set to 'assist' or 'continue' while generating so the button
+// labels can swap to Stop and clicks can route to cancel rather than re-start.
+const entryStates = new Map(); // id -> { originalSeed, hasGenerated, generating, activeAction }
 
 function getWIAResponseLength() {
     const n = world_info_assist_moduleSettings?.wiaResponseLength;
@@ -4220,7 +4476,16 @@ function getTitle(formEl) {
     return commentInput?.value?.trim() || '';
 }
 
-function setUIState(formEl, state) {
+// Original button markup, captured so we can restore it when leaving the
+// generating state. Keyed by class name.
+const WIA_BTN_ORIGINAL_HTML = {
+    'wia-btn-assist': '<span class="fa-solid fa-wand-magic-sparkles"></span> <span class="wia-btn-label">Assist</span>',
+    'wia-btn-continue': '<span class="fa-solid fa-arrow-right"></span>',
+};
+
+const WIA_BTN_STOP_HTML = '<span class="fa-solid fa-stop"></span> <span class="wia-btn-label">Stop</span>';
+
+function setUIState(formEl, state, activeAction = null) {
     const controls = formEl.querySelector('.wia-controls');
     if (!controls) return;
     const assistBtn = controls.querySelector('.wia-btn-assist');
@@ -4230,20 +4495,40 @@ function setUIState(formEl, state) {
     const spinner = controls.querySelector('.wia-spinner');
 
     const show = (el, vis) => el && el.classList.toggle('wia-hidden', !vis);
+    const restoreBtn = (btn, key) => {
+        if (btn && WIA_BTN_ORIGINAL_HTML[key]) btn.innerHTML = WIA_BTN_ORIGINAL_HTML[key];
+    };
 
     if (state === 'idle') {
+        restoreBtn(assistBtn, 'wia-btn-assist');
+        restoreBtn(continueBtn, 'wia-btn-continue');
         show(assistBtn, true);
         show(continueBtn, false);
         show(retryBtn, false);
         show(revertBtn, false);
         show(spinner, false);
     } else if (state === 'generating') {
-        show(assistBtn, false);
-        show(continueBtn, false);
+        // Keep the active button visible and swap its content to a Stop
+        // affordance. Hide the others so the user can't accidentally
+        // re-trigger them mid-generation.
+        const isContinue = activeAction === 'continue';
+        if (isContinue) {
+            restoreBtn(assistBtn, 'wia-btn-assist');
+            if (continueBtn) continueBtn.innerHTML = WIA_BTN_STOP_HTML;
+            show(assistBtn, false);
+            show(continueBtn, true);
+        } else {
+            restoreBtn(continueBtn, 'wia-btn-continue');
+            if (assistBtn) assistBtn.innerHTML = WIA_BTN_STOP_HTML;
+            show(assistBtn, true);
+            show(continueBtn, false);
+        }
         show(retryBtn, false);
         show(revertBtn, false);
-        show(spinner, true);
+        show(spinner, false);
     } else if (state === 'generated') {
+        restoreBtn(assistBtn, 'wia-btn-assist');
+        restoreBtn(continueBtn, 'wia-btn-continue');
         show(assistBtn, false);
         show(continueBtn, true);
         show(retryBtn, true);
@@ -4255,8 +4540,23 @@ function setUIState(formEl, state) {
 // ─── Generation ───
 
 async function onAssist(formEl, id, isContinue) {
-    const state = entryStates.get(id) || { originalSeed: '', hasGenerated: false, generating: false };
-    if (state.generating) return;
+    const state = entryStates.get(id)
+        || { originalSeed: '', hasGenerated: false, generating: false, activeAction: null };
+    const action = isContinue ? 'continue' : 'assist';
+
+    // If we're already generating, treat a click on the active button as a
+    // Stop. Clicks on the other button (which is hidden anyway) are ignored.
+    if (state.generating) {
+        if (state.activeAction === action) {
+            // Use abortAllGenerations (not abortAllSilentGenerations) so
+            // ST's GENERATION_STOPPED event fires and actually cancels the
+            // backend fetch — otherwise KoboldCpp etc. keep generating to
+            // the response cap while only the UI frees up.
+            abortAllGenerations('wia-cancel');
+            world_info_assist_debug('Stop requested for', id);
+        }
+        return;
+    }
 
     const contentEl = getContentTextarea(formEl);
     if (!contentEl) return;
@@ -4267,9 +4567,10 @@ async function onAssist(formEl, id, isContinue) {
         state.originalSeed = contentEl.value;
     }
     state.generating = true;
+    state.activeAction = action;
     entryStates.set(id, state);
 
-    setUIState(formEl, 'generating');
+    setUIState(formEl, 'generating', action);
 
     try {
         const title = getTitle(formEl);
@@ -4363,14 +4664,20 @@ async function onAssist(formEl, id, isContinue) {
 
         state.hasGenerated = true;
         state.generating = false;
+        state.activeAction = null;
         entryStates.set(id, state);
 
         setUIState(formEl, 'generated');
         world_info_assist_debug('Generation complete for', id);
     } catch (err) {
-        console.error('WIA generation error:', err);
-        toast(`World Info assist failed: ${err.message}`, 'error');
+        if (isSilentGenerationAbort(err)) {
+            world_info_assist_debug('Generation cancelled for', id);
+        } else {
+            console.error('WIA generation error:', err);
+            toast(`World Info assist failed: ${err.message}`, 'error');
+        }
         state.generating = false;
+        state.activeAction = null;
         entryStates.set(id, state);
         setUIState(formEl, state.hasGenerated ? 'generated' : 'idle');
     }
@@ -4491,6 +4798,7 @@ function bindWIASettings(saveSettings) {
 
 
 
+
 // ─── Constants ───
 
 const NG_INJECTION_KEY = 'narrative_guidance';
@@ -4513,6 +4821,9 @@ let narrative_guidance_moduleSettings = null;
 let narrative_guidance_saveSettingsCb = null;
 let narrative_guidance_debug = () => {};
 let regenInProgress = false;
+// Which action is currently running: 'regen' | 'continue' | null.
+// Used to swap the active button to Stop and route its click to cancel.
+let ngActiveAction = null;
 let ngLastGuidanceSnapshot = null; // guidance text before last regen, for Retry
 let saveTimer = null;
 
@@ -4614,8 +4925,8 @@ async function regenGuidance(reason) {
     ngLastGuidanceSnapshot = preRegenState.guidance || '';
 
     regenInProgress = true;
+    ngActiveAction = 'regen';
     setNGActionButtonsRunning(true);
-    showRegenOverlay();
     clearInjection();
     narrative_guidance_debug('regenGuidance — starting, reason:', reason);
 
@@ -4686,14 +4997,18 @@ async function regenGuidance(reason) {
         toast('Narrative guidance regenerated.', 'success');
         narrative_guidance_debug('regenGuidance — complete, length:', cleaned.length);
     } catch (err) {
-        console.error('Narrative Guidance generation error:', err);
-        toast(`Narrative guidance failed: ${err.message}`, 'error');
+        if (isSilentGenerationAbort(err)) {
+            narrative_guidance_debug('regenGuidance — cancelled by user');
+        } else {
+            console.error('Narrative Guidance generation error:', err);
+            toast(`Narrative guidance failed: ${err.message}`, 'error');
+        }
         // Restore whatever injection we had before clearing.
         reapplyInjection();
     } finally {
         regenInProgress = false;
+        ngActiveAction = null;
         setNGActionButtonsRunning(false);
-        hideRegenOverlay();
     }
 }
 
@@ -4713,6 +5028,7 @@ async function continueGuidance() {
     }
 
     regenInProgress = true;
+    ngActiveAction = 'continue';
     setNGActionButtonsRunning(true);
     narrative_guidance_debug('continueGuidance — starting');
 
@@ -4754,39 +5070,18 @@ async function continueGuidance() {
         toast('Narrative guidance continued.', 'success');
         narrative_guidance_debug('continueGuidance — complete, added length:', continuation.length);
     } catch (err) {
-        console.error('Narrative Guidance continue error:', err);
-        toast(`Continue failed: ${err.message}`, 'error');
+        if (isSilentGenerationAbort(err)) {
+            narrative_guidance_debug('continueGuidance — cancelled by user');
+        } else {
+            console.error('Narrative Guidance continue error:', err);
+            toast(`Continue failed: ${err.message}`, 'error');
+        }
     } finally {
         regenInProgress = false;
+        ngActiveAction = null;
         setNGActionButtonsRunning(false);
         refreshNGActionButtonStates();
     }
-}
-
-// ─── Regeneration Overlay ───
-
-const NG_OVERLAY_ID = 'ng_regen_overlay';
-
-function showRegenOverlay() {
-    if (document.getElementById(NG_OVERLAY_ID)) return;
-    const overlay = document.createElement('div');
-    overlay.id = NG_OVERLAY_ID;
-    overlay.className = 'ng-regen-overlay';
-    overlay.innerHTML = `
-        <div class="ng-regen-overlay-card">
-            <div class="ng-regen-overlay-spinner"><span class="fa-solid fa-wand-sparkles fa-spin"></span></div>
-            <div class="ng-regen-overlay-title">Regenerating narrative guidance…</div>
-            <div class="ng-regen-overlay-subtitle">Please wait — input is paused until the new guidance is ready.</div>
-        </div>
-    `;
-    // Block keyboard activation of focused buttons (Enter / Space) while up.
-    overlay.addEventListener('keydown', (e) => { e.stopPropagation(); e.preventDefault(); });
-    document.body.appendChild(overlay);
-}
-
-function hideRegenOverlay() {
-    const overlay = document.getElementById(NG_OVERLAY_ID);
-    if (overlay) overlay.remove();
 }
 
 // ─── Event Handlers ───
@@ -4861,19 +5156,52 @@ function refreshPanelFromState() {
     refreshNGActionButtonStates();
 }
 
+// Original button HTML, captured so we can restore it when leaving the
+// generating state.
+const NG_REGEN_BTN_HTML = '<span class="ng-regen-icon fa-solid fa-wand-sparkles"></span> Regenerate Now';
+const NG_CONTINUE_BTN_HTML = '<span class="fa-solid fa-arrow-right"></span> Continue';
+const NG_STOP_BTN_HTML = '<span class="fa-solid fa-stop"></span> Stop';
+
 function setNGActionButtonsRunning(running) {
     const regenBtn = document.getElementById('ng_regenerate_now');
-    if (regenBtn) {
-        regenBtn.classList.toggle('disabled', running);
-        const icon = regenBtn.querySelector('.ng-regen-icon');
-        if (icon) {
-            icon.className = running
-                ? 'ng-regen-icon fa-solid fa-spinner fa-spin'
-                : 'ng-regen-icon fa-solid fa-wand-sparkles';
+    const continueBtn = document.getElementById('ng_continue_now');
+    const retryBtn = document.getElementById('ng_retry_now');
+
+    if (running) {
+        // Active button becomes Stop; the others get the disabled class so the
+        // user can't fire off a second job mid-flight.
+        if (ngActiveAction === 'continue') {
+            if (regenBtn) {
+                regenBtn.innerHTML = NG_REGEN_BTN_HTML;
+                regenBtn.classList.add('disabled');
+            }
+            if (continueBtn) {
+                continueBtn.innerHTML = NG_STOP_BTN_HTML;
+                continueBtn.classList.remove('disabled');
+            }
+        } else {
+            // 'regen' or unspecified — treat regenerate as active.
+            if (regenBtn) {
+                regenBtn.innerHTML = NG_STOP_BTN_HTML;
+                regenBtn.classList.remove('disabled');
+            }
+            if (continueBtn) {
+                continueBtn.innerHTML = NG_CONTINUE_BTN_HTML;
+                continueBtn.classList.add('disabled');
+            }
         }
+        retryBtn?.classList.add('disabled');
+    } else {
+        if (regenBtn) {
+            regenBtn.innerHTML = NG_REGEN_BTN_HTML;
+            regenBtn.classList.remove('disabled');
+        }
+        if (continueBtn) {
+            continueBtn.innerHTML = NG_CONTINUE_BTN_HTML;
+            continueBtn.classList.remove('disabled');
+        }
+        retryBtn?.classList.remove('disabled');
     }
-    document.getElementById('ng_continue_now')?.classList.toggle('disabled', running);
-    document.getElementById('ng_retry_now')?.classList.toggle('disabled', running);
 }
 
 function refreshNGActionButtonStates() {
@@ -5118,12 +5446,27 @@ function bindNarrativeGuidanceSettings(saveSettings) {
     });
 
     document.getElementById('ng_regenerate_now')?.addEventListener('click', async () => {
-        if (regenInProgress) return;
+        // While running, the regenerate button is the Stop affordance for an
+        // active regen. Clicks during a `continue` job are ignored (that
+        // button is disabled in the UI).
+        if (regenInProgress) {
+            if (ngActiveAction === 'regen') {
+                abortAllGenerations('ng-cancel');
+                narrative_guidance_debug('Stop requested via regenerate button');
+            }
+            return;
+        }
         await regenGuidance('manual');
     });
 
     document.getElementById('ng_continue_now')?.addEventListener('click', async () => {
-        if (regenInProgress) return;
+        if (regenInProgress) {
+            if (ngActiveAction === 'continue') {
+                abortAllGenerations('ng-cancel');
+                narrative_guidance_debug('Stop requested via continue button');
+            }
+            return;
+        }
         await continueGuidance();
     });
 
@@ -5171,6 +5514,7 @@ function initNarrativeGuidance({ settings }) {
 
 
 
+
 // ─── Constants ───
 
 const EXTENSION_NAME = 'Saints-Silly-Extensions';
@@ -5205,6 +5549,7 @@ const defaultSettings = {
     narrativeGuidanceInjectionDepth: DEFAULT_NG_INJECTION_DEPTH,
     narrativeGuidanceInjectionRole: DEFAULT_NG_INJECTION_ROLE,
     narrativeGuidanceLoreBookNames: [],
+    silentGenerationDebugMode: false,
     promptTemplates: {
         phrasingPrompt: {},
         phrasingInversePrompt: {},
@@ -5254,6 +5599,7 @@ function injectSettingsPanel() {
     bindACCSettings(saveSettings);
     bindWIASettings(saveSettings);
     bindNarrativeGuidanceSettings(saveSettings);
+    bindSilentGenerationSettings(saveSettings);
 }
 
 // ─── Merged Event Handlers ───
@@ -5335,6 +5681,11 @@ jQuery(async () => {
     // Phrasing UI
     createInputAreaButton();
     createHamburgerMenuItem();
+
+    // Wire up the global "stop button → abort silent generations" hook
+    // before subscribing any per-module handlers, so a stop event always
+    // unblocks in-flight silent jobs first.
+    initSilentGeneration({ settings: src_settings });
 
     // Subscribe to events
     const { eventSource, eventTypes } = getContext();

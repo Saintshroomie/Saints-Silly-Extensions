@@ -202,6 +202,12 @@ Open **Extensions** > **Saint's Silly Extensions** in SillyTavern's settings pan
 | Active Guidance (per-chat) | The currently active guidance paragraph. Edit directly to hand-tune steering; edits apply on the next AI turn. |
 | Turns Remaining / -1 / Reset / Regenerate Now | Manual controls over the per-chat counter and on-demand regeneration |
 
+### Diagnostics
+
+| Setting | Description |
+|---------|-------------|
+| Silent Generation Debug Mode | Log the silent-generation manager's lifecycle (job start/abort/completion, stop-listener events, stream token counts) to the browser console. Useful when diagnosing why a Stop button does or doesn't halt the LLM backend across ACC, WIA, and Narrative Guidance. |
+
 ### Prompt Templates
 
 Every editable prompt in the settings panel (Phrasing standard, Phrasing inverse, Assisted Character Creation, World Info Assist, Narrative Guidance generation, Narrative Guidance injection) has its own template dropdown directly below the textarea, plus four actions:

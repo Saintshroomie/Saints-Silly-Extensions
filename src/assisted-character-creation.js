@@ -15,6 +15,10 @@ import {
     streamingGenerate,
     withSingleLineDisabled,
 } from './utils.js';
+import {
+    abortAllGenerations,
+    isSilentGenerationAbort,
+} from './silent-generation.js';
 import { setupPromptTemplates } from './prompt-templates.js';
 
 // ─── Default Prompt ───
@@ -459,7 +463,9 @@ async function runGeneration(action, brief) {
         lastAction = action;
         debug(`${action} complete, length:`, result.length);
     } catch (err) {
-        if (!abortRequested) {
+        if (isSilentGenerationAbort(err)) {
+            debug(`${action} aborted via cancellation`);
+        } else if (!abortRequested) {
             console.error('ACC generation error:', err);
             toast(`Generation failed: ${err.message}`, 'error');
         }
@@ -550,8 +556,13 @@ async function buildPreambleBlock(ctxOptions) {
 }
 
 function stopGeneration() {
-    const stopBtn = document.getElementById('mes_stop');
-    if (stopBtn) stopBtn.click();
+    // Route through abortAllGenerations() so that ST's GENERATION_STOPPED
+    // event also fires. That's what triggers generateRawData() to abort
+    // its fetch, close the connection, and let ST's server propagate the
+    // abort to the backend (e.g. POST /api/extra/abort to KoboldCpp).
+    // Aborting only our local controllers would free the UI but leave the
+    // LLM generating to the response cap.
+    abortAllGenerations('acc-cancel');
     debug('Stop generation triggered');
 }
 
