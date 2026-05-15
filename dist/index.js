@@ -1296,7 +1296,7 @@ var update = injectStylesIntoStyleTag_default()(style/* default */.A, options);
 
 ;// ./src/settings.html
 // Module
-var code = `<div id="saints_silly_settings" class="extension_settings"> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Saint's Silly Extensions</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-up up"></div> </div> <div class="inline-drawer-content"> <h4 class="saints_section_header"> <span class="fa-solid fa-ghost"></span> Possession </h4> <label class="checkbox_label"> <input id="possession_enabled" type="checkbox"/> <span>Enable Possession</span> </label> <label class="checkbox_label"> <input id="possession_show_toast" type="checkbox"/> <span>Show Toast on Possess/Unpossess</span> </label> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-pen-fancy"></span> Phrasing! </h4> <label class="checkbox_label"> <input id="phrasing_enabled" type="checkbox" checked="checked"/> <span>Enable Phrasing!</span> </label> <label class="checkbox_label" title="When enabled, rephrasing a message includes every existing swipe in the prompt and asks the model to produce something wildly different."> <input id="phrasing_inverse_guidance" type="checkbox"/> <span>Inverse Guidance</span> </label> <div class="phrasing_prompt_section"> <label for="phrasing_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="phrasing_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Phrasing! prompt template..."></textarea> </div> <div class="saints_template_controls" id="phrasing_prompt_templates"></div> <div class="phrasing_prompt_section"> <label for="phrasing_inverse_prompt_textarea"><b>Inverse Guidance Prompt Template:</b></label> <textarea id="phrasing_inverse_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Inverse Guidance prompt template..."></textarea> <small>Available placeholders: <code>{{phrasingSeed}}</code>, <code>{{phrasingSwipes}}</code></small> </div> <div class="saints_template_controls" id="phrasing_inverse_prompt_templates"></div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-wand-magic-sparkles"></span> Assisted Character Creation </h4> <label class="checkbox_label"> <input id="acc_enabled" type="checkbox"/> <span>Enable Assisted Character Creation</span> </label> <div class="ng_inline_row"> <label for="acc_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="acc_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for ACC generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="acc_prompt_section"> <label for="acc_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="acc_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your ACC prompt template..."></textarea> </div> <div class="saints_template_controls" id="acc_prompt_templates"></div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-book-atlas"></span> World Info Assist </h4> <label class="checkbox_label"> <input id="wia_enabled" type="checkbox"/> <span>Enable World Info Assist</span> </label> <div class="ng_inline_row"> <label for="wia_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="wia_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for World Info Assist generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="wia_response_length"><b><span class="fa-solid fa-coins"></span> Response Token Limit:</b></label> <input id="wia_response_length" type="number" min="50" max="8192" step="50" class="text_pole ng_number_input" title="Maximum tokens the model may use for each World Info Assist generation."/> </div> <div class="wia_prompt_section"> <label for="wia_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="wia_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your World Info Assist prompt template..."></textarea> </div> <div class="saints_template_controls" id="wia_prompt_templates"></div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-compass"></span> Narrative Guidance </h4> <label class="checkbox_label"> <input id="ng_enabled" type="checkbox"/> <span>Enable Narrative Guidance</span> </label> <label class="checkbox_label" title="When on, regenerates guidance automatically when the turn counter hits zero. When off, only the Regenerate Now button updates the guidance."> <input id="ng_auto_regen" type="checkbox"/> <span>Auto-Regenerate at Zero</span> </label> <div class="ng_inline_row"> <label for="ng_default_turn_count"><b>Turns Between Regenerations:</b></label> <input id="ng_default_turn_count" type="number" min="1" step="1" class="text_pole ng_number_input"/> </div> <div class="ng_inline_row"> <label for="ng_response_length"><b>Response Token Limit:</b></label> <input id="ng_response_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="Maximum number of tokens the model may use for each generated guidance paragraph."/> </div> <div class="ng_inline_row"> <label for="ng_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="ng_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for Narrative Guidance generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_prompt_section"> <label for="ng_generation_prompt_textarea"><b>Generation Prompt (used as prefill):</b></label> <textarea id="ng_generation_prompt_textarea" class="text_pole" rows="4" placeholder="Enter the prefill that the LLM will continue..."></textarea> <small>The model's reply continues this text and becomes the active guidance.</small> </div> <div class="saints_template_controls" id="ng_generation_prompt_templates"></div> <div class="ng_prompt_section"> <label for="ng_injection_prompt_textarea"><b>Injection Prompt Template:</b></label> <textarea id="ng_injection_prompt_textarea" class="text_pole" rows="3" placeholder="Template injected before each AI turn..."></textarea> <small>Available placeholder: <code>{{guidance}}</code></small> </div> <div class="saints_template_controls" id="ng_injection_prompt_templates"></div> <div class="ng_inline_row"> <label for="ng_injection_depth"><b>Depth:</b></label> <input id="ng_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the guidance after (0 = bottom)."/> <label for="ng_injection_role"><b>Role:</b></label> <select id="ng_injection_role" class="text_pole ng_select_input" title="Role used when injecting the guidance into the prompt."> <option value="system">System</option> <option value="user">User</option> <option value="assistant">Assistant</option> </select> </div> <details id="ng_lorebooks_details" class="ng-lorebook-picker"> <summary><span class="fa-solid fa-book"></span> <span id="ng_lorebooks_summary_label">Lore Books</span></summary> <div id="ng_lorebooks_list" class="ng-lorebook-list"></div> </details> <h5 class="saints_subsection_header">Per-Chat</h5> <div class="ng_prompt_section"> <label for="ng_themes_textarea"><b>Themes / Story Arcs:</b></label> <textarea id="ng_themes_textarea" class="text_pole" rows="4" placeholder="Optional themes, ideas, or arcs for the AI to consider..."></textarea> </div> <div class="ng_prompt_section"> <label for="ng_active_guidance_textarea"><b>Active Guidance:</b></label> <textarea id="ng_active_guidance_textarea" class="text_pole" rows="6" placeholder="The currently active guidance paragraph. Edit freely; changes apply on the next AI turn."></textarea> </div> <div class="ng_inline_row"> <span><b>Turns Remaining:</b> <span id="ng_remaining_display">0</span></span> <div class="menu_button" id="ng_decrement_button" title="Decrement remaining by 1"> <span class="fa-solid fa-minus"></span> </div> <div class="menu_button" id="ng_reset_button" title="Reset remaining to default turn count"> <span class="fa-solid fa-rotate-right"></span> Reset </div> <div class="menu_button disabled" id="ng_continue_now" title="Continue the current guidance paragraph"> <span class="fa-solid fa-arrow-right"></span> Continue </div> <div class="menu_button disabled" id="ng_retry_now" title="Restore previous guidance and regenerate"> <span class="fa-solid fa-rotate-right"></span> Retry </div> <div class="menu_button" id="ng_regenerate_now" title="Regenerate guidance now"> <span class="ng-regen-icon fa-solid fa-wand-sparkles"></span> Regenerate Now </div> </div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-bug"></span> Diagnostics </h4> <label class="checkbox_label" title="Log detailed Possession events to the browser console."> <input id="possession_debug_mode" type="checkbox"/> <span>Possession Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Phrasing events to the browser console."> <input id="phrasing_debug_mode" type="checkbox"/> <span>Phrasing Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Assisted Character Creation events, prompts, and generations to the browser console."> <input id="acc_debug_mode" type="checkbox"/> <span>ACC Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed World Info Assist events, prompts, and generations to the browser console."> <input id="wia_debug_mode" type="checkbox"/> <span>WI Assist Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Narrative Guidance events to the browser console."> <input id="ng_debug_mode" type="checkbox"/> <span>Narrative Guidance Debug Mode</span> </label> <label class="checkbox_label" title="Log silent-generation lifecycle (job start/abort/completion, stop-listener events, stream token counts) to the browser console. Useful when diagnosing stop-button behavior across backends."> <input id="silent_generation_debug_mode" type="checkbox"/> <span>Silent Generation Debug Mode</span> </label> </div> </div> </div> `;
+var code = `<div id="saints_silly_settings" class="extension_settings"> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Saint's Silly Extensions</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-up down"></div> </div> <div class="inline-drawer-content" style="display:none"> <h4 class="saints_section_header"> <span class="fa-solid fa-ghost"></span> Possession </h4> <label class="checkbox_label"> <input id="possession_enabled" type="checkbox"/> <span>Enable Possession</span> </label> <label class="checkbox_label"> <input id="possession_show_toast" type="checkbox"/> <span>Show Toast on Possess/Unpossess</span> </label> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-pen-fancy"></span> Phrasing! </h4> <label class="checkbox_label"> <input id="phrasing_enabled" type="checkbox" checked="checked"/> <span>Enable Phrasing!</span> </label> <label class="checkbox_label" title="When enabled, rephrasing a message includes every existing swipe in the prompt and asks the model to produce something wildly different."> <input id="phrasing_inverse_guidance" type="checkbox"/> <span>Inverse Guidance</span> </label> <div class="phrasing_prompt_section"> <label for="phrasing_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="phrasing_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Phrasing! prompt template..."></textarea> </div> <div class="saints_template_controls" id="phrasing_prompt_templates"></div> <div class="phrasing_prompt_section"> <label for="phrasing_inverse_prompt_textarea"><b>Inverse Guidance Prompt Template:</b></label> <textarea id="phrasing_inverse_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Inverse Guidance prompt template..."></textarea> <small>Available placeholders: <code>{{phrasingSeed}}</code>, <code>{{phrasingSwipes}}</code></small> </div> <div class="saints_template_controls" id="phrasing_inverse_prompt_templates"></div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-wand-magic-sparkles"></span> Assisted Character Creation </h4> <label class="checkbox_label"> <input id="acc_enabled" type="checkbox"/> <span>Enable Assisted Character Creation</span> </label> <div class="ng_inline_row"> <label for="acc_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="acc_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for ACC generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="acc_prompt_section"> <label for="acc_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="acc_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your ACC prompt template..."></textarea> </div> <div class="saints_template_controls" id="acc_prompt_templates"></div> <div class="acc_prompt_section"> <label for="acc_prefill_textarea"><b>Prefill Template:</b></label> <textarea id="acc_prefill_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix the model continues. Also prepended to the description on success."></textarea> <small>Passed to the model as an assistant prefix and kept at the top of the generated description.</small> </div> <div class="saints_template_controls" id="acc_prefill_templates"></div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-book-atlas"></span> World Info Assist </h4> <label class="checkbox_label"> <input id="wia_enabled" type="checkbox"/> <span>Enable World Info Assist</span> </label> <div class="ng_inline_row"> <label for="wia_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="wia_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for World Info Assist generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="wia_response_length"><b><span class="fa-solid fa-coins"></span> Response Token Limit:</b></label> <input id="wia_response_length" type="number" min="50" max="8192" step="50" class="text_pole ng_number_input" title="Maximum tokens the model may use for each World Info Assist generation."/> </div> <div class="wia_prompt_section"> <label for="wia_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="wia_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your World Info Assist prompt template..."></textarea> </div> <div class="saints_template_controls" id="wia_prompt_templates"></div> <div class="wia_prompt_section"> <label for="wia_prefill_titled_textarea"><b>Prefill Template — Titled Entry:</b></label> <textarea id="wia_prefill_titled_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix used when the entry has a title."></textarea> <small>Available placeholder: <code>{{title}}</code>. Used as the assistant prefix and prepended to the entry on success.</small> </div> <div class="saints_template_controls" id="wia_prefill_titled_templates"></div> <div class="wia_prompt_section"> <label for="wia_prefill_untitled_textarea"><b>Prefill Template — Untitled Entry:</b></label> <textarea id="wia_prefill_untitled_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix used when the entry has no title yet."></textarea> <small>Used as the assistant prefix and prepended to the entry on success.</small> </div> <div class="saints_template_controls" id="wia_prefill_untitled_templates"></div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-compass"></span> Narrative Guidance </h4> <label class="checkbox_label"> <input id="ng_enabled" type="checkbox"/> <span>Enable Narrative Guidance</span> </label> <label class="checkbox_label" title="When on, regenerates guidance automatically when the turn counter hits zero. When off, only the Regenerate Now button updates the guidance."> <input id="ng_auto_regen" type="checkbox"/> <span>Auto-Regenerate at Zero</span> </label> <div class="ng_inline_row"> <label for="ng_default_turn_count"><b>Turns Between Regenerations:</b></label> <input id="ng_default_turn_count" type="number" min="1" step="1" class="text_pole ng_number_input"/> </div> <div class="ng_inline_row"> <label for="ng_response_length"><b>Response Token Limit:</b></label> <input id="ng_response_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="Maximum number of tokens the model may use for each generated guidance paragraph."/> </div> <div class="ng_inline_row"> <label for="ng_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="ng_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for Narrative Guidance generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_prompt_section"> <label for="ng_generation_prompt_textarea"><b>Generation Prompt (used as prefill):</b></label> <textarea id="ng_generation_prompt_textarea" class="text_pole" rows="4" placeholder="Enter the prefill that the LLM will continue..."></textarea> <small>The model's reply continues this text and becomes the active guidance.</small> </div> <div class="saints_template_controls" id="ng_generation_prompt_templates"></div> <div class="ng_prompt_section"> <label for="ng_injection_prompt_textarea"><b>Injection Prompt Template:</b></label> <textarea id="ng_injection_prompt_textarea" class="text_pole" rows="3" placeholder="Template injected before each AI turn..."></textarea> <small>Available placeholder: <code>{{guidance}}</code></small> </div> <div class="saints_template_controls" id="ng_injection_prompt_templates"></div> <div class="ng_inline_row"> <label for="ng_injection_depth"><b>Depth:</b></label> <input id="ng_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the guidance after (0 = bottom)."/> <label for="ng_injection_role"><b>Role:</b></label> <select id="ng_injection_role" class="text_pole ng_select_input" title="Role used when injecting the guidance into the prompt."> <option value="system">System</option> <option value="user">User</option> <option value="assistant">Assistant</option> </select> </div> <details id="ng_lorebooks_details" class="ng-lorebook-picker"> <summary><span class="fa-solid fa-book"></span> <span id="ng_lorebooks_summary_label">Lore Books</span></summary> <div id="ng_lorebooks_list" class="ng-lorebook-list"></div> </details> <h5 class="saints_subsection_header">Per-Chat</h5> <div class="ng_prompt_section"> <label for="ng_themes_textarea"><b>Themes / Story Arcs:</b></label> <textarea id="ng_themes_textarea" class="text_pole" rows="4" placeholder="Optional themes, ideas, or arcs for the AI to consider..."></textarea> </div> <div class="ng_prompt_section"> <label for="ng_active_guidance_textarea"><b>Active Guidance:</b></label> <textarea id="ng_active_guidance_textarea" class="text_pole" rows="6" placeholder="The currently active guidance paragraph. Edit freely; changes apply on the next AI turn."></textarea> </div> <div class="ng_inline_row"> <span><b>Turns Remaining:</b> <span id="ng_remaining_display">0</span></span> <div class="menu_button" id="ng_decrement_button" title="Decrement remaining by 1"> <span class="fa-solid fa-minus"></span> </div> <div class="menu_button" id="ng_reset_button" title="Reset remaining to default turn count"> <span class="fa-solid fa-rotate-right"></span> Reset </div> <div class="menu_button disabled" id="ng_continue_now" title="Continue the current guidance paragraph"> <span class="fa-solid fa-arrow-right"></span> Continue </div> <div class="menu_button disabled" id="ng_retry_now" title="Restore previous guidance and regenerate"> <span class="fa-solid fa-rotate-right"></span> Retry </div> <div class="menu_button" id="ng_regenerate_now" title="Regenerate guidance now"> <span class="ng-regen-icon fa-solid fa-wand-sparkles"></span> Regenerate Now </div> </div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-bug"></span> Diagnostics </h4> <label class="checkbox_label" title="Log detailed Possession events to the browser console."> <input id="possession_debug_mode" type="checkbox"/> <span>Possession Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Phrasing events to the browser console."> <input id="phrasing_debug_mode" type="checkbox"/> <span>Phrasing Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Assisted Character Creation events, prompts, and generations to the browser console."> <input id="acc_debug_mode" type="checkbox"/> <span>ACC Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed World Info Assist events, prompts, and generations to the browser console."> <input id="wia_debug_mode" type="checkbox"/> <span>WI Assist Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Narrative Guidance events to the browser console."> <input id="ng_debug_mode" type="checkbox"/> <span>Narrative Guidance Debug Mode</span> </label> <label class="checkbox_label" title="Log silent-generation lifecycle (job start/abort/completion, stop-listener events, stream token counts) to the browser console. Useful when diagnosing stop-button behavior across backends."> <input id="silent_generation_debug_mode" type="checkbox"/> <span>Silent Generation Debug Mode</span> </label> </div> </div> </div> `;
 // Exports
 /* harmony default export */ const settings = (code);
 ;// external "../../../../world-info.js"
@@ -3562,7 +3562,8 @@ General Output Rules:
 - Genre Flexibility: Adapt field content to genre. E.g., "Equipment" might list a plasma rifle (sci-fi) or a lute (fantasy). Fields that are irrelevant to the genre/character should be marked "N/A" rather than omitted.
 - Specificity: Avoid vague defaults. Prefer "pale, freckled, sun-damaged across the nose" over "fair skin."
 - Gender: Characters should be male or female. Reserve non-binary/ambiguous gender only for non-humanoid entities (creatures, monsters, constructs, eldritch beings, etc.). Use he/him or she/her accordingly; use it/its or they/them only for non-humanoid entities.
-- No Commentary: Output the character sheet only. No preamble, no follow-up.
+- No Commentary: Output the character sheet only. Begin directly with the opening "[". No preamble ("Here is...", "Sure!", "Of course..."), no acknowledgements, no follow-up after the closing "]".
+- Prefill: The assistant turn is prefilled with the schema opening (e.g. "[\nCharacter Name: "). Continue from where the prefill ends — never repeat or echo it.
 
 Format Rules:
 - Use the exact bracket-and-semicolon format shown below.
@@ -3623,6 +3624,12 @@ Quirks: Names all her knives, refuses to eat mushrooms (no stated reason), insti
 Current Goal: {{ .sableGoalOverride ?? Reach the Greenmarch interior and locate the Thornblight's origin before the scar reaches her chest }};
 ]
 ]`;
+
+// Prefill is configured as a named template (like the prompt). It is passed
+// to the model as an assistant-prefix so the reply continues from it, and
+// is also prepended to the final text inserted into the description
+// textarea — the user sees prefill + model output as one block.
+const DEFAULT_ACC_PREFILL = '[\nCharacter Name: ';
 
 const DEFAULT_ACC_RESPONSE_LENGTH = 1000;
 
@@ -3723,6 +3730,23 @@ function bindACCSettings(saveSettings) {
         defaultText: DEFAULT_ACC_PROMPT,
         textareaId: 'acc_prompt_textarea',
         containerId: 'acc_prompt_templates',
+        settings: assisted_character_creation_moduleSettings,
+        saveSettings,
+    });
+
+    const prefillArea = document.getElementById('acc_prefill_textarea');
+    if (prefillArea) {
+        prefillArea.value = assisted_character_creation_moduleSettings.accPrefill || DEFAULT_ACC_PREFILL;
+        prefillArea.addEventListener('input', () => {
+            assisted_character_creation_moduleSettings.accPrefill = prefillArea.value;
+            saveSettings();
+        });
+    }
+    setupPromptTemplates({
+        promptKey: 'accPrefill',
+        defaultText: DEFAULT_ACC_PREFILL,
+        textareaId: 'acc_prefill_textarea',
+        containerId: 'acc_prefill_templates',
         settings: assisted_character_creation_moduleSettings,
         saveSettings,
     });
@@ -4015,18 +4039,21 @@ async function generateDescription(brief, ctxOptions) {
     const prompt = `${preambleBlock}${promptTemplate}\n\nCharacter Brief:\n${brief}`;
     const systemPrompt = 'You are a character creation assistant. Follow the instructions and output format in the prompt exactly. Output only the character sheet — no preamble, no commentary.';
     const responseLength = getResponseLength();
+    const prefill = getPrefill();
 
     assisted_character_creation_debug('Generating with brief length', brief.length, 'tokens', responseLength);
     assisted_character_creation_debug('System prompt:', systemPrompt);
     assisted_character_creation_debug('Prompt:', prompt);
+    assisted_character_creation_debug('Prefill:', prefill);
 
     const outputEl = document.getElementById('acc_description_output');
     const result = await withSingleLineDisabled(() => streamingGenerate(
-        { prompt, systemPrompt, responseLength },
+        { prompt, systemPrompt, responseLength, ...(prefill ? { prefill } : {}) },
         outputEl,
         { append: false },
     ));
-    return __WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(result).trim();
+    const cleaned = __WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(result).trim();
+    return (prefill || '') + cleaned;
 }
 
 async function generateContinuation(brief, existing, ctxOptions) {
@@ -4053,6 +4080,11 @@ async function generateContinuation(brief, existing, ctxOptions) {
 function getPromptTemplate() {
     const stored = assisted_character_creation_moduleSettings?.accPrompt;
     return (typeof stored === 'string' && stored.trim()) ? stored : DEFAULT_ACC_PROMPT;
+}
+
+function getPrefill() {
+    const stored = assisted_character_creation_moduleSettings?.accPrefill;
+    return (typeof stored === 'string' && stored.length > 0) ? stored : DEFAULT_ACC_PREFILL;
 }
 
 function getResponseLength() {
@@ -4212,28 +4244,47 @@ function escapeAttr(str) {
 // ─── Default Prompt ───
 
 const DEFAULT_WIA_PROMPT = `[
-The next reply will be an out of story generated World Lore Description. This is a setting reference entry that codifies key facts about an event, person, place, institution, or artifact so they remain consistent and reusable. It should prioritize clear, canonical details over narrative dramatization.
+The next reply will be an out-of-story World Lore Description: a setting reference entry codifying key facts about an event, person, place, institution, or artifact so they remain consistent and reusable.
+
+Write as a worldbook gazetteer entry, NOT as a story excerpt. Treat the reader as a setting researcher who needs canonical facts, not a vivid scene.
 
 General Input Rules:
 * Guidance (optional): IP/canon, tone/genre, tags, audience, era, length, style notes.
 
 Defaults:
-* Tone: Genre-appropriate, neutral-evocative.
+* Voice: Encyclopedic reference style. Declarative facts. No narration, no metaphor, no in-character voice.
+* Tone: Genre-appropriate but neutral.
 * Canon: Respect canon when named or implied.
 * Length: 1–3 crisp sentences per entry (unless the user requests more).
 
 Output Format (use exactly as written):
-[ <Name of the Subject>: <Detailed Description of the Event, Person, Place, or Thing> ]
+[ <Name of the Subject>: <Detailed factual description — type, founders/origin/dates, function/purpose, defining properties, current status> ]
 
 Format Rules:
-
 * Return only the World Lore Description artifact.
 * Follow schema verbatim (brackets, colon, spacing).
 * No extra commentary.
 
+Anti-patterns — do NOT write like a story:
+* No narrative verbs ("rose", "fell", "swept across", "fueled", "burned bright").
+* No dramatic phrasing ("…and so it was that…", "fueling a decade of…").
+* No metaphor ("a kingdom of glass and ash", "a serpent of a road").
+* No in-character voice or address to the reader.
+* No multi-clause story arcs strung with semicolons; favor noun phrases and short factual clauses.
+
 Example — World Lore:
-[ The Ashen Concord: A pact of five city-states after the Ember War to share river trade, standardize coinage, and outlaw pyromancy; prosperity rose while hedge mages went underground, fueling a decade of covert arson reprisals; ]
+[ The Ashen Concord: Five-member city-state pact, signed 47 AB after the Ember War; covers river-trade routes, standardized coinage (the Concord drachma), and a continent-wide ban on pyromancy; enforcement body is the Cinder Court at Vellis; pyromancers operate covertly as the Hedge League; remains nominally active but strained by ongoing arson reprisals. ]
 ]`;
+
+// Prefills are configured as named templates (like prompts). They are passed
+// to the model as an assistant-prefix so the reply continues from them, and
+// are also prepended to the final text inserted into the entry field on
+// success — the user sees prefill + model output as one block.
+const DEFAULT_WIA_PREFILL_TITLED =
+    '[Factual world-lore reference entry — encyclopedic, declarative, no narrative voice.\n\n{{title}}: ';
+
+const DEFAULT_WIA_PREFILL_UNTITLED =
+    '[Factual world-lore reference entry — encyclopedic, declarative, no narrative voice.\n\n';
 
 const DEFAULT_WIA_RESPONSE_LENGTH = 600;
 
@@ -4252,6 +4303,20 @@ const entryStates = new Map(); // id -> { originalSeed, hasGenerated, generating
 function getWIAResponseLength() {
     const n = world_info_assist_moduleSettings?.wiaResponseLength;
     return (typeof n === 'number' && n > 0) ? n : DEFAULT_WIA_RESPONSE_LENGTH;
+}
+
+function resolveWIAPrefill(title) {
+    const trimmedTitle = (title || '').trim();
+    if (trimmedTitle) {
+        const tpl = (typeof world_info_assist_moduleSettings?.wiaPrefillTitled === 'string' && world_info_assist_moduleSettings.wiaPrefillTitled)
+            ? world_info_assist_moduleSettings.wiaPrefillTitled
+            : DEFAULT_WIA_PREFILL_TITLED;
+        return tpl.replace(/\{\{title\}\}/g, trimmedTitle);
+    }
+    const tpl = (typeof world_info_assist_moduleSettings?.wiaPrefillUntitled === 'string' && world_info_assist_moduleSettings.wiaPrefillUntitled)
+        ? world_info_assist_moduleSettings.wiaPrefillUntitled
+        : DEFAULT_WIA_PREFILL_UNTITLED;
+    return tpl;
 }
 
 // ─── Init ───
@@ -4613,9 +4678,9 @@ async function onAssist(formEl, id, isContinue) {
                 `${preambleBlock}${promptTemplate}\n\n` +
                 `Guidance from the user:\n${seed || '(no specific guidance — invent a fitting entry)'}\n\n` +
                 (title
-                    ? `Respond on one line with only the value for "${title}":`
-                    : 'No title was provided — invent a fitting subject name.');
-            prefill = title ? `[${title}- ` : '[';
+                    ? `Write the entry for "${title}". The reply has been prefilled with the opening bracket, a tone anchor, and the subject name — continue from where the prefill ends with the factual description, then close the bracket.`
+                    : 'No title was provided — invent a fitting subject name. The reply has been prefilled with the opening bracket and a tone anchor — continue from where the prefill ends with the subject name, colon, factual description, then close the bracket.');
+            prefill = resolveWIAPrefill(title);
         }
 
         const systemPrompt =
@@ -4650,13 +4715,9 @@ async function onAssist(formEl, id, isContinue) {
                     : ' ';
             contentEl.value = currentText + sep + cleaned;
         } else {
-            // If the model didn't echo the prefill back, prepend it so the
-            // entry always starts in the desired format.
-            let finalText = cleaned;
-            if (prefill && !finalText.startsWith('[')) {
-                finalText = prefill + finalText;
-            }
-            contentEl.value = finalText;
+            // The prefill is always preserved in the final entry text — the
+            // user sees prefill + model output as one block.
+            contentEl.value = (prefill || '') + cleaned;
         }
 
         // Notify SillyTavern that the entry has changed so it gets persisted.
@@ -4779,6 +4840,40 @@ function bindWIASettings(saveSettings) {
         settings: world_info_assist_moduleSettings,
         saveSettings,
     });
+
+    const prefillTitledArea = document.getElementById('wia_prefill_titled_textarea');
+    if (prefillTitledArea) {
+        prefillTitledArea.value = world_info_assist_moduleSettings.wiaPrefillTitled || DEFAULT_WIA_PREFILL_TITLED;
+        prefillTitledArea.addEventListener('input', () => {
+            world_info_assist_moduleSettings.wiaPrefillTitled = prefillTitledArea.value;
+            saveSettings();
+        });
+    }
+    setupPromptTemplates({
+        promptKey: 'wiaPrefillTitled',
+        defaultText: DEFAULT_WIA_PREFILL_TITLED,
+        textareaId: 'wia_prefill_titled_textarea',
+        containerId: 'wia_prefill_titled_templates',
+        settings: world_info_assist_moduleSettings,
+        saveSettings,
+    });
+
+    const prefillUntitledArea = document.getElementById('wia_prefill_untitled_textarea');
+    if (prefillUntitledArea) {
+        prefillUntitledArea.value = world_info_assist_moduleSettings.wiaPrefillUntitled || DEFAULT_WIA_PREFILL_UNTITLED;
+        prefillUntitledArea.addEventListener('input', () => {
+            world_info_assist_moduleSettings.wiaPrefillUntitled = prefillUntitledArea.value;
+            saveSettings();
+        });
+    }
+    setupPromptTemplates({
+        promptKey: 'wiaPrefillUntitled',
+        defaultText: DEFAULT_WIA_PREFILL_UNTITLED,
+        textareaId: 'wia_prefill_untitled_textarea',
+        containerId: 'wia_prefill_untitled_templates',
+        settings: world_info_assist_moduleSettings,
+        saveSettings,
+    });
 }
 
 ;// ./src/narrative-guidance.js
@@ -4874,7 +4969,11 @@ function reapplyInjection() {
         return;
     }
     const tpl = narrative_guidance_moduleSettings.narrativeGuidanceInjectionPrompt || DEFAULT_NG_INJECTION_PROMPT;
-    let body = tpl.replace(/\{\{guidance\}\}/g, state.guidance);
+    // state.guidance retains the generation prefill (so the textarea shows
+    // it). Strip outer brackets here so {{guidance}} substitutes cleanly
+    // into whatever injection template the user has configured.
+    const guidanceForInjection = stripBracketWrap(state.guidance);
+    let body = tpl.replace(/\{\{guidance\}\}/g, guidanceForInjection);
     body = __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParams__(body);
     const depth = Number.isFinite(narrative_guidance_moduleSettings.narrativeGuidanceInjectionDepth)
         && narrative_guidance_moduleSettings.narrativeGuidanceInjectionDepth >= 0
@@ -4979,12 +5078,16 @@ async function regenGuidance(reason) {
             { append: false },
         ));
 
-        const cleaned = stripBracketWrap(__WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(raw));
+        // Preserve the prefill in the stored guidance so the active-guidance
+        // textarea shows prefill + model output as one block. The bracket
+        // wrappers are stripped only at injection time (see reapplyInjection)
+        // so the injected payload doesn't end up nested inside two brackets.
+        const cleaned = __WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(raw).trim();
         if (!cleaned) {
             throw new Error('Model returned empty guidance.');
         }
 
-        state.guidance = cleaned;
+        state.guidance = (prefill || '') + cleaned;
         const defaultTurns = Number.isFinite(narrative_guidance_moduleSettings.narrativeGuidanceDefaultTurnCount)
             && narrative_guidance_moduleSettings.narrativeGuidanceDefaultTurnCount > 0
             ? narrative_guidance_moduleSettings.narrativeGuidanceDefaultTurnCount
@@ -5531,11 +5634,14 @@ const defaultSettings = {
     accEnabled: true,
     accDebugMode: false,
     accPrompt: DEFAULT_ACC_PROMPT,
+    accPrefill: DEFAULT_ACC_PREFILL,
     accResponseLength: DEFAULT_ACC_RESPONSE_LENGTH,
     accMaxContextOverride: 0,
     wiaEnabled: true,
     wiaDebugMode: false,
     wiaPrompt: DEFAULT_WIA_PROMPT,
+    wiaPrefillTitled: DEFAULT_WIA_PREFILL_TITLED,
+    wiaPrefillUntitled: DEFAULT_WIA_PREFILL_UNTITLED,
     wiaResponseLength: DEFAULT_WIA_RESPONSE_LENGTH,
     wiaMaxContextOverride: 0,
     narrativeGuidanceEnabled: false,
@@ -5554,7 +5660,10 @@ const defaultSettings = {
         phrasingPrompt: {},
         phrasingInversePrompt: {},
         accPrompt: {},
+        accPrefill: {},
         wiaPrompt: {},
+        wiaPrefillTitled: {},
+        wiaPrefillUntitled: {},
         narrativeGuidanceGenerationPrompt: {},
         narrativeGuidanceInjectionPrompt: {},
     },
@@ -5562,7 +5671,10 @@ const defaultSettings = {
         phrasingPrompt: '__default__',
         phrasingInversePrompt: '__default__',
         accPrompt: '__default__',
+        accPrefill: '__default__',
         wiaPrompt: '__default__',
+        wiaPrefillTitled: '__default__',
+        wiaPrefillUntitled: '__default__',
         narrativeGuidanceGenerationPrompt: '__default__',
         narrativeGuidanceInjectionPrompt: '__default__',
     },
