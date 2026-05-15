@@ -25,7 +25,10 @@ import {
     streamingGenerate,
     withSingleLineDisabled,
 } from './utils.js';
-import { isSilentGenerationAbort } from './silent-generation.js';
+import {
+    isSilentGenerationAbort,
+    abortAllSilentGenerations,
+} from './silent-generation.js';
 import { setupPromptTemplates } from './prompt-templates.js';
 
 // ─── Constants ───
@@ -50,6 +53,9 @@ let moduleSettings = null;
 let saveSettingsCb = null;
 let debug = () => {};
 let regenInProgress = false;
+// Which action is currently running: 'regen' | 'continue' | null.
+// Used to swap the active button to Stop and route its click to cancel.
+let ngActiveAction = null;
 let ngLastGuidanceSnapshot = null; // guidance text before last regen, for Retry
 let saveTimer = null;
 
@@ -151,6 +157,7 @@ async function regenGuidance(reason) {
     ngLastGuidanceSnapshot = preRegenState.guidance || '';
 
     regenInProgress = true;
+    ngActiveAction = 'regen';
     setNGActionButtonsRunning(true);
     showRegenOverlay();
     clearInjection();
@@ -233,6 +240,7 @@ async function regenGuidance(reason) {
         reapplyInjection();
     } finally {
         regenInProgress = false;
+        ngActiveAction = null;
         setNGActionButtonsRunning(false);
         hideRegenOverlay();
     }
@@ -254,6 +262,7 @@ async function continueGuidance() {
     }
 
     regenInProgress = true;
+    ngActiveAction = 'continue';
     setNGActionButtonsRunning(true);
     debug('continueGuidance — starting');
 
@@ -303,6 +312,7 @@ async function continueGuidance() {
         }
     } finally {
         regenInProgress = false;
+        ngActiveAction = null;
         setNGActionButtonsRunning(false);
         refreshNGActionButtonStates();
     }
@@ -321,11 +331,18 @@ function showRegenOverlay() {
         <div class="ng-regen-overlay-card">
             <div class="ng-regen-overlay-spinner"><span class="fa-solid fa-wand-sparkles fa-spin"></span></div>
             <div class="ng-regen-overlay-title">Regenerating narrative guidance…</div>
-            <div class="ng-regen-overlay-subtitle">Please wait — input is paused until the new guidance is ready.</div>
+            <div class="ng-regen-overlay-subtitle">Input is paused until the new guidance is ready.</div>
+            <div class="ng-regen-overlay-stop menu_button interactable" title="Cancel this generation">
+                <span class="fa-solid fa-stop"></span> Stop
+            </div>
         </div>
     `;
     // Block keyboard activation of focused buttons (Enter / Space) while up.
     overlay.addEventListener('keydown', (e) => { e.stopPropagation(); e.preventDefault(); });
+    overlay.querySelector('.ng-regen-overlay-stop')?.addEventListener('click', () => {
+        abortAllSilentGenerations('ng-overlay-cancel');
+        debug('Stop requested via regen overlay');
+    });
     document.body.appendChild(overlay);
 }
 
@@ -406,19 +423,52 @@ function refreshPanelFromState() {
     refreshNGActionButtonStates();
 }
 
+// Original button HTML, captured so we can restore it when leaving the
+// generating state.
+const NG_REGEN_BTN_HTML = '<span class="ng-regen-icon fa-solid fa-wand-sparkles"></span> Regenerate Now';
+const NG_CONTINUE_BTN_HTML = '<span class="fa-solid fa-arrow-right"></span> Continue';
+const NG_STOP_BTN_HTML = '<span class="fa-solid fa-stop"></span> Stop';
+
 function setNGActionButtonsRunning(running) {
     const regenBtn = document.getElementById('ng_regenerate_now');
-    if (regenBtn) {
-        regenBtn.classList.toggle('disabled', running);
-        const icon = regenBtn.querySelector('.ng-regen-icon');
-        if (icon) {
-            icon.className = running
-                ? 'ng-regen-icon fa-solid fa-spinner fa-spin'
-                : 'ng-regen-icon fa-solid fa-wand-sparkles';
+    const continueBtn = document.getElementById('ng_continue_now');
+    const retryBtn = document.getElementById('ng_retry_now');
+
+    if (running) {
+        // Active button becomes Stop; the others get the disabled class so the
+        // user can't fire off a second job mid-flight.
+        if (ngActiveAction === 'continue') {
+            if (regenBtn) {
+                regenBtn.innerHTML = NG_REGEN_BTN_HTML;
+                regenBtn.classList.add('disabled');
+            }
+            if (continueBtn) {
+                continueBtn.innerHTML = NG_STOP_BTN_HTML;
+                continueBtn.classList.remove('disabled');
+            }
+        } else {
+            // 'regen' or unspecified — treat regenerate as active.
+            if (regenBtn) {
+                regenBtn.innerHTML = NG_STOP_BTN_HTML;
+                regenBtn.classList.remove('disabled');
+            }
+            if (continueBtn) {
+                continueBtn.innerHTML = NG_CONTINUE_BTN_HTML;
+                continueBtn.classList.add('disabled');
+            }
         }
+        retryBtn?.classList.add('disabled');
+    } else {
+        if (regenBtn) {
+            regenBtn.innerHTML = NG_REGEN_BTN_HTML;
+            regenBtn.classList.remove('disabled');
+        }
+        if (continueBtn) {
+            continueBtn.innerHTML = NG_CONTINUE_BTN_HTML;
+            continueBtn.classList.remove('disabled');
+        }
+        retryBtn?.classList.remove('disabled');
     }
-    document.getElementById('ng_continue_now')?.classList.toggle('disabled', running);
-    document.getElementById('ng_retry_now')?.classList.toggle('disabled', running);
 }
 
 function refreshNGActionButtonStates() {
@@ -663,12 +713,27 @@ export function bindNarrativeGuidanceSettings(saveSettings) {
     });
 
     document.getElementById('ng_regenerate_now')?.addEventListener('click', async () => {
-        if (regenInProgress) return;
+        // While running, the regenerate button is the Stop affordance for an
+        // active regen. Clicks during a `continue` job are ignored (that
+        // button is disabled in the UI).
+        if (regenInProgress) {
+            if (ngActiveAction === 'regen') {
+                abortAllSilentGenerations('ng-cancel');
+                debug('Stop requested via regenerate button');
+            }
+            return;
+        }
         await regenGuidance('manual');
     });
 
     document.getElementById('ng_continue_now')?.addEventListener('click', async () => {
-        if (regenInProgress) return;
+        if (regenInProgress) {
+            if (ngActiveAction === 'continue') {
+                abortAllSilentGenerations('ng-cancel');
+                debug('Stop requested via continue button');
+            }
+            return;
+        }
         await continueGuidance();
     });
 

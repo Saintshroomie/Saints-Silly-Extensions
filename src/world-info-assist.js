@@ -17,7 +17,10 @@ import {
     streamingGenerate,
     withSingleLineDisabled,
 } from './utils.js';
-import { isSilentGenerationAbort } from './silent-generation.js';
+import {
+    isSilentGenerationAbort,
+    abortAllSilentGenerations,
+} from './silent-generation.js';
 import { setupPromptTemplates } from './prompt-templates.js';
 
 // ─── Default Prompt ───
@@ -55,8 +58,10 @@ let debug = () => {};
 let observer = null;
 let saveSettingsCb = null;
 
-// Per-entry state, keyed by a stable id derived from the entry uid / DOM element
-const entryStates = new Map(); // id -> { originalSeed, hasGenerated, generating }
+// Per-entry state, keyed by a stable id derived from the entry uid / DOM element.
+// `activeAction` is set to 'assist' or 'continue' while generating so the button
+// labels can swap to Stop and clicks can route to cancel rather than re-start.
+const entryStates = new Map(); // id -> { originalSeed, hasGenerated, generating, activeAction }
 
 function getWIAResponseLength() {
     const n = moduleSettings?.wiaResponseLength;
@@ -285,7 +290,16 @@ function getTitle(formEl) {
     return commentInput?.value?.trim() || '';
 }
 
-function setUIState(formEl, state) {
+// Original button markup, captured so we can restore it when leaving the
+// generating state. Keyed by class name.
+const WIA_BTN_ORIGINAL_HTML = {
+    'wia-btn-assist': '<span class="fa-solid fa-wand-magic-sparkles"></span> <span class="wia-btn-label">Assist</span>',
+    'wia-btn-continue': '<span class="fa-solid fa-arrow-right"></span>',
+};
+
+const WIA_BTN_STOP_HTML = '<span class="fa-solid fa-stop"></span> <span class="wia-btn-label">Stop</span>';
+
+function setUIState(formEl, state, activeAction = null) {
     const controls = formEl.querySelector('.wia-controls');
     if (!controls) return;
     const assistBtn = controls.querySelector('.wia-btn-assist');
@@ -295,20 +309,40 @@ function setUIState(formEl, state) {
     const spinner = controls.querySelector('.wia-spinner');
 
     const show = (el, vis) => el && el.classList.toggle('wia-hidden', !vis);
+    const restoreBtn = (btn, key) => {
+        if (btn && WIA_BTN_ORIGINAL_HTML[key]) btn.innerHTML = WIA_BTN_ORIGINAL_HTML[key];
+    };
 
     if (state === 'idle') {
+        restoreBtn(assistBtn, 'wia-btn-assist');
+        restoreBtn(continueBtn, 'wia-btn-continue');
         show(assistBtn, true);
         show(continueBtn, false);
         show(retryBtn, false);
         show(revertBtn, false);
         show(spinner, false);
     } else if (state === 'generating') {
-        show(assistBtn, false);
-        show(continueBtn, false);
+        // Keep the active button visible and swap its content to a Stop
+        // affordance. Hide the others so the user can't accidentally
+        // re-trigger them mid-generation.
+        const isContinue = activeAction === 'continue';
+        if (isContinue) {
+            restoreBtn(assistBtn, 'wia-btn-assist');
+            if (continueBtn) continueBtn.innerHTML = WIA_BTN_STOP_HTML;
+            show(assistBtn, false);
+            show(continueBtn, true);
+        } else {
+            restoreBtn(continueBtn, 'wia-btn-continue');
+            if (assistBtn) assistBtn.innerHTML = WIA_BTN_STOP_HTML;
+            show(assistBtn, true);
+            show(continueBtn, false);
+        }
         show(retryBtn, false);
         show(revertBtn, false);
-        show(spinner, true);
+        show(spinner, false);
     } else if (state === 'generated') {
+        restoreBtn(assistBtn, 'wia-btn-assist');
+        restoreBtn(continueBtn, 'wia-btn-continue');
         show(assistBtn, false);
         show(continueBtn, true);
         show(retryBtn, true);
@@ -320,8 +354,19 @@ function setUIState(formEl, state) {
 // ─── Generation ───
 
 async function onAssist(formEl, id, isContinue) {
-    const state = entryStates.get(id) || { originalSeed: '', hasGenerated: false, generating: false };
-    if (state.generating) return;
+    const state = entryStates.get(id)
+        || { originalSeed: '', hasGenerated: false, generating: false, activeAction: null };
+    const action = isContinue ? 'continue' : 'assist';
+
+    // If we're already generating, treat a click on the active button as a
+    // Stop. Clicks on the other button (which is hidden anyway) are ignored.
+    if (state.generating) {
+        if (state.activeAction === action) {
+            abortAllSilentGenerations('wia-cancel');
+            debug('Stop requested for', id);
+        }
+        return;
+    }
 
     const contentEl = getContentTextarea(formEl);
     if (!contentEl) return;
@@ -332,9 +377,10 @@ async function onAssist(formEl, id, isContinue) {
         state.originalSeed = contentEl.value;
     }
     state.generating = true;
+    state.activeAction = action;
     entryStates.set(id, state);
 
-    setUIState(formEl, 'generating');
+    setUIState(formEl, 'generating', action);
 
     try {
         const title = getTitle(formEl);
@@ -428,6 +474,7 @@ async function onAssist(formEl, id, isContinue) {
 
         state.hasGenerated = true;
         state.generating = false;
+        state.activeAction = null;
         entryStates.set(id, state);
 
         setUIState(formEl, 'generated');
@@ -440,6 +487,7 @@ async function onAssist(formEl, id, isContinue) {
             toast(`World Info assist failed: ${err.message}`, 'error');
         }
         state.generating = false;
+        state.activeAction = null;
         entryStates.set(id, state);
         setUIState(formEl, state.hasGenerated ? 'generated' : 'idle');
     }

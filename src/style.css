@@ -830,3 +830,8 @@
     font-size: 0.9em;
     opacity: 0.75;
 }
+
+.ng-regen-overlay-stop {
+    margin-top: 8px;
+    cursor: pointer;
+}
