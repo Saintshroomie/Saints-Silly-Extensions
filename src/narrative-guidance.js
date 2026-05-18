@@ -13,7 +13,7 @@ import {
     setExtensionPrompt,
     extension_prompt_types,
     extension_prompt_roles,
-    substituteParams,
+    substituteParamsExtended,
 } from '../../../../../script.js';
 import { removeReasoningFromString } from '../../../../reasoning.js';
 import {
@@ -21,7 +21,7 @@ import {
     createDebugLogger,
     toast,
     buildContextPreamble,
-    getAvailableLoreBookNames,
+    createLoreBookPicker,
     streamingGenerate,
     withSingleLineDisabled,
 } from './utils.js';
@@ -110,8 +110,7 @@ function reapplyInjection() {
     // it). Strip outer brackets here so {{guidance}} substitutes cleanly
     // into whatever injection template the user has configured.
     const guidanceForInjection = stripBracketWrap(state.guidance);
-    let body = tpl.replace(/\{\{guidance\}\}/g, guidanceForInjection);
-    body = substituteParams(body);
+    const body = substituteParamsExtended(tpl, { guidance: guidanceForInjection });
     const depth = Number.isFinite(moduleSettings.narrativeGuidanceInjectionDepth)
         && moduleSettings.narrativeGuidanceInjectionDepth >= 0
         ? moduleSettings.narrativeGuidanceInjectionDepth
@@ -454,64 +453,23 @@ function refreshNGActionButtonStates() {
 }
 
 function populateLoreBookPicker() {
-    const picker = document.getElementById('ng_lorebooks_details');
-    const list = document.getElementById('ng_lorebooks_list');
-    const summaryLabel = document.getElementById('ng_lorebooks_summary_label');
-    if (!picker || !list || !summaryLabel) return;
+    const host = document.getElementById('ng_lorebooks_host');
+    if (!host) return;
 
-    const updateSummary = () => {
-        const checked = list.querySelectorAll('input[type="checkbox"]:checked').length;
-        summaryLabel.textContent = checked > 0 ? `Lore Books (${checked})` : 'Lore Books';
-    };
+    const initial = Array.isArray(moduleSettings.narrativeGuidanceLoreBookNames)
+        ? moduleSettings.narrativeGuidanceLoreBookNames
+        : [];
 
-    const writeSelectionToSettings = () => {
-        const names = Array.from(list.querySelectorAll('input[type="checkbox"]:checked'))
-            .map(cb => cb.value);
-        moduleSettings.narrativeGuidanceLoreBookNames = names;
-        saveSettingsCb?.();
-    };
-
-    const render = () => {
-        const names = getAvailableLoreBookNames();
-        const previouslyChecked = new Set(
-            Array.isArray(moduleSettings.narrativeGuidanceLoreBookNames)
-                ? moduleSettings.narrativeGuidanceLoreBookNames
-                : [],
-        );
-        list.innerHTML = '';
-        if (!names.length) {
-            const empty = document.createElement('div');
-            empty.className = 'ng-lorebook-empty';
-            empty.textContent = 'No lore books available.';
-            list.appendChild(empty);
-            updateSummary();
-            return;
-        }
-        for (const name of names) {
-            const label = document.createElement('label');
-            label.className = 'ng-lorebook-item checkbox_label';
-            const cb = document.createElement('input');
-            cb.type = 'checkbox';
-            cb.value = name;
-            if (previouslyChecked.has(name)) cb.checked = true;
-            cb.addEventListener('change', () => {
-                writeSelectionToSettings();
-                updateSummary();
-            });
-            const span = document.createElement('span');
-            span.textContent = name;
-            label.appendChild(cb);
-            label.appendChild(span);
-            list.appendChild(label);
-        }
-        updateSummary();
-    };
-
-    picker.addEventListener('toggle', () => {
-        if (picker.open) render();
+    const { element } = createLoreBookPicker({
+        initialSelection: initial,
+        classPrefix: 'ng-lorebook',
+        onChange: (names) => {
+            moduleSettings.narrativeGuidanceLoreBookNames = names;
+            saveSettingsCb?.();
+        },
     });
-
-    render();
+    element.id = 'ng_lorebooks_details';
+    host.replaceChildren(element);
 }
 
 export function bindNarrativeGuidanceSettings(saveSettings) {

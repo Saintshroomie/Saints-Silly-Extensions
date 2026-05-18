@@ -1,11 +1,11 @@
-import { loadWorldInfo as __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_loadWorldInfo__, world_names as __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_world_names__ } from "../../../../world-info.js";
-import { extension_prompt_roles as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_roles__, extension_prompt_types as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_types__, generateRaw as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__, getMaxContextSize as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_getMaxContextSize__, setExtensionPrompt as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_setExtensionPrompt__, stopGeneration as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_stopGeneration__, substituteParams as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParams__ } from "../../../../../script.js";
+import { loadWorldInfo as __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_loadWorldInfo__ } from "../../../../world-info.js";
+import { extension_prompt_roles as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_roles__, extension_prompt_types as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_types__, generateRaw as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__, getMaxPromptTokens as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_getMaxPromptTokens__, setExtensionPrompt as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_setExtensionPrompt__, stopGeneration as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_stopGeneration__, substituteParamsExtended as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParamsExtended__ } from "../../../../../script.js";
 import { getTokenCountAsync as __WEBPACK_EXTERNAL_MODULE__tokenizers_js_d5863f55_getTokenCountAsync__ } from "../../../../tokenizers.js";
-import { groups as __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_groups__, selected_group as __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__ } from "../../../../group-chats.js";
 import { SlashCommandParser as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandParser_js_42c8b851_SlashCommandParser__ } from "../../../../slash-commands/SlashCommandParser.js";
 import { SlashCommand as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommand_js_1b0d5616_SlashCommand__ } from "../../../../slash-commands/SlashCommand.js";
 import { ARGUMENT_TYPE as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandArgument_js_a42b9371_ARGUMENT_TYPE__, SlashCommandArgument as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandArgument_js_a42b9371_SlashCommandArgument__ } from "../../../../slash-commands/SlashCommandArgument.js";
 import { removeReasoningFromString as __WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__ } from "../../../../reasoning.js";
+import { POPUP_RESULT as __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_POPUP_RESULT__, POPUP_TYPE as __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_POPUP_TYPE__, Popup as __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_Popup__ } from "../../../../popup.js";
 /******/ var __webpack_modules__ = ({
 
 /***/ 208
@@ -262,69 +262,15 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Saint's Silly Extensions — Combin
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════
-   ACC MODAL STYLES
+   ACC MODAL STYLES (rendered inside ST's Popup; chrome is provided by Popup)
    ═══════════════════════════════════════════════════════════════════════════════ */
 
-#acc_modal_overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
-    z-index: 10000;
-}
-
-#acc_modal {
-    position: fixed;
-    top: 5vh;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--SmartThemeBlurTintColor, #1a1a2e);
-    border: 1px solid var(--SmartThemeBorderColor, #555);
-    border-radius: 8px;
-    width: 90%;
-    max-width: 700px;
-    height: 90vh;
+.acc-modal-body {
     display: flex;
     flex-direction: column;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-    z-index: 10001;
-}
-
-#acc_modal .acc-modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--SmartThemeBorderColor, #555);
-    flex-shrink: 0;
-}
-
-#acc_modal .acc-modal-header h3 {
-    margin: 0;
-    font-size: 1.1em;
-}
-
-.acc-close-btn {
-    cursor: pointer;
-    opacity: 0.7;
-    transition: opacity 0.15s ease;
-    font-size: 1.2em;
-    padding: 4px 8px;
-}
-
-.acc-close-btn:hover {
-    opacity: 1;
-}
-
-#acc_modal .acc-modal-body {
-    padding: 16px;
-    overflow-y: auto !important;
     flex: 1 1 0%;
     min-height: 0;
-    display: flex;
-    flex-direction: column;
+    text-align: left;
 }
 
 .acc-brief-section {
@@ -421,26 +367,6 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Saint's Silly Extensions — Combin
 
 .acc-hidden {
     display: none !important;
-}
-
-#acc_modal .acc-modal-footer {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding: 12px 16px;
-    border-top: 1px solid var(--SmartThemeBorderColor, #555);
-    gap: 8px;
-    flex-shrink: 0;
-}
-
-.acc-footer-right {
-    display: flex;
-    gap: 8px;
-}
-
-.acc-done-btn.acc-disabled {
-    opacity: 0.3;
-    pointer-events: none;
 }
 
 /* ACC Launch button in character creator */
@@ -814,7 +740,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Saint's Silly Extensions — Combin
     pointer-events: none;
 }
 
-`, "",{"version":3,"sources":["webpack://./src/style.css"],"names":[],"mappings":"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","sourcesContent":["/* Saint's Silly Extensions — Combined Styles */\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   POSSESSION STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Group Chat: Radio Button Toggle ── */\n\n.possession_radio_wrapper {\n    display: inline-flex;\n    align-items: center;\n    margin-left: 4px;\n    cursor: pointer;\n}\n\n.possession_radio {\n    width: 16px;\n    height: 16px;\n    border-radius: 50%;\n    border: 2px solid var(--SmartThemeBorderColor, #555);\n    background: transparent;\n    cursor: pointer;\n    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;\n    position: relative;\n    flex-shrink: 0;\n}\n\n.possession_radio:hover {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.possession_radio.possession_active {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n    background: var(--SmartThemeQuoteColor, #e8a23a);\n    box-shadow: inset 0 0 0 3px var(--SmartThemeBlurTintColor, #1a1a2e);\n}\n\n/* ── Solo Chat: Possess Toggle Button ── */\n\n#possession_solo_btn {\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    cursor: pointer;\n    position: relative;\n}\n\n#possession_solo_btn:hover {\n    opacity: 1;\n}\n\n#possession_solo_btn.possession_active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n#possession_solo_btn.possession_active::after {\n    content: '';\n    position: absolute;\n    bottom: -2px;\n    left: 50%;\n    transform: translateX(-50%);\n    width: 6px;\n    height: 6px;\n    border-radius: 50%;\n    background-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Group member highlight when possessed ── */\n\n.group_member.possession_possessed {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n/* ── Possession Impersonate Button (Character Avatar) ── */\n\n#possession_impersonate_btn {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease;\n    padding: 2px;\n}\n\n#possession_impersonate_btn:hover {\n    opacity: 1;\n}\n\n.possession_impersonate_avatar {\n    width: 26px;\n    height: 26px;\n    border-radius: 50%;\n    object-fit: cover;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    transition: border-color 0.15s ease;\n}\n\n#possession_impersonate_btn:hover .possession_impersonate_avatar {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hide controls when extension is disabled ── */\n\n.possession_hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PHRASING STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Input Area Button (next to Send) ── */\n\n#phrasing_send_button {\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    padding: 3px;\n    font-size: 1.2em;\n}\n\n#phrasing_send_button:hover {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hamburger Menu Item ── */\n\n#phrasing_menu_button {\n    cursor: pointer;\n}\n\n#phrasing_menu_button .fa-solid {\n    margin-right: 5px;\n    width: 1em;\n    text-align: center;\n}\n\n/* ── Hide buttons during generation ── */\n\n.phrasing-hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SETTINGS PANEL STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .inline-drawer-content {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n    padding: 8px 0;\n}\n\n#saints_silly_settings .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_section_header {\n    margin: 4px 0 2px 0;\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_divider {\n    border: none;\n    border-top: 1px solid var(--SmartThemeBorderColor, #555);\n    margin: 8px 0;\n}\n\n#saints_silly_settings .phrasing_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #phrasing_prompt_textarea {\n    width: 100%;\n    min-height: 120px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .acc_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #acc_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC MODAL STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#acc_modal_overlay {\n    position: fixed;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    background: rgba(0, 0, 0, 0.6);\n    z-index: 10000;\n}\n\n#acc_modal {\n    position: fixed;\n    top: 5vh;\n    left: 50%;\n    transform: translateX(-50%);\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 8px;\n    width: 90%;\n    max-width: 700px;\n    height: 90vh;\n    display: flex;\n    flex-direction: column;\n    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);\n    z-index: 10001;\n}\n\n#acc_modal .acc-modal-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    padding: 12px 16px;\n    border-bottom: 1px solid var(--SmartThemeBorderColor, #555);\n    flex-shrink: 0;\n}\n\n#acc_modal .acc-modal-header h3 {\n    margin: 0;\n    font-size: 1.1em;\n}\n\n.acc-close-btn {\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease;\n    font-size: 1.2em;\n    padding: 4px 8px;\n}\n\n.acc-close-btn:hover {\n    opacity: 1;\n}\n\n#acc_modal .acc-modal-body {\n    padding: 16px;\n    overflow-y: auto !important;\n    flex: 1 1 0%;\n    min-height: 0;\n    display: flex;\n    flex-direction: column;\n}\n\n.acc-brief-section {\n    margin-bottom: 12px;\n}\n\n.acc-brief-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.acc-action-row {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    margin-bottom: 8px;\n}\n\n.acc-tokens-row {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 6px;\n    margin-bottom: 12px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.acc-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.acc-tokens-input {\n    width: 80px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n.acc-action-btn {\n    flex: 1 1 0;\n    min-width: 110px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n.acc-action-btn.acc-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.acc-generate-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.acc-status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    background: var(--SmartThemeBodyColor, #222);\n    border-radius: 4px;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 0.9em;\n}\n\n.acc-description-section {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.acc-description-section label {\n    margin-bottom: 4px;\n}\n\n.acc-description-output {\n    width: 100%;\n    flex: 1 1 0%;\n    min-height: 200px;\n    resize: vertical;\n}\n\n.acc-description-output[disabled] {\n    opacity: 0.5;\n    cursor: not-allowed;\n}\n\n.acc-hidden {\n    display: none !important;\n}\n\n#acc_modal .acc-modal-footer {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    padding: 12px 16px;\n    border-top: 1px solid var(--SmartThemeBorderColor, #555);\n    gap: 8px;\n    flex-shrink: 0;\n}\n\n.acc-footer-right {\n    display: flex;\n    gap: 8px;\n}\n\n.acc-done-btn.acc-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n/* ACC Launch button in character creator */\n#acc_launch_btn {\n    display: flex;\n    align-items: center;\n    gap: 4px;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   WORLD INFO ASSIST STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Settings panel */\n#saints_silly_settings .wia_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #wia_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* Per-entry assist controls injected into each WI entry form */\n.wia-controls {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    flex-wrap: wrap;\n    margin: 6px 0 6px 0;\n}\n\n.wia-controls .wia-btn {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    cursor: pointer;\n    font-size: 0.85em;\n    padding: 4px 8px;\n}\n\n.wia-controls .wia-btn-assist {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.wia-controls .wia-btn-label {\n    font-weight: 500;\n}\n\n.wia-controls .wia-spinner {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 1em;\n    display: inline-flex;\n    align-items: center;\n    padding: 4px 6px;\n}\n\n.wia-controls .wia-hidden {\n    display: none !important;\n}\n\n/* Use Chat Context checkbox */\n.wia-controls .wia-context-toggle {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    font-size: 0.85em;\n    cursor: pointer;\n    opacity: 0.85;\n    user-select: none;\n}\n\n.wia-controls .wia-context-toggle:hover {\n    opacity: 1;\n}\n\n/* Lore book multi-select picker (per-entry) */\n.wia-controls .wia-lorebook-picker {\n    position: relative;\n    font-size: 0.85em;\n}\n\n.wia-controls .wia-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.wia-controls .wia-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.wia-controls .wia-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.wia-controls .wia-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 50;\n    min-width: 220px;\n    max-height: 240px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);\n}\n\n.wia-controls .wia-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.wia-controls .wia-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Per-entry token limit row */\n.wia-controls .wia-tokens-row {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.85em;\n    opacity: 0.85;\n    margin-left: auto;\n}\n\n.wia-controls .wia-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.wia-controls .wia-tokens-input {\n    width: 72px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n/* ── ACC modal: context preamble controls ── */\n\n.acc-context-section {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: wrap;\n    margin-bottom: 12px;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.acc-context-section .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.9em;\n    cursor: pointer;\n}\n\n.acc-lorebook-picker {\n    position: relative;\n    font-size: 0.9em;\n}\n\n.acc-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.acc-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.acc-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.acc-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 10002;\n    min-width: 240px;\n    max-height: 260px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\n}\n\n.acc-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.acc-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   NARRATIVE GUIDANCE SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_subsection_header {\n    margin: 12px 0 4px 0;\n    opacity: 0.85;\n}\n\n#saints_silly_settings .ng_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings .ng_prompt_section textarea {\n    width: 100%;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .ng_inline_row {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin: 6px 0;\n}\n\n#saints_silly_settings .ng_number_input {\n    width: 5em;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng_select_input {\n    width: auto;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng-lorebook-picker {\n    margin: 8px 0;\n}\n\n#saints_silly_settings .ng-lorebook-list {\n    margin-top: 4px;\n    padding: 6px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n}\n\n#saints_silly_settings .ng-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n#saints_silly_settings .ng-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n#saints_silly_settings #ng_regenerate_now.disabled,\n#saints_silly_settings #ng_continue_now.disabled,\n#saints_silly_settings #ng_retry_now.disabled {\n    opacity: 0.6;\n    pointer-events: none;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PROMPT TEMPLATE CONTROLS (shared, one row per prompt)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_template_controls {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin-top: 6px;\n}\n\n#saints_silly_settings .saints_template_select {\n    width: 100%;\n}\n\n#saints_silly_settings .saints_template_buttons {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button {\n    flex: 1 1 0;\n    min-width: 100px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button.disabled {\n    opacity: 0.5;\n    pointer-events: none;\n}\n\n"],"sourceRoot":""}]);
+`, "",{"version":3,"sources":["webpack://./src/style.css"],"names":[],"mappings":"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","sourcesContent":["/* Saint's Silly Extensions — Combined Styles */\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   POSSESSION STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Group Chat: Radio Button Toggle ── */\n\n.possession_radio_wrapper {\n    display: inline-flex;\n    align-items: center;\n    margin-left: 4px;\n    cursor: pointer;\n}\n\n.possession_radio {\n    width: 16px;\n    height: 16px;\n    border-radius: 50%;\n    border: 2px solid var(--SmartThemeBorderColor, #555);\n    background: transparent;\n    cursor: pointer;\n    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;\n    position: relative;\n    flex-shrink: 0;\n}\n\n.possession_radio:hover {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.possession_radio.possession_active {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n    background: var(--SmartThemeQuoteColor, #e8a23a);\n    box-shadow: inset 0 0 0 3px var(--SmartThemeBlurTintColor, #1a1a2e);\n}\n\n/* ── Solo Chat: Possess Toggle Button ── */\n\n#possession_solo_btn {\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    cursor: pointer;\n    position: relative;\n}\n\n#possession_solo_btn:hover {\n    opacity: 1;\n}\n\n#possession_solo_btn.possession_active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n#possession_solo_btn.possession_active::after {\n    content: '';\n    position: absolute;\n    bottom: -2px;\n    left: 50%;\n    transform: translateX(-50%);\n    width: 6px;\n    height: 6px;\n    border-radius: 50%;\n    background-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Group member highlight when possessed ── */\n\n.group_member.possession_possessed {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n/* ── Possession Impersonate Button (Character Avatar) ── */\n\n#possession_impersonate_btn {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease;\n    padding: 2px;\n}\n\n#possession_impersonate_btn:hover {\n    opacity: 1;\n}\n\n.possession_impersonate_avatar {\n    width: 26px;\n    height: 26px;\n    border-radius: 50%;\n    object-fit: cover;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    transition: border-color 0.15s ease;\n}\n\n#possession_impersonate_btn:hover .possession_impersonate_avatar {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hide controls when extension is disabled ── */\n\n.possession_hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PHRASING STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Input Area Button (next to Send) ── */\n\n#phrasing_send_button {\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    padding: 3px;\n    font-size: 1.2em;\n}\n\n#phrasing_send_button:hover {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hamburger Menu Item ── */\n\n#phrasing_menu_button {\n    cursor: pointer;\n}\n\n#phrasing_menu_button .fa-solid {\n    margin-right: 5px;\n    width: 1em;\n    text-align: center;\n}\n\n/* ── Hide buttons during generation ── */\n\n.phrasing-hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SETTINGS PANEL STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .inline-drawer-content {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n    padding: 8px 0;\n}\n\n#saints_silly_settings .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_section_header {\n    margin: 4px 0 2px 0;\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_divider {\n    border: none;\n    border-top: 1px solid var(--SmartThemeBorderColor, #555);\n    margin: 8px 0;\n}\n\n#saints_silly_settings .phrasing_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #phrasing_prompt_textarea {\n    width: 100%;\n    min-height: 120px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .acc_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #acc_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC MODAL STYLES (rendered inside ST's Popup; chrome is provided by Popup)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n.acc-modal-body {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n    text-align: left;\n}\n\n.acc-brief-section {\n    margin-bottom: 12px;\n}\n\n.acc-brief-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.acc-action-row {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    margin-bottom: 8px;\n}\n\n.acc-tokens-row {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 6px;\n    margin-bottom: 12px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.acc-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.acc-tokens-input {\n    width: 80px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n.acc-action-btn {\n    flex: 1 1 0;\n    min-width: 110px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n.acc-action-btn.acc-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.acc-generate-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.acc-status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    background: var(--SmartThemeBodyColor, #222);\n    border-radius: 4px;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 0.9em;\n}\n\n.acc-description-section {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.acc-description-section label {\n    margin-bottom: 4px;\n}\n\n.acc-description-output {\n    width: 100%;\n    flex: 1 1 0%;\n    min-height: 200px;\n    resize: vertical;\n}\n\n.acc-description-output[disabled] {\n    opacity: 0.5;\n    cursor: not-allowed;\n}\n\n.acc-hidden {\n    display: none !important;\n}\n\n/* ACC Launch button in character creator */\n#acc_launch_btn {\n    display: flex;\n    align-items: center;\n    gap: 4px;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   WORLD INFO ASSIST STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Settings panel */\n#saints_silly_settings .wia_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #wia_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* Per-entry assist controls injected into each WI entry form */\n.wia-controls {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    flex-wrap: wrap;\n    margin: 6px 0 6px 0;\n}\n\n.wia-controls .wia-btn {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    cursor: pointer;\n    font-size: 0.85em;\n    padding: 4px 8px;\n}\n\n.wia-controls .wia-btn-assist {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.wia-controls .wia-btn-label {\n    font-weight: 500;\n}\n\n.wia-controls .wia-spinner {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 1em;\n    display: inline-flex;\n    align-items: center;\n    padding: 4px 6px;\n}\n\n.wia-controls .wia-hidden {\n    display: none !important;\n}\n\n/* Use Chat Context checkbox */\n.wia-controls .wia-context-toggle {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    font-size: 0.85em;\n    cursor: pointer;\n    opacity: 0.85;\n    user-select: none;\n}\n\n.wia-controls .wia-context-toggle:hover {\n    opacity: 1;\n}\n\n/* Lore book multi-select picker (per-entry) */\n.wia-controls .wia-lorebook-picker {\n    position: relative;\n    font-size: 0.85em;\n}\n\n.wia-controls .wia-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.wia-controls .wia-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.wia-controls .wia-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.wia-controls .wia-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 50;\n    min-width: 220px;\n    max-height: 240px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);\n}\n\n.wia-controls .wia-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.wia-controls .wia-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Per-entry token limit row */\n.wia-controls .wia-tokens-row {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.85em;\n    opacity: 0.85;\n    margin-left: auto;\n}\n\n.wia-controls .wia-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.wia-controls .wia-tokens-input {\n    width: 72px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n/* ── ACC modal: context preamble controls ── */\n\n.acc-context-section {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: wrap;\n    margin-bottom: 12px;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.acc-context-section .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.9em;\n    cursor: pointer;\n}\n\n.acc-lorebook-picker {\n    position: relative;\n    font-size: 0.9em;\n}\n\n.acc-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.acc-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.acc-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.acc-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 10002;\n    min-width: 240px;\n    max-height: 260px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\n}\n\n.acc-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.acc-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   NARRATIVE GUIDANCE SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_subsection_header {\n    margin: 12px 0 4px 0;\n    opacity: 0.85;\n}\n\n#saints_silly_settings .ng_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings .ng_prompt_section textarea {\n    width: 100%;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .ng_inline_row {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin: 6px 0;\n}\n\n#saints_silly_settings .ng_number_input {\n    width: 5em;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng_select_input {\n    width: auto;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng-lorebook-picker {\n    margin: 8px 0;\n}\n\n#saints_silly_settings .ng-lorebook-list {\n    margin-top: 4px;\n    padding: 6px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n}\n\n#saints_silly_settings .ng-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n#saints_silly_settings .ng-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n#saints_silly_settings #ng_regenerate_now.disabled,\n#saints_silly_settings #ng_continue_now.disabled,\n#saints_silly_settings #ng_retry_now.disabled {\n    opacity: 0.6;\n    pointer-events: none;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PROMPT TEMPLATE CONTROLS (shared, one row per prompt)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_template_controls {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin-top: 6px;\n}\n\n#saints_silly_settings .saints_template_select {\n    width: 100%;\n}\n\n#saints_silly_settings .saints_template_buttons {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button {\n    flex: 1 1 0;\n    min-width: 100px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button.disabled {\n    opacity: 0.5;\n    pointer-events: none;\n}\n\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -1296,7 +1222,7 @@ var update = injectStylesIntoStyleTag_default()(style/* default */.A, options);
 
 ;// ./src/settings.html
 // Module
-var code = `<div id="saints_silly_settings" class="extension_settings"> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Saint's Silly Extensions</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <h4 class="saints_section_header"> <span class="fa-solid fa-ghost"></span> Possession </h4> <label class="checkbox_label"> <input id="possession_enabled" type="checkbox"/> <span>Enable Possession</span> </label> <label class="checkbox_label"> <input id="possession_show_toast" type="checkbox"/> <span>Show Toast on Possess/Unpossess</span> </label> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-pen-fancy"></span> Phrasing! </h4> <label class="checkbox_label"> <input id="phrasing_enabled" type="checkbox" checked="checked"/> <span>Enable Phrasing!</span> </label> <label class="checkbox_label" title="When enabled, rephrasing a message includes every existing swipe in the prompt and asks the model to produce something wildly different."> <input id="phrasing_inverse_guidance" type="checkbox"/> <span>Inverse Guidance</span> </label> <div class="phrasing_prompt_section"> <label for="phrasing_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="phrasing_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Phrasing! prompt template..."></textarea> </div> <div class="saints_template_controls" id="phrasing_prompt_templates"></div> <div class="phrasing_prompt_section"> <label for="phrasing_inverse_prompt_textarea"><b>Inverse Guidance Prompt Template:</b></label> <textarea id="phrasing_inverse_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Inverse Guidance prompt template..."></textarea> <small>Available placeholders: <code>{{phrasingSeed}}</code>, <code>{{phrasingSwipes}}</code></small> </div> <div class="saints_template_controls" id="phrasing_inverse_prompt_templates"></div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-wand-magic-sparkles"></span> Assisted Character Creation </h4> <label class="checkbox_label"> <input id="acc_enabled" type="checkbox"/> <span>Enable Assisted Character Creation</span> </label> <div class="ng_inline_row"> <label for="acc_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="acc_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for ACC generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="acc_prompt_section"> <label for="acc_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="acc_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your ACC prompt template..."></textarea> </div> <div class="saints_template_controls" id="acc_prompt_templates"></div> <div class="acc_prompt_section"> <label for="acc_prefill_textarea"><b>Prefill Template:</b></label> <textarea id="acc_prefill_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix the model continues. Also prepended to the description on success."></textarea> <small>Passed to the model as an assistant prefix and kept at the top of the generated description.</small> </div> <div class="saints_template_controls" id="acc_prefill_templates"></div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-book-atlas"></span> World Info Assist </h4> <label class="checkbox_label"> <input id="wia_enabled" type="checkbox"/> <span>Enable World Info Assist</span> </label> <div class="ng_inline_row"> <label for="wia_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="wia_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for World Info Assist generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="wia_response_length"><b><span class="fa-solid fa-coins"></span> Response Token Limit:</b></label> <input id="wia_response_length" type="number" min="50" max="8192" step="50" class="text_pole ng_number_input" title="Maximum tokens the model may use for each World Info Assist generation."/> </div> <div class="wia_prompt_section"> <label for="wia_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="wia_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your World Info Assist prompt template..."></textarea> </div> <div class="saints_template_controls" id="wia_prompt_templates"></div> <div class="wia_prompt_section"> <label for="wia_prefill_titled_textarea"><b>Prefill Template — Titled Entry:</b></label> <textarea id="wia_prefill_titled_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix used when the entry has a title."></textarea> <small>Available placeholder: <code>{{title}}</code>. Used as the assistant prefix and prepended to the entry on success.</small> </div> <div class="saints_template_controls" id="wia_prefill_titled_templates"></div> <div class="wia_prompt_section"> <label for="wia_prefill_untitled_textarea"><b>Prefill Template — Untitled Entry:</b></label> <textarea id="wia_prefill_untitled_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix used when the entry has no title yet."></textarea> <small>Used as the assistant prefix and prepended to the entry on success.</small> </div> <div class="saints_template_controls" id="wia_prefill_untitled_templates"></div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-compass"></span> Narrative Guidance </h4> <label class="checkbox_label"> <input id="ng_enabled" type="checkbox"/> <span>Enable Narrative Guidance</span> </label> <label class="checkbox_label" title="When on, regenerates guidance automatically when the turn counter hits zero. When off, only the Regenerate Now button updates the guidance."> <input id="ng_auto_regen" type="checkbox"/> <span>Auto-Regenerate at Zero</span> </label> <div class="ng_inline_row"> <label for="ng_default_turn_count"><b>Turns Between Regenerations:</b></label> <input id="ng_default_turn_count" type="number" min="1" step="1" class="text_pole ng_number_input"/> </div> <div class="ng_inline_row"> <label for="ng_response_length"><b>Response Token Limit:</b></label> <input id="ng_response_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="Maximum number of tokens the model may use for each generated guidance paragraph."/> </div> <div class="ng_inline_row"> <label for="ng_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="ng_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for Narrative Guidance generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_prompt_section"> <label for="ng_generation_prompt_textarea"><b>Generation Prompt (used as prefill):</b></label> <textarea id="ng_generation_prompt_textarea" class="text_pole" rows="4" placeholder="Enter the prefill that the LLM will continue..."></textarea> <small>The model's reply continues this text and becomes the active guidance.</small> </div> <div class="saints_template_controls" id="ng_generation_prompt_templates"></div> <div class="ng_prompt_section"> <label for="ng_injection_prompt_textarea"><b>Injection Prompt Template:</b></label> <textarea id="ng_injection_prompt_textarea" class="text_pole" rows="3" placeholder="Template injected before each AI turn..."></textarea> <small>Available placeholder: <code>{{guidance}}</code></small> </div> <div class="saints_template_controls" id="ng_injection_prompt_templates"></div> <div class="ng_inline_row"> <label for="ng_injection_depth"><b>Depth:</b></label> <input id="ng_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the guidance after (0 = bottom)."/> <label for="ng_injection_role"><b>Role:</b></label> <select id="ng_injection_role" class="text_pole ng_select_input" title="Role used when injecting the guidance into the prompt."> <option value="system">System</option> <option value="user">User</option> <option value="assistant">Assistant</option> </select> </div> <details id="ng_lorebooks_details" class="ng-lorebook-picker"> <summary><span class="fa-solid fa-book"></span> <span id="ng_lorebooks_summary_label">Lore Books</span></summary> <div id="ng_lorebooks_list" class="ng-lorebook-list"></div> </details> <h5 class="saints_subsection_header">Per-Chat</h5> <div class="ng_prompt_section"> <label for="ng_themes_textarea"><b>Themes / Story Arcs:</b></label> <textarea id="ng_themes_textarea" class="text_pole" rows="4" placeholder="Optional themes, ideas, or arcs for the AI to consider..."></textarea> </div> <div class="ng_prompt_section"> <label for="ng_active_guidance_textarea"><b>Active Guidance:</b></label> <textarea id="ng_active_guidance_textarea" class="text_pole" rows="6" placeholder="The currently active guidance paragraph. Edit freely; changes apply on the next AI turn."></textarea> </div> <div class="ng_inline_row"> <span><b>Turns Remaining:</b> <span id="ng_remaining_display">0</span></span> <div class="menu_button" id="ng_decrement_button" title="Decrement remaining by 1"> <span class="fa-solid fa-minus"></span> </div> <div class="menu_button" id="ng_reset_button" title="Reset remaining to default turn count"> <span class="fa-solid fa-rotate-right"></span> Reset </div> <div class="menu_button disabled" id="ng_continue_now" title="Continue the current guidance paragraph"> <span class="fa-solid fa-arrow-right"></span> Continue </div> <div class="menu_button disabled" id="ng_retry_now" title="Restore previous guidance and regenerate"> <span class="fa-solid fa-rotate-right"></span> Retry </div> <div class="menu_button" id="ng_regenerate_now" title="Regenerate guidance now"> <span class="ng-regen-icon fa-solid fa-wand-sparkles"></span> Regenerate Now </div> </div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-bug"></span> Diagnostics </h4> <label class="checkbox_label" title="Log detailed Possession events to the browser console."> <input id="possession_debug_mode" type="checkbox"/> <span>Possession Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Phrasing events to the browser console."> <input id="phrasing_debug_mode" type="checkbox"/> <span>Phrasing Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Assisted Character Creation events, prompts, and generations to the browser console."> <input id="acc_debug_mode" type="checkbox"/> <span>ACC Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed World Info Assist events, prompts, and generations to the browser console."> <input id="wia_debug_mode" type="checkbox"/> <span>WI Assist Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Narrative Guidance events to the browser console."> <input id="ng_debug_mode" type="checkbox"/> <span>Narrative Guidance Debug Mode</span> </label> <label class="checkbox_label" title="Log silent-generation lifecycle (job start/abort/completion, stop-listener events, stream token counts) to the browser console. Useful when diagnosing stop-button behavior across backends."> <input id="silent_generation_debug_mode" type="checkbox"/> <span>Silent Generation Debug Mode</span> </label> </div> </div> </div> `;
+var code = `<div id="saints_silly_settings" class="extension_settings"> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Saint's Silly Extensions</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <h4 class="saints_section_header"> <span class="fa-solid fa-ghost"></span> Possession </h4> <label class="checkbox_label"> <input id="possession_enabled" type="checkbox"/> <span>Enable Possession</span> </label> <label class="checkbox_label"> <input id="possession_show_toast" type="checkbox"/> <span>Show Toast on Possess/Unpossess</span> </label> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-pen-fancy"></span> Phrasing! </h4> <label class="checkbox_label"> <input id="phrasing_enabled" type="checkbox" checked="checked"/> <span>Enable Phrasing!</span> </label> <label class="checkbox_label" title="When enabled, rephrasing a message includes every existing swipe in the prompt and asks the model to produce something wildly different."> <input id="phrasing_inverse_guidance" type="checkbox"/> <span>Inverse Guidance</span> </label> <div class="phrasing_prompt_section"> <label for="phrasing_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="phrasing_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Phrasing! prompt template..."></textarea> </div> <div class="saints_template_controls" id="phrasing_prompt_templates"></div> <div class="phrasing_prompt_section"> <label for="phrasing_inverse_prompt_textarea"><b>Inverse Guidance Prompt Template:</b></label> <textarea id="phrasing_inverse_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Inverse Guidance prompt template..."></textarea> <small>Available placeholders: <code>{{phrasingSeed}}</code>, <code>{{phrasingSwipes}}</code></small> </div> <div class="saints_template_controls" id="phrasing_inverse_prompt_templates"></div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-wand-magic-sparkles"></span> Assisted Character Creation </h4> <label class="checkbox_label"> <input id="acc_enabled" type="checkbox"/> <span>Enable Assisted Character Creation</span> </label> <div class="ng_inline_row"> <label for="acc_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="acc_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for ACC generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="acc_prompt_section"> <label for="acc_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="acc_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your ACC prompt template..."></textarea> </div> <div class="saints_template_controls" id="acc_prompt_templates"></div> <div class="acc_prompt_section"> <label for="acc_prefill_textarea"><b>Prefill Template:</b></label> <textarea id="acc_prefill_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix the model continues. Also prepended to the description on success."></textarea> <small>Passed to the model as an assistant prefix and kept at the top of the generated description.</small> </div> <div class="saints_template_controls" id="acc_prefill_templates"></div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-book-atlas"></span> World Info Assist </h4> <label class="checkbox_label"> <input id="wia_enabled" type="checkbox"/> <span>Enable World Info Assist</span> </label> <div class="ng_inline_row"> <label for="wia_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="wia_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for World Info Assist generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="wia_response_length"><b><span class="fa-solid fa-coins"></span> Response Token Limit:</b></label> <input id="wia_response_length" type="number" min="50" max="8192" step="50" class="text_pole ng_number_input" title="Maximum tokens the model may use for each World Info Assist generation."/> </div> <div class="wia_prompt_section"> <label for="wia_prompt_textarea"><b>Prompt Template:</b></label> <textarea id="wia_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your World Info Assist prompt template..."></textarea> </div> <div class="saints_template_controls" id="wia_prompt_templates"></div> <div class="wia_prompt_section"> <label for="wia_prefill_titled_textarea"><b>Prefill Template — Titled Entry:</b></label> <textarea id="wia_prefill_titled_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix used when the entry has a title."></textarea> <small>Available placeholder: <code>{{title}}</code>. Used as the assistant prefix and prepended to the entry on success.</small> </div> <div class="saints_template_controls" id="wia_prefill_titled_templates"></div> <div class="wia_prompt_section"> <label for="wia_prefill_untitled_textarea"><b>Prefill Template — Untitled Entry:</b></label> <textarea id="wia_prefill_untitled_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix used when the entry has no title yet."></textarea> <small>Used as the assistant prefix and prepended to the entry on success.</small> </div> <div class="saints_template_controls" id="wia_prefill_untitled_templates"></div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-compass"></span> Narrative Guidance </h4> <label class="checkbox_label"> <input id="ng_enabled" type="checkbox"/> <span>Enable Narrative Guidance</span> </label> <label class="checkbox_label" title="When on, regenerates guidance automatically when the turn counter hits zero. When off, only the Regenerate Now button updates the guidance."> <input id="ng_auto_regen" type="checkbox"/> <span>Auto-Regenerate at Zero</span> </label> <div class="ng_inline_row"> <label for="ng_default_turn_count"><b>Turns Between Regenerations:</b></label> <input id="ng_default_turn_count" type="number" min="1" step="1" class="text_pole ng_number_input"/> </div> <div class="ng_inline_row"> <label for="ng_response_length"><b>Response Token Limit:</b></label> <input id="ng_response_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="Maximum number of tokens the model may use for each generated guidance paragraph."/> </div> <div class="ng_inline_row"> <label for="ng_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="ng_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for Narrative Guidance generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_prompt_section"> <label for="ng_generation_prompt_textarea"><b>Generation Prompt (used as prefill):</b></label> <textarea id="ng_generation_prompt_textarea" class="text_pole" rows="4" placeholder="Enter the prefill that the LLM will continue..."></textarea> <small>The model's reply continues this text and becomes the active guidance.</small> </div> <div class="saints_template_controls" id="ng_generation_prompt_templates"></div> <div class="ng_prompt_section"> <label for="ng_injection_prompt_textarea"><b>Injection Prompt Template:</b></label> <textarea id="ng_injection_prompt_textarea" class="text_pole" rows="3" placeholder="Template injected before each AI turn..."></textarea> <small>Available placeholder: <code>{{guidance}}</code></small> </div> <div class="saints_template_controls" id="ng_injection_prompt_templates"></div> <div class="ng_inline_row"> <label for="ng_injection_depth"><b>Depth:</b></label> <input id="ng_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the guidance after (0 = bottom)."/> <label for="ng_injection_role"><b>Role:</b></label> <select id="ng_injection_role" class="text_pole ng_select_input" title="Role used when injecting the guidance into the prompt."> <option value="system">System</option> <option value="user">User</option> <option value="assistant">Assistant</option> </select> </div> <div id="ng_lorebooks_host"></div> <h5 class="saints_subsection_header">Per-Chat</h5> <div class="ng_prompt_section"> <label for="ng_themes_textarea"><b>Themes / Story Arcs:</b></label> <textarea id="ng_themes_textarea" class="text_pole" rows="4" placeholder="Optional themes, ideas, or arcs for the AI to consider..."></textarea> </div> <div class="ng_prompt_section"> <label for="ng_active_guidance_textarea"><b>Active Guidance:</b></label> <textarea id="ng_active_guidance_textarea" class="text_pole" rows="6" placeholder="The currently active guidance paragraph. Edit freely; changes apply on the next AI turn."></textarea> </div> <div class="ng_inline_row"> <span><b>Turns Remaining:</b> <span id="ng_remaining_display">0</span></span> <div class="menu_button" id="ng_decrement_button" title="Decrement remaining by 1"> <span class="fa-solid fa-minus"></span> </div> <div class="menu_button" id="ng_reset_button" title="Reset remaining to default turn count"> <span class="fa-solid fa-rotate-right"></span> Reset </div> <div class="menu_button disabled" id="ng_continue_now" title="Continue the current guidance paragraph"> <span class="fa-solid fa-arrow-right"></span> Continue </div> <div class="menu_button disabled" id="ng_retry_now" title="Restore previous guidance and regenerate"> <span class="fa-solid fa-rotate-right"></span> Retry </div> <div class="menu_button" id="ng_regenerate_now" title="Regenerate guidance now"> <span class="ng-regen-icon fa-solid fa-wand-sparkles"></span> Regenerate Now </div> </div> <hr class="saints_divider"/> <h4 class="saints_section_header"> <span class="fa-solid fa-bug"></span> Diagnostics </h4> <label class="checkbox_label" title="Log detailed Possession events to the browser console."> <input id="possession_debug_mode" type="checkbox"/> <span>Possession Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Phrasing events to the browser console."> <input id="phrasing_debug_mode" type="checkbox"/> <span>Phrasing Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Assisted Character Creation events, prompts, and generations to the browser console."> <input id="acc_debug_mode" type="checkbox"/> <span>ACC Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed World Info Assist events, prompts, and generations to the browser console."> <input id="wia_debug_mode" type="checkbox"/> <span>WI Assist Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Narrative Guidance events to the browser console."> <input id="ng_debug_mode" type="checkbox"/> <span>Narrative Guidance Debug Mode</span> </label> <label class="checkbox_label" title="Log silent-generation lifecycle (job start/abort/completion, stop-listener events, stream token counts) to the browser console. Useful when diagnosing stop-button behavior across backends."> <input id="silent_generation_debug_mode" type="checkbox"/> <span>Silent Generation Debug Mode</span> </label> </div> </div> </div> `;
 // Exports
 /* harmony default export */ const settings = (code);
 ;// external "../../../../world-info.js"
@@ -1552,64 +1478,37 @@ function isSilentGenerationAbort(err) {
     return msg.includes('aborted') || msg.includes('cancelled by stop event');
 }
 
-// ─── Streaming Helper ───
+// ─── Generation Helper ───
 
 /**
- * Cancellable replacement for the old streamingGenerate(). Calls
- * `generateRaw` with optional onToken streaming and plugs the call into
- * the silent-generation cancel system. Throws AbortError on cancel.
+ * Run `generateRaw` under the silent-generation cancel system, optionally
+ * writing the final result into a target textarea once it arrives.
+ *
+ * `generateRaw` does not stream into extension callers — it does one fetch
+ * and returns the full text — so this fills `targetEl` in a single write
+ * when the promise resolves. The name is kept for historical reasons and
+ * because callers conceptually wire this to a streaming-style output area.
  *
  * @param {object} params - generateRaw parameters.
- * @param {HTMLTextAreaElement|null} targetEl - Element to stream into, or null.
+ * @param {HTMLTextAreaElement|null} targetEl - Element to write the result into, or null.
  * @param {{ append?: boolean, name?: string }} [opts]
  * @returns {Promise<string>} The full generated text.
  * @throws {DOMException} AbortError if cancelled.
  */
 async function cancellableStreamingGenerate(params, targetEl, { append = false, name } = {}) {
     const jobName = name || 'streamingGenerate';
-    const hasStream = !!targetEl;
-    debug(`cancellableStreamingGenerate — name: ${jobName}, streaming: ${hasStream}, append: ${append}, promptLen: ${params?.prompt?.length ?? 0}, responseLength: ${params?.responseLength ?? '(default)'}`);
+    debug(`cancellableStreamingGenerate — name: ${jobName}, hasTarget: ${!!targetEl}, append: ${append}, promptLen: ${params?.prompt?.length ?? 0}, responseLength: ${params?.responseLength ?? '(default)'}`);
 
     return runCancellableSilentGeneration({
         name: jobName,
         run: async (_signal) => {
-            if (!targetEl) {
-                debug(`${jobName} — no targetEl, calling generateRaw directly`);
-                return __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__(params);
+            const result = await __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__(params);
+            debug(`${jobName} — generateRaw resolved, length: ${(result || '').length}`);
+            if (targetEl && result) {
+                targetEl.value = append ? ((targetEl.value || '') + result) : result;
+                targetEl.scrollTop = targetEl.scrollHeight;
             }
-
-            let accumulated = append ? (targetEl.value || '') : '';
-            let streamingWorked = false;
-            let tokenCount = 0;
-
-            try {
-                const result = await __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__({
-                    ...params,
-                    onToken: (token) => {
-                        accumulated += token;
-                        targetEl.value = accumulated;
-                        targetEl.scrollTop = targetEl.scrollHeight;
-                        streamingWorked = true;
-                        tokenCount++;
-                    },
-                });
-                debug(`${jobName} — generateRaw resolved, streamingWorked: ${streamingWorked}, tokens streamed: ${tokenCount}, final length: ${(result || accumulated).length}`);
-                if (!streamingWorked && result) {
-                    targetEl.value = append ? ((targetEl.value || '') + result) : result;
-                }
-                return result || accumulated;
-            } catch (err) {
-                // Fall back if ST rejected the unknown onToken param.
-                const msg = (err?.message || '').toLowerCase();
-                if (msg.includes('ontoken') || msg.includes('unknown') || msg.includes('invalid param')) {
-                    debug(`${jobName} — onToken unsupported, falling back to non-streaming generateRaw`);
-                    const fallback = await __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__(params);
-                    if (fallback) targetEl.value = append ? ((targetEl.value || '') + fallback) : fallback;
-                    return fallback;
-                }
-                debug(`${jobName} — generateRaw rejected:`, err?.message || err);
-                throw err;
-            }
+            return result;
         },
     });
 }
@@ -1816,24 +1715,18 @@ async function streamingGenerate(params, targetEl, opts = {}) {
  * (WIA, ACC, NG) from being truncated at the first newline when the user has
  * that option active for normal chat.
  *
- * Checks multiple likely property names for robustness across ST versions.
- *
  * @template T
  * @param {() => Promise<T>} fn - Async function to execute with single-line disabled.
  * @returns {Promise<T>}
  */
 async function withSingleLineDisabled(fn) {
-    const ctx = getContext();
-    const pus = ctx.powerUserSettings;
-    const propName = pus
-        ? (['single_line', 'singleLine', 'single_line_auto_extend'].find(k => k in pus) ?? null)
-        : null;
-    const original = propName ? pus[propName] : undefined;
-    if (propName && original) pus[propName] = false;
+    const pus = getContext().powerUserSettings;
+    const original = pus?.single_line;
+    if (pus && original) pus.single_line = false;
     try {
         return await fn();
     } finally {
-        if (propName && original !== undefined) pus[propName] = original;
+        if (pus && original !== undefined) pus.single_line = original;
     }
 }
 
@@ -1905,17 +1798,101 @@ function collectActiveCharacters(ctx) {
  * @returns {string[]}
  */
 function getAvailableLoreBookNames() {
-    if (Array.isArray(__WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_world_names__) && __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_world_names__.length) {
-        return __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_world_names__.slice();
-    }
-    // DOM fallback in case the host export is unavailable for some reason.
-    const selector = document.getElementById('world_info');
-    if (selector) {
-        return Array.from(selector.options)
-            .map(o => (o.textContent || '').trim())
-            .filter(Boolean);
-    }
-    return [];
+    const names = getContext().getWorldInfoNames?.();
+    return Array.isArray(names) ? names : [];
+}
+
+// ─── Lore Book Picker Widget ───
+
+/**
+ * Build a reusable lore-book picker: a `<details>` element containing a list
+ * of checkboxes (one per known lore book) plus a summary that shows the
+ * current selection count. Re-renders on open so newly added/removed books
+ * appear without a reload.
+ *
+ * @param {object} [opts]
+ * @param {string[]} [opts.initialSelection] - Names to start checked.
+ * @param {(names: string[]) => void} [opts.onChange] - Called on every selection change.
+ * @param {string} [opts.classPrefix='sse-lorebook'] - CSS class prefix; the existing
+ *        module-specific styles (wia-…, acc-…, ng-…) all share the same shape,
+ *        so callers can pass their own prefix to keep their styling intact.
+ * @param {string} [opts.title='Lore Books'] - Summary label when nothing is selected.
+ * @returns {{ element: HTMLDetailsElement, getSelected: () => string[] }}
+ */
+function createLoreBookPicker({
+    initialSelection = [],
+    onChange = null,
+    classPrefix = 'sse-lorebook',
+    title = 'Lore Books',
+} = {}) {
+    const details = document.createElement('details');
+    details.className = `${classPrefix}-picker`;
+    details.title = 'Prepend active entries from the selected lore books';
+
+    const summary = document.createElement('summary');
+    const icon = document.createElement('span');
+    icon.className = 'fa-solid fa-book';
+    const summaryLabel = document.createElement('span');
+    summaryLabel.className = `${classPrefix}-summary-label`;
+    summaryLabel.textContent = title;
+    summary.appendChild(icon);
+    summary.appendChild(document.createTextNode(' '));
+    summary.appendChild(summaryLabel);
+    details.appendChild(summary);
+
+    const list = document.createElement('div');
+    list.className = `${classPrefix}-list`;
+    details.appendChild(list);
+
+    const getSelected = () => Array.from(
+        list.querySelectorAll('input[type="checkbox"]:checked'),
+    ).map(cb => cb.value);
+
+    const updateSummary = () => {
+        const count = getSelected().length;
+        summaryLabel.textContent = count > 0 ? `${title} (${count})` : title;
+    };
+
+    const render = () => {
+        const names = getAvailableLoreBookNames();
+        const previouslyChecked = new Set(
+            list.children.length === 0 ? initialSelection : getSelected(),
+        );
+        list.replaceChildren();
+        if (!names.length) {
+            const empty = document.createElement('div');
+            empty.className = `${classPrefix}-empty`;
+            empty.textContent = 'No lore books available.';
+            list.appendChild(empty);
+            updateSummary();
+            return;
+        }
+        for (const name of names) {
+            const label = document.createElement('label');
+            label.className = `${classPrefix}-item checkbox_label`;
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.value = name;
+            if (previouslyChecked.has(name)) cb.checked = true;
+            cb.addEventListener('change', () => {
+                updateSummary();
+                onChange?.(getSelected());
+            });
+            const span = document.createElement('span');
+            span.textContent = name;
+            label.appendChild(cb);
+            label.appendChild(span);
+            list.appendChild(label);
+        }
+        updateSummary();
+    };
+
+    details.addEventListener('toggle', () => {
+        if (details.open) render();
+    });
+    render();
+
+    return { element: details, getSelected };
 }
 
 // Tokens reserved on top of `responseLength` for the surrounding prompt
@@ -1964,14 +1941,14 @@ async function packRecentChatLines(chat, ctx, chatBudget) {
  * the active entries of any selected lore books.
  *
  * Recent chat is packed to fit the model's remaining context budget
- * (`getMaxContextSize() - responseLength - reserve`), after the non-chat
+ * (`getMaxPromptTokens() - responseLength - reserve`), after the non-chat
  * sections have been counted. No fixed message cap.
  *
  * @param {object} opts
  * @param {boolean} [opts.includeChat=false] - Include character card, persona, and recent chat messages.
  * @param {string[]} [opts.loreBookNames=[]] - Names of lore books whose enabled entries to include.
  * @param {number}  [opts.responseLength=0] - Tokens reserved for the model's response; subtracted from the budget.
- * @param {number}  [opts.maxContextOverride=0] - If > 0, use this as the max-context size instead of `getMaxContextSize()`. Lets callers cap how much chat history they pull in independently of the model's real window.
+ * @param {number}  [opts.maxContextOverride=0] - If > 0, use this as the max-context size instead of `getMaxPromptTokens()`. Lets callers cap how much chat history they pull in independently of the model's real window.
  * @returns {Promise<string>} The composed preamble, or '' if nothing was included.
  */
 async function buildContextPreamble({
@@ -2032,7 +2009,7 @@ async function buildContextPreamble({
             let recentBlock = '';
             try {
                 const overrideValid = Number.isFinite(maxContextOverride) && maxContextOverride > 0;
-                const maxContext = overrideValid ? maxContextOverride : __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_getMaxContextSize__();
+                const maxContext = overrideValid ? maxContextOverride : __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_getMaxPromptTokens__();
                 if (!Number.isFinite(maxContext) || maxContext <= 0) {
                     throw new Error(`maxContext resolved to ${maxContext}`);
                 }
@@ -2058,8 +2035,6 @@ async function buildContextPreamble({
     return sections.join('\n\n');
 }
 
-;// external "../../../../group-chats.js"
-
 ;// external "../../../../slash-commands/SlashCommandParser.js"
 
 ;// external "../../../../slash-commands/SlashCommand.js"
@@ -2071,7 +2046,6 @@ async function buildContextPreamble({
  * Possession module — lets the user "possess" a character so their messages
  * are posted under that character's name/avatar.
  */
-
 
 
 
@@ -2147,8 +2121,8 @@ function getPossessedCharacter() {
         if (byAvatar) return byAvatar;
     }
     // In group chats, prefer the character whose avatar is in the group members list
-    if (__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__) {
-        const group = __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_groups__.find(g => g.id === __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__);
+    if (context.groupId) {
+        const group = context.groups.find(g => g.id === context.groupId);
         if (group) {
             const groupChar = group.members
                 .map(avatar => context.characters.find(c => c.avatar === avatar))
@@ -2160,10 +2134,11 @@ function getPossessedCharacter() {
 }
 
 function validatePossessedCharInGroup() {
-    if (!__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__ || !possessedCharName) return;
-    const group = __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_groups__.find(g => g.id === __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__);
-    if (!group) return;
+    if (!possessedCharName) return;
     const context = getContext();
+    if (!context.groupId) return;
+    const group = context.groups.find(g => g.id === context.groupId);
+    if (!group) return;
     const isMember = group.members.some(avatar => {
         if (possessedCharAvatar) return avatar === possessedCharAvatar;
         const char = context.characters.find(c => c.avatar === avatar);
@@ -2188,8 +2163,8 @@ function setPossession(charName, charAvatar) {
             const context = getContext();
             // In group chats, prefer the character whose avatar is in the group members list
             let char = null;
-            if (__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__) {
-                const group = __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_groups__.find(g => g.id === __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__);
+            if (context.groupId) {
+                const group = context.groups.find(g => g.id === context.groupId);
                 if (group) {
                     char = group.members
                         .map(avatar => context.characters.find(c => c.avatar === avatar))
@@ -2234,7 +2209,7 @@ async function postPossessedMessage(text) {
         extra: { possession: true },
     };
 
-    if (__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__) {
+    if (context.groupId) {
         message.original_avatar = char.avatar;
         message.is_name = true;
     }
@@ -2271,7 +2246,7 @@ function onMessageSent(messageIndex) {
     message.force_avatar = char.avatar ? `/characters/${char.avatar}` : undefined;
     message.extra = { ...(message.extra || {}), possession: true };
 
-    if (__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__) {
+    if (context.groupId) {
         message.original_avatar = char.avatar;
         message.is_name = true;
     }
@@ -2338,13 +2313,14 @@ function attachContinueInterceptor() {
 // ─── UI: Group Radio Buttons ───
 
 function injectGroupRadioButtons() {
-    if (!__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__) return;
     if (!ctx.settings.possessionEnabled) return;
 
-    const group = __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_groups__.find(g => g.id === __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__);
+    const context = getContext();
+    if (!context.groupId) return;
+
+    const group = context.groups.find(g => g.id === context.groupId);
     if (!group) return;
 
-    const context = getContext();
     const memberEntries = document.querySelectorAll('#rm_group_members .group_member');
 
     memberEntries.forEach(entry => {
@@ -2472,7 +2448,7 @@ function removeGroupRadioButtons() {
 // ─── UI: Solo Chat Button ───
 
 function injectSoloButton() {
-    if (__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__) return;
+    if (getContext().groupId) return;
     if (!ctx.settings.possessionEnabled) return;
     if (document.getElementById('possession_solo_btn')) return;
 
@@ -2563,36 +2539,8 @@ function injectPossessionImpersonateButton() {
 
         possession_debug('Possession impersonate clicked — triggering generation for', char.name);
 
-        if (__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__) {
-            const radios = document.querySelectorAll('.possession_radio');
-            for (const radio of radios) {
-                const radioMatch = (possessedCharAvatar && radio.dataset.charAvatar)
-                    ? radio.dataset.charAvatar === possessedCharAvatar
-                    : radio.dataset.charName === possessedCharName;
-                if (radioMatch) {
-                    const memberEntry = radio.closest('.group_member');
-                    if (memberEntry) {
-                        const speakBtn = memberEntry.querySelector('.right_menu_button[data-action="speak"]');
-                        if (speakBtn) {
-                            speakBtn.click();
-                            return;
-                        }
-                    }
-                    break;
-                }
-            }
-            possession_debug('Speak button not found, falling back to /trigger');
-            if (context.executeSlashCommandsWithOptions) {
-                await context.executeSlashCommandsWithOptions(`/trigger ${char.name}`);
-            }
-        } else {
-            if (context.executeSlashCommandsWithOptions) {
-                await context.executeSlashCommandsWithOptions('/trigger');
-            } else {
-                const sendBtn = document.getElementById('send_but');
-                if (sendBtn) sendBtn.click();
-            }
-        }
+        const cmd = context.groupId ? `/trigger ${char.name}` : '/trigger';
+        await context.executeSlashCommandsWithOptions(cmd);
     });
 
     const phrasingBtn = document.getElementById('phrasing_send_button');
@@ -2631,7 +2579,7 @@ function syncAllPossessionUI() {
         return;
     }
 
-    if (__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__) {
+    if (getContext().groupId) {
         removeSoloButton();
         injectGroupRadioButtons();
         syncGroupRadioButtons();
@@ -2670,7 +2618,7 @@ function onGroupUpdated() {
 }
 
 function onCharacterPageLoaded() {
-    if (!__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__) {
+    if (!getContext().groupId) {
         injectSoloButton();
         syncSoloButton();
     }
@@ -2726,8 +2674,8 @@ function registerPossessionSlashCommands() {
                     toastr.info(`Currently possessing: ${possessedCharName}`, 'Possession');
                     return possessedCharName;
                 }
-                if (!__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__) {
-                    const context = getContext();
+                const context = getContext();
+                if (!context.groupId) {
                     const char = context.characters?.[context.characterId];
                     if (char) {
                         setPossession(char.name, char.avatar);
@@ -2741,8 +2689,8 @@ function registerPossessionSlashCommands() {
             const context = getContext();
             const nameLower = name.toLowerCase();
 
-            if (__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__) {
-                const group = __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_groups__.find(g => g.id === __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_selected_group__);
+            if (context.groupId) {
+                const group = context.groups.find(g => g.id === context.groupId);
                 if (!group) {
                     toastr.error('No active group found.', 'Possession');
                     return '';
@@ -3079,12 +3027,11 @@ function formatSeedWithSpeaker(seedText, isUser, speakerName) {
 function assemblePrompt(seedText, swipesContext = null) {
     const useInverse = !!swipesContext;
     phrasing_debug('assemblePrompt — seed length:', seedText.length, '| mode:', useInverse ? 'inverse' : 'standard');
-    let prompt = useInverse ? getActiveInversePrompt() : getActivePrompt();
-    prompt = prompt.replace(/\{\{phrasingSeed\}\}/g, seedText);
-    if (useInverse) {
-        prompt = prompt.replace(/\{\{phrasingSwipes\}\}/g, swipesContext);
-    }
-    prompt = __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParams__(prompt);
+    const tpl = useInverse ? getActiveInversePrompt() : getActivePrompt();
+    const macros = useInverse
+        ? { phrasingSeed: seedText, phrasingSwipes: swipesContext }
+        : { phrasingSeed: seedText };
+    const prompt = __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParamsExtended__(tpl, macros);
     phrasing_debug('assemblePrompt — final length:', prompt.length);
     return prompt;
 }
@@ -3185,16 +3132,10 @@ async function doPrimaryFlow(seedText) {
             const assembled = assemblePrompt(seedText);
             injectPhrasingPrompt(assembled);
 
-            phrasing_debug('doPrimaryFlow — normal path: triggering impersonate');
-            const impersonateBtn = document.getElementById('option_impersonate');
-            if (impersonateBtn) {
-                impersonateBtn.click();
-            } else {
-                phrasing_debug('doPrimaryFlow — FAILED: option_impersonate not found');
-                return '';
-            }
-
-            await waitForGenerationEnd();
+            phrasing_debug('doPrimaryFlow — normal path: triggering /impersonate');
+            const ended = waitForGenerationEnd();
+            await context.executeSlashCommandsWithOptions('/impersonate');
+            await ended;
 
             const textarea = document.getElementById('send_textarea');
             const result = textarea?.value?.trim() || '';
@@ -3267,35 +3208,27 @@ async function doSwipeMode(messageIndex) {
             message.swipe_id = lastSwipeIndex;
             message.mes = message.swipes[lastSwipeIndex];
 
+            // Re-render the visible message text (no public helper for this).
             const messageEl = document.querySelector(`#chat .mes[mesid="${messageIndex}"]`);
-            if (messageEl) {
-                const textEl = messageEl.querySelector('.mes_text');
-                if (textEl) {
-                    if (typeof context.messageFormatting === 'function') {
-                        textEl.innerHTML = context.messageFormatting(
-                            message.mes, message.name, message.is_system, message.is_user, messageIndex,
-                        );
-                    } else {
-                        textEl.textContent = message.mes;
-                    }
-                }
-                const swipeCounter = messageEl.querySelector('.swipes-counter');
-                if (swipeCounter) {
-                    swipeCounter.textContent = `${message.swipe_id + 1}/${message.swipes.length}`;
-                }
+            const textEl = messageEl?.querySelector('.mes_text');
+            if (textEl && typeof context.messageFormatting === 'function') {
+                textEl.innerHTML = context.messageFormatting(
+                    message.mes, message.name, message.is_system, message.is_user, messageIndex,
+                );
+            } else if (textEl) {
+                textEl.textContent = message.mes;
             }
+            // refresh(true) re-renders chevrons AND swipe counters.
+            context.swipe.refresh(true);
         }
 
-        const swipeRight = document.querySelector(`#chat .mes[mesid="${messageIndex}"] .swipe_right`);
-        if (!swipeRight) {
-            phrasing_debug('doSwipeMode — FAILED: swipe_right button not found');
-            return '';
-        }
-
-        phrasing_debug('doSwipeMode — clicking swipe_right');
-        swipeRight.click();
-
-        const result = await waitForGenerationEnd();
+        phrasing_debug('doSwipeMode — triggering swipe right');
+        // Install the GENERATION_ENDED listener before calling swipe.right
+        // so we never miss the event if generation completes before the
+        // swipe animation does.
+        const ended = waitForGenerationEnd();
+        await context.swipe.right(null, { message });
+        const result = await ended;
         phrasing_debug('doSwipeMode — complete, result length:', result.length);
         return result;
     } finally {
@@ -3531,6 +3464,8 @@ function initPhrasing({ settings, possessionApi: pApi }) {
 
 ;// external "../../../../reasoning.js"
 
+;// external "../../../../popup.js"
+
 ;// ./src/assisted-character-creation.js
 /**
  * Assisted Character Creation (ACC)
@@ -3539,6 +3474,7 @@ function initPhrasing({ settings, possessionApi: pApi }) {
  * generates a complete description, optionally extends or re-rolls it,
  * and clicks Done to copy it into SillyTavern's description field.
  */
+
 
 
 
@@ -3754,8 +3690,11 @@ function bindACCSettings(saveSettings) {
 
 // ─── Modal ───
 
-function openModal() {
-    if (document.getElementById('acc_modal_overlay')) return;
+let activePopup = null;
+let activeBody = null;
+
+async function openModal() {
+    if (activePopup) return;
 
     isGenerating = false;
     abortRequested = false;
@@ -3763,32 +3702,122 @@ function openModal() {
     lastAction = null;
     restorePoint = null;
 
-    const overlay = document.createElement('div');
-    overlay.id = 'acc_modal_overlay';
-    overlay.innerHTML = buildModalHTML();
-    document.body.appendChild(overlay);
+    const body = buildModalBody();
 
-    overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) closeModal();
+    const popup = new __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_Popup__(body, __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_POPUP_TYPE__.TEXT, '', {
+        okButton: 'Done',
+        cancelButton: 'Cancel',
+        wide: true,
+        large: true,
+        allowVerticalScrolling: true,
+        onOpen: () => {
+            bindModalHandlers();
+            refreshActionButtonStates();
+            assisted_character_creation_debug('Modal opened');
+        },
+        onClosing: (p) => {
+            if (p.result === __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_POPUP_RESULT__.AFFIRMATIVE) {
+                // Done clicked — refuse to close mid-generation.
+                if (isGenerating) {
+                    toast('Wait for generation to finish before clicking Done.', 'warning');
+                    return false;
+                }
+                const output = body.querySelector('#acc_description_output')?.value?.trim() || '';
+                if (!output) {
+                    toast('Description is empty. Nothing to save.', 'warning');
+                    return false;
+                }
+                return true;
+            }
+            // Cancel / Esc / X — abort any in-flight job, then allow close.
+            if (isGenerating) {
+                abortRequested = true;
+                stopGeneration();
+            }
+            return true;
+        },
     });
+    activePopup = popup;
+    activeBody = body;
 
-    document.getElementById('acc_close_btn')?.addEventListener('click', closeModal);
-    document.getElementById('acc_cancel_btn')?.addEventListener('click', closeModal);
-    document.getElementById('acc_done_btn')?.addEventListener('click', handleDone);
+    try {
+        const result = await popup.show();
+        if (result === __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_POPUP_RESULT__.AFFIRMATIVE) {
+            applyDescription(body);
+        }
+    } finally {
+        activePopup = null;
+        activeBody = null;
+        isGenerating = false;
+        activeAction = null;
+        lastAction = null;
+        restorePoint = null;
+        assisted_character_creation_debug('Modal closed');
+    }
+}
+
+function buildModalBody() {
+    const root = document.createElement('div');
+    root.className = 'acc-modal-body';
+    root.innerHTML = `
+        <div class="acc-context-section">
+            <label class="checkbox_label" title="Prepend the current chat / character context to the generation">
+                <input id="acc_use_chat_context" type="checkbox" />
+                <span>Use Chat Context</span>
+            </label>
+            <div class="acc-lorebook-host"></div>
+        </div>
+        <div class="acc-brief-section">
+            <label for="acc_character_brief"><b>Character Brief:</b></label>
+            <textarea id="acc_character_brief" class="text_pole" rows="4" placeholder="Describe your character concept, setting, and any key details..."></textarea>
+        </div>
+        <div class="acc-action-row">
+            <div id="acc_generate_btn" class="menu_button interactable acc-action-btn acc-generate-btn" title="Generate a fresh description from the brief (replaces the textarea)">
+                <span class="fa-solid fa-wand-magic-sparkles"></span> Generate
+            </div>
+            <div id="acc_continue_btn" class="menu_button interactable acc-action-btn acc-continue-btn" title="Continue from where the description leaves off">
+                <span class="fa-solid fa-arrow-right"></span> Continue
+            </div>
+            <div id="acc_checkpoint_btn" class="menu_button interactable acc-action-btn acc-checkpoint-btn" title="Save the current description as the Retry restore point">
+                <span class="fa-solid fa-flag"></span> Checkpoint
+            </div>
+            <div id="acc_retry_btn" class="menu_button interactable acc-action-btn acc-retry-btn" title="Restore to the last snapshot and re-run the last action">
+                <span class="fa-solid fa-rotate-right"></span> Retry
+            </div>
+        </div>
+        <div class="acc-tokens-row">
+            <label class="acc-tokens-label" for="acc_response_length" title="Maximum tokens for each generation">
+                <span class="fa-solid fa-coins"></span> Max Tokens:
+            </label>
+            <input id="acc_response_length" type="number" class="text_pole acc-tokens-input" min="50" max="8192" step="50" />
+        </div>
+        <div class="acc-status-bar acc-hidden" id="acc_status_bar">
+            <span class="fa-solid fa-spinner fa-spin"></span>
+            <span id="acc_status_text"></span>
+        </div>
+        <div class="acc-description-section">
+            <label for="acc_description_output"><b>Character Description:</b></label>
+            <textarea id="acc_description_output" class="text_pole acc-description-output" rows="18" placeholder="Generated description will appear here. You can edit it before clicking Done."></textarea>
+        </div>
+    `;
+
+    // Initialize the token field from current settings.
+    const tokenInput = root.querySelector('#acc_response_length');
+    if (tokenInput) tokenInput.value = String(getResponseLength());
+
+    // Mount the shared lore-book picker.
+    const picker = createLoreBookPicker({ classPrefix: 'acc-lorebook' });
+    root.querySelector('.acc-lorebook-host').replaceWith(picker.element);
+    root._accLorebookPicker = picker;
+
+    return root;
+}
+
+function bindModalHandlers() {
     document.getElementById('acc_generate_btn')?.addEventListener('click', handleGenerate);
     document.getElementById('acc_continue_btn')?.addEventListener('click', handleContinue);
     document.getElementById('acc_checkpoint_btn')?.addEventListener('click', handleCheckpoint);
     document.getElementById('acc_retry_btn')?.addEventListener('click', handleRetry);
-
-    const updateLoreBookSummary = () => {
-        const label = document.getElementById('acc_lorebook_summary_label');
-        if (!label) return;
-        const checked = document.querySelectorAll('#acc_lorebook_list .acc-lorebook-cb:checked').length;
-        label.textContent = checked > 0 ? `Lore Books (${checked})` : 'Lore Books';
-    };
-    document.querySelectorAll('#acc_lorebook_list .acc-lorebook-cb').forEach(cb => {
-        cb.addEventListener('change', updateLoreBookSummary);
-    });
 
     const output = document.getElementById('acc_description_output');
     output?.addEventListener('input', refreshActionButtonStates);
@@ -3801,102 +3830,25 @@ function openModal() {
             saveSettingsFn?.();
         }
     });
-
-    refreshActionButtonStates();
-    assisted_character_creation_debug('Modal opened');
 }
 
-function closeModal() {
-    if (isGenerating) {
-        abortRequested = true;
-        stopGeneration();
+function applyDescription(body) {
+    const output = body.querySelector('#acc_description_output')?.value?.trim() || '';
+    if (!output) return;
+    const descField = document.getElementById('description_textarea');
+    if (descField) {
+        descField.value = output;
+        descField.dispatchEvent(new Event('input', { bubbles: true }));
     }
-    const overlay = document.getElementById('acc_modal_overlay');
-    if (overlay) overlay.remove();
-    isGenerating = false;
-    activeAction = null;
-    lastAction = null;
-    restorePoint = null;
-    assisted_character_creation_debug('Modal closed');
-}
-
-function buildModalHTML() {
-    const loreBookNames = getAvailableLoreBookNames();
-    const loreBookOptions = loreBookNames.length
-        ? loreBookNames.map(n => `
-            <label class="acc-lorebook-item checkbox_label">
-                <input type="checkbox" class="acc-lorebook-cb" value="${escapeAttr(n)}" />
-                <span>${escapeHTML(n)}</span>
-            </label>
-        `).join('')
-        : '<div class="acc-lorebook-empty">No lore books available.</div>';
-
-    return `
-        <div id="acc_modal" class="acc-modal">
-            <div class="acc-modal-header">
-                <h3>Assisted Character Creation</h3>
-                <div id="acc_close_btn" class="acc-close-btn interactable"><span class="fa-solid fa-xmark"></span></div>
-            </div>
-            <div class="acc-modal-body">
-                <div class="acc-context-section">
-                    <label class="checkbox_label" title="Prepend the current chat / character context to the generation">
-                        <input id="acc_use_chat_context" type="checkbox" />
-                        <span>Use Chat Context</span>
-                    </label>
-                    <details class="acc-lorebook-picker" title="Prepend active entries from the selected lore books">
-                        <summary><span class="fa-solid fa-book"></span> <span id="acc_lorebook_summary_label">Lore Books</span></summary>
-                        <div id="acc_lorebook_list" class="acc-lorebook-list">${loreBookOptions}</div>
-                    </details>
-                </div>
-                <div class="acc-brief-section">
-                    <label for="acc_character_brief"><b>Character Brief:</b></label>
-                    <textarea id="acc_character_brief" class="text_pole" rows="4" placeholder="Describe your character concept, setting, and any key details..."></textarea>
-                </div>
-                <div class="acc-action-row">
-                    <div id="acc_generate_btn" class="menu_button interactable acc-action-btn acc-generate-btn" title="Generate a fresh description from the brief (replaces the textarea)">
-                        <span class="fa-solid fa-wand-magic-sparkles"></span> Generate
-                    </div>
-                    <div id="acc_continue_btn" class="menu_button interactable acc-action-btn acc-continue-btn" title="Continue from where the description leaves off">
-                        <span class="fa-solid fa-arrow-right"></span> Continue
-                    </div>
-                    <div id="acc_checkpoint_btn" class="menu_button interactable acc-action-btn acc-checkpoint-btn" title="Save the current description as the Retry restore point">
-                        <span class="fa-solid fa-flag"></span> Checkpoint
-                    </div>
-                    <div id="acc_retry_btn" class="menu_button interactable acc-action-btn acc-retry-btn" title="Restore to the last snapshot and re-run the last action">
-                        <span class="fa-solid fa-rotate-right"></span> Retry
-                    </div>
-                </div>
-                <div class="acc-tokens-row">
-                    <label class="acc-tokens-label" for="acc_response_length" title="Maximum tokens for each generation">
-                        <span class="fa-solid fa-coins"></span> Max Tokens:
-                    </label>
-                    <input id="acc_response_length" type="number" class="text_pole acc-tokens-input" min="50" max="8192" step="50" value="${getResponseLength()}" />
-                </div>
-                <div class="acc-status-bar acc-hidden" id="acc_status_bar">
-                    <span class="fa-solid fa-spinner fa-spin"></span>
-                    <span id="acc_status_text"></span>
-                </div>
-                <div class="acc-description-section">
-                    <label for="acc_description_output"><b>Character Description:</b></label>
-                    <textarea id="acc_description_output" class="text_pole acc-description-output" rows="18" placeholder="Generated description will appear here. You can edit it before clicking Done."></textarea>
-                </div>
-            </div>
-            <div class="acc-modal-footer">
-                <div class="acc-footer-right">
-                    <div id="acc_cancel_btn" class="menu_button interactable">Cancel</div>
-                    <div id="acc_done_btn" class="menu_button interactable acc-done-btn">Done</div>
-                </div>
-            </div>
-        </div>`;
+    toast('Character description applied!', 'success');
 }
 
 // ─── Actions ───
 
 function readModalContextOptions() {
     const includeChat = !!document.getElementById('acc_use_chat_context')?.checked;
-    const loreBookNames = Array.from(
-        document.querySelectorAll('#acc_lorebook_list .acc-lorebook-cb:checked'),
-    ).map(el => el.value);
+    const picker = activeBody?._accLorebookPicker;
+    const loreBookNames = picker ? picker.getSelected() : [];
     return { includeChat, loreBookNames };
 }
 
@@ -4122,27 +4074,6 @@ function stopGeneration() {
     assisted_character_creation_debug('Stop generation triggered');
 }
 
-// ─── Done ───
-
-function handleDone() {
-    if (isGenerating) return;
-
-    const output = document.getElementById('acc_description_output')?.value?.trim() || '';
-    if (!output) {
-        toast('Description is empty. Nothing to save.', 'warning');
-        return;
-    }
-
-    const descField = document.getElementById('description_textarea');
-    if (descField) {
-        descField.value = output;
-        descField.dispatchEvent(new Event('input', { bubbles: true }));
-    }
-
-    toast('Character description applied!', 'success');
-    closeModal();
-}
-
 // ─── UI Helpers ───
 
 const ACTION_BUTTON_IDS = ['acc_generate_btn', 'acc_continue_btn', 'acc_checkpoint_btn', 'acc_retry_btn'];
@@ -4155,7 +4086,6 @@ const ACTION_LABELS = {
 };
 
 function setGeneratingUI(generating, action) {
-    const doneBtn = document.getElementById('acc_done_btn');
     const briefInput = document.getElementById('acc_character_brief');
     const activeBtnId = action === 'continue' ? 'acc_continue_btn' : 'acc_generate_btn';
 
@@ -4176,11 +4106,15 @@ function setGeneratingUI(generating, action) {
         }
     }
 
+    // Popup owns the Done/Cancel buttons; toggle the OK button visually so
+    // users get a clear "wait for generation" hint. The onClosing guard
+    // still blocks the close if they click it mid-flight.
+    const okBtn = activePopup?.okButton;
+    if (okBtn) okBtn.classList.toggle('disabled', !!generating);
+
     if (generating) {
-        doneBtn?.classList.add('acc-disabled');
         briefInput?.setAttribute('disabled', 'true');
     } else {
-        doneBtn?.classList.remove('acc-disabled');
         briefInput?.removeAttribute('disabled');
         refreshActionButtonStates();
     }
@@ -4215,16 +4149,6 @@ function setStatusBar(message) {
     }
 }
 
-function escapeHTML(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-}
-
-function escapeAttr(str) {
-    return str.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-}
-
 ;// ./src/world-info-assist.js
 /**
  * World Info Assist (WIA)
@@ -4235,6 +4159,7 @@ function escapeAttr(str) {
  * Assisted Character Creation tool, but operating on a single field
  * (the entry's content) and using a free-form prompt instead of a schema.
  */
+
 
 
 
@@ -4292,6 +4217,7 @@ const DEFAULT_WIA_RESPONSE_LENGTH = 600;
 
 let world_info_assist_moduleSettings = null;
 let world_info_assist_debug = () => {};
+let listenersInstalled = false;
 let observer = null;
 let saveSettingsCb = null;
 
@@ -4311,12 +4237,12 @@ function resolveWIAPrefill(title) {
         const tpl = (typeof world_info_assist_moduleSettings?.wiaPrefillTitled === 'string' && world_info_assist_moduleSettings.wiaPrefillTitled)
             ? world_info_assist_moduleSettings.wiaPrefillTitled
             : DEFAULT_WIA_PREFILL_TITLED;
-        return tpl.replace(/\{\{title\}\}/g, trimmedTitle);
+        return __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParamsExtended__(tpl, { title: trimmedTitle });
     }
     const tpl = (typeof world_info_assist_moduleSettings?.wiaPrefillUntitled === 'string' && world_info_assist_moduleSettings.wiaPrefillUntitled)
         ? world_info_assist_moduleSettings.wiaPrefillUntitled
         : DEFAULT_WIA_PREFILL_UNTITLED;
-    return tpl;
+    return __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParamsExtended__(tpl, {});
 }
 
 // ─── Init ───
@@ -4331,33 +4257,51 @@ function initWIA({ settings }) {
     world_info_assist_debug('Module initialized');
 }
 
-// ─── DOM Observation / Injection ───
+// ─── Editor Observation / Injection ───
 
 /**
- * Start watching the DOM for new World Info entry forms and inject
- * assist controls into each one.
+ * Watch for World Info entry forms appearing in the editor and inject the
+ * assist controls. ST does not emit an event when an individual entry is
+ * expanded — `displayWorldEntries` mutates the editor list directly — so we
+ * use a narrowly-scoped MutationObserver on the editor's entry list
+ * container, plus the WORLDINFO_UPDATED event for refresh after saves.
  */
 function startWIAObserver() {
-    if (observer) return;
+    if (listenersInstalled) return;
+    listenersInstalled = true;
 
-    observer = new MutationObserver((mutations) => {
+    const rescan = () => {
         if (!world_info_assist_moduleSettings?.wiaEnabled) return;
-        for (const m of mutations) {
-            for (const node of m.addedNodes) {
-                if (!(node instanceof HTMLElement)) continue;
-                if (node.matches?.('.world_entry_edit')) {
-                    injectControls(node);
+        document.querySelectorAll('.world_entry_edit').forEach(injectControls);
+    };
+
+    const attachObserver = () => {
+        if (observer) return;
+        const container = document.getElementById('world_popup_entries_list');
+        if (!container) return;
+        observer = new MutationObserver((mutations) => {
+            if (!world_info_assist_moduleSettings?.wiaEnabled) return;
+            for (const m of mutations) {
+                for (const node of m.addedNodes) {
+                    if (!(node instanceof HTMLElement)) continue;
+                    if (node.matches?.('.world_entry_edit')) injectControls(node);
+                    node.querySelectorAll?.('.world_entry_edit').forEach(injectControls);
                 }
-                node.querySelectorAll?.('.world_entry_edit').forEach(injectControls);
             }
-        }
-    });
+        });
+        observer.observe(container, { childList: true, subtree: true });
+        world_info_assist_debug('WI editor observer attached');
+    };
 
-    observer.observe(document.body, { childList: true, subtree: true });
+    // The editor list isn't in the DOM until the user opens World Info, so
+    // try once now and re-try on WI events (which fire after open / save).
+    attachObserver();
+    const { eventSource, eventTypes } = getContext();
+    eventSource.on(eventTypes.WORLDINFO_UPDATED, () => { attachObserver(); rescan(); });
+    eventSource.on(eventTypes.WORLDINFO_ENTRIES_LOADED, () => { attachObserver(); rescan(); });
 
-    // Process anything already present on the page
-    document.querySelectorAll('.world_entry_edit').forEach(injectControls);
-    world_info_assist_debug('Observer started');
+    rescan();
+    world_info_assist_debug('WI listeners installed');
 }
 
 /**
@@ -4407,10 +4351,7 @@ function injectControls(formEl) {
             <input type="checkbox" class="wia-context-cb" />
             <span>Use Chat Context</span>
         </label>
-        <details class="wia-lorebook-picker" title="Prepend active entries from the selected lore books">
-            <summary><span class="fa-solid fa-book"></span> <span class="wia-lorebook-summary-label">Lore Books</span></summary>
-            <div class="wia-lorebook-list"></div>
-        </details>
+        <div class="wia-lorebook-host"></div>
         <div class="wia-btn wia-btn-continue menu_button interactable wia-hidden" title="Continue generation from where it left off">
             <span class="fa-solid fa-arrow-right"></span>
         </div>
@@ -4457,72 +4398,19 @@ function injectControls(formEl) {
         });
     }
 
-    populateLoreBookPicker(controls);
+    const picker = createLoreBookPicker({ classPrefix: 'wia-lorebook' });
+    controls.querySelector('.wia-lorebook-host').replaceWith(picker.element);
+    controls._wiaLorebookPicker = picker;
 
     world_info_assist_debug('Injected controls for entry', id);
-}
-
-/**
- * Fill the lore book picker with one checkbox per known book and wire up the
- * summary label so it reflects the current selection count.
- */
-function populateLoreBookPicker(controls) {
-    const picker = controls.querySelector('.wia-lorebook-picker');
-    const list = controls.querySelector('.wia-lorebook-list');
-    const summaryLabel = controls.querySelector('.wia-lorebook-summary-label');
-    if (!picker || !list || !summaryLabel) return;
-
-    const updateSummary = () => {
-        const checked = list.querySelectorAll('input[type="checkbox"]:checked').length;
-        summaryLabel.textContent = checked > 0 ? `Lore Books (${checked})` : 'Lore Books';
-    };
-
-    const render = () => {
-        const names = getAvailableLoreBookNames();
-        const previouslyChecked = new Set(
-            Array.from(list.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value),
-        );
-        list.innerHTML = '';
-        if (!names.length) {
-            const empty = document.createElement('div');
-            empty.className = 'wia-lorebook-empty';
-            empty.textContent = 'No lore books available.';
-            list.appendChild(empty);
-            updateSummary();
-            return;
-        }
-        for (const name of names) {
-            const label = document.createElement('label');
-            label.className = 'wia-lorebook-item checkbox_label';
-            const cb = document.createElement('input');
-            cb.type = 'checkbox';
-            cb.value = name;
-            if (previouslyChecked.has(name)) cb.checked = true;
-            cb.addEventListener('change', updateSummary);
-            const span = document.createElement('span');
-            span.textContent = name;
-            label.appendChild(cb);
-            label.appendChild(span);
-            list.appendChild(label);
-        }
-        updateSummary();
-    };
-
-    // Re-render on open so newly added/removed books appear without a reload.
-    picker.addEventListener('toggle', () => {
-        if (picker.open) render();
-    });
-
-    render();
 }
 
 function readContextOptions(controls) {
     if (!controls) return { includeChat: false, loreBookNames: [] };
     const cb = controls.querySelector('.wia-context-cb');
     const includeChat = !!cb?.checked;
-    const loreBookNames = Array.from(
-        controls.querySelectorAll('.wia-lorebook-list input[type="checkbox"]:checked'),
-    ).map(el => el.value);
+    const picker = controls._wiaLorebookPicker;
+    const loreBookNames = picker ? picker.getSelected() : [];
     return { includeChat, loreBookNames };
 }
 
@@ -4973,8 +4861,7 @@ function reapplyInjection() {
     // it). Strip outer brackets here so {{guidance}} substitutes cleanly
     // into whatever injection template the user has configured.
     const guidanceForInjection = stripBracketWrap(state.guidance);
-    let body = tpl.replace(/\{\{guidance\}\}/g, guidanceForInjection);
-    body = __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParams__(body);
+    const body = __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParamsExtended__(tpl, { guidance: guidanceForInjection });
     const depth = Number.isFinite(narrative_guidance_moduleSettings.narrativeGuidanceInjectionDepth)
         && narrative_guidance_moduleSettings.narrativeGuidanceInjectionDepth >= 0
         ? narrative_guidance_moduleSettings.narrativeGuidanceInjectionDepth
@@ -5316,65 +5203,24 @@ function refreshNGActionButtonStates() {
         ?.classList.toggle('disabled', !(state.guidance && state.guidance.trim()));
 }
 
-function narrative_guidance_populateLoreBookPicker() {
-    const picker = document.getElementById('ng_lorebooks_details');
-    const list = document.getElementById('ng_lorebooks_list');
-    const summaryLabel = document.getElementById('ng_lorebooks_summary_label');
-    if (!picker || !list || !summaryLabel) return;
+function populateLoreBookPicker() {
+    const host = document.getElementById('ng_lorebooks_host');
+    if (!host) return;
 
-    const updateSummary = () => {
-        const checked = list.querySelectorAll('input[type="checkbox"]:checked').length;
-        summaryLabel.textContent = checked > 0 ? `Lore Books (${checked})` : 'Lore Books';
-    };
+    const initial = Array.isArray(narrative_guidance_moduleSettings.narrativeGuidanceLoreBookNames)
+        ? narrative_guidance_moduleSettings.narrativeGuidanceLoreBookNames
+        : [];
 
-    const writeSelectionToSettings = () => {
-        const names = Array.from(list.querySelectorAll('input[type="checkbox"]:checked'))
-            .map(cb => cb.value);
-        narrative_guidance_moduleSettings.narrativeGuidanceLoreBookNames = names;
-        narrative_guidance_saveSettingsCb?.();
-    };
-
-    const render = () => {
-        const names = getAvailableLoreBookNames();
-        const previouslyChecked = new Set(
-            Array.isArray(narrative_guidance_moduleSettings.narrativeGuidanceLoreBookNames)
-                ? narrative_guidance_moduleSettings.narrativeGuidanceLoreBookNames
-                : [],
-        );
-        list.innerHTML = '';
-        if (!names.length) {
-            const empty = document.createElement('div');
-            empty.className = 'ng-lorebook-empty';
-            empty.textContent = 'No lore books available.';
-            list.appendChild(empty);
-            updateSummary();
-            return;
-        }
-        for (const name of names) {
-            const label = document.createElement('label');
-            label.className = 'ng-lorebook-item checkbox_label';
-            const cb = document.createElement('input');
-            cb.type = 'checkbox';
-            cb.value = name;
-            if (previouslyChecked.has(name)) cb.checked = true;
-            cb.addEventListener('change', () => {
-                writeSelectionToSettings();
-                updateSummary();
-            });
-            const span = document.createElement('span');
-            span.textContent = name;
-            label.appendChild(cb);
-            label.appendChild(span);
-            list.appendChild(label);
-        }
-        updateSummary();
-    };
-
-    picker.addEventListener('toggle', () => {
-        if (picker.open) render();
+    const { element } = createLoreBookPicker({
+        initialSelection: initial,
+        classPrefix: 'ng-lorebook',
+        onChange: (names) => {
+            narrative_guidance_moduleSettings.narrativeGuidanceLoreBookNames = names;
+            narrative_guidance_saveSettingsCb?.();
+        },
     });
-
-    render();
+    element.id = 'ng_lorebooks_details';
+    host.replaceChildren(element);
 }
 
 function bindNarrativeGuidanceSettings(saveSettings) {
@@ -5587,7 +5433,7 @@ function bindNarrativeGuidanceSettings(saveSettings) {
         await regenGuidance('retry');
     });
 
-    narrative_guidance_populateLoreBookPicker();
+    populateLoreBookPicker();
     refreshPanelFromState();
     refreshNGActionButtonStates();
 }

@@ -8,10 +8,15 @@
 
 import { removeReasoningFromString } from '../../../../reasoning.js';
 import {
+    Popup,
+    POPUP_TYPE,
+    POPUP_RESULT,
+} from '../../../../popup.js';
+import {
     createDebugLogger,
     toast,
     buildContextPreamble,
-    getAvailableLoreBookNames,
+    createLoreBookPicker,
     streamingGenerate,
     withSingleLineDisabled,
 } from './utils.js';
@@ -230,8 +235,11 @@ export function bindACCSettings(saveSettings) {
 
 // ─── Modal ───
 
-function openModal() {
-    if (document.getElementById('acc_modal_overlay')) return;
+let activePopup = null;
+let activeBody = null;
+
+async function openModal() {
+    if (activePopup) return;
 
     isGenerating = false;
     abortRequested = false;
@@ -239,32 +247,122 @@ function openModal() {
     lastAction = null;
     restorePoint = null;
 
-    const overlay = document.createElement('div');
-    overlay.id = 'acc_modal_overlay';
-    overlay.innerHTML = buildModalHTML();
-    document.body.appendChild(overlay);
+    const body = buildModalBody();
 
-    overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) closeModal();
+    const popup = new Popup(body, POPUP_TYPE.TEXT, '', {
+        okButton: 'Done',
+        cancelButton: 'Cancel',
+        wide: true,
+        large: true,
+        allowVerticalScrolling: true,
+        onOpen: () => {
+            bindModalHandlers();
+            refreshActionButtonStates();
+            debug('Modal opened');
+        },
+        onClosing: (p) => {
+            if (p.result === POPUP_RESULT.AFFIRMATIVE) {
+                // Done clicked — refuse to close mid-generation.
+                if (isGenerating) {
+                    toast('Wait for generation to finish before clicking Done.', 'warning');
+                    return false;
+                }
+                const output = body.querySelector('#acc_description_output')?.value?.trim() || '';
+                if (!output) {
+                    toast('Description is empty. Nothing to save.', 'warning');
+                    return false;
+                }
+                return true;
+            }
+            // Cancel / Esc / X — abort any in-flight job, then allow close.
+            if (isGenerating) {
+                abortRequested = true;
+                stopGeneration();
+            }
+            return true;
+        },
     });
+    activePopup = popup;
+    activeBody = body;
 
-    document.getElementById('acc_close_btn')?.addEventListener('click', closeModal);
-    document.getElementById('acc_cancel_btn')?.addEventListener('click', closeModal);
-    document.getElementById('acc_done_btn')?.addEventListener('click', handleDone);
+    try {
+        const result = await popup.show();
+        if (result === POPUP_RESULT.AFFIRMATIVE) {
+            applyDescription(body);
+        }
+    } finally {
+        activePopup = null;
+        activeBody = null;
+        isGenerating = false;
+        activeAction = null;
+        lastAction = null;
+        restorePoint = null;
+        debug('Modal closed');
+    }
+}
+
+function buildModalBody() {
+    const root = document.createElement('div');
+    root.className = 'acc-modal-body';
+    root.innerHTML = `
+        <div class="acc-context-section">
+            <label class="checkbox_label" title="Prepend the current chat / character context to the generation">
+                <input id="acc_use_chat_context" type="checkbox" />
+                <span>Use Chat Context</span>
+            </label>
+            <div class="acc-lorebook-host"></div>
+        </div>
+        <div class="acc-brief-section">
+            <label for="acc_character_brief"><b>Character Brief:</b></label>
+            <textarea id="acc_character_brief" class="text_pole" rows="4" placeholder="Describe your character concept, setting, and any key details..."></textarea>
+        </div>
+        <div class="acc-action-row">
+            <div id="acc_generate_btn" class="menu_button interactable acc-action-btn acc-generate-btn" title="Generate a fresh description from the brief (replaces the textarea)">
+                <span class="fa-solid fa-wand-magic-sparkles"></span> Generate
+            </div>
+            <div id="acc_continue_btn" class="menu_button interactable acc-action-btn acc-continue-btn" title="Continue from where the description leaves off">
+                <span class="fa-solid fa-arrow-right"></span> Continue
+            </div>
+            <div id="acc_checkpoint_btn" class="menu_button interactable acc-action-btn acc-checkpoint-btn" title="Save the current description as the Retry restore point">
+                <span class="fa-solid fa-flag"></span> Checkpoint
+            </div>
+            <div id="acc_retry_btn" class="menu_button interactable acc-action-btn acc-retry-btn" title="Restore to the last snapshot and re-run the last action">
+                <span class="fa-solid fa-rotate-right"></span> Retry
+            </div>
+        </div>
+        <div class="acc-tokens-row">
+            <label class="acc-tokens-label" for="acc_response_length" title="Maximum tokens for each generation">
+                <span class="fa-solid fa-coins"></span> Max Tokens:
+            </label>
+            <input id="acc_response_length" type="number" class="text_pole acc-tokens-input" min="50" max="8192" step="50" />
+        </div>
+        <div class="acc-status-bar acc-hidden" id="acc_status_bar">
+            <span class="fa-solid fa-spinner fa-spin"></span>
+            <span id="acc_status_text"></span>
+        </div>
+        <div class="acc-description-section">
+            <label for="acc_description_output"><b>Character Description:</b></label>
+            <textarea id="acc_description_output" class="text_pole acc-description-output" rows="18" placeholder="Generated description will appear here. You can edit it before clicking Done."></textarea>
+        </div>
+    `;
+
+    // Initialize the token field from current settings.
+    const tokenInput = root.querySelector('#acc_response_length');
+    if (tokenInput) tokenInput.value = String(getResponseLength());
+
+    // Mount the shared lore-book picker.
+    const picker = createLoreBookPicker({ classPrefix: 'acc-lorebook' });
+    root.querySelector('.acc-lorebook-host').replaceWith(picker.element);
+    root._accLorebookPicker = picker;
+
+    return root;
+}
+
+function bindModalHandlers() {
     document.getElementById('acc_generate_btn')?.addEventListener('click', handleGenerate);
     document.getElementById('acc_continue_btn')?.addEventListener('click', handleContinue);
     document.getElementById('acc_checkpoint_btn')?.addEventListener('click', handleCheckpoint);
     document.getElementById('acc_retry_btn')?.addEventListener('click', handleRetry);
-
-    const updateLoreBookSummary = () => {
-        const label = document.getElementById('acc_lorebook_summary_label');
-        if (!label) return;
-        const checked = document.querySelectorAll('#acc_lorebook_list .acc-lorebook-cb:checked').length;
-        label.textContent = checked > 0 ? `Lore Books (${checked})` : 'Lore Books';
-    };
-    document.querySelectorAll('#acc_lorebook_list .acc-lorebook-cb').forEach(cb => {
-        cb.addEventListener('change', updateLoreBookSummary);
-    });
 
     const output = document.getElementById('acc_description_output');
     output?.addEventListener('input', refreshActionButtonStates);
@@ -277,102 +375,25 @@ function openModal() {
             saveSettingsFn?.();
         }
     });
-
-    refreshActionButtonStates();
-    debug('Modal opened');
 }
 
-function closeModal() {
-    if (isGenerating) {
-        abortRequested = true;
-        stopGeneration();
+function applyDescription(body) {
+    const output = body.querySelector('#acc_description_output')?.value?.trim() || '';
+    if (!output) return;
+    const descField = document.getElementById('description_textarea');
+    if (descField) {
+        descField.value = output;
+        descField.dispatchEvent(new Event('input', { bubbles: true }));
     }
-    const overlay = document.getElementById('acc_modal_overlay');
-    if (overlay) overlay.remove();
-    isGenerating = false;
-    activeAction = null;
-    lastAction = null;
-    restorePoint = null;
-    debug('Modal closed');
-}
-
-function buildModalHTML() {
-    const loreBookNames = getAvailableLoreBookNames();
-    const loreBookOptions = loreBookNames.length
-        ? loreBookNames.map(n => `
-            <label class="acc-lorebook-item checkbox_label">
-                <input type="checkbox" class="acc-lorebook-cb" value="${escapeAttr(n)}" />
-                <span>${escapeHTML(n)}</span>
-            </label>
-        `).join('')
-        : '<div class="acc-lorebook-empty">No lore books available.</div>';
-
-    return `
-        <div id="acc_modal" class="acc-modal">
-            <div class="acc-modal-header">
-                <h3>Assisted Character Creation</h3>
-                <div id="acc_close_btn" class="acc-close-btn interactable"><span class="fa-solid fa-xmark"></span></div>
-            </div>
-            <div class="acc-modal-body">
-                <div class="acc-context-section">
-                    <label class="checkbox_label" title="Prepend the current chat / character context to the generation">
-                        <input id="acc_use_chat_context" type="checkbox" />
-                        <span>Use Chat Context</span>
-                    </label>
-                    <details class="acc-lorebook-picker" title="Prepend active entries from the selected lore books">
-                        <summary><span class="fa-solid fa-book"></span> <span id="acc_lorebook_summary_label">Lore Books</span></summary>
-                        <div id="acc_lorebook_list" class="acc-lorebook-list">${loreBookOptions}</div>
-                    </details>
-                </div>
-                <div class="acc-brief-section">
-                    <label for="acc_character_brief"><b>Character Brief:</b></label>
-                    <textarea id="acc_character_brief" class="text_pole" rows="4" placeholder="Describe your character concept, setting, and any key details..."></textarea>
-                </div>
-                <div class="acc-action-row">
-                    <div id="acc_generate_btn" class="menu_button interactable acc-action-btn acc-generate-btn" title="Generate a fresh description from the brief (replaces the textarea)">
-                        <span class="fa-solid fa-wand-magic-sparkles"></span> Generate
-                    </div>
-                    <div id="acc_continue_btn" class="menu_button interactable acc-action-btn acc-continue-btn" title="Continue from where the description leaves off">
-                        <span class="fa-solid fa-arrow-right"></span> Continue
-                    </div>
-                    <div id="acc_checkpoint_btn" class="menu_button interactable acc-action-btn acc-checkpoint-btn" title="Save the current description as the Retry restore point">
-                        <span class="fa-solid fa-flag"></span> Checkpoint
-                    </div>
-                    <div id="acc_retry_btn" class="menu_button interactable acc-action-btn acc-retry-btn" title="Restore to the last snapshot and re-run the last action">
-                        <span class="fa-solid fa-rotate-right"></span> Retry
-                    </div>
-                </div>
-                <div class="acc-tokens-row">
-                    <label class="acc-tokens-label" for="acc_response_length" title="Maximum tokens for each generation">
-                        <span class="fa-solid fa-coins"></span> Max Tokens:
-                    </label>
-                    <input id="acc_response_length" type="number" class="text_pole acc-tokens-input" min="50" max="8192" step="50" value="${getResponseLength()}" />
-                </div>
-                <div class="acc-status-bar acc-hidden" id="acc_status_bar">
-                    <span class="fa-solid fa-spinner fa-spin"></span>
-                    <span id="acc_status_text"></span>
-                </div>
-                <div class="acc-description-section">
-                    <label for="acc_description_output"><b>Character Description:</b></label>
-                    <textarea id="acc_description_output" class="text_pole acc-description-output" rows="18" placeholder="Generated description will appear here. You can edit it before clicking Done."></textarea>
-                </div>
-            </div>
-            <div class="acc-modal-footer">
-                <div class="acc-footer-right">
-                    <div id="acc_cancel_btn" class="menu_button interactable">Cancel</div>
-                    <div id="acc_done_btn" class="menu_button interactable acc-done-btn">Done</div>
-                </div>
-            </div>
-        </div>`;
+    toast('Character description applied!', 'success');
 }
 
 // ─── Actions ───
 
 function readModalContextOptions() {
     const includeChat = !!document.getElementById('acc_use_chat_context')?.checked;
-    const loreBookNames = Array.from(
-        document.querySelectorAll('#acc_lorebook_list .acc-lorebook-cb:checked'),
-    ).map(el => el.value);
+    const picker = activeBody?._accLorebookPicker;
+    const loreBookNames = picker ? picker.getSelected() : [];
     return { includeChat, loreBookNames };
 }
 
@@ -598,27 +619,6 @@ function stopGeneration() {
     debug('Stop generation triggered');
 }
 
-// ─── Done ───
-
-function handleDone() {
-    if (isGenerating) return;
-
-    const output = document.getElementById('acc_description_output')?.value?.trim() || '';
-    if (!output) {
-        toast('Description is empty. Nothing to save.', 'warning');
-        return;
-    }
-
-    const descField = document.getElementById('description_textarea');
-    if (descField) {
-        descField.value = output;
-        descField.dispatchEvent(new Event('input', { bubbles: true }));
-    }
-
-    toast('Character description applied!', 'success');
-    closeModal();
-}
-
 // ─── UI Helpers ───
 
 const ACTION_BUTTON_IDS = ['acc_generate_btn', 'acc_continue_btn', 'acc_checkpoint_btn', 'acc_retry_btn'];
@@ -631,7 +631,6 @@ const ACTION_LABELS = {
 };
 
 function setGeneratingUI(generating, action) {
-    const doneBtn = document.getElementById('acc_done_btn');
     const briefInput = document.getElementById('acc_character_brief');
     const activeBtnId = action === 'continue' ? 'acc_continue_btn' : 'acc_generate_btn';
 
@@ -652,11 +651,15 @@ function setGeneratingUI(generating, action) {
         }
     }
 
+    // Popup owns the Done/Cancel buttons; toggle the OK button visually so
+    // users get a clear "wait for generation" hint. The onClosing guard
+    // still blocks the close if they click it mid-flight.
+    const okBtn = activePopup?.okButton;
+    if (okBtn) okBtn.classList.toggle('disabled', !!generating);
+
     if (generating) {
-        doneBtn?.classList.add('acc-disabled');
         briefInput?.setAttribute('disabled', 'true');
     } else {
-        doneBtn?.classList.remove('acc-disabled');
         briefInput?.removeAttribute('disabled');
         refreshActionButtonStates();
     }
@@ -689,14 +692,4 @@ function setStatusBar(message) {
     } else {
         bar.classList.add('acc-hidden');
     }
-}
-
-function escapeHTML(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-}
-
-function escapeAttr(str) {
-    return str.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }

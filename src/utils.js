@@ -11,8 +11,8 @@
  *   - Generation context preamble (chat + lore books)
  */
 
-import { loadWorldInfo, world_names } from '../../../../world-info.js';
-import { getMaxContextSize } from '../../../../../script.js';
+import { loadWorldInfo } from '../../../../world-info.js';
+import { getMaxPromptTokens } from '../../../../../script.js';
 import { getTokenCountAsync } from '../../../../tokenizers.js';
 import { cancellableStreamingGenerate } from './silent-generation.js';
 
@@ -199,24 +199,18 @@ export async function streamingGenerate(params, targetEl, opts = {}) {
  * (WIA, ACC, NG) from being truncated at the first newline when the user has
  * that option active for normal chat.
  *
- * Checks multiple likely property names for robustness across ST versions.
- *
  * @template T
  * @param {() => Promise<T>} fn - Async function to execute with single-line disabled.
  * @returns {Promise<T>}
  */
 export async function withSingleLineDisabled(fn) {
-    const ctx = getContext();
-    const pus = ctx.powerUserSettings;
-    const propName = pus
-        ? (['single_line', 'singleLine', 'single_line_auto_extend'].find(k => k in pus) ?? null)
-        : null;
-    const original = propName ? pus[propName] : undefined;
-    if (propName && original) pus[propName] = false;
+    const pus = getContext().powerUserSettings;
+    const original = pus?.single_line;
+    if (pus && original) pus.single_line = false;
     try {
         return await fn();
     } finally {
-        if (propName && original !== undefined) pus[propName] = original;
+        if (pus && original !== undefined) pus.single_line = original;
     }
 }
 
@@ -288,17 +282,101 @@ function collectActiveCharacters(ctx) {
  * @returns {string[]}
  */
 export function getAvailableLoreBookNames() {
-    if (Array.isArray(world_names) && world_names.length) {
-        return world_names.slice();
-    }
-    // DOM fallback in case the host export is unavailable for some reason.
-    const selector = document.getElementById('world_info');
-    if (selector) {
-        return Array.from(selector.options)
-            .map(o => (o.textContent || '').trim())
-            .filter(Boolean);
-    }
-    return [];
+    const names = getContext().getWorldInfoNames?.();
+    return Array.isArray(names) ? names : [];
+}
+
+// ─── Lore Book Picker Widget ───
+
+/**
+ * Build a reusable lore-book picker: a `<details>` element containing a list
+ * of checkboxes (one per known lore book) plus a summary that shows the
+ * current selection count. Re-renders on open so newly added/removed books
+ * appear without a reload.
+ *
+ * @param {object} [opts]
+ * @param {string[]} [opts.initialSelection] - Names to start checked.
+ * @param {(names: string[]) => void} [opts.onChange] - Called on every selection change.
+ * @param {string} [opts.classPrefix='sse-lorebook'] - CSS class prefix; the existing
+ *        module-specific styles (wia-…, acc-…, ng-…) all share the same shape,
+ *        so callers can pass their own prefix to keep their styling intact.
+ * @param {string} [opts.title='Lore Books'] - Summary label when nothing is selected.
+ * @returns {{ element: HTMLDetailsElement, getSelected: () => string[] }}
+ */
+export function createLoreBookPicker({
+    initialSelection = [],
+    onChange = null,
+    classPrefix = 'sse-lorebook',
+    title = 'Lore Books',
+} = {}) {
+    const details = document.createElement('details');
+    details.className = `${classPrefix}-picker`;
+    details.title = 'Prepend active entries from the selected lore books';
+
+    const summary = document.createElement('summary');
+    const icon = document.createElement('span');
+    icon.className = 'fa-solid fa-book';
+    const summaryLabel = document.createElement('span');
+    summaryLabel.className = `${classPrefix}-summary-label`;
+    summaryLabel.textContent = title;
+    summary.appendChild(icon);
+    summary.appendChild(document.createTextNode(' '));
+    summary.appendChild(summaryLabel);
+    details.appendChild(summary);
+
+    const list = document.createElement('div');
+    list.className = `${classPrefix}-list`;
+    details.appendChild(list);
+
+    const getSelected = () => Array.from(
+        list.querySelectorAll('input[type="checkbox"]:checked'),
+    ).map(cb => cb.value);
+
+    const updateSummary = () => {
+        const count = getSelected().length;
+        summaryLabel.textContent = count > 0 ? `${title} (${count})` : title;
+    };
+
+    const render = () => {
+        const names = getAvailableLoreBookNames();
+        const previouslyChecked = new Set(
+            list.children.length === 0 ? initialSelection : getSelected(),
+        );
+        list.replaceChildren();
+        if (!names.length) {
+            const empty = document.createElement('div');
+            empty.className = `${classPrefix}-empty`;
+            empty.textContent = 'No lore books available.';
+            list.appendChild(empty);
+            updateSummary();
+            return;
+        }
+        for (const name of names) {
+            const label = document.createElement('label');
+            label.className = `${classPrefix}-item checkbox_label`;
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.value = name;
+            if (previouslyChecked.has(name)) cb.checked = true;
+            cb.addEventListener('change', () => {
+                updateSummary();
+                onChange?.(getSelected());
+            });
+            const span = document.createElement('span');
+            span.textContent = name;
+            label.appendChild(cb);
+            label.appendChild(span);
+            list.appendChild(label);
+        }
+        updateSummary();
+    };
+
+    details.addEventListener('toggle', () => {
+        if (details.open) render();
+    });
+    render();
+
+    return { element: details, getSelected };
 }
 
 // Tokens reserved on top of `responseLength` for the surrounding prompt
@@ -347,14 +425,14 @@ async function packRecentChatLines(chat, ctx, chatBudget) {
  * the active entries of any selected lore books.
  *
  * Recent chat is packed to fit the model's remaining context budget
- * (`getMaxContextSize() - responseLength - reserve`), after the non-chat
+ * (`getMaxPromptTokens() - responseLength - reserve`), after the non-chat
  * sections have been counted. No fixed message cap.
  *
  * @param {object} opts
  * @param {boolean} [opts.includeChat=false] - Include character card, persona, and recent chat messages.
  * @param {string[]} [opts.loreBookNames=[]] - Names of lore books whose enabled entries to include.
  * @param {number}  [opts.responseLength=0] - Tokens reserved for the model's response; subtracted from the budget.
- * @param {number}  [opts.maxContextOverride=0] - If > 0, use this as the max-context size instead of `getMaxContextSize()`. Lets callers cap how much chat history they pull in independently of the model's real window.
+ * @param {number}  [opts.maxContextOverride=0] - If > 0, use this as the max-context size instead of `getMaxPromptTokens()`. Lets callers cap how much chat history they pull in independently of the model's real window.
  * @returns {Promise<string>} The composed preamble, or '' if nothing was included.
  */
 export async function buildContextPreamble({
@@ -415,7 +493,7 @@ export async function buildContextPreamble({
             let recentBlock = '';
             try {
                 const overrideValid = Number.isFinite(maxContextOverride) && maxContextOverride > 0;
-                const maxContext = overrideValid ? maxContextOverride : getMaxContextSize();
+                const maxContext = overrideValid ? maxContextOverride : getMaxPromptTokens();
                 if (!Number.isFinite(maxContext) || maxContext <= 0) {
                     throw new Error(`maxContext resolved to ${maxContext}`);
                 }

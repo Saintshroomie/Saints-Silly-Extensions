@@ -3,7 +3,6 @@
  * are posted under that character's name/avatar.
  */
 
-import { selected_group, groups } from '../../../../group-chats.js';
 import { SlashCommandParser } from '../../../../slash-commands/SlashCommandParser.js';
 import { SlashCommand } from '../../../../slash-commands/SlashCommand.js';
 import { ARGUMENT_TYPE, SlashCommandArgument } from '../../../../slash-commands/SlashCommandArgument.js';
@@ -78,8 +77,8 @@ export function getPossessedCharacter() {
         if (byAvatar) return byAvatar;
     }
     // In group chats, prefer the character whose avatar is in the group members list
-    if (selected_group) {
-        const group = groups.find(g => g.id === selected_group);
+    if (context.groupId) {
+        const group = context.groups.find(g => g.id === context.groupId);
         if (group) {
             const groupChar = group.members
                 .map(avatar => context.characters.find(c => c.avatar === avatar))
@@ -91,10 +90,11 @@ export function getPossessedCharacter() {
 }
 
 function validatePossessedCharInGroup() {
-    if (!selected_group || !possessedCharName) return;
-    const group = groups.find(g => g.id === selected_group);
-    if (!group) return;
+    if (!possessedCharName) return;
     const context = getContext();
+    if (!context.groupId) return;
+    const group = context.groups.find(g => g.id === context.groupId);
+    if (!group) return;
     const isMember = group.members.some(avatar => {
         if (possessedCharAvatar) return avatar === possessedCharAvatar;
         const char = context.characters.find(c => c.avatar === avatar);
@@ -119,8 +119,8 @@ function setPossession(charName, charAvatar) {
             const context = getContext();
             // In group chats, prefer the character whose avatar is in the group members list
             let char = null;
-            if (selected_group) {
-                const group = groups.find(g => g.id === selected_group);
+            if (context.groupId) {
+                const group = context.groups.find(g => g.id === context.groupId);
                 if (group) {
                     char = group.members
                         .map(avatar => context.characters.find(c => c.avatar === avatar))
@@ -165,7 +165,7 @@ export async function postPossessedMessage(text) {
         extra: { possession: true },
     };
 
-    if (selected_group) {
+    if (context.groupId) {
         message.original_avatar = char.avatar;
         message.is_name = true;
     }
@@ -202,7 +202,7 @@ export function onMessageSent(messageIndex) {
     message.force_avatar = char.avatar ? `/characters/${char.avatar}` : undefined;
     message.extra = { ...(message.extra || {}), possession: true };
 
-    if (selected_group) {
+    if (context.groupId) {
         message.original_avatar = char.avatar;
         message.is_name = true;
     }
@@ -269,13 +269,14 @@ export function attachContinueInterceptor() {
 // ─── UI: Group Radio Buttons ───
 
 function injectGroupRadioButtons() {
-    if (!selected_group) return;
     if (!ctx.settings.possessionEnabled) return;
 
-    const group = groups.find(g => g.id === selected_group);
+    const context = getContext();
+    if (!context.groupId) return;
+
+    const group = context.groups.find(g => g.id === context.groupId);
     if (!group) return;
 
-    const context = getContext();
     const memberEntries = document.querySelectorAll('#rm_group_members .group_member');
 
     memberEntries.forEach(entry => {
@@ -403,7 +404,7 @@ function removeGroupRadioButtons() {
 // ─── UI: Solo Chat Button ───
 
 function injectSoloButton() {
-    if (selected_group) return;
+    if (getContext().groupId) return;
     if (!ctx.settings.possessionEnabled) return;
     if (document.getElementById('possession_solo_btn')) return;
 
@@ -494,36 +495,8 @@ function injectPossessionImpersonateButton() {
 
         debug('Possession impersonate clicked — triggering generation for', char.name);
 
-        if (selected_group) {
-            const radios = document.querySelectorAll('.possession_radio');
-            for (const radio of radios) {
-                const radioMatch = (possessedCharAvatar && radio.dataset.charAvatar)
-                    ? radio.dataset.charAvatar === possessedCharAvatar
-                    : radio.dataset.charName === possessedCharName;
-                if (radioMatch) {
-                    const memberEntry = radio.closest('.group_member');
-                    if (memberEntry) {
-                        const speakBtn = memberEntry.querySelector('.right_menu_button[data-action="speak"]');
-                        if (speakBtn) {
-                            speakBtn.click();
-                            return;
-                        }
-                    }
-                    break;
-                }
-            }
-            debug('Speak button not found, falling back to /trigger');
-            if (context.executeSlashCommandsWithOptions) {
-                await context.executeSlashCommandsWithOptions(`/trigger ${char.name}`);
-            }
-        } else {
-            if (context.executeSlashCommandsWithOptions) {
-                await context.executeSlashCommandsWithOptions('/trigger');
-            } else {
-                const sendBtn = document.getElementById('send_but');
-                if (sendBtn) sendBtn.click();
-            }
-        }
+        const cmd = context.groupId ? `/trigger ${char.name}` : '/trigger';
+        await context.executeSlashCommandsWithOptions(cmd);
     });
 
     const phrasingBtn = document.getElementById('phrasing_send_button');
@@ -562,7 +535,7 @@ export function syncAllPossessionUI() {
         return;
     }
 
-    if (selected_group) {
+    if (getContext().groupId) {
         removeSoloButton();
         injectGroupRadioButtons();
         syncGroupRadioButtons();
@@ -601,7 +574,7 @@ export function onGroupUpdated() {
 }
 
 export function onCharacterPageLoaded() {
-    if (!selected_group) {
+    if (!getContext().groupId) {
         injectSoloButton();
         syncSoloButton();
     }
@@ -657,8 +630,8 @@ export function registerPossessionSlashCommands() {
                     toastr.info(`Currently possessing: ${possessedCharName}`, 'Possession');
                     return possessedCharName;
                 }
-                if (!selected_group) {
-                    const context = getContext();
+                const context = getContext();
+                if (!context.groupId) {
                     const char = context.characters?.[context.characterId];
                     if (char) {
                         setPossession(char.name, char.avatar);
@@ -672,8 +645,8 @@ export function registerPossessionSlashCommands() {
             const context = getContext();
             const nameLower = name.toLowerCase();
 
-            if (selected_group) {
-                const group = groups.find(g => g.id === selected_group);
+            if (context.groupId) {
+                const group = context.groups.find(g => g.id === context.groupId);
                 if (!group) {
                     toastr.error('No active group found.', 'Possession');
                     return '';
