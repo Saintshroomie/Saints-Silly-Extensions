@@ -1,4 +1,4 @@
-import { loadWorldInfo as __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_loadWorldInfo__ } from "../../../../world-info.js";
+import { loadWorldInfo as __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_loadWorldInfo__, world_names as __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_world_names__ } from "../../../../world-info.js";
 import { extension_prompt_roles as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_roles__, extension_prompt_types as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_types__, generateRaw as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__, getMaxPromptTokens as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_getMaxPromptTokens__, setExtensionPrompt as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_setExtensionPrompt__, stopGeneration as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_stopGeneration__, substituteParamsExtended as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParamsExtended__ } from "../../../../../script.js";
 import { getTokenCountAsync as __WEBPACK_EXTERNAL_MODULE__tokenizers_js_d5863f55_getTokenCountAsync__ } from "../../../../tokenizers.js";
 import { SlashCommandParser as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandParser_js_42c8b851_SlashCommandParser__ } from "../../../../slash-commands/SlashCommandParser.js";
@@ -1798,8 +1798,19 @@ function collectActiveCharacters(ctx) {
  * @returns {string[]}
  */
 function getAvailableLoreBookNames() {
-    const names = getContext().getWorldInfoNames?.();
-    return Array.isArray(names) ? names : [];
+    // Prefer the context method, but fall back to the live `world_names`
+    // import (the source of truth) and finally to the DOM. Older ST
+    // versions don't expose `getWorldInfoNames` on the context.
+    const fromContext = getContext().getWorldInfoNames?.();
+    if (Array.isArray(fromContext) && fromContext.length) return fromContext;
+    if (Array.isArray(__WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_world_names__) && __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_world_names__.length) return __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_world_names__.slice();
+    const selector = document.getElementById('world_info');
+    if (selector) {
+        return Array.from(selector.options)
+            .map(o => (o.textContent || '').trim())
+            .filter(Boolean);
+    }
+    return [];
 }
 
 // ─── Lore Book Picker Widget ───

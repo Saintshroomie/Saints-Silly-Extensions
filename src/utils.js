@@ -11,7 +11,7 @@
  *   - Generation context preamble (chat + lore books)
  */
 
-import { loadWorldInfo } from '../../../../world-info.js';
+import { loadWorldInfo, world_names } from '../../../../world-info.js';
 import { getMaxPromptTokens } from '../../../../../script.js';
 import { getTokenCountAsync } from '../../../../tokenizers.js';
 import { cancellableStreamingGenerate } from './silent-generation.js';
@@ -282,8 +282,19 @@ function collectActiveCharacters(ctx) {
  * @returns {string[]}
  */
 export function getAvailableLoreBookNames() {
-    const names = getContext().getWorldInfoNames?.();
-    return Array.isArray(names) ? names : [];
+    // Prefer the context method, but fall back to the live `world_names`
+    // import (the source of truth) and finally to the DOM. Older ST
+    // versions don't expose `getWorldInfoNames` on the context.
+    const fromContext = getContext().getWorldInfoNames?.();
+    if (Array.isArray(fromContext) && fromContext.length) return fromContext;
+    if (Array.isArray(world_names) && world_names.length) return world_names.slice();
+    const selector = document.getElementById('world_info');
+    if (selector) {
+        return Array.from(selector.options)
+            .map(o => (o.textContent || '').trim())
+            .filter(Boolean);
+    }
+    return [];
 }
 
 // ─── Lore Book Picker Widget ───
