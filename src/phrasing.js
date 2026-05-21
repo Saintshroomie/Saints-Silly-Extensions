@@ -10,7 +10,7 @@ import {
     setExtensionPrompt,
     extension_prompt_types,
     extension_prompt_roles,
-    substituteParams,
+    substituteParamsExtended,
 } from '../../../../../script.js';
 import {
     getContext,
@@ -89,12 +89,11 @@ function formatSeedWithSpeaker(seedText, isUser, speakerName) {
 function assemblePrompt(seedText, swipesContext = null) {
     const useInverse = !!swipesContext;
     debug('assemblePrompt — seed length:', seedText.length, '| mode:', useInverse ? 'inverse' : 'standard');
-    let prompt = useInverse ? getActiveInversePrompt() : getActivePrompt();
-    prompt = prompt.replace(/\{\{phrasingSeed\}\}/g, seedText);
-    if (useInverse) {
-        prompt = prompt.replace(/\{\{phrasingSwipes\}\}/g, swipesContext);
-    }
-    prompt = substituteParams(prompt);
+    const tpl = useInverse ? getActiveInversePrompt() : getActivePrompt();
+    const macros = useInverse
+        ? { phrasingSeed: seedText, phrasingSwipes: swipesContext }
+        : { phrasingSeed: seedText };
+    const prompt = substituteParamsExtended(tpl, macros);
     debug('assemblePrompt — final length:', prompt.length);
     return prompt;
 }
@@ -195,16 +194,10 @@ async function doPrimaryFlow(seedText) {
             const assembled = assemblePrompt(seedText);
             injectPhrasingPrompt(assembled);
 
-            debug('doPrimaryFlow — normal path: triggering impersonate');
-            const impersonateBtn = document.getElementById('option_impersonate');
-            if (impersonateBtn) {
-                impersonateBtn.click();
-            } else {
-                debug('doPrimaryFlow — FAILED: option_impersonate not found');
-                return '';
-            }
-
-            await waitForGenerationEnd();
+            debug('doPrimaryFlow — normal path: triggering /impersonate');
+            const ended = waitForGenerationEnd();
+            await context.executeSlashCommandsWithOptions('/impersonate');
+            await ended;
 
             const textarea = document.getElementById('send_textarea');
             const result = textarea?.value?.trim() || '';
@@ -277,35 +270,27 @@ async function doSwipeMode(messageIndex) {
             message.swipe_id = lastSwipeIndex;
             message.mes = message.swipes[lastSwipeIndex];
 
+            // Re-render the visible message text (no public helper for this).
             const messageEl = document.querySelector(`#chat .mes[mesid="${messageIndex}"]`);
-            if (messageEl) {
-                const textEl = messageEl.querySelector('.mes_text');
-                if (textEl) {
-                    if (typeof context.messageFormatting === 'function') {
-                        textEl.innerHTML = context.messageFormatting(
-                            message.mes, message.name, message.is_system, message.is_user, messageIndex,
-                        );
-                    } else {
-                        textEl.textContent = message.mes;
-                    }
-                }
-                const swipeCounter = messageEl.querySelector('.swipes-counter');
-                if (swipeCounter) {
-                    swipeCounter.textContent = `${message.swipe_id + 1}/${message.swipes.length}`;
-                }
+            const textEl = messageEl?.querySelector('.mes_text');
+            if (textEl && typeof context.messageFormatting === 'function') {
+                textEl.innerHTML = context.messageFormatting(
+                    message.mes, message.name, message.is_system, message.is_user, messageIndex,
+                );
+            } else if (textEl) {
+                textEl.textContent = message.mes;
             }
+            // refresh(true) re-renders chevrons AND swipe counters.
+            context.swipe.refresh(true);
         }
 
-        const swipeRight = document.querySelector(`#chat .mes[mesid="${messageIndex}"] .swipe_right`);
-        if (!swipeRight) {
-            debug('doSwipeMode — FAILED: swipe_right button not found');
-            return '';
-        }
-
-        debug('doSwipeMode — clicking swipe_right');
-        swipeRight.click();
-
-        const result = await waitForGenerationEnd();
+        debug('doSwipeMode — triggering swipe right');
+        // Install the GENERATION_ENDED listener before calling swipe.right
+        // so we never miss the event if generation completes before the
+        // swipe animation does.
+        const ended = waitForGenerationEnd();
+        await context.swipe.right(null, { message });
+        const result = await ended;
         debug('doSwipeMode — complete, result length:', result.length);
         return result;
     } finally {

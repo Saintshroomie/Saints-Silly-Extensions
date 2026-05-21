@@ -8,12 +8,14 @@
  * (the entry's content) and using a free-form prompt instead of a schema.
  */
 
+import { substituteParamsExtended } from '../../../../../script.js';
 import { removeReasoningFromString } from '../../../../reasoning.js';
 import {
+    getContext,
     createDebugLogger,
     toast,
     buildContextPreamble,
-    getAvailableLoreBookNames,
+    createLoreBookPicker,
     streamingGenerate,
     withSingleLineDisabled,
 } from './utils.js';
@@ -74,6 +76,7 @@ export const DEFAULT_WIA_RESPONSE_LENGTH = 600;
 
 let moduleSettings = null;
 let debug = () => {};
+let listenersInstalled = false;
 let observer = null;
 let saveSettingsCb = null;
 
@@ -93,12 +96,12 @@ function resolveWIAPrefill(title) {
         const tpl = (typeof moduleSettings?.wiaPrefillTitled === 'string' && moduleSettings.wiaPrefillTitled)
             ? moduleSettings.wiaPrefillTitled
             : DEFAULT_WIA_PREFILL_TITLED;
-        return tpl.replace(/\{\{title\}\}/g, trimmedTitle);
+        return substituteParamsExtended(tpl, { title: trimmedTitle });
     }
     const tpl = (typeof moduleSettings?.wiaPrefillUntitled === 'string' && moduleSettings.wiaPrefillUntitled)
         ? moduleSettings.wiaPrefillUntitled
         : DEFAULT_WIA_PREFILL_UNTITLED;
-    return tpl;
+    return substituteParamsExtended(tpl, {});
 }
 
 // ─── Init ───
@@ -113,33 +116,51 @@ export function initWIA({ settings }) {
     debug('Module initialized');
 }
 
-// ─── DOM Observation / Injection ───
+// ─── Editor Observation / Injection ───
 
 /**
- * Start watching the DOM for new World Info entry forms and inject
- * assist controls into each one.
+ * Watch for World Info entry forms appearing in the editor and inject the
+ * assist controls. ST does not emit an event when an individual entry is
+ * expanded — `displayWorldEntries` mutates the editor list directly — so we
+ * use a narrowly-scoped MutationObserver on the editor's entry list
+ * container, plus the WORLDINFO_UPDATED event for refresh after saves.
  */
 export function startWIAObserver() {
-    if (observer) return;
+    if (listenersInstalled) return;
+    listenersInstalled = true;
 
-    observer = new MutationObserver((mutations) => {
+    const rescan = () => {
         if (!moduleSettings?.wiaEnabled) return;
-        for (const m of mutations) {
-            for (const node of m.addedNodes) {
-                if (!(node instanceof HTMLElement)) continue;
-                if (node.matches?.('.world_entry_edit')) {
-                    injectControls(node);
+        document.querySelectorAll('.world_entry_edit').forEach(injectControls);
+    };
+
+    const attachObserver = () => {
+        if (observer) return;
+        const container = document.getElementById('world_popup_entries_list');
+        if (!container) return;
+        observer = new MutationObserver((mutations) => {
+            if (!moduleSettings?.wiaEnabled) return;
+            for (const m of mutations) {
+                for (const node of m.addedNodes) {
+                    if (!(node instanceof HTMLElement)) continue;
+                    if (node.matches?.('.world_entry_edit')) injectControls(node);
+                    node.querySelectorAll?.('.world_entry_edit').forEach(injectControls);
                 }
-                node.querySelectorAll?.('.world_entry_edit').forEach(injectControls);
             }
-        }
-    });
+        });
+        observer.observe(container, { childList: true, subtree: true });
+        debug('WI editor observer attached');
+    };
 
-    observer.observe(document.body, { childList: true, subtree: true });
+    // The editor list isn't in the DOM until the user opens World Info, so
+    // try once now and re-try on WI events (which fire after open / save).
+    attachObserver();
+    const { eventSource, eventTypes } = getContext();
+    eventSource.on(eventTypes.WORLDINFO_UPDATED, () => { attachObserver(); rescan(); });
+    eventSource.on(eventTypes.WORLDINFO_ENTRIES_LOADED, () => { attachObserver(); rescan(); });
 
-    // Process anything already present on the page
-    document.querySelectorAll('.world_entry_edit').forEach(injectControls);
-    debug('Observer started');
+    rescan();
+    debug('WI listeners installed');
 }
 
 /**
@@ -189,10 +210,7 @@ function injectControls(formEl) {
             <input type="checkbox" class="wia-context-cb" />
             <span>Use Chat Context</span>
         </label>
-        <details class="wia-lorebook-picker" title="Prepend active entries from the selected lore books">
-            <summary><span class="fa-solid fa-book"></span> <span class="wia-lorebook-summary-label">Lore Books</span></summary>
-            <div class="wia-lorebook-list"></div>
-        </details>
+        <div class="wia-lorebook-host"></div>
         <div class="wia-btn wia-btn-continue menu_button interactable wia-hidden" title="Continue generation from where it left off">
             <span class="fa-solid fa-arrow-right"></span>
         </div>
@@ -239,72 +257,19 @@ function injectControls(formEl) {
         });
     }
 
-    populateLoreBookPicker(controls);
+    const picker = createLoreBookPicker({ classPrefix: 'wia-lorebook' });
+    controls.querySelector('.wia-lorebook-host').replaceWith(picker.element);
+    controls._wiaLorebookPicker = picker;
 
     debug('Injected controls for entry', id);
-}
-
-/**
- * Fill the lore book picker with one checkbox per known book and wire up the
- * summary label so it reflects the current selection count.
- */
-function populateLoreBookPicker(controls) {
-    const picker = controls.querySelector('.wia-lorebook-picker');
-    const list = controls.querySelector('.wia-lorebook-list');
-    const summaryLabel = controls.querySelector('.wia-lorebook-summary-label');
-    if (!picker || !list || !summaryLabel) return;
-
-    const updateSummary = () => {
-        const checked = list.querySelectorAll('input[type="checkbox"]:checked').length;
-        summaryLabel.textContent = checked > 0 ? `Lore Books (${checked})` : 'Lore Books';
-    };
-
-    const render = () => {
-        const names = getAvailableLoreBookNames();
-        const previouslyChecked = new Set(
-            Array.from(list.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value),
-        );
-        list.innerHTML = '';
-        if (!names.length) {
-            const empty = document.createElement('div');
-            empty.className = 'wia-lorebook-empty';
-            empty.textContent = 'No lore books available.';
-            list.appendChild(empty);
-            updateSummary();
-            return;
-        }
-        for (const name of names) {
-            const label = document.createElement('label');
-            label.className = 'wia-lorebook-item checkbox_label';
-            const cb = document.createElement('input');
-            cb.type = 'checkbox';
-            cb.value = name;
-            if (previouslyChecked.has(name)) cb.checked = true;
-            cb.addEventListener('change', updateSummary);
-            const span = document.createElement('span');
-            span.textContent = name;
-            label.appendChild(cb);
-            label.appendChild(span);
-            list.appendChild(label);
-        }
-        updateSummary();
-    };
-
-    // Re-render on open so newly added/removed books appear without a reload.
-    picker.addEventListener('toggle', () => {
-        if (picker.open) render();
-    });
-
-    render();
 }
 
 function readContextOptions(controls) {
     if (!controls) return { includeChat: false, loreBookNames: [] };
     const cb = controls.querySelector('.wia-context-cb');
     const includeChat = !!cb?.checked;
-    const loreBookNames = Array.from(
-        controls.querySelectorAll('.wia-lorebook-list input[type="checkbox"]:checked'),
-    ).map(el => el.value);
+    const picker = controls._wiaLorebookPicker;
+    const loreBookNames = picker ? picker.getSelected() : [];
     return { includeChat, loreBookNames };
 }
 

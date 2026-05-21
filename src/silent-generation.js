@@ -244,64 +244,37 @@ export function isSilentGenerationAbort(err) {
     return msg.includes('aborted') || msg.includes('cancelled by stop event');
 }
 
-// ─── Streaming Helper ───
+// ─── Generation Helper ───
 
 /**
- * Cancellable replacement for the old streamingGenerate(). Calls
- * `generateRaw` with optional onToken streaming and plugs the call into
- * the silent-generation cancel system. Throws AbortError on cancel.
+ * Run `generateRaw` under the silent-generation cancel system, optionally
+ * writing the final result into a target textarea once it arrives.
+ *
+ * `generateRaw` does not stream into extension callers — it does one fetch
+ * and returns the full text — so this fills `targetEl` in a single write
+ * when the promise resolves. The name is kept for historical reasons and
+ * because callers conceptually wire this to a streaming-style output area.
  *
  * @param {object} params - generateRaw parameters.
- * @param {HTMLTextAreaElement|null} targetEl - Element to stream into, or null.
+ * @param {HTMLTextAreaElement|null} targetEl - Element to write the result into, or null.
  * @param {{ append?: boolean, name?: string }} [opts]
  * @returns {Promise<string>} The full generated text.
  * @throws {DOMException} AbortError if cancelled.
  */
 export async function cancellableStreamingGenerate(params, targetEl, { append = false, name } = {}) {
     const jobName = name || 'streamingGenerate';
-    const hasStream = !!targetEl;
-    debug(`cancellableStreamingGenerate — name: ${jobName}, streaming: ${hasStream}, append: ${append}, promptLen: ${params?.prompt?.length ?? 0}, responseLength: ${params?.responseLength ?? '(default)'}`);
+    debug(`cancellableStreamingGenerate — name: ${jobName}, hasTarget: ${!!targetEl}, append: ${append}, promptLen: ${params?.prompt?.length ?? 0}, responseLength: ${params?.responseLength ?? '(default)'}`);
 
     return runCancellableSilentGeneration({
         name: jobName,
         run: async (_signal) => {
-            if (!targetEl) {
-                debug(`${jobName} — no targetEl, calling generateRaw directly`);
-                return generateRaw(params);
+            const result = await generateRaw(params);
+            debug(`${jobName} — generateRaw resolved, length: ${(result || '').length}`);
+            if (targetEl && result) {
+                targetEl.value = append ? ((targetEl.value || '') + result) : result;
+                targetEl.scrollTop = targetEl.scrollHeight;
             }
-
-            let accumulated = append ? (targetEl.value || '') : '';
-            let streamingWorked = false;
-            let tokenCount = 0;
-
-            try {
-                const result = await generateRaw({
-                    ...params,
-                    onToken: (token) => {
-                        accumulated += token;
-                        targetEl.value = accumulated;
-                        targetEl.scrollTop = targetEl.scrollHeight;
-                        streamingWorked = true;
-                        tokenCount++;
-                    },
-                });
-                debug(`${jobName} — generateRaw resolved, streamingWorked: ${streamingWorked}, tokens streamed: ${tokenCount}, final length: ${(result || accumulated).length}`);
-                if (!streamingWorked && result) {
-                    targetEl.value = append ? ((targetEl.value || '') + result) : result;
-                }
-                return result || accumulated;
-            } catch (err) {
-                // Fall back if ST rejected the unknown onToken param.
-                const msg = (err?.message || '').toLowerCase();
-                if (msg.includes('ontoken') || msg.includes('unknown') || msg.includes('invalid param')) {
-                    debug(`${jobName} — onToken unsupported, falling back to non-streaming generateRaw`);
-                    const fallback = await generateRaw(params);
-                    if (fallback) targetEl.value = append ? ((targetEl.value || '') + fallback) : fallback;
-                    return fallback;
-                }
-                debug(`${jobName} — generateRaw rejected:`, err?.message || err);
-                throw err;
-            }
+            return result;
         },
     });
 }
