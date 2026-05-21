@@ -175,6 +175,29 @@
     padding: 8px 0;
 }
 
+/* Nested drawers (template fields inside each tool's panel) — slightly
+   indented and with a smaller, dimmer header so they read as a sub-section
+   rather than a peer of the top-level tool drawer. */
+#saints_silly_settings .saints_nested_drawer {
+    margin: 4px 0 4px 4px;
+    border-left: 2px solid var(--SmartThemeBorderColor, #555);
+    padding-left: 8px;
+}
+
+#saints_silly_settings .saints_nested_drawer > .inline-drawer-toggle {
+    font-size: 0.95em;
+    opacity: 0.85;
+    padding: 2px 0;
+}
+
+#saints_silly_settings .saints_nested_drawer > .inline-drawer-toggle:hover {
+    opacity: 1;
+}
+
+#saints_silly_settings .saints_nested_drawer > .inline-drawer-content {
+    padding: 4px 0 4px 0;
+}
+
 #saints_silly_settings .checkbox_label {
     display: flex;
     align-items: center;
