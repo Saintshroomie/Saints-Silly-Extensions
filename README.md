@@ -43,6 +43,7 @@ A modal-based character creator that adds an **Assist** button to SillyTavern's 
 - **Optional context** — Tick **Use Chat Context** or pick lore books to prepend the current chat / character context and selected lore entries to the generation.
 - **Stop mid-generation** — Click the active button again while generating to stop and discard the result.
 - **Apply on Done** — Clicking Done copies the textarea contents into SillyTavern's description field. Cancel discards.
+- **Modal contents persist** — The brief, generated description, Use Chat Context toggle, selected lore books, and token count are all remembered the next time you open the modal — even after clicking Done or Cancel. Use the per-field **Clear** buttons to wipe the brief or description when you want to start fresh.
 
 ### World Info Assist
 
@@ -50,8 +51,9 @@ Adds an **Assist** button to every World Info / lore book entry, letting you dra
 
 - **Per-entry Assist button** — Every World Info entry form gets its own Assist button row injected above the content textarea. New entries get one automatically as soon as they're created.
 - **Title-aware priming** — If the entry has a title (the comment field), generation is primed with `[Title: ` so the model continues in the exact bracketed format. If the title is empty, generation is primed with just `[`.
-- **Guidance from the content field** — Whatever you've typed into the entry's content textarea is used as guidance for the generation, so you can sketch a rough idea and let the LLM flesh it out.
-- **Continue / Retry / Revert** — After a generation, the Assist button is replaced by Continue (extends the current entry), Retry (re-rolls from your original guidance text), and Revert (restores your original guidance text and discards the generation).
+- **Dedicated Assist Guidance field** — A separate guidance textarea sits between the Assist button row and the entry's content textarea. Type a rough idea, tone, canon notes, or anything else you want the model to consider — it's used as the seed for every Assist / Retry / Continue on that entry. The guidance is saved on the entry itself (in its `extensions` field) so it persists across page reloads and travels with the lorebook on export.
+- **Continue / Retry** — After a generation, the Assist button is replaced by Continue (extends the current entry) and Retry (re-runs Assist with your saved guidance, replacing the content).
+- **Clear buttons** — One-click buttons clear the guidance field or the entry's content independently.
 - **Editable prompt template** — The default prompt instructs the model to emit a `[ Subject: Description ]` world lore artifact with no commentary. You can edit it freely in the settings panel; save named variants and switch between them via the template dropdown (see Prompt Templates below).
 - **No schema** — Unlike Assisted Character Creation, World Info Assist has no schema. The prompt itself defines the desired output format.
 
@@ -106,11 +108,11 @@ When Possession and Phrasing are used together, you can quickly take over charac
 
 ### How to Use World Info Assist
 
-1. Open any World Info / lore book entry. An **Assist** button will appear above the entry's content textarea.
+1. Open any World Info / lore book entry. An **Assist** button row and an **Assist Guidance** textarea will appear above the entry's content textarea.
 2. (Optional) Type a title in the comment field at the top of the entry — it will be used to prime the generation with `[Title: `.
-3. (Optional) Type any guidance into the content textarea — keywords, a rough idea, tone, canon notes, anything you want the model to consider.
+3. (Optional) Type guidance into the **Assist Guidance** field — keywords, a rough idea, tone, canon notes, anything you want the model to consider. The guidance is saved on the entry and persists across page reloads.
 4. Click **Assist** to generate the entry. The result is written into the content textarea and saved automatically.
-5. Click **Continue** to extend the entry, **Retry** to re-roll from your original guidance text, or **Revert** to discard the generation and restore what you originally typed.
+5. Click **Continue** to extend the entry, or **Retry** to re-run Assist with your saved guidance (replacing the current content). Use the **Clear** buttons to wipe the guidance or content fields when starting over.
 
 ### How to Use Narrative Guidance
 

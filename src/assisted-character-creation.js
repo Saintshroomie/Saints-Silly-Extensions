@@ -125,6 +125,18 @@ let activeAction = null;       // which button initiated the current generation
 let lastAction = null;         // 'generate' | 'continue' — what Retry should redo
 let restorePoint = null;       // textarea snapshot used by Retry
 
+// Modal contents are remembered across open/close so the user doesn't lose
+// their brief, generated description, or context-toggle selections — even
+// when the modal closes via Done. Cleared only when the user uses the
+// explicit Clear buttons inside the modal.
+const persistedModalState = {
+    brief: '',
+    output: '',
+    useChatContext: false,
+    selectedLoreBooks: [],
+    responseLength: null, // null means "use saved setting"
+};
+
 // ─── Init ───
 
 /**
@@ -244,6 +256,8 @@ async function openModal() {
     isGenerating = false;
     abortRequested = false;
     activeAction = null;
+    // Note: lastAction / restorePoint stay null on each open. They're
+    // retry-only state and don't need to persist across modal sessions.
     lastAction = null;
     restorePoint = null;
 
@@ -291,6 +305,9 @@ async function openModal() {
             applyDescription(body);
         }
     } finally {
+        // Snapshot the modal's current state into the persisted store so
+        // the next open shows the same brief / output / context options.
+        capturePersistedModalState(body);
         activePopup = null;
         activeBody = null;
         isGenerating = false;
@@ -299,6 +316,18 @@ async function openModal() {
         restorePoint = null;
         debug('Modal closed');
     }
+}
+
+function capturePersistedModalState(body) {
+    if (!body) return;
+    persistedModalState.brief = body.querySelector('#acc_character_brief')?.value || '';
+    persistedModalState.output = body.querySelector('#acc_description_output')?.value || '';
+    persistedModalState.useChatContext = !!body.querySelector('#acc_use_chat_context')?.checked;
+    const picker = body._accLorebookPicker;
+    persistedModalState.selectedLoreBooks = picker ? picker.getSelected() : [];
+    const tokenInput = body.querySelector('#acc_response_length');
+    const parsed = tokenInput ? parseInt(tokenInput.value, 10) : NaN;
+    persistedModalState.responseLength = (!isNaN(parsed) && parsed > 0) ? parsed : null;
 }
 
 function buildModalBody() {
@@ -313,7 +342,12 @@ function buildModalBody() {
             <div class="acc-lorebook-host"></div>
         </div>
         <div class="acc-brief-section">
-            <label for="acc_character_brief"><b>Character Brief:</b></label>
+            <div class="acc-field-header">
+                <label for="acc_character_brief"><b>Character Brief:</b></label>
+                <div id="acc_clear_brief_btn" class="menu_button interactable acc-clear-btn" title="Clear the brief">
+                    <span class="fa-solid fa-eraser"></span> Clear
+                </div>
+            </div>
             <textarea id="acc_character_brief" class="text_pole" rows="4" placeholder="Describe your character concept, setting, and any key details..."></textarea>
         </div>
         <div class="acc-action-row">
@@ -341,17 +375,41 @@ function buildModalBody() {
             <span id="acc_status_text"></span>
         </div>
         <div class="acc-description-section">
-            <label for="acc_description_output"><b>Character Description:</b></label>
+            <div class="acc-field-header">
+                <label for="acc_description_output"><b>Character Description:</b></label>
+                <div id="acc_clear_output_btn" class="menu_button interactable acc-clear-btn" title="Clear the generated description">
+                    <span class="fa-solid fa-eraser"></span> Clear
+                </div>
+            </div>
             <textarea id="acc_description_output" class="text_pole acc-description-output" rows="18" placeholder="Generated description will appear here. You can edit it before clicking Done."></textarea>
         </div>
     `;
 
-    // Initialize the token field from current settings.
-    const tokenInput = root.querySelector('#acc_response_length');
-    if (tokenInput) tokenInput.value = String(getResponseLength());
+    // Hydrate the persisted-across-opens fields.
+    const briefEl = root.querySelector('#acc_character_brief');
+    if (briefEl) briefEl.value = persistedModalState.brief || '';
+    const outputEl = root.querySelector('#acc_description_output');
+    if (outputEl) outputEl.value = persistedModalState.output || '';
+    const chatCb = root.querySelector('#acc_use_chat_context');
+    if (chatCb) chatCb.checked = !!persistedModalState.useChatContext;
 
-    // Mount the shared lore-book picker.
-    const picker = createLoreBookPicker({ classPrefix: 'acc-lorebook' });
+    // Initialize the token field from persisted state if available, else
+    // from settings.
+    const tokenInput = root.querySelector('#acc_response_length');
+    if (tokenInput) {
+        const persisted = persistedModalState.responseLength;
+        tokenInput.value = String((typeof persisted === 'number' && persisted > 0)
+            ? persisted
+            : getResponseLength());
+    }
+
+    // Mount the shared lore-book picker with previously-selected entries.
+    const picker = createLoreBookPicker({
+        classPrefix: 'acc-lorebook',
+        initialSelection: Array.isArray(persistedModalState.selectedLoreBooks)
+            ? persistedModalState.selectedLoreBooks.slice()
+            : [],
+    });
     root.querySelector('.acc-lorebook-host').replaceWith(picker.element);
     root._accLorebookPicker = picker;
 
@@ -374,6 +432,27 @@ function bindModalHandlers() {
             moduleSettings.accResponseLength = parsed;
             saveSettingsFn?.();
         }
+    });
+
+    document.getElementById('acc_clear_brief_btn')?.addEventListener('click', () => {
+        if (isGenerating) return;
+        const brief = document.getElementById('acc_character_brief');
+        if (!brief) return;
+        brief.value = '';
+        brief.focus();
+        refreshActionButtonStates();
+    });
+    document.getElementById('acc_clear_output_btn')?.addEventListener('click', () => {
+        if (isGenerating) return;
+        const out = document.getElementById('acc_description_output');
+        if (!out) return;
+        out.value = '';
+        // Clearing the output invalidates the existing Retry restore point
+        // so the user doesn't accidentally restore an unrelated description.
+        restorePoint = null;
+        lastAction = null;
+        out.focus();
+        refreshActionButtonStates();
     });
 }
 
