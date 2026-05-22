@@ -201,19 +201,9 @@
         </div>
         <div class="inline-drawer-content" style="display: none;">
 
-            <!-- Per-Chat: pinned to the top of the panel for easy access. -->
-            <div class="ng_prompt_section">
-                <label for="ng_themes_textarea"><b>Themes / Story Arcs:</b></label>
-                <textarea id="ng_themes_textarea" class="text_pole" rows="4"
-                    placeholder="Optional themes, ideas, or arcs for the AI to consider..."></textarea>
-            </div>
-
-            <div class="ng_prompt_section">
-                <label for="ng_active_guidance_textarea"><b>Active Guidance:</b></label>
-                <textarea id="ng_active_guidance_textarea" class="text_pole" rows="6"
-                    placeholder="The currently active guidance paragraph. Edit freely; changes apply on the next AI turn."></textarea>
-            </div>
-
+            <!-- Controls first: enable / cadence / limits / injection / lorebooks /
+                 turn counter. The user input/output textareas sit below them so
+                 the knobs aren't buried under the freeform fields. -->
             <label class="checkbox_label">
                 <input id="ng_enabled" type="checkbox" />
                 <span>Enable Narrative Guidance</span>
@@ -238,36 +228,6 @@
                 <label for="ng_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label>
                 <input id="ng_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for Narrative Guidance generations. 0 = use the model's full context size." />
                 <small>0 = use model default</small>
-            </div>
-
-            <div class="inline-drawer saints_nested_drawer">
-                <div class="inline-drawer-toggle inline-drawer-header">
-                    <b>Generation Prompt (used as prefill)</b>
-                    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
-                </div>
-                <div class="inline-drawer-content" style="display: none;">
-                    <div class="ng_prompt_section">
-                        <textarea id="ng_generation_prompt_textarea" class="text_pole" rows="4"
-                            placeholder="Enter the prefill that the LLM will continue..."></textarea>
-                        <small>The model's reply continues this text and becomes the active guidance.</small>
-                    </div>
-                    <div class="saints_template_controls" id="ng_generation_prompt_templates"></div>
-                </div>
-            </div>
-
-            <div class="inline-drawer saints_nested_drawer">
-                <div class="inline-drawer-toggle inline-drawer-header">
-                    <b>Injection Prompt Template</b>
-                    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
-                </div>
-                <div class="inline-drawer-content" style="display: none;">
-                    <div class="ng_prompt_section">
-                        <textarea id="ng_injection_prompt_textarea" class="text_pole" rows="3"
-                            placeholder="Template injected before each AI turn..."></textarea>
-                        <small>Available placeholder: <code>{{guidance}}</code></small>
-                    </div>
-                    <div class="saints_template_controls" id="ng_injection_prompt_templates"></div>
-                </div>
             </div>
 
             <div class="ng_inline_row">
@@ -299,6 +259,49 @@
                 </div>
                 <div class="menu_button" id="ng_regenerate_now" title="Regenerate guidance now">
                     <span class="ng-regen-icon fa-solid fa-wand-sparkles"></span> Regenerate Now
+                </div>
+            </div>
+
+            <!-- User input / output: per-chat themes and the live guidance paragraph. -->
+            <div class="ng_prompt_section">
+                <label for="ng_themes_textarea"><b>Themes / Story Arcs:</b></label>
+                <textarea id="ng_themes_textarea" class="text_pole" rows="4"
+                    placeholder="Optional themes, ideas, or arcs for the AI to consider..."></textarea>
+            </div>
+
+            <div class="ng_prompt_section">
+                <label for="ng_active_guidance_textarea"><b>Active Guidance:</b></label>
+                <textarea id="ng_active_guidance_textarea" class="text_pole" rows="6"
+                    placeholder="The currently active guidance paragraph. Edit freely; changes apply on the next AI turn."></textarea>
+            </div>
+
+            <div class="inline-drawer saints_nested_drawer">
+                <div class="inline-drawer-toggle inline-drawer-header">
+                    <b>Generation Prompt (used as prefill)</b>
+                    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                </div>
+                <div class="inline-drawer-content" style="display: none;">
+                    <div class="ng_prompt_section">
+                        <textarea id="ng_generation_prompt_textarea" class="text_pole" rows="4"
+                            placeholder="Enter the prefill that the LLM will continue..."></textarea>
+                        <small>The model's reply continues this text and becomes the active guidance.</small>
+                    </div>
+                    <div class="saints_template_controls" id="ng_generation_prompt_templates"></div>
+                </div>
+            </div>
+
+            <div class="inline-drawer saints_nested_drawer">
+                <div class="inline-drawer-toggle inline-drawer-header">
+                    <b>Injection Prompt Template</b>
+                    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                </div>
+                <div class="inline-drawer-content" style="display: none;">
+                    <div class="ng_prompt_section">
+                        <textarea id="ng_injection_prompt_textarea" class="text_pole" rows="3"
+                            placeholder="Template injected before each AI turn..."></textarea>
+                        <small>Available placeholder: <code>{{guidance}}</code></small>
+                    </div>
+                    <div class="saints_template_controls" id="ng_injection_prompt_templates"></div>
                 </div>
             </div>
 
