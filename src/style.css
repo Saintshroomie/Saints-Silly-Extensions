@@ -1,22 +1,5 @@
 /* Saint's Silly Extensions — Combined Styles */
 
-/* ═══════════════════════════════════════════════════════════════════════════════
-   MOBILE: WRAP CHAT-INPUT QUICK-ACTION BUTTONS INTO A COLUMN
-   ═══════════════════════════════════════════════════════════════════════════════
-   SillyTavern keeps the buttons next to the chat input field on a single
-   non-wrapping row. On narrow viewports that wastes a lot of horizontal
-   space because the row stays the full button-count wide even when the
-   text area would prefer to grow. On mobile, stack them vertically so the
-   chat input gets the remaining width. */
-@media (max-width: 768px) {
-    #rightSendForm {
-        flex-direction: column !important;
-        flex-wrap: wrap !important;
-        align-items: stretch;
-        max-height: none;
-    }
-}
-
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    POSSESSION STYLES
