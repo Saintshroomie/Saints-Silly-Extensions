@@ -1,5 +1,6 @@
 /* Saint's Silly Extensions — Combined Styles */
 
+
 /* ═══════════════════════════════════════════════════════════════════════════════
    POSSESSION STYLES
    ═══════════════════════════════════════════════════════════════════════════════ */
@@ -155,6 +156,29 @@
     flex-direction: column;
     gap: 8px;
     padding: 8px 0;
+}
+
+/* Nested drawers (template fields inside each tool's panel) — slightly
+   indented and with a smaller, dimmer header so they read as a sub-section
+   rather than a peer of the top-level tool drawer. */
+#saints_silly_settings .saints_nested_drawer {
+    margin: 4px 0 4px 4px;
+    border-left: 2px solid var(--SmartThemeBorderColor, #555);
+    padding-left: 8px;
+}
+
+#saints_silly_settings .saints_nested_drawer > .inline-drawer-toggle {
+    font-size: 0.95em;
+    opacity: 0.85;
+    padding: 2px 0;
+}
+
+#saints_silly_settings .saints_nested_drawer > .inline-drawer-toggle:hover {
+    opacity: 1;
+}
+
+#saints_silly_settings .saints_nested_drawer > .inline-drawer-content {
+    padding: 4px 0 4px 0;
 }
 
 #saints_silly_settings .checkbox_label {
@@ -351,6 +375,25 @@
     gap: 4px;
 }
 
+/* Field header row: label on the left, Clear button on the right. */
+.acc-modal-body .acc-field-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.acc-modal-body .acc-clear-btn {
+    font-size: 0.8em;
+    padding: 2px 8px;
+    opacity: 0.85;
+}
+
+.acc-modal-body .acc-clear-btn:hover {
+    opacity: 1;
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════════
    WORLD INFO ASSIST STYLES
    ═══════════════════════════════════════════════════════════════════════════════ */
@@ -492,6 +535,57 @@
 .wia-controls .wia-lorebook-empty {
     opacity: 0.6;
     font-style: italic;
+}
+
+/* Inline Clear-content button on the WIA controls row */
+.wia-controls .wia-btn-clear-content {
+    font-size: 0.85em;
+    padding: 4px 8px;
+    opacity: 0.85;
+}
+
+.wia-controls .wia-btn-clear-content:hover {
+    opacity: 1;
+}
+
+/* Per-entry guidance section — sits between the controls and the entry's
+   content textarea so it's clearly the user's *input* to the assist. */
+.wia-guidance-block {
+    margin: 0 0 8px 0;
+}
+
+.wia-guidance-block .wia-guidance-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 0 0 4px 0;
+}
+
+.wia-guidance-block .wia-guidance-label {
+    font-size: 0.9em;
+    font-weight: 500;
+    opacity: 0.9;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.wia-guidance-block .wia-btn-clear-guidance {
+    font-size: 0.8em;
+    padding: 2px 8px;
+    opacity: 0.85;
+}
+
+.wia-guidance-block .wia-btn-clear-guidance:hover {
+    opacity: 1;
+}
+
+.wia-guidance-block .wia-guidance-textarea {
+    width: 100%;
+    resize: vertical;
+    min-height: 60px;
+    font-size: 0.9em;
 }
 
 /* Per-entry token limit row */

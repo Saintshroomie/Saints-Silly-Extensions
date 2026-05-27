@@ -18,6 +18,11 @@ import {
     createLoreBookPicker,
     streamingGenerate,
     withSingleLineDisabled,
+    getCurrentWorldEditorName,
+    getEntryUidFromForm,
+    readWIAEntryGuidance,
+    saveWIAEntryGuidanceDebounced,
+    flushWIAEntryGuidanceSave,
 } from './utils.js';
 import {
     isSilentGenerationAbort,
@@ -83,7 +88,9 @@ let saveSettingsCb = null;
 // Per-entry state, keyed by a stable id derived from the entry uid / DOM element.
 // `activeAction` is set to 'assist' or 'continue' while generating so the button
 // labels can swap to Stop and clicks can route to cancel rather than re-start.
-const entryStates = new Map(); // id -> { originalSeed, hasGenerated, generating, activeAction }
+// Guidance text now lives in its own textarea (and is persisted on the entry's
+// `extensions` field), so we no longer track an originalSeed for revert.
+const entryStates = new Map(); // id -> { hasGenerated, generating, activeAction }
 
 function getWIAResponseLength() {
     const n = moduleSettings?.wiaResponseLength;
@@ -214,11 +221,11 @@ function injectControls(formEl) {
         <div class="wia-btn wia-btn-continue menu_button interactable wia-hidden" title="Continue generation from where it left off">
             <span class="fa-solid fa-arrow-right"></span>
         </div>
-        <div class="wia-btn wia-btn-retry menu_button interactable wia-hidden" title="Retry from your original guidance text">
+        <div class="wia-btn wia-btn-retry menu_button interactable wia-hidden" title="Retry using your saved guidance">
             <span class="fa-solid fa-rotate-right"></span>
         </div>
-        <div class="wia-btn wia-btn-revert menu_button interactable wia-hidden" title="Revert to your original guidance text">
-            <span class="fa-solid fa-arrow-rotate-left"></span>
+        <div class="wia-btn wia-btn-clear-content menu_button interactable" title="Clear this entry's content">
+            <span class="fa-solid fa-eraser"></span>
         </div>
         <div class="wia-spinner wia-hidden" title="Generating..."><span class="fa-solid fa-spinner fa-spin"></span></div>
         <div class="wia-tokens-row">
@@ -231,16 +238,75 @@ function injectControls(formEl) {
     // visible above both the label and textarea.
     formControl.insertBefore(controls, formControl.firstChild);
 
+    // Build the dedicated guidance section (user's prompt for the assist).
+    // It sits between the control row and the entry's content textarea so
+    // it's clearly the *input* and the content textarea is the *output*.
+    const guidanceBlock = document.createElement('div');
+    guidanceBlock.className = 'wia-guidance-block';
+    guidanceBlock.innerHTML = `
+        <div class="wia-guidance-header">
+            <label class="wia-guidance-label" title="Free-form guidance for the LLM. Saved on the entry — persists across page reloads.">
+                <span class="fa-solid fa-pen"></span> Assist Guidance
+            </label>
+            <div class="wia-btn wia-btn-clear-guidance menu_button interactable" title="Clear the guidance field">
+                <span class="fa-solid fa-eraser"></span> Clear
+            </div>
+        </div>
+        <textarea class="text_pole wia-guidance-textarea" rows="3"
+            placeholder="What should this entry be about? Tone, era, faction, key facts..."></textarea>
+    `;
+    // Insert after the controls row, before the original label/textarea.
+    controls.insertAdjacentElement('afterend', guidanceBlock);
+
+    const guidanceTextarea = guidanceBlock.querySelector('.wia-guidance-textarea');
+    const clearGuidanceBtn = guidanceBlock.querySelector('.wia-btn-clear-guidance');
     const assistBtn = controls.querySelector('.wia-btn-assist');
     const continueBtn = controls.querySelector('.wia-btn-continue');
     const retryBtn = controls.querySelector('.wia-btn-retry');
-    const revertBtn = controls.querySelector('.wia-btn-revert');
+    const clearContentBtn = controls.querySelector('.wia-btn-clear-content');
     const tokensInput = controls.querySelector('.wia-tokens-input');
+
+    // Wire up persistence for the guidance field — read on mount, save on
+    // input (debounced) and on blur (flush).
+    const worldName = getCurrentWorldEditorName();
+    const uid = getEntryUidFromForm(formEl);
+    if (worldName && uid != null) {
+        guidanceTextarea.dataset.wiaWorld = worldName;
+        guidanceTextarea.dataset.wiaUid = String(uid);
+        // Best-effort hydrate. The async read is fire-and-forget; if the
+        // user has typed in the meantime, we keep their text.
+        readWIAEntryGuidance(worldName, uid).then(saved => {
+            if (saved && !guidanceTextarea.value) {
+                guidanceTextarea.value = saved;
+            }
+        }).catch(() => {});
+        guidanceTextarea.addEventListener('input', () => {
+            saveWIAEntryGuidanceDebounced(worldName, uid, guidanceTextarea.value);
+        });
+        guidanceTextarea.addEventListener('blur', () => {
+            flushWIAEntryGuidanceSave(worldName, uid).catch(() => {});
+        });
+    }
 
     assistBtn.addEventListener('click', () => onAssist(formEl, id, false));
     continueBtn.addEventListener('click', () => onAssist(formEl, id, true));
     retryBtn.addEventListener('click', () => onRetry(formEl, id));
-    revertBtn.addEventListener('click', () => onRevert(formEl, id));
+    clearGuidanceBtn.addEventListener('click', () => {
+        guidanceTextarea.value = '';
+        guidanceTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+        guidanceTextarea.focus();
+    });
+    clearContentBtn.addEventListener('click', () => {
+        contentTextarea.value = '';
+        contentTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+        const st = entryStates.get(id);
+        if (st) {
+            st.hasGenerated = false;
+            entryStates.set(id, st);
+        }
+        setUIState(formEl, 'idle');
+        contentTextarea.focus();
+    });
 
     if (tokensInput) {
         tokensInput.value = getWIAResponseLength();
@@ -279,6 +345,14 @@ function getContentTextarea(formEl) {
     return formEl.querySelector('textarea[name="content"]');
 }
 
+function getGuidanceTextarea(formEl) {
+    return formEl.querySelector('.wia-guidance-textarea');
+}
+
+function readGuidance(formEl) {
+    return (getGuidanceTextarea(formEl)?.value || '').trim();
+}
+
 function getTitle(formEl) {
     // The title field (textarea[name="comment"]) lives in the entry's
     // inline-drawer header, which is a sibling of `.world_entry_edit` —
@@ -303,7 +377,6 @@ function setUIState(formEl, state, activeAction = null) {
     const assistBtn = controls.querySelector('.wia-btn-assist');
     const continueBtn = controls.querySelector('.wia-btn-continue');
     const retryBtn = controls.querySelector('.wia-btn-retry');
-    const revertBtn = controls.querySelector('.wia-btn-revert');
     const spinner = controls.querySelector('.wia-spinner');
 
     const show = (el, vis) => el && el.classList.toggle('wia-hidden', !vis);
@@ -317,7 +390,6 @@ function setUIState(formEl, state, activeAction = null) {
         show(assistBtn, true);
         show(continueBtn, false);
         show(retryBtn, false);
-        show(revertBtn, false);
         show(spinner, false);
     } else if (state === 'generating') {
         // Keep the active button visible and swap its content to a Stop
@@ -336,7 +408,6 @@ function setUIState(formEl, state, activeAction = null) {
             show(continueBtn, false);
         }
         show(retryBtn, false);
-        show(revertBtn, false);
         show(spinner, false);
     } else if (state === 'generated') {
         restoreBtn(assistBtn, 'wia-btn-assist');
@@ -344,7 +415,6 @@ function setUIState(formEl, state, activeAction = null) {
         show(assistBtn, false);
         show(continueBtn, true);
         show(retryBtn, true);
-        show(revertBtn, true);
         show(spinner, false);
     }
 }
@@ -353,7 +423,7 @@ function setUIState(formEl, state, activeAction = null) {
 
 async function onAssist(formEl, id, isContinue) {
     const state = entryStates.get(id)
-        || { originalSeed: '', hasGenerated: false, generating: false, activeAction: null };
+        || { hasGenerated: false, generating: false, activeAction: null };
     const action = isContinue ? 'continue' : 'assist';
 
     // If we're already generating, treat a click on the active button as a
@@ -373,11 +443,6 @@ async function onAssist(formEl, id, isContinue) {
     const contentEl = getContentTextarea(formEl);
     if (!contentEl) return;
 
-    if (!isContinue) {
-        // First-pass generation: capture the user's seed text from the field
-        // so we can revert / retry from it later.
-        state.originalSeed = contentEl.value;
-    }
     state.generating = true;
     state.activeAction = action;
     entryStates.set(id, state);
@@ -386,7 +451,9 @@ async function onAssist(formEl, id, isContinue) {
 
     try {
         const title = getTitle(formEl);
-        const seed = state.originalSeed || '';
+        // Guidance now lives in its own persisted field, separate from the
+        // entry's content. Both Assist and Continue feed it to the model.
+        const seed = readGuidance(formEl);
         const currentText = contentEl.value || '';
 
         const promptTemplate = (moduleSettings.wiaPrompt && moduleSettings.wiaPrompt.trim())
@@ -497,25 +564,14 @@ async function onRetry(formEl, id) {
     const contentEl = getContentTextarea(formEl);
     if (!contentEl) return;
 
-    contentEl.value = state.originalSeed || '';
+    // Guidance lives in its own persisted field now, so Retry is just a
+    // fresh Assist that overwrites the content textarea with a new output.
+    contentEl.value = '';
     contentEl.dispatchEvent(new Event('input', { bubbles: true }));
     state.hasGenerated = false;
     entryStates.set(id, state);
 
     await onAssist(formEl, id, false);
-}
-
-function onRevert(formEl, id) {
-    const state = entryStates.get(id);
-    if (!state) return;
-    const contentEl = getContentTextarea(formEl);
-    if (!contentEl) return;
-
-    contentEl.value = state.originalSeed || '';
-    contentEl.dispatchEvent(new Event('input', { bubbles: true }));
-    state.hasGenerated = false;
-    entryStates.set(id, state);
-    setUIState(formEl, 'idle');
 }
 
 // ─── Settings ───

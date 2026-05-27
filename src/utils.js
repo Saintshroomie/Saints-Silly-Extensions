@@ -11,7 +11,12 @@
  *   - Generation context preamble (chat + lore books)
  */
 
-import { loadWorldInfo, world_names } from '../../../../world-info.js';
+import {
+    loadWorldInfo,
+    saveWorldInfo,
+    setWIOriginalDataValue,
+    world_names,
+} from '../../../../world-info.js';
 import { getMaxPromptTokens } from '../../../../../script.js';
 import { getTokenCountAsync } from '../../../../tokenizers.js';
 import { cancellableStreamingGenerate } from './silent-generation.js';
@@ -295,6 +300,134 @@ export function getAvailableLoreBookNames() {
             .filter(Boolean);
     }
     return [];
+}
+
+// ─── World Info Entry Extension Persistence ───
+
+/**
+ * Key used to stash this extension's per-entry guidance text inside each
+ * World Info entry's `extensions` object. Travels with the lorebook on
+ * export so guidance follows the entry across installs.
+ */
+export const WIA_GUIDANCE_EXT_KEY = 'saintsSillyGuidance';
+
+/**
+ * Return the name of the world currently open in the WI editor, or null.
+ */
+export function getCurrentWorldEditorName() {
+    const sel = document.getElementById('world_editor_select');
+    if (!sel) return null;
+    const opt = sel.options[sel.selectedIndex];
+    if (!opt) return null;
+    const text = (opt.textContent || '').trim();
+    return text || null;
+}
+
+/**
+ * Walk up from a WI entry form element to find the closest ancestor that
+ * exposes a uid (either as an `uid` attribute or `data-uid`). Returns the
+ * raw string or null.
+ */
+export function getEntryUidFromForm(formEl) {
+    let el = formEl;
+    while (el) {
+        if (el.getAttribute) {
+            const a = el.getAttribute('uid');
+            if (a != null && a !== '') return a;
+            const d = el.dataset?.uid;
+            if (d != null && d !== '') return d;
+        }
+        el = el.parentElement;
+    }
+    return null;
+}
+
+/**
+ * Read this extension's persisted guidance text for a WI entry. Returns ''
+ * when the world/entry/field is missing.
+ */
+export async function readWIAEntryGuidance(worldName, uid) {
+    if (!worldName || uid == null || uid === '') return '';
+    try {
+        const data = await loadWorldInfo(worldName);
+        if (!data?.entries) return '';
+        const entry = data.entries[uid];
+        if (!entry) return '';
+        const ext = entry.extensions;
+        if (ext && typeof ext === 'object' && typeof ext[WIA_GUIDANCE_EXT_KEY] === 'string') {
+            return ext[WIA_GUIDANCE_EXT_KEY];
+        }
+        return '';
+    } catch (err) {
+        console.error('Saints-Silly-Extensions: failed to read WIA guidance', err);
+        return '';
+    }
+}
+
+const wiaGuidancePending = new Map(); // mapKey -> { timer, latestValue }
+
+async function flushWIASave(worldName, uid, guidance) {
+    try {
+        const data = await loadWorldInfo(worldName);
+        if (!data?.entries) return;
+        const entry = data.entries[uid];
+        if (!entry) return;
+        if (!entry.extensions || typeof entry.extensions !== 'object') {
+            entry.extensions = {};
+        }
+        if (guidance === '' || guidance == null) {
+            delete entry.extensions[WIA_GUIDANCE_EXT_KEY];
+        } else {
+            entry.extensions[WIA_GUIDANCE_EXT_KEY] = guidance;
+        }
+        // Mirror to originalData for entries imported from character books,
+        // so the extension key survives if ST re-serializes from that shadow.
+        if (data.originalData?.entries) {
+            try {
+                setWIOriginalDataValue(
+                    data,
+                    uid,
+                    `extensions.${WIA_GUIDANCE_EXT_KEY}`,
+                    (guidance === '' || guidance == null) ? undefined : guidance,
+                );
+            } catch (_) { /* originalData mirror is best-effort */ }
+        }
+        await saveWorldInfo(worldName, data, false);
+    } catch (err) {
+        console.error('Saints-Silly-Extensions: failed to save WIA guidance', err);
+    }
+}
+
+/**
+ * Persist guidance text into a WI entry's `extensions` field. Debounced per
+ * (world,uid) — the latest call wins. An empty string deletes the key.
+ */
+export function saveWIAEntryGuidanceDebounced(worldName, uid, guidance, delayMs = 1200) {
+    if (!worldName || uid == null || uid === '') return;
+    const mapKey = `${worldName}::${uid}`;
+    const existing = wiaGuidancePending.get(mapKey);
+    if (existing?.timer) clearTimeout(existing.timer);
+    const entry = { latestValue: guidance, timer: null };
+    entry.timer = setTimeout(async () => {
+        wiaGuidancePending.delete(mapKey);
+        await flushWIASave(worldName, uid, entry.latestValue);
+    }, delayMs);
+    wiaGuidancePending.set(mapKey, entry);
+}
+
+/**
+ * Force any pending guidance save for (world,uid) to flush immediately.
+ * Used on blur so the user doesn't lose unsaved text if they reload right
+ * after typing.
+ */
+export async function flushWIAEntryGuidanceSave(worldName, uid) {
+    if (!worldName || uid == null || uid === '') return;
+    const mapKey = `${worldName}::${uid}`;
+    const pending = wiaGuidancePending.get(mapKey);
+    if (!pending) return;
+    clearTimeout(pending.timer);
+    wiaGuidancePending.delete(mapKey);
+    await flushWIASave(worldName, uid, pending.latestValue);
 }
 
 // ─── Lore Book Picker Widget ───
