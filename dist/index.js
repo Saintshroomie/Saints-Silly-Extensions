@@ -1,11 +1,11 @@
 import { loadWorldInfo as __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_loadWorldInfo__, saveWorldInfo as __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_saveWorldInfo__, setWIOriginalDataValue as __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_setWIOriginalDataValue__, world_names as __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_world_names__ } from "../../../../world-info.js";
 import { extension_prompt_roles as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_roles__, extension_prompt_types as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_types__, generateRaw as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__, getMaxPromptTokens as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_getMaxPromptTokens__, setExtensionPrompt as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_setExtensionPrompt__, stopGeneration as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_stopGeneration__, substituteParamsExtended as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParamsExtended__ } from "../../../../../script.js";
 import { getTokenCountAsync as __WEBPACK_EXTERNAL_MODULE__tokenizers_js_d5863f55_getTokenCountAsync__ } from "../../../../tokenizers.js";
+import { POPUP_RESULT as __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_POPUP_RESULT__, POPUP_TYPE as __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_POPUP_TYPE__, Popup as __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_Popup__ } from "../../../../popup.js";
 import { SlashCommandParser as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandParser_js_42c8b851_SlashCommandParser__ } from "../../../../slash-commands/SlashCommandParser.js";
 import { SlashCommand as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommand_js_1b0d5616_SlashCommand__ } from "../../../../slash-commands/SlashCommand.js";
 import { ARGUMENT_TYPE as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandArgument_js_a42b9371_ARGUMENT_TYPE__, SlashCommandArgument as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandArgument_js_a42b9371_SlashCommandArgument__ } from "../../../../slash-commands/SlashCommandArgument.js";
 import { removeReasoningFromString as __WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__ } from "../../../../reasoning.js";
-import { POPUP_RESULT as __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_POPUP_RESULT__, POPUP_TYPE as __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_POPUP_TYPE__, Popup as __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_Popup__ } from "../../../../popup.js";
 /******/ var __webpack_modules__ = ({
 
 /***/ 208
@@ -834,7 +834,58 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Saint's Silly Extensions — Combin
     pointer-events: none;
 }
 
-`, "",{"version":3,"sources":["webpack://./src/style.css"],"names":[],"mappings":"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","sourcesContent":["/* Saint's Silly Extensions — Combined Styles */\n\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   POSSESSION STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Group Chat: Radio Button Toggle ── */\n\n.possession_radio_wrapper {\n    display: inline-flex;\n    align-items: center;\n    margin-left: 4px;\n    cursor: pointer;\n}\n\n.possession_radio {\n    width: 16px;\n    height: 16px;\n    border-radius: 50%;\n    border: 2px solid var(--SmartThemeBorderColor, #555);\n    background: transparent;\n    cursor: pointer;\n    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;\n    position: relative;\n    flex-shrink: 0;\n}\n\n.possession_radio:hover {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.possession_radio.possession_active {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n    background: var(--SmartThemeQuoteColor, #e8a23a);\n    box-shadow: inset 0 0 0 3px var(--SmartThemeBlurTintColor, #1a1a2e);\n}\n\n/* ── Solo Chat: Possess Toggle Button ── */\n\n#possession_solo_btn {\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    cursor: pointer;\n    position: relative;\n}\n\n#possession_solo_btn:hover {\n    opacity: 1;\n}\n\n#possession_solo_btn.possession_active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n#possession_solo_btn.possession_active::after {\n    content: '';\n    position: absolute;\n    bottom: -2px;\n    left: 50%;\n    transform: translateX(-50%);\n    width: 6px;\n    height: 6px;\n    border-radius: 50%;\n    background-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Group member highlight when possessed ── */\n\n.group_member.possession_possessed {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n/* ── Possession Impersonate Button (Character Avatar) ── */\n\n#possession_impersonate_btn {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease;\n    padding: 2px;\n}\n\n#possession_impersonate_btn:hover {\n    opacity: 1;\n}\n\n.possession_impersonate_avatar {\n    width: 26px;\n    height: 26px;\n    border-radius: 50%;\n    object-fit: cover;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    transition: border-color 0.15s ease;\n}\n\n#possession_impersonate_btn:hover .possession_impersonate_avatar {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hide controls when extension is disabled ── */\n\n.possession_hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PHRASING STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Input Area Button (next to Send) ── */\n\n#phrasing_send_button {\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    padding: 3px;\n    font-size: 1.2em;\n}\n\n#phrasing_send_button:hover {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hamburger Menu Item ── */\n\n#phrasing_menu_button {\n    cursor: pointer;\n}\n\n#phrasing_menu_button .fa-solid {\n    margin-right: 5px;\n    width: 1em;\n    text-align: center;\n}\n\n/* ── Hide buttons during generation ── */\n\n.phrasing-hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SETTINGS PANEL STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .inline-drawer-content {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n    padding: 8px 0;\n}\n\n/* Nested drawers (template fields inside each tool's panel) — slightly\n   indented and with a smaller, dimmer header so they read as a sub-section\n   rather than a peer of the top-level tool drawer. */\n#saints_silly_settings .saints_nested_drawer {\n    margin: 4px 0 4px 4px;\n    border-left: 2px solid var(--SmartThemeBorderColor, #555);\n    padding-left: 8px;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-toggle {\n    font-size: 0.95em;\n    opacity: 0.85;\n    padding: 2px 0;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-toggle:hover {\n    opacity: 1;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-content {\n    padding: 4px 0 4px 0;\n}\n\n#saints_silly_settings .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_section_header {\n    margin: 4px 0 2px 0;\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_divider {\n    border: none;\n    border-top: 1px solid var(--SmartThemeBorderColor, #555);\n    margin: 8px 0;\n}\n\n#saints_silly_settings .phrasing_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #phrasing_prompt_textarea {\n    width: 100%;\n    min-height: 120px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .acc_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #acc_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC MODAL STYLES (rendered inside ST's Popup; chrome is provided by Popup)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n.acc-modal-body {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n    text-align: left;\n}\n\n.acc-brief-section {\n    margin-bottom: 12px;\n}\n\n.acc-brief-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.acc-action-row {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    margin-bottom: 8px;\n}\n\n.acc-tokens-row {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 6px;\n    margin-bottom: 12px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.acc-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.acc-tokens-input {\n    width: 80px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n.acc-action-btn {\n    flex: 1 1 0;\n    min-width: 110px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n.acc-action-btn.acc-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.acc-generate-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.acc-status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    background: var(--SmartThemeBodyColor, #222);\n    border-radius: 4px;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 0.9em;\n}\n\n.acc-description-section {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.acc-description-section label {\n    margin-bottom: 4px;\n}\n\n.acc-description-output {\n    width: 100%;\n    flex: 1 1 0%;\n    min-height: 200px;\n    resize: vertical;\n}\n\n.acc-description-output[disabled] {\n    opacity: 0.5;\n    cursor: not-allowed;\n}\n\n.acc-hidden {\n    display: none !important;\n}\n\n/* ACC Launch button in character creator */\n#acc_launch_btn {\n    display: flex;\n    align-items: center;\n    gap: 4px;\n}\n\n/* Field header row: label on the left, Clear button on the right. */\n.acc-modal-body .acc-field-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin-bottom: 4px;\n}\n\n.acc-modal-body .acc-clear-btn {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.acc-modal-body .acc-clear-btn:hover {\n    opacity: 1;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   WORLD INFO ASSIST STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Settings panel */\n#saints_silly_settings .wia_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #wia_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* Per-entry assist controls injected into each WI entry form */\n.wia-controls {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    flex-wrap: wrap;\n    margin: 6px 0 6px 0;\n}\n\n.wia-controls .wia-btn {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    cursor: pointer;\n    font-size: 0.85em;\n    padding: 4px 8px;\n}\n\n.wia-controls .wia-btn-assist {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.wia-controls .wia-btn-label {\n    font-weight: 500;\n}\n\n.wia-controls .wia-spinner {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 1em;\n    display: inline-flex;\n    align-items: center;\n    padding: 4px 6px;\n}\n\n.wia-controls .wia-hidden {\n    display: none !important;\n}\n\n/* Use Chat Context checkbox */\n.wia-controls .wia-context-toggle {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    font-size: 0.85em;\n    cursor: pointer;\n    opacity: 0.85;\n    user-select: none;\n}\n\n.wia-controls .wia-context-toggle:hover {\n    opacity: 1;\n}\n\n/* Lore book multi-select picker (per-entry) */\n.wia-controls .wia-lorebook-picker {\n    position: relative;\n    font-size: 0.85em;\n}\n\n.wia-controls .wia-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.wia-controls .wia-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.wia-controls .wia-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.wia-controls .wia-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 50;\n    min-width: 220px;\n    max-height: 240px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);\n}\n\n.wia-controls .wia-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.wia-controls .wia-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Inline Clear-content button on the WIA controls row */\n.wia-controls .wia-btn-clear-content {\n    font-size: 0.85em;\n    padding: 4px 8px;\n    opacity: 0.85;\n}\n\n.wia-controls .wia-btn-clear-content:hover {\n    opacity: 1;\n}\n\n/* Per-entry guidance section — sits between the controls and the entry's\n   content textarea so it's clearly the user's *input* to the assist. */\n.wia-guidance-block {\n    margin: 0 0 8px 0;\n}\n\n.wia-guidance-block .wia-guidance-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin: 0 0 4px 0;\n}\n\n.wia-guidance-block .wia-guidance-label {\n    font-size: 0.9em;\n    font-weight: 500;\n    opacity: 0.9;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n}\n\n.wia-guidance-block .wia-btn-clear-guidance {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.wia-guidance-block .wia-btn-clear-guidance:hover {\n    opacity: 1;\n}\n\n.wia-guidance-block .wia-guidance-textarea {\n    width: 100%;\n    resize: vertical;\n    min-height: 60px;\n    font-size: 0.9em;\n}\n\n/* Per-entry token limit row */\n.wia-controls .wia-tokens-row {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.85em;\n    opacity: 0.85;\n    margin-left: auto;\n}\n\n.wia-controls .wia-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.wia-controls .wia-tokens-input {\n    width: 72px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n/* ── ACC modal: context preamble controls ── */\n\n.acc-context-section {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: wrap;\n    margin-bottom: 12px;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.acc-context-section .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.9em;\n    cursor: pointer;\n}\n\n.acc-lorebook-picker {\n    position: relative;\n    font-size: 0.9em;\n}\n\n.acc-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.acc-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.acc-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.acc-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 10002;\n    min-width: 240px;\n    max-height: 260px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\n}\n\n.acc-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.acc-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   NARRATIVE GUIDANCE SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_subsection_header {\n    margin: 12px 0 4px 0;\n    opacity: 0.85;\n}\n\n#saints_silly_settings .ng_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings .ng_prompt_section textarea {\n    width: 100%;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .ng_inline_row {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin: 6px 0;\n}\n\n#saints_silly_settings .ng_number_input {\n    width: 5em;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng_select_input {\n    width: auto;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng-lorebook-picker {\n    margin: 8px 0;\n}\n\n#saints_silly_settings .ng-lorebook-list {\n    margin-top: 4px;\n    padding: 6px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n}\n\n#saints_silly_settings .ng-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n#saints_silly_settings .ng-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n#saints_silly_settings #ng_regenerate_now.disabled,\n#saints_silly_settings #ng_continue_now.disabled,\n#saints_silly_settings #ng_retry_now.disabled {\n    opacity: 0.6;\n    pointer-events: none;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PROMPT TEMPLATE CONTROLS (shared, one row per prompt)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_template_controls {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin-top: 6px;\n}\n\n#saints_silly_settings .saints_template_select {\n    width: 100%;\n}\n\n#saints_silly_settings .saints_template_buttons {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button {\n    flex: 1 1 0;\n    min-width: 100px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button.disabled {\n    opacity: 0.5;\n    pointer-events: none;\n}\n\n"],"sourceRoot":""}]);
+/* ═══════════════════════════════════════════════════════════════════════════════
+   TOOL PRESET BLOCK & PROMPT PREVIEW
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+#saints_silly_settings .saints_preset_block {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 8px 0;
+    padding: 8px;
+    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));
+    border-radius: 6px;
+}
+
+#saints_silly_settings .saints_preview_btn {
+    align-self: flex-start;
+    white-space: nowrap;
+}
+
+.sse-prompt-preview {
+    text-align: left;
+}
+
+.sse-prompt-preview h3 {
+    margin: 0 0 10px 0;
+}
+
+.sse-preview-section {
+    margin-bottom: 12px;
+}
+
+.sse-preview-label {
+    font-weight: bold;
+    opacity: 0.8;
+    margin-bottom: 4px;
+}
+
+.sse-preview-text {
+    white-space: pre-wrap;
+    word-break: break-word;
+    text-align: left;
+    font-size: calc(var(--mainFontSize, 14px) * 0.85);
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));
+    border-radius: 6px;
+    padding: 8px;
+    margin: 0;
+    max-height: 40vh;
+    overflow-y: auto;
+}
+
+`, "",{"version":3,"sources":["webpack://./src/style.css"],"names":[],"mappings":"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","sourcesContent":["/* Saint's Silly Extensions — Combined Styles */\n\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   POSSESSION STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Group Chat: Radio Button Toggle ── */\n\n.possession_radio_wrapper {\n    display: inline-flex;\n    align-items: center;\n    margin-left: 4px;\n    cursor: pointer;\n}\n\n.possession_radio {\n    width: 16px;\n    height: 16px;\n    border-radius: 50%;\n    border: 2px solid var(--SmartThemeBorderColor, #555);\n    background: transparent;\n    cursor: pointer;\n    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;\n    position: relative;\n    flex-shrink: 0;\n}\n\n.possession_radio:hover {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.possession_radio.possession_active {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n    background: var(--SmartThemeQuoteColor, #e8a23a);\n    box-shadow: inset 0 0 0 3px var(--SmartThemeBlurTintColor, #1a1a2e);\n}\n\n/* ── Solo Chat: Possess Toggle Button ── */\n\n#possession_solo_btn {\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    cursor: pointer;\n    position: relative;\n}\n\n#possession_solo_btn:hover {\n    opacity: 1;\n}\n\n#possession_solo_btn.possession_active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n#possession_solo_btn.possession_active::after {\n    content: '';\n    position: absolute;\n    bottom: -2px;\n    left: 50%;\n    transform: translateX(-50%);\n    width: 6px;\n    height: 6px;\n    border-radius: 50%;\n    background-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Group member highlight when possessed ── */\n\n.group_member.possession_possessed {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n/* ── Possession Impersonate Button (Character Avatar) ── */\n\n#possession_impersonate_btn {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease;\n    padding: 2px;\n}\n\n#possession_impersonate_btn:hover {\n    opacity: 1;\n}\n\n.possession_impersonate_avatar {\n    width: 26px;\n    height: 26px;\n    border-radius: 50%;\n    object-fit: cover;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    transition: border-color 0.15s ease;\n}\n\n#possession_impersonate_btn:hover .possession_impersonate_avatar {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hide controls when extension is disabled ── */\n\n.possession_hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PHRASING STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Input Area Button (next to Send) ── */\n\n#phrasing_send_button {\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    padding: 3px;\n    font-size: 1.2em;\n}\n\n#phrasing_send_button:hover {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hamburger Menu Item ── */\n\n#phrasing_menu_button {\n    cursor: pointer;\n}\n\n#phrasing_menu_button .fa-solid {\n    margin-right: 5px;\n    width: 1em;\n    text-align: center;\n}\n\n/* ── Hide buttons during generation ── */\n\n.phrasing-hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SETTINGS PANEL STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .inline-drawer-content {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n    padding: 8px 0;\n}\n\n/* Nested drawers (template fields inside each tool's panel) — slightly\n   indented and with a smaller, dimmer header so they read as a sub-section\n   rather than a peer of the top-level tool drawer. */\n#saints_silly_settings .saints_nested_drawer {\n    margin: 4px 0 4px 4px;\n    border-left: 2px solid var(--SmartThemeBorderColor, #555);\n    padding-left: 8px;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-toggle {\n    font-size: 0.95em;\n    opacity: 0.85;\n    padding: 2px 0;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-toggle:hover {\n    opacity: 1;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-content {\n    padding: 4px 0 4px 0;\n}\n\n#saints_silly_settings .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_section_header {\n    margin: 4px 0 2px 0;\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_divider {\n    border: none;\n    border-top: 1px solid var(--SmartThemeBorderColor, #555);\n    margin: 8px 0;\n}\n\n#saints_silly_settings .phrasing_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #phrasing_prompt_textarea {\n    width: 100%;\n    min-height: 120px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .acc_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #acc_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC MODAL STYLES (rendered inside ST's Popup; chrome is provided by Popup)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n.acc-modal-body {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n    text-align: left;\n}\n\n.acc-brief-section {\n    margin-bottom: 12px;\n}\n\n.acc-brief-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.acc-action-row {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    margin-bottom: 8px;\n}\n\n.acc-tokens-row {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 6px;\n    margin-bottom: 12px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.acc-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.acc-tokens-input {\n    width: 80px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n.acc-action-btn {\n    flex: 1 1 0;\n    min-width: 110px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n.acc-action-btn.acc-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.acc-generate-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.acc-status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    background: var(--SmartThemeBodyColor, #222);\n    border-radius: 4px;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 0.9em;\n}\n\n.acc-description-section {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.acc-description-section label {\n    margin-bottom: 4px;\n}\n\n.acc-description-output {\n    width: 100%;\n    flex: 1 1 0%;\n    min-height: 200px;\n    resize: vertical;\n}\n\n.acc-description-output[disabled] {\n    opacity: 0.5;\n    cursor: not-allowed;\n}\n\n.acc-hidden {\n    display: none !important;\n}\n\n/* ACC Launch button in character creator */\n#acc_launch_btn {\n    display: flex;\n    align-items: center;\n    gap: 4px;\n}\n\n/* Field header row: label on the left, Clear button on the right. */\n.acc-modal-body .acc-field-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin-bottom: 4px;\n}\n\n.acc-modal-body .acc-clear-btn {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.acc-modal-body .acc-clear-btn:hover {\n    opacity: 1;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   WORLD INFO ASSIST STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Settings panel */\n#saints_silly_settings .wia_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #wia_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* Per-entry assist controls injected into each WI entry form */\n.wia-controls {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    flex-wrap: wrap;\n    margin: 6px 0 6px 0;\n}\n\n.wia-controls .wia-btn {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    cursor: pointer;\n    font-size: 0.85em;\n    padding: 4px 8px;\n}\n\n.wia-controls .wia-btn-assist {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.wia-controls .wia-btn-label {\n    font-weight: 500;\n}\n\n.wia-controls .wia-spinner {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 1em;\n    display: inline-flex;\n    align-items: center;\n    padding: 4px 6px;\n}\n\n.wia-controls .wia-hidden {\n    display: none !important;\n}\n\n/* Use Chat Context checkbox */\n.wia-controls .wia-context-toggle {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    font-size: 0.85em;\n    cursor: pointer;\n    opacity: 0.85;\n    user-select: none;\n}\n\n.wia-controls .wia-context-toggle:hover {\n    opacity: 1;\n}\n\n/* Lore book multi-select picker (per-entry) */\n.wia-controls .wia-lorebook-picker {\n    position: relative;\n    font-size: 0.85em;\n}\n\n.wia-controls .wia-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.wia-controls .wia-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.wia-controls .wia-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.wia-controls .wia-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 50;\n    min-width: 220px;\n    max-height: 240px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);\n}\n\n.wia-controls .wia-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.wia-controls .wia-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Inline Clear-content button on the WIA controls row */\n.wia-controls .wia-btn-clear-content {\n    font-size: 0.85em;\n    padding: 4px 8px;\n    opacity: 0.85;\n}\n\n.wia-controls .wia-btn-clear-content:hover {\n    opacity: 1;\n}\n\n/* Per-entry guidance section — sits between the controls and the entry's\n   content textarea so it's clearly the user's *input* to the assist. */\n.wia-guidance-block {\n    margin: 0 0 8px 0;\n}\n\n.wia-guidance-block .wia-guidance-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin: 0 0 4px 0;\n}\n\n.wia-guidance-block .wia-guidance-label {\n    font-size: 0.9em;\n    font-weight: 500;\n    opacity: 0.9;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n}\n\n.wia-guidance-block .wia-btn-clear-guidance {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.wia-guidance-block .wia-btn-clear-guidance:hover {\n    opacity: 1;\n}\n\n.wia-guidance-block .wia-guidance-textarea {\n    width: 100%;\n    resize: vertical;\n    min-height: 60px;\n    font-size: 0.9em;\n}\n\n/* Per-entry token limit row */\n.wia-controls .wia-tokens-row {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.85em;\n    opacity: 0.85;\n    margin-left: auto;\n}\n\n.wia-controls .wia-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.wia-controls .wia-tokens-input {\n    width: 72px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n/* ── ACC modal: context preamble controls ── */\n\n.acc-context-section {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: wrap;\n    margin-bottom: 12px;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.acc-context-section .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.9em;\n    cursor: pointer;\n}\n\n.acc-lorebook-picker {\n    position: relative;\n    font-size: 0.9em;\n}\n\n.acc-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.acc-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.acc-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.acc-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 10002;\n    min-width: 240px;\n    max-height: 260px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\n}\n\n.acc-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.acc-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   NARRATIVE GUIDANCE SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_subsection_header {\n    margin: 12px 0 4px 0;\n    opacity: 0.85;\n}\n\n#saints_silly_settings .ng_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings .ng_prompt_section textarea {\n    width: 100%;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .ng_inline_row {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin: 6px 0;\n}\n\n#saints_silly_settings .ng_number_input {\n    width: 5em;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng_select_input {\n    width: auto;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng-lorebook-picker {\n    margin: 8px 0;\n}\n\n#saints_silly_settings .ng-lorebook-list {\n    margin-top: 4px;\n    padding: 6px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n}\n\n#saints_silly_settings .ng-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n#saints_silly_settings .ng-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n#saints_silly_settings #ng_regenerate_now.disabled,\n#saints_silly_settings #ng_continue_now.disabled,\n#saints_silly_settings #ng_retry_now.disabled {\n    opacity: 0.6;\n    pointer-events: none;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PROMPT TEMPLATE CONTROLS (shared, one row per prompt)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_template_controls {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin-top: 6px;\n}\n\n#saints_silly_settings .saints_template_select {\n    width: 100%;\n}\n\n#saints_silly_settings .saints_template_buttons {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button {\n    flex: 1 1 0;\n    min-width: 100px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button.disabled {\n    opacity: 0.5;\n    pointer-events: none;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   TOOL PRESET BLOCK & PROMPT PREVIEW\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_preset_block {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin: 8px 0;\n    padding: 8px;\n    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));\n    border-radius: 6px;\n}\n\n#saints_silly_settings .saints_preview_btn {\n    align-self: flex-start;\n    white-space: nowrap;\n}\n\n.sse-prompt-preview {\n    text-align: left;\n}\n\n.sse-prompt-preview h3 {\n    margin: 0 0 10px 0;\n}\n\n.sse-preview-section {\n    margin-bottom: 12px;\n}\n\n.sse-preview-label {\n    font-weight: bold;\n    opacity: 0.8;\n    margin-bottom: 4px;\n}\n\n.sse-preview-text {\n    white-space: pre-wrap;\n    word-break: break-word;\n    text-align: left;\n    font-size: calc(var(--mainFontSize, 14px) * 0.85);\n    background-color: rgba(0, 0, 0, 0.2);\n    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));\n    border-radius: 6px;\n    padding: 8px;\n    margin: 0;\n    max-height: 40vh;\n    overflow-y: auto;\n}\n\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -1316,7 +1367,7 @@ var update = injectStylesIntoStyleTag_default()(style/* default */.A, options);
 
 ;// ./src/settings.html
 // Module
-var code = `<div id="saints_silly_settings" class="extension_settings"> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-ghost"></span> SSE Possession</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="possession_enabled" type="checkbox"/> <span>Enable Possession</span> </label> <label class="checkbox_label"> <input id="possession_show_toast" type="checkbox"/> <span>Show Toast on Possess/Unpossess</span> </label> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-pen-fancy"></span> SSE Phrasing!</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="phrasing_enabled" type="checkbox" checked="checked"/> <span>Enable Phrasing!</span> </label> <label class="checkbox_label" title="When enabled, rephrasing a message includes every existing swipe in the prompt and asks the model to produce something wildly different."> <input id="phrasing_inverse_guidance" type="checkbox"/> <span>Inverse Guidance</span> </label> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrasing_prompt_section"> <textarea id="phrasing_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Phrasing! prompt template..."></textarea> </div> <div class="saints_template_controls" id="phrasing_prompt_templates"></div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Inverse Guidance Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrasing_prompt_section"> <textarea id="phrasing_inverse_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Inverse Guidance prompt template..."></textarea> <small>Available placeholders: <code>{{phrasingSeed}}</code>, <code>{{phrasingSwipes}}</code></small> </div> <div class="saints_template_controls" id="phrasing_inverse_prompt_templates"></div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-wand-magic-sparkles"></span> SSE Assisted Character Creation</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="acc_enabled" type="checkbox"/> <span>Enable Assisted Character Creation</span> </label> <div class="ng_inline_row"> <label for="acc_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="acc_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for ACC generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="acc_prompt_section"> <textarea id="acc_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your ACC prompt template..."></textarea> </div> <div class="saints_template_controls" id="acc_prompt_templates"></div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="acc_prompt_section"> <textarea id="acc_prefill_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix the model continues. Also prepended to the description on success."></textarea> <small>Passed to the model as an assistant prefix and kept at the top of the generated description.</small> </div> <div class="saints_template_controls" id="acc_prefill_templates"></div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-book-atlas"></span> SSE World Info Assist</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="wia_enabled" type="checkbox"/> <span>Enable World Info Assist</span> </label> <div class="ng_inline_row"> <label for="wia_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="wia_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for World Info Assist generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="wia_response_length"><b><span class="fa-solid fa-coins"></span> Response Token Limit:</b></label> <input id="wia_response_length" type="number" min="50" max="8192" step="50" class="text_pole ng_number_input" title="Maximum tokens the model may use for each World Info Assist generation."/> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="wia_prompt_section"> <textarea id="wia_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your World Info Assist prompt template..."></textarea> </div> <div class="saints_template_controls" id="wia_prompt_templates"></div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template — Titled Entry</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="wia_prompt_section"> <textarea id="wia_prefill_titled_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix used when the entry has a title."></textarea> <small>Available placeholder: <code>{{title}}</code>. Used as the assistant prefix and prepended to the entry on success.</small> </div> <div class="saints_template_controls" id="wia_prefill_titled_templates"></div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template — Untitled Entry</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="wia_prompt_section"> <textarea id="wia_prefill_untitled_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix used when the entry has no title yet."></textarea> <small>Used as the assistant prefix and prepended to the entry on success.</small> </div> <div class="saints_template_controls" id="wia_prefill_untitled_templates"></div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-compass"></span> SSE Narrative Guidance</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="ng_enabled" type="checkbox"/> <span>Enable Narrative Guidance</span> </label> <label class="checkbox_label" title="When on, regenerates guidance automatically when the turn counter hits zero. When off, only the Regenerate Now button updates the guidance."> <input id="ng_auto_regen" type="checkbox"/> <span>Auto-Regenerate at Zero</span> </label> <div class="ng_inline_row"> <label for="ng_default_turn_count"><b>Turns Between Regenerations:</b></label> <input id="ng_default_turn_count" type="number" min="1" step="1" class="text_pole ng_number_input"/> </div> <div class="ng_inline_row"> <label for="ng_response_length"><b>Response Token Limit:</b></label> <input id="ng_response_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="Maximum number of tokens the model may use for each generated guidance paragraph."/> </div> <div class="ng_inline_row"> <label for="ng_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="ng_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for Narrative Guidance generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="ng_injection_depth"><b>Depth:</b></label> <input id="ng_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the guidance after (0 = bottom)."/> <label for="ng_injection_role"><b>Role:</b></label> <select id="ng_injection_role" class="text_pole ng_select_input" title="Role used when injecting the guidance into the prompt."> <option value="system">System</option> <option value="user">User</option> <option value="assistant">Assistant</option> </select> </div> <div id="ng_lorebooks_host"></div> <div class="ng_inline_row"> <span><b>Turns Remaining:</b> <span id="ng_remaining_display">0</span></span> <div class="menu_button" id="ng_decrement_button" title="Decrement remaining by 1"> <span class="fa-solid fa-minus"></span> </div> <div class="menu_button" id="ng_reset_button" title="Reset remaining to default turn count"> <span class="fa-solid fa-rotate-right"></span> Reset </div> <div class="menu_button disabled" id="ng_continue_now" title="Continue the current guidance paragraph"> <span class="fa-solid fa-arrow-right"></span> Continue </div> <div class="menu_button disabled" id="ng_retry_now" title="Restore previous guidance and regenerate"> <span class="fa-solid fa-rotate-right"></span> Retry </div> <div class="menu_button" id="ng_regenerate_now" title="Regenerate guidance now"> <span class="ng-regen-icon fa-solid fa-wand-sparkles"></span> Regenerate Now </div> </div> <div class="ng_prompt_section"> <label for="ng_themes_textarea"><b>Themes / Story Arcs:</b></label> <textarea id="ng_themes_textarea" class="text_pole" rows="4" placeholder="Optional themes, ideas, or arcs for the AI to consider..."></textarea> </div> <div class="ng_prompt_section"> <label for="ng_active_guidance_textarea"><b>Active Guidance:</b></label> <textarea id="ng_active_guidance_textarea" class="text_pole" rows="6" placeholder="The currently active guidance paragraph. Edit freely; changes apply on the next AI turn."></textarea> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Generation Prompt (used as prefill)</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_generation_prompt_textarea" class="text_pole" rows="4" placeholder="Enter the prefill that the LLM will continue..."></textarea> <small>The model's reply continues this text and becomes the active guidance.</small> </div> <div class="saints_template_controls" id="ng_generation_prompt_templates"></div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Injection Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_injection_prompt_textarea" class="text_pole" rows="3" placeholder="Template injected before each AI turn..."></textarea> <small>Available placeholder: <code>{{guidance}}</code></small> </div> <div class="saints_template_controls" id="ng_injection_prompt_templates"></div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-bug"></span> SSE Diagnostics</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label" title="Log detailed Possession events to the browser console."> <input id="possession_debug_mode" type="checkbox"/> <span>Possession Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Phrasing events to the browser console."> <input id="phrasing_debug_mode" type="checkbox"/> <span>Phrasing Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Assisted Character Creation events, prompts, and generations to the browser console."> <input id="acc_debug_mode" type="checkbox"/> <span>ACC Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed World Info Assist events, prompts, and generations to the browser console."> <input id="wia_debug_mode" type="checkbox"/> <span>WI Assist Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Narrative Guidance events to the browser console."> <input id="ng_debug_mode" type="checkbox"/> <span>Narrative Guidance Debug Mode</span> </label> <label class="checkbox_label" title="Log silent-generation lifecycle (job start/abort/completion, stop-listener events, stream token counts) to the browser console. Useful when diagnosing stop-button behavior across backends."> <input id="silent_generation_debug_mode" type="checkbox"/> <span>Silent Generation Debug Mode</span> </label> </div> </div> </div> `;
+var code = `<div id="saints_silly_settings" class="extension_settings"> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-ghost"></span> SSE Possession</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="possession_enabled" type="checkbox"/> <span>Enable Possession</span> </label> <label class="checkbox_label"> <input id="possession_show_toast" type="checkbox"/> <span>Show Toast on Possess/Unpossess</span> </label> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-pen-fancy"></span> SSE Phrasing!</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="phrasing_enabled" type="checkbox" checked="checked"/> <span>Enable Phrasing!</span> </label> <label class="checkbox_label" title="When enabled, rephrasing a message includes every existing swipe in the prompt and asks the model to produce something wildly different."> <input id="phrasing_inverse_guidance" type="checkbox"/> <span>Inverse Guidance</span> </label> <div class="saints_preset_block"> <label title="Save and switch named bundles of every Phrasing prompt field below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="phrasing_presets"></div> <div class="menu_button saints_preview_btn" id="phrasing_preview_btn" title="Show exactly what Phrasing! will inject into the chat prompt, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrasing_prompt_section"> <textarea id="phrasing_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Phrasing! prompt template..."></textarea> <small>Injected into the chat prompt as a system message for the rephrase generation. Placeholder: <code>{{phrasingSeed}}</code> — the speaker-prefixed message being rephrased.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Inverse Guidance Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrasing_prompt_section"> <textarea id="phrasing_inverse_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Inverse Guidance prompt template..."></textarea> <small>Used instead of the standard prompt when Inverse Guidance is on. Placeholders: <code>{{phrasingSeed}}</code>, <code>{{phrasingSwipes}}</code> — the existing swipes to avoid resembling.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-wand-magic-sparkles"></span> SSE Assisted Character Creation</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="acc_enabled" type="checkbox"/> <span>Enable Assisted Character Creation</span> </label> <div class="ng_inline_row"> <label for="acc_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="acc_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for ACC generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the ACC prompt + prefill below. The prompt describes the prefill's opening, so they are saved together."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="acc_presets"></div> <div class="menu_button saints_preview_btn" id="acc_preview_btn" title="Show the exact system prompt, assembled user prompt, and prefill ACC will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="acc_prompt_section"> <textarea id="acc_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your ACC prompt template..."></textarea> <small>Sent as the user prompt for each generation. Placeholders: <code>{{context}}</code> (chat/lore preamble, when enabled in the modal), <code>{{brief}}</code> (your Character Brief). If a placeholder is missing, the context is prepended and the brief appended automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="acc_prompt_section"> <textarea id="acc_prefill_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix the model continues. Also prepended to the description on success."></textarea> <small>Sent as an assistant prefix the model continues from, and kept at the top of the final description. If the backend ignores prefills and the model repeats it, the echo is stripped automatically. Keep it in sync with the format the Prompt Template describes.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-book-atlas"></span> SSE World Info Assist</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="wia_enabled" type="checkbox"/> <span>Enable World Info Assist</span> </label> <div class="ng_inline_row"> <label for="wia_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="wia_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for World Info Assist generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="wia_response_length"><b><span class="fa-solid fa-coins"></span> Response Token Limit:</b></label> <input id="wia_response_length" type="number" min="50" max="8192" step="50" class="text_pole ng_number_input" title="Maximum tokens the model may use for each World Info Assist generation."/> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the WIA prompt + both prefills below. The prompt describes the prefill's opening, so they are saved together."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="wia_presets"></div> <div class="menu_button saints_preview_btn" id="wia_preview_btn" title="Show the exact system prompt, assembled user prompt, and prefills WIA will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="wia_prompt_section"> <textarea id="wia_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your World Info Assist prompt template..."></textarea> <small>Sent as the user prompt for each Assist/Continue. Placeholders: <code>{{context}}</code> (chat/lore preamble, when enabled on the entry's Assist row), <code>{{guidance}}</code> (the entry's Assist Guidance text), <code>{{title}}</code> (the entry's title). If context or guidance placeholders are missing, those blocks are added automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template — Titled Entry</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="wia_prompt_section"> <textarea id="wia_prefill_titled_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix used when the entry has a title."></textarea> <small>Sent as an assistant prefix when the entry has a title, and kept at the start of the entry on success. Placeholder: <code>{{title}}</code>. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template — Untitled Entry</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="wia_prompt_section"> <textarea id="wia_prefill_untitled_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix used when the entry has no title yet."></textarea> <small>Sent as an assistant prefix when the entry has no title, and kept at the start of the entry on success. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-compass"></span> SSE Narrative Guidance</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="ng_enabled" type="checkbox"/> <span>Enable Narrative Guidance</span> </label> <label class="checkbox_label" title="When on, regenerates guidance automatically when the turn counter hits zero. When off, only the Regenerate Now button updates the guidance."> <input id="ng_auto_regen" type="checkbox"/> <span>Auto-Regenerate at Zero</span> </label> <div class="ng_inline_row"> <label for="ng_default_turn_count"><b>Turns Between Regenerations:</b></label> <input id="ng_default_turn_count" type="number" min="1" step="1" class="text_pole ng_number_input"/> </div> <div class="ng_inline_row"> <label for="ng_response_length"><b>Response Token Limit:</b></label> <input id="ng_response_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="Maximum number of tokens the model may use for each generated guidance paragraph."/> </div> <div class="ng_inline_row"> <label for="ng_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="ng_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for Narrative Guidance generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="ng_injection_depth"><b>Depth:</b></label> <input id="ng_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the guidance after (0 = bottom)."/> <label for="ng_injection_role"><b>Role:</b></label> <select id="ng_injection_role" class="text_pole ng_select_input" title="Role used when injecting the guidance into the prompt."> <option value="system">System</option> <option value="user">User</option> <option value="assistant">Assistant</option> </select> </div> <div id="ng_lorebooks_host"></div> <div class="ng_inline_row"> <span><b>Turns Remaining:</b> <span id="ng_remaining_display">0</span></span> <div class="menu_button" id="ng_decrement_button" title="Decrement remaining by 1"> <span class="fa-solid fa-minus"></span> </div> <div class="menu_button" id="ng_reset_button" title="Reset remaining to default turn count"> <span class="fa-solid fa-rotate-right"></span> Reset </div> <div class="menu_button disabled" id="ng_continue_now" title="Continue the current guidance paragraph"> <span class="fa-solid fa-arrow-right"></span> Continue </div> <div class="menu_button disabled" id="ng_retry_now" title="Restore previous guidance and regenerate"> <span class="fa-solid fa-rotate-right"></span> Retry </div> <div class="menu_button" id="ng_regenerate_now" title="Regenerate guidance now"> <span class="ng-regen-icon fa-solid fa-wand-sparkles"></span> Regenerate Now </div> </div> <div class="ng_prompt_section"> <label for="ng_themes_textarea"><b>Themes / Story Arcs:</b></label> <textarea id="ng_themes_textarea" class="text_pole" rows="4" placeholder="Optional themes, ideas, or arcs for the AI to consider..."></textarea> </div> <div class="ng_prompt_section"> <label for="ng_active_guidance_textarea"><b>Active Guidance:</b></label> <textarea id="ng_active_guidance_textarea" class="text_pole" rows="6" placeholder="The currently active guidance paragraph. Edit freely; changes apply on the next AI turn."></textarea> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the three Narrative Guidance prompt fields below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="ng_presets"></div> <div class="menu_button saints_preview_btn" id="ng_preview_btn" title="Show the exact system prompt, assembled user prompt, prefill, and injection Narrative Guidance will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Generation Instructions Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_user_prompt_textarea" class="text_pole" rows="5" placeholder="Instructions sent as the user prompt for each guidance generation..."></textarea> <small>Sent as the user prompt for each guidance generation. Placeholders: <code>{{context}}</code> (chat/lore preamble), <code>{{themes}}</code> (your Themes / Story Arcs block). If a placeholder is missing, the blocks are prepended automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_generation_prompt_textarea" class="text_pole" rows="4" placeholder="Enter the prefill that the LLM will continue..."></textarea> <small>Sent as an assistant prefix the model continues from; the prefill plus the reply becomes the active guidance. If it opens with "[", the brackets are stripped when the guidance is injected into the chat prompt. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Injection Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_injection_prompt_textarea" class="text_pole" rows="3" placeholder="Template injected before each AI turn..."></textarea> <small>Added to the chat prompt before each AI turn while guidance is active. Placeholder: <code>{{guidance}}</code> — the active guidance text (outer brackets stripped).</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-bug"></span> SSE Diagnostics</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label" title="Log detailed Possession events to the browser console."> <input id="possession_debug_mode" type="checkbox"/> <span>Possession Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Phrasing events to the browser console."> <input id="phrasing_debug_mode" type="checkbox"/> <span>Phrasing Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Assisted Character Creation events, prompts, and generations to the browser console."> <input id="acc_debug_mode" type="checkbox"/> <span>ACC Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed World Info Assist events, prompts, and generations to the browser console."> <input id="wia_debug_mode" type="checkbox"/> <span>WI Assist Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Narrative Guidance events to the browser console."> <input id="ng_debug_mode" type="checkbox"/> <span>Narrative Guidance Debug Mode</span> </label> <label class="checkbox_label" title="Log silent-generation lifecycle (job start/abort/completion, stop-listener events, stream token counts) to the browser console. Useful when diagnosing stop-button behavior across backends."> <input id="silent_generation_debug_mode" type="checkbox"/> <span>Silent Generation Debug Mode</span> </label> </div> </div> </div> `;
 // Exports
 /* harmony default export */ const settings = (code);
 ;// external "../../../../world-info.js"
@@ -1324,6 +1375,8 @@ var code = `<div id="saints_silly_settings" class="extension_settings"> <div cla
 ;// external "../../../../../script.js"
 
 ;// external "../../../../tokenizers.js"
+
+;// external "../../../../popup.js"
 
 ;// ./src/silent-generation.js
 /**
@@ -1631,6 +1684,7 @@ async function cancellableStreamingGenerate(params, targetEl, { append = false, 
 
 
 
+
 // ─── Context ───
 
 /**
@@ -1827,6 +1881,110 @@ async function withSingleLineDisabled(fn) {
     } finally {
         if (pus && original !== undefined) pus.single_line = original;
     }
+}
+
+// ─── Template Macros ───
+
+/**
+ * Replace this extension's own `{{key}}` placeholders in a prompt template.
+ *
+ * Deliberately NOT SillyTavern's macro engine: ST macros run on Phrasing's
+ * injection templates already, but the ACC/WIA templates contain literal
+ * `{{ .fooOverride ?? bar }}` override syntax that must pass through
+ * untouched, so generation prompts only get this narrow substitution.
+ *
+ * @param {string} template - Template text possibly containing `{{key}}` placeholders.
+ * @param {Record<string, string>} macros - key → replacement value.
+ * @returns {{ text: string, used: Set<string> }} The substituted text plus the
+ *          set of macro keys that were actually present. Callers use `used`
+ *          to fall back to appending/prepending a block when its placeholder
+ *          is absent, which keeps old templates working unchanged.
+ */
+function applyTemplateMacros(template, macros) {
+    let text = template || '';
+    const used = new Set();
+    for (const [key, value] of Object.entries(macros)) {
+        const re = new RegExp(`\\{\\{\\s*${key}\\s*\\}\\}`, 'gi');
+        if (re.test(text)) {
+            used.add(key);
+            text = text.replace(new RegExp(re.source, 'gi'), () => value ?? '');
+        }
+    }
+    return { text, used };
+}
+
+// ─── Prefill Echo Stripping ───
+
+/**
+ * Strip a prefill echo from the start of a generation result.
+ *
+ * Backends that support assistant-prefix continuation return only the new
+ * text, so callers prepend the prefill to the result. Chat-completion
+ * backends that ignore the prefix (e.g. OpenAI) often start over and re-emit
+ * the prefill (or its final line), which would produce a doubled opening
+ * once the prefill is prepended. Detects a full-prefill echo or a final-line
+ * echo and removes it. Conservative: requires an exact match of at least a
+ * few characters, so legitimate output is never trimmed.
+ *
+ * @param {string} output  - Cleaned (trimmed) generation result.
+ * @param {string} prefill - The prefill that was sent as the assistant prefix.
+ * @returns {string} The output with any leading prefill echo removed.
+ */
+function stripPrefillEcho(output, prefill) {
+    if (!output || !prefill) return output;
+    const whole = prefill.trim();
+    if (whole.length >= 3 && output.startsWith(whole)) {
+        return output.slice(whole.length).replace(/^\s+/, '');
+    }
+    const lines = prefill.split('\n').map(l => l.trim()).filter(Boolean);
+    const lastLine = lines[lines.length - 1];
+    if (lastLine && lastLine.length >= 4 && output.startsWith(lastLine)) {
+        return output.slice(lastLine.length).replace(/^\s+/, '');
+    }
+    return output;
+}
+
+// ─── Prompt Preview Popup ───
+
+/**
+ * Show a read-only popup laying out exactly what a tool will send to the
+ * model: system prompt, assembled user prompt, prefill, injection, etc.
+ *
+ * @param {string} title - Popup heading.
+ * @param {Array<{ label: string, text: string|null }>} sections - Sections to
+ *        render in order. Sections with `text == null` are skipped; empty
+ *        strings render as "(empty)".
+ */
+function showPromptPreview(title, sections) {
+    const root = document.createElement('div');
+    root.className = 'sse-prompt-preview';
+
+    const heading = document.createElement('h3');
+    heading.textContent = title;
+    root.appendChild(heading);
+
+    for (const { label, text } of sections) {
+        if (text == null) continue;
+        const section = document.createElement('div');
+        section.className = 'sse-preview-section';
+        const labelEl = document.createElement('div');
+        labelEl.className = 'sse-preview-label';
+        labelEl.textContent = label;
+        const pre = document.createElement('pre');
+        pre.className = 'sse-preview-text';
+        pre.textContent = text || '(empty)';
+        section.appendChild(labelEl);
+        section.appendChild(pre);
+        root.appendChild(section);
+    }
+
+    const popup = new __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_Popup__(root, __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_POPUP_TYPE__.TEXT, '', {
+        okButton: 'Close',
+        wide: true,
+        large: true,
+        allowVerticalScrolling: true,
+    });
+    popup.show();
 }
 
 // ─── Generation Context Preamble ───
@@ -2997,202 +3155,11 @@ function initPossession({ settings, phrasingApi: pApi }) {
     possession_debug = createDebugLogger('POSSESSION', () => settings.possessionDebugMode);
 }
 
-;// ./src/prompt-templates.js
-/**
- * Prompt Templates — named, reusable presets for any of the extension's
- * editable LLM prompts. Persisted at the extension-settings level (across
- * chats). One dropdown + Save/Update/Rename/Delete buttons per prompt.
- *
- * The associated textarea (e.g. #acc_prompt_textarea) remains the single
- * live source of truth for the active prompt. Selecting a template loads
- * its text into the textarea and re-dispatches an `input` event so the
- * owning module's existing live-binding persists textarea → settings.
- */
-
-const DEFAULT_ID = '__default__';
-const DEFAULT_LABEL = 'Default';
-
-function isValidName(name, existingNames, currentName = null) {
-    if (!name || !name.trim()) return { ok: false, reason: 'Name cannot be empty.' };
-    const trimmed = name.trim();
-    if (trimmed === DEFAULT_ID) return { ok: false, reason: `Name "${DEFAULT_ID}" is reserved.` };
-    if (trimmed === DEFAULT_LABEL) return { ok: false, reason: `Name "${DEFAULT_LABEL}" is reserved.` };
-    if (trimmed !== currentName && existingNames.includes(trimmed)) {
-        return { ok: false, reason: `A template named "${trimmed}" already exists.` };
-    }
-    return { ok: true, name: trimmed };
-}
-
-/**
- * Render a templates dropdown + action buttons for one prompt.
- *
- * @param {object} opts
- * @param {string}   opts.promptKey     Settings key, e.g. 'phrasingPrompt'.
- * @param {string}   opts.defaultText   The hardcoded DEFAULT_* constant.
- * @param {string}   opts.textareaId    Id of the existing textarea (no '#').
- * @param {string}   opts.containerId   Id of the empty <div> to render into (no '#').
- * @param {object}   opts.settings      Shared mutable settings reference.
- * @param {Function} opts.saveSettings  () => void — persists settings.
- */
-function setupPromptTemplates({ promptKey, defaultText, textareaId, containerId, settings, saveSettings }) {
-    const container = document.getElementById(containerId);
-    const textarea = document.getElementById(textareaId);
-    if (!container || !textarea) return;
-
-    if (!settings.promptTemplates) settings.promptTemplates = {};
-    if (!settings.activePromptTemplate) settings.activePromptTemplate = {};
-    if (!settings.promptTemplates[promptKey]) settings.promptTemplates[promptKey] = {};
-    if (!settings.activePromptTemplate[promptKey]) settings.activePromptTemplate[promptKey] = DEFAULT_ID;
-
-    container.innerHTML = `
-        <select class="text_pole saints_template_select" id="${containerId}_select"></select>
-        <div class="saints_template_buttons">
-            <div class="menu_button" data-action="save" title="Save the current textarea as a new named template">
-                <span class="fa-solid fa-plus"></span> Save as New
-            </div>
-            <div class="menu_button" data-action="update" title="Overwrite the selected template with the current textarea">
-                <span class="fa-solid fa-floppy-disk"></span> Update
-            </div>
-            <div class="menu_button" data-action="rename" title="Rename the selected template">
-                <span class="fa-solid fa-pen"></span> Rename
-            </div>
-            <div class="menu_button" data-action="delete" title="Delete the selected template">
-                <span class="fa-solid fa-trash"></span> Delete
-            </div>
-        </div>
-    `;
-
-    const select = container.querySelector('select');
-    const buttons = {
-        save:   container.querySelector('[data-action="save"]'),
-        update: container.querySelector('[data-action="update"]'),
-        rename: container.querySelector('[data-action="rename"]'),
-        delete: container.querySelector('[data-action="delete"]'),
-    };
-
-    function getActiveId() {
-        return settings.activePromptTemplate[promptKey] || DEFAULT_ID;
-    }
-
-    function getTemplateText(id) {
-        if (id === DEFAULT_ID) return defaultText;
-        const text = settings.promptTemplates[promptKey][id];
-        return text === undefined ? defaultText : text;
-    }
-
-    function refreshDropdown() {
-        const active = getActiveId();
-        const names = Object.keys(settings.promptTemplates[promptKey]).sort((a, b) => a.localeCompare(b));
-        select.innerHTML = '';
-        select.appendChild(new Option(DEFAULT_LABEL, DEFAULT_ID, false, active === DEFAULT_ID));
-        for (const name of names) {
-            select.appendChild(new Option(name, name, false, active === name));
-        }
-        refreshButtonStates();
-    }
-
-    function refreshButtonStates() {
-        const isDefault = getActiveId() === DEFAULT_ID;
-        buttons.update.classList.toggle('disabled', isDefault);
-        buttons.rename.classList.toggle('disabled', isDefault);
-        buttons.delete.classList.toggle('disabled', isDefault);
-    }
-
-    function loadActiveIntoTextarea() {
-        textarea.value = getTemplateText(getActiveId());
-        textarea.dispatchEvent(new Event('input', { bubbles: true }));
-    }
-
-    function existingNames() {
-        return Object.keys(settings.promptTemplates[promptKey]);
-    }
-
-    // ── Actions ──
-
-    buttons.save.addEventListener('click', () => {
-        const raw = window.prompt('Name for the new template:', '');
-        if (raw === null) return;
-        const result = isValidName(raw, existingNames());
-        if (!result.ok) {
-            window.alert(result.reason);
-            return;
-        }
-        settings.promptTemplates[promptKey][result.name] = textarea.value;
-        settings.activePromptTemplate[promptKey] = result.name;
-        saveSettings();
-        refreshDropdown();
-    });
-
-    buttons.update.addEventListener('click', () => {
-        const active = getActiveId();
-        if (active === DEFAULT_ID) return;
-        settings.promptTemplates[promptKey][active] = textarea.value;
-        saveSettings();
-    });
-
-    buttons.rename.addEventListener('click', () => {
-        const active = getActiveId();
-        if (active === DEFAULT_ID) return;
-        const raw = window.prompt('Rename template:', active);
-        if (raw === null) return;
-        const result = isValidName(raw, existingNames(), active);
-        if (!result.ok) {
-            window.alert(result.reason);
-            return;
-        }
-        if (result.name === active) return;
-        const text = settings.promptTemplates[promptKey][active];
-        delete settings.promptTemplates[promptKey][active];
-        settings.promptTemplates[promptKey][result.name] = text;
-        settings.activePromptTemplate[promptKey] = result.name;
-        saveSettings();
-        refreshDropdown();
-    });
-
-    buttons.delete.addEventListener('click', () => {
-        const active = getActiveId();
-        if (active === DEFAULT_ID) return;
-        if (!window.confirm(`Delete template "${active}"?`)) return;
-        delete settings.promptTemplates[promptKey][active];
-        settings.activePromptTemplate[promptKey] = DEFAULT_ID;
-        saveSettings();
-        refreshDropdown();
-        loadActiveIntoTextarea();
-    });
-
-    select.addEventListener('change', () => {
-        settings.activePromptTemplate[promptKey] = select.value;
-        saveSettings();
-        loadActiveIntoTextarea();
-        refreshButtonStates();
-    });
-
-    // ── Initial paint ──
-
-    refreshDropdown();
-
-    // First-interaction guard: if the active template is "Default" but the
-    // user already has a customised textarea/settings value (from a prior
-    // version with no template system), preserve their work. They can click
-    // "Save as New" to name it. Explicit "Default" selection still overwrites.
-    const initialActive = getActiveId();
-    const settingsValue = settings[promptKey];
-    const hasCustomization =
-        initialActive === DEFAULT_ID &&
-        typeof settingsValue === 'string' &&
-        settingsValue.length > 0 &&
-        settingsValue !== defaultText;
-    if (!hasCustomization) {
-        loadActiveIntoTextarea();
-    }
-}
-
 ;// ./src/phrasing.js
 /**
  * Phrasing module — enriches messages with AI-generated narration via
  * prompt injection + impersonate/swipe flows.
  */
-
 
 
 
@@ -3634,22 +3601,26 @@ function bindPhrasingSettings(saveSettings) {
         });
     }
 
-    setupPromptTemplates({
-        promptKey: 'phrasingPrompt',
-        defaultText: DEFAULT_PHRASING_PROMPT,
-        textareaId: 'phrasing_prompt_textarea',
-        containerId: 'phrasing_prompt_templates',
-        settings: phrasing_ctx.settings,
-        saveSettings,
-    });
-    setupPromptTemplates({
-        promptKey: 'phrasingInversePrompt',
-        defaultText: DEFAULT_PHRASING_INVERSE_PROMPT,
-        textareaId: 'phrasing_inverse_prompt_textarea',
-        containerId: 'phrasing_inverse_prompt_templates',
-        settings: phrasing_ctx.settings,
-        saveSettings,
-    });
+    document.getElementById('phrasing_preview_btn')
+        ?.addEventListener('click', showPhrasingPromptPreview);
+}
+
+function showPhrasingPromptPreview() {
+    const sampleSeed = 'User: (the message text being rephrased)';
+    const sampleSwipes = formatSwipesContext(
+        ['(first existing variation)', '(second existing variation)'],
+        'User',
+    );
+    showPromptPreview('Phrasing! — Injection Preview', [
+        {
+            label: 'Standard injection (added to the chat prompt as a system message at depth 0 for the rephrase generation)',
+            text: assemblePrompt(sampleSeed),
+        },
+        {
+            label: 'Inverse Guidance injection (used instead when Inverse Guidance is on)',
+            text: assemblePrompt(sampleSeed, sampleSwipes),
+        },
+    ]);
 }
 
 // ─── Slash Command ───
@@ -3707,8 +3678,6 @@ function initPhrasing({ settings, possessionApi: pApi }) {
 
 ;// external "../../../../reasoning.js"
 
-;// external "../../../../popup.js"
-
 ;// ./src/assisted-character-creation.js
 /**
  * Assisted Character Creation (ACC)
@@ -3723,10 +3692,13 @@ function initPhrasing({ settings, possessionApi: pApi }) {
 
 
 
-
 // ─── Default Prompt ───
 
-const DEFAULT_ACC_PROMPT = `[
+// {{context}} and {{brief}} are this extension's placeholders (substituted
+// by applyTemplateMacros, not ST's macro engine — the literal
+// {{ .fooOverride ?? ... }} syntax below must pass through untouched). If a
+// placeholder is removed, the block is prepended/appended automatically.
+const DEFAULT_ACC_PROMPT = `{{context}}[
 Role:
 You are an AI that produces detailed, concise character description sheets for text-based roleplaying games across any genre.
 
@@ -3802,7 +3774,19 @@ Secrets: The thorn-scar pulses near corrupted creatures and may be bonding with 
 Quirks: Names all her knives, refuses to eat mushrooms (no stated reason), instinctively catches falling objects — unnervingly fast reflexes;
 Current Goal: {{ .sableGoalOverride ?? Reach the Greenmarch interior and locate the Thornblight's origin before the scar reaches her chest }};
 ]
-]`;
+]
+
+Character Brief:
+{{brief}}`;
+
+const ACC_GENERATE_SYSTEM_PROMPT =
+    'You are a character creation assistant. Follow the instructions and output format '
+    + 'in the prompt exactly. Output only the character sheet — no preamble, no commentary.';
+
+const ACC_CONTINUE_SYSTEM_PROMPT =
+    'You are a character creation assistant. Continue the existing character sheet seamlessly '
+    + 'in the same format. Output only the continuation — no headers, no meta-commentary, '
+    + 'no repetition of prior text.';
 
 // Prefill is configured as a named template (like the prompt). It is passed
 // to the model as an assistant-prefix so the reply continues from it, and
@@ -3916,15 +3900,6 @@ function bindACCSettings(saveSettings) {
         });
     }
 
-    setupPromptTemplates({
-        promptKey: 'accPrompt',
-        defaultText: DEFAULT_ACC_PROMPT,
-        textareaId: 'acc_prompt_textarea',
-        containerId: 'acc_prompt_templates',
-        settings: assisted_character_creation_moduleSettings,
-        saveSettings,
-    });
-
     const prefillArea = document.getElementById('acc_prefill_textarea');
     if (prefillArea) {
         prefillArea.value = assisted_character_creation_moduleSettings.accPrefill || DEFAULT_ACC_PREFILL;
@@ -3933,14 +3908,27 @@ function bindACCSettings(saveSettings) {
             saveSettings();
         });
     }
-    setupPromptTemplates({
-        promptKey: 'accPrefill',
-        defaultText: DEFAULT_ACC_PREFILL,
-        textareaId: 'acc_prefill_textarea',
-        containerId: 'acc_prefill_templates',
-        settings: assisted_character_creation_moduleSettings,
-        saveSettings,
-    });
+
+    document.getElementById('acc_preview_btn')
+        ?.addEventListener('click', showACCPromptPreview);
+}
+
+function showACCPromptPreview() {
+    const sampleContext =
+        'Existing context to consider when generating (do not repeat verbatim):\n'
+        + '(character cards, persona, selected lore books, and recent chat — included when '
+        + 'enabled in the Assist modal)\n\n';
+    const prompt = composeGeneratePrompt(sampleContext, '(your character brief)');
+    showPromptPreview('Assisted Character Creation — Prompt Preview (Generate)', [
+        { label: 'System Prompt (fixed)', text: ACC_GENERATE_SYSTEM_PROMPT },
+        { label: 'User Prompt (template with sample values)', text: prompt },
+        { label: 'Prefill (assistant prefix; kept at the top of the final description)', text: getPrefill() },
+        {
+            label: 'Note',
+            text: 'Continue uses the same template plus a fixed "Description so far: …" block and '
+                + `continuation instructions, with this system prompt:\n\n${ACC_CONTINUE_SYSTEM_PROMPT}`,
+        },
+    ]);
 }
 
 // ─── Modal ───
@@ -4307,11 +4295,43 @@ function needsSeparator(text) {
     return last !== ' ' && last !== '\n' && last !== '\t';
 }
 
+/**
+ * Assemble the Generate-mode user prompt. {{context}} / {{brief}} are
+ * substituted in place; when a placeholder is absent the block is added the
+ * old way (context prepended, brief appended) so legacy templates keep
+ * working unchanged.
+ */
+function composeGeneratePrompt(preambleBlock, brief) {
+    const { text, used } = applyTemplateMacros(getPromptTemplate(), {
+        context: preambleBlock || '',
+        brief,
+    });
+    let prompt = text;
+    if (!used.has('context') && preambleBlock) prompt = preambleBlock + prompt;
+    if (!used.has('brief')) prompt = `${prompt}\n\nCharacter Brief:\n${brief}`;
+    return prompt;
+}
+
+/**
+ * Assemble the Continue-mode user prompt: same template + macros, then the
+ * description-so-far and continuation instructions.
+ */
+function composeContinuePrompt(preambleBlock, brief, existing) {
+    const briefValue = brief || '(none provided)';
+    const { text, used } = applyTemplateMacros(getPromptTemplate(), {
+        context: preambleBlock || '',
+        brief: briefValue,
+    });
+    let prompt = text;
+    if (!used.has('context') && preambleBlock) prompt = preambleBlock + prompt;
+    if (!used.has('brief') && brief) prompt = `${prompt}\n\nCharacter Brief:\n${brief}`;
+    return `${prompt}\n\nDescription so far:\n${existing}\n\nContinue exactly where the text leaves off. Do not repeat any text already present. Maintain the same format and style. Output only the continuation.`;
+}
+
 async function generateDescription(brief, ctxOptions) {
     const preambleBlock = await buildPreambleBlock(ctxOptions);
-    const promptTemplate = getPromptTemplate();
-    const prompt = `${preambleBlock}${promptTemplate}\n\nCharacter Brief:\n${brief}`;
-    const systemPrompt = 'You are a character creation assistant. Follow the instructions and output format in the prompt exactly. Output only the character sheet — no preamble, no commentary.';
+    const prompt = composeGeneratePrompt(preambleBlock, brief);
+    const systemPrompt = ACC_GENERATE_SYSTEM_PROMPT;
     const responseLength = getResponseLength();
     const prefill = getPrefill();
 
@@ -4326,16 +4346,16 @@ async function generateDescription(brief, ctxOptions) {
         outputEl,
         { append: false },
     ));
-    const cleaned = __WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(result).trim();
+    // Backends that ignore the assistant prefix may re-emit the prefill;
+    // strip the echo so prepending it doesn't double the opening.
+    const cleaned = stripPrefillEcho(__WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(result).trim(), prefill);
     return (prefill || '') + cleaned;
 }
 
 async function generateContinuation(brief, existing, ctxOptions) {
     const preambleBlock = await buildPreambleBlock(ctxOptions);
-    const promptTemplate = getPromptTemplate();
-    const briefBlock = brief ? `Character Brief:\n${brief}\n\n` : '';
-    const prompt = `${preambleBlock}${promptTemplate}\n\n${briefBlock}Description so far:\n${existing}\n\nContinue exactly where the text leaves off. Do not repeat any text already present. Maintain the same format and style. Output only the continuation.`;
-    const systemPrompt = 'You are a character creation assistant. Continue the existing character sheet seamlessly in the same format. Output only the continuation — no headers, no meta-commentary, no repetition of prior text.';
+    const prompt = composeContinuePrompt(preambleBlock, brief, existing);
+    const systemPrompt = ACC_CONTINUE_SYSTEM_PROMPT;
     const responseLength = getResponseLength();
 
     assisted_character_creation_debug('Continuing with existing length', existing.length, 'tokens', responseLength);
@@ -4487,10 +4507,12 @@ function setStatusBar(message) {
 
 
 
-
 // ─── Default Prompt ───
 
-const DEFAULT_WIA_PROMPT = `[
+// {{context}} and {{guidance}} are this extension's placeholders
+// (substituted by applyTemplateMacros). If a placeholder is removed, the
+// block is prepended/appended automatically. {{title}} is also available.
+const DEFAULT_WIA_PROMPT = `{{context}}[
 The next reply will be an out-of-story World Lore Description: a setting reference entry codifying key facts about an event, person, place, institution, or artifact so they remain consistent and reusable.
 
 Write as a worldbook gazetteer entry, NOT as a story excerpt. Treat the reader as a setting researcher who needs canonical facts, not a vivid scene.
@@ -4521,7 +4543,15 @@ Anti-patterns — do NOT write like a story:
 
 Example — World Lore:
 [ The Ashen Concord: Five-member city-state pact, signed 47 AB after the Ember War; covers river-trade routes, standardized coinage (the Concord drachma), and a continent-wide ban on pyromancy; enforcement body is the Cinder Court at Vellis; pyromancers operate covertly as the Hedge League; remains nominally active but strained by ongoing arson reprisals. ]
-]`;
+]
+
+Guidance from the user:
+{{guidance}}`;
+
+const WIA_SYSTEM_PROMPT =
+    'You are a world-building assistant. Output only the requested '
+    + 'World Lore Description in the exact bracketed format described. '
+    + 'No commentary, no preamble, no explanations.';
 
 // Prefills are configured as named templates (like prompts). They are passed
 // to the model as an assistant-prefix so the reply continues from them, and
@@ -4879,6 +4909,42 @@ function setUIState(formEl, state, activeAction = null) {
 
 // ─── Generation ───
 
+function getWIAPromptTemplate() {
+    return (world_info_assist_moduleSettings?.wiaPrompt && world_info_assist_moduleSettings.wiaPrompt.trim())
+        ? world_info_assist_moduleSettings.wiaPrompt
+        : DEFAULT_WIA_PROMPT;
+}
+
+/**
+ * Assemble the Assist/Continue user prompt. {{context}} / {{guidance}} /
+ * {{title}} are substituted in place; when context or guidance placeholders
+ * are absent the blocks are added the old way (context prepended, guidance
+ * appended) so legacy templates keep working unchanged. The mode-specific
+ * tail (prefill pointer or entry-so-far + continuation instructions) is
+ * always appended.
+ */
+function composeWIAPrompt({ preambleBlock, seed, title, isContinue, currentText }) {
+    const guidanceValue = seed
+        || (isContinue ? '(none provided)' : '(no specific guidance — invent a fitting entry)');
+    const { text, used } = applyTemplateMacros(getWIAPromptTemplate(), {
+        context: preambleBlock || '',
+        guidance: guidanceValue,
+        title: (title || '').trim(),
+    });
+    let prompt = text;
+    if (!used.has('context') && preambleBlock) prompt = preambleBlock + prompt;
+    if (!used.has('guidance')) prompt = `${prompt}\n\nGuidance from the user:\n${guidanceValue}`;
+
+    if (isContinue) {
+        return `${prompt}\n\nThe entry so far:\n${currentText}\n\n` +
+            'Continue exactly where the entry left off. Do not repeat any text. ' +
+            'Maintain the bracketed format and close the bracket when the entry is complete.';
+    }
+    return `${prompt}\n\n` + (title
+        ? `Write the entry for "${title}". The reply has been prefilled with the opening bracket, a tone anchor, and the subject name — continue from where the prefill ends with the factual description, then close the bracket.`
+        : 'No title was provided — invent a fitting subject name. The reply has been prefilled with the opening bracket and a tone anchor — continue from where the prefill ends with the subject name, colon, factual description, then close the bracket.');
+}
+
 async function onAssist(formEl, id, isContinue) {
     const state = entryStates.get(id)
         || { hasGenerated: false, generating: false, activeAction: null };
@@ -4914,10 +4980,6 @@ async function onAssist(formEl, id, isContinue) {
         const seed = readGuidance(formEl);
         const currentText = contentEl.value || '';
 
-        const promptTemplate = (world_info_assist_moduleSettings.wiaPrompt && world_info_assist_moduleSettings.wiaPrompt.trim())
-            ? world_info_assist_moduleSettings.wiaPrompt
-            : DEFAULT_WIA_PROMPT;
-
         // Optional preamble assembled from chat / character / lore books.
         const controls = formEl.querySelector('.wia-controls');
         const ctxOptions = readContextOptions(controls);
@@ -4934,31 +4996,11 @@ async function onAssist(formEl, id, isContinue) {
             ? `Existing context to consider when generating (do not repeat verbatim):\n${preamble}\n\n`
             : '';
 
-        let userPrompt;
-        let prefill;
-
-        if (isContinue) {
-            userPrompt =
-                `${preambleBlock}${promptTemplate}\n\n` +
-                `Guidance from the user:\n${seed || '(none provided)'}\n\n` +
-                `The entry so far:\n${currentText}\n\n` +
-                'Continue exactly where the entry left off. Do not repeat any text. ' +
-                'Maintain the bracketed format and close the bracket when the entry is complete.';
-            prefill = '';
-        } else {
-            userPrompt =
-                `${preambleBlock}${promptTemplate}\n\n` +
-                `Guidance from the user:\n${seed || '(no specific guidance — invent a fitting entry)'}\n\n` +
-                (title
-                    ? `Write the entry for "${title}". The reply has been prefilled with the opening bracket, a tone anchor, and the subject name — continue from where the prefill ends with the factual description, then close the bracket.`
-                    : 'No title was provided — invent a fitting subject name. The reply has been prefilled with the opening bracket and a tone anchor — continue from where the prefill ends with the subject name, colon, factual description, then close the bracket.');
-            prefill = resolveWIAPrefill(title);
-        }
-
-        const systemPrompt =
-            'You are a world-building assistant. Output only the requested ' +
-            'World Lore Description in the exact bracketed format described. ' +
-            'No commentary, no preamble, no explanations.';
+        const userPrompt = composeWIAPrompt({
+            preambleBlock, seed, title, isContinue, currentText,
+        });
+        const prefill = isContinue ? '' : resolveWIAPrefill(title);
+        const systemPrompt = WIA_SYSTEM_PROMPT;
 
         world_info_assist_debug('System prompt:', systemPrompt);
         world_info_assist_debug('User prompt:', userPrompt);
@@ -4976,6 +5018,9 @@ async function onAssist(formEl, id, isContinue) {
         ));
 
         let cleaned = __WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(raw).trim();
+        // Backends that ignore the assistant prefix may re-emit the prefill;
+        // strip the echo so prepending it doesn't double the opening.
+        if (!isContinue) cleaned = stripPrefillEcho(cleaned, prefill);
 
         if (isContinue) {
             const sep =
@@ -5093,15 +5138,6 @@ function bindWIASettings(saveSettings) {
         });
     }
 
-    setupPromptTemplates({
-        promptKey: 'wiaPrompt',
-        defaultText: DEFAULT_WIA_PROMPT,
-        textareaId: 'wia_prompt_textarea',
-        containerId: 'wia_prompt_templates',
-        settings: world_info_assist_moduleSettings,
-        saveSettings,
-    });
-
     const prefillTitledArea = document.getElementById('wia_prefill_titled_textarea');
     if (prefillTitledArea) {
         prefillTitledArea.value = world_info_assist_moduleSettings.wiaPrefillTitled || DEFAULT_WIA_PREFILL_TITLED;
@@ -5110,14 +5146,6 @@ function bindWIASettings(saveSettings) {
             saveSettings();
         });
     }
-    setupPromptTemplates({
-        promptKey: 'wiaPrefillTitled',
-        defaultText: DEFAULT_WIA_PREFILL_TITLED,
-        textareaId: 'wia_prefill_titled_textarea',
-        containerId: 'wia_prefill_titled_templates',
-        settings: world_info_assist_moduleSettings,
-        saveSettings,
-    });
 
     const prefillUntitledArea = document.getElementById('wia_prefill_untitled_textarea');
     if (prefillUntitledArea) {
@@ -5127,14 +5155,36 @@ function bindWIASettings(saveSettings) {
             saveSettings();
         });
     }
-    setupPromptTemplates({
-        promptKey: 'wiaPrefillUntitled',
-        defaultText: DEFAULT_WIA_PREFILL_UNTITLED,
-        textareaId: 'wia_prefill_untitled_textarea',
-        containerId: 'wia_prefill_untitled_templates',
-        settings: world_info_assist_moduleSettings,
-        saveSettings,
+
+    document.getElementById('wia_preview_btn')
+        ?.addEventListener('click', showWIAPromptPreview);
+}
+
+function showWIAPromptPreview() {
+    const sampleContext =
+        'Existing context to consider when generating (do not repeat verbatim):\n'
+        + '(character cards, persona, selected lore books, and recent chat — included when '
+        + 'enabled on the entry\'s Assist row)\n\n';
+    const sampleTitle = 'The Ashen Concord';
+    const prompt = composeWIAPrompt({
+        preambleBlock: sampleContext,
+        seed: '(your Assist Guidance text)',
+        title: sampleTitle,
+        isContinue: false,
+        currentText: '',
     });
+    showPromptPreview('World Info Assist — Prompt Preview (Assist, titled entry)', [
+        { label: 'System Prompt (fixed)', text: WIA_SYSTEM_PROMPT },
+        { label: 'User Prompt (template with sample values)', text: prompt },
+        { label: `Prefill — titled entry (sample title "${sampleTitle}")`, text: resolveWIAPrefill(sampleTitle) },
+        { label: 'Prefill — untitled entry', text: resolveWIAPrefill('') },
+        {
+            label: 'Note',
+            text: 'The prefill is sent as an assistant prefix and kept at the start of the entry on '
+                + 'success. Continue uses the same template plus a fixed "The entry so far: …" block '
+                + 'and continuation instructions, with no prefill.',
+        },
+    ]);
 }
 
 ;// ./src/narrative-guidance.js
@@ -5154,17 +5204,30 @@ function bindWIASettings(saveSettings) {
 
 
 
-
 // ─── Constants ───
 
 const NG_INJECTION_KEY = 'narrative_guidance';
 const NG_METADATA_KEY = 'narrativeGuidance';
+
+// User-prompt template for guidance generation. {{context}} and {{themes}}
+// are replaced by the packed chat/lore preamble and the per-chat themes
+// block; if either placeholder is missing, the block is prepended instead.
+const DEFAULT_NG_USER_PROMPT =
+    '{{context}}{{themes}}Continue the bracketed paragraph below. Output a single short paragraph ' +
+    '(2–4 sentences) proposing where the story should head over the next several turns. ' +
+    'Describe direction, mood, complications, and beats — not direct dialogue or scene actions. ' +
+    'Close the bracket when done.';
 
 const DEFAULT_NG_GENERATION_PROMPT =
     '[The following paragraph is based on the given context, and will guide the actions of the characters for the next several turns:';
 
 const DEFAULT_NG_INJECTION_PROMPT =
     '[Guide the story in the following direction: {{guidance}}]';
+
+const NG_GENERATION_SYSTEM_PROMPT =
+    'You are a story-direction assistant. Output only a single short paragraph ' +
+    'of narrative guidance in the requested bracketed format. ' +
+    'No commentary, no preamble, no explanations.';
 
 const DEFAULT_NG_TURN_COUNT = 10;
 const DEFAULT_NG_INJECTION_DEPTH = 0;
@@ -5278,6 +5341,45 @@ function stripBracketWrap(text) {
     return out;
 }
 
+/**
+ * Assemble the guidance-generation user prompt from the editable template.
+ * {{context}} / {{themes}} are substituted in place; when a placeholder is
+ * absent the corresponding block is prepended (context first), matching the
+ * pre-template behavior.
+ */
+function composeGenerationPrompt(preambleBlock, themesBlock) {
+    const tpl = (typeof narrative_guidance_moduleSettings?.narrativeGuidancePrompt === 'string'
+        && narrative_guidance_moduleSettings.narrativeGuidancePrompt.trim())
+        ? narrative_guidance_moduleSettings.narrativeGuidancePrompt
+        : DEFAULT_NG_USER_PROMPT;
+    const { text, used } = applyTemplateMacros(tpl, {
+        context: preambleBlock || '',
+        themes: themesBlock || '',
+    });
+    let prompt = text;
+    if (!used.has('themes') && themesBlock) prompt = themesBlock + prompt;
+    if (!used.has('context') && preambleBlock) prompt = preambleBlock + prompt;
+    return prompt;
+}
+
+function showNGPromptPreview() {
+    const sampleContext =
+        'Existing context to consider when generating (do not repeat verbatim):\n'
+        + '(character cards, persona, selected lore books, and recent chat)\n\n';
+    const sampleThemes = 'Themes / story arcs to weave in:\n(your Themes / Story Arcs text)\n\n';
+    const prefill = narrative_guidance_moduleSettings.narrativeGuidanceGenerationPrompt || DEFAULT_NG_GENERATION_PROMPT;
+    const injectionTpl = narrative_guidance_moduleSettings.narrativeGuidanceInjectionPrompt || DEFAULT_NG_INJECTION_PROMPT;
+    const injection = __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParamsExtended__(injectionTpl, {
+        guidance: '(the generated guidance text, outer brackets stripped)',
+    });
+    showPromptPreview('Narrative Guidance — Prompt Preview', [
+        { label: 'System Prompt (fixed)', text: NG_GENERATION_SYSTEM_PROMPT },
+        { label: 'User Prompt (Generation Instructions template with sample values)', text: composeGenerationPrompt(sampleContext, sampleThemes) },
+        { label: 'Prefill (assistant prefix; kept at the start of the stored guidance)', text: prefill },
+        { label: 'Injection (added to the chat prompt before each AI turn while guidance is active)', text: injection },
+    ]);
+}
+
 async function regenGuidance(reason) {
     if (regenInProgress) {
         narrative_guidance_debug('regenGuidance — skipped (already running)');
@@ -5324,17 +5426,8 @@ async function regenGuidance(reason) {
         const prefill = narrative_guidance_moduleSettings.narrativeGuidanceGenerationPrompt
             || DEFAULT_NG_GENERATION_PROMPT;
 
-        const userPrompt =
-            `${preambleBlock}${themesBlock}` +
-            'Continue the bracketed paragraph below. Output a single short paragraph ' +
-            '(2–4 sentences) proposing where the story should head over the next several turns. ' +
-            'Describe direction, mood, complications, and beats — not direct dialogue or scene actions. ' +
-            'Close the bracket when done.';
-
-        const systemPrompt =
-            'You are a story-direction assistant. Output only a single short paragraph ' +
-            'of narrative guidance in the requested bracketed format. ' +
-            'No commentary, no preamble, no explanations.';
+        const userPrompt = composeGenerationPrompt(preambleBlock, themesBlock);
+        const systemPrompt = NG_GENERATION_SYSTEM_PROMPT;
 
         narrative_guidance_debug('System prompt:', systemPrompt);
         narrative_guidance_debug('User prompt length:', userPrompt.length);
@@ -5351,7 +5444,9 @@ async function regenGuidance(reason) {
         // textarea shows prefill + model output as one block. The bracket
         // wrappers are stripped only at injection time (see reapplyInjection)
         // so the injected payload doesn't end up nested inside two brackets.
-        const cleaned = __WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(raw).trim();
+        // Backends that ignore the assistant prefix may re-emit the prefill;
+        // strip the echo so the stored block doesn't double its opening.
+        const cleaned = stripPrefillEcho(__WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(raw).trim(), prefill);
         if (!cleaned) {
             throw new Error('Model returned empty guidance.');
         }
@@ -5679,6 +5774,15 @@ function bindNarrativeGuidanceSettings(saveSettings) {
         });
     }
 
+    const userPromptArea = document.getElementById('ng_user_prompt_textarea');
+    if (userPromptArea) {
+        userPromptArea.value = narrative_guidance_moduleSettings.narrativeGuidancePrompt || DEFAULT_NG_USER_PROMPT;
+        userPromptArea.addEventListener('input', () => {
+            narrative_guidance_moduleSettings.narrativeGuidancePrompt = userPromptArea.value;
+            saveSettings();
+        });
+    }
+
     const genArea = document.getElementById('ng_generation_prompt_textarea');
     if (genArea) {
         genArea.value = narrative_guidance_moduleSettings.narrativeGuidanceGenerationPrompt || DEFAULT_NG_GENERATION_PROMPT;
@@ -5687,15 +5791,6 @@ function bindNarrativeGuidanceSettings(saveSettings) {
             saveSettings();
         });
     }
-
-    setupPromptTemplates({
-        promptKey: 'narrativeGuidanceGenerationPrompt',
-        defaultText: DEFAULT_NG_GENERATION_PROMPT,
-        textareaId: 'ng_generation_prompt_textarea',
-        containerId: 'ng_generation_prompt_templates',
-        settings: narrative_guidance_moduleSettings,
-        saveSettings,
-    });
 
     const injectArea = document.getElementById('ng_injection_prompt_textarea');
     if (injectArea) {
@@ -5711,14 +5806,8 @@ function bindNarrativeGuidanceSettings(saveSettings) {
         });
     }
 
-    setupPromptTemplates({
-        promptKey: 'narrativeGuidanceInjectionPrompt',
-        defaultText: DEFAULT_NG_INJECTION_PROMPT,
-        textareaId: 'ng_injection_prompt_textarea',
-        containerId: 'ng_injection_prompt_templates',
-        settings: narrative_guidance_moduleSettings,
-        saveSettings,
-    });
+    document.getElementById('ng_preview_btn')
+        ?.addEventListener('click', showNGPromptPreview);
 
     const depthInput = document.getElementById('ng_injection_depth');
     if (depthInput) {
@@ -5837,9 +5926,323 @@ function initNarrativeGuidance({ settings }) {
     narrative_guidance_debug('Module initialized');
 }
 
+;// ./src/prompt-templates.js
+/**
+ * Tool Presets — named, reusable bundles of every editable prompt/prefill a
+ * tool owns, replacing the old per-field prompt templates. One dropdown +
+ * Save/Update/Rename/Delete per tool keeps coupled fields (e.g. a prompt
+ * that describes its prefill's format) saved and restored together.
+ * Persisted at the extension-settings level (across chats) under
+ * `toolPresets` / `activeToolPreset`.
+ *
+ * The bound textareas remain the single live source of truth: selecting a
+ * preset loads each field's text into its textarea and re-dispatches `input`
+ * so the owning module's existing live-binding persists textarea → settings.
+ * Editing a textarea never silently mutates the preset — the dropdown shows
+ * "(modified)" until the user clicks Update or saves a new preset, and
+ * switching presets with unsaved changes asks for confirmation first.
+ */
+
+const DEFAULT_ID = '__default__';
+const DEFAULT_LABEL = 'Default';
+
+function isValidName(name, existingNames, currentName = null) {
+    if (!name || !name.trim()) return { ok: false, reason: 'Name cannot be empty.' };
+    const trimmed = name.trim();
+    if (trimmed === DEFAULT_ID) return { ok: false, reason: `Name "${DEFAULT_ID}" is reserved.` };
+    if (trimmed === DEFAULT_LABEL) return { ok: false, reason: `Name "${DEFAULT_LABEL}" is reserved.` };
+    if (trimmed !== currentName && existingNames.includes(trimmed)) {
+        return { ok: false, reason: `A preset named "${trimmed}" already exists.` };
+    }
+    return { ok: true, name: trimmed };
+}
+
+/**
+ * One-time migration from the legacy per-field template system
+ * (`promptTemplates` / `activePromptTemplate`) to per-tool presets.
+ *
+ * Each legacy named template becomes a preset whose other fields hold the
+ * built-in defaults; name collisions across a tool's fields get a
+ * "(Field Label)" suffix. The legacy settings keys are left in place so a
+ * downgrade loses nothing. Every tool's active preset starts at Default and
+ * the user's current live texts are preserved untouched — the dirty marker
+ * shows "(modified)" where they had customized.
+ *
+ * @param {object} settings - Shared mutable settings reference.
+ * @param {Array<{ toolKey: string, fields: Array<{ key: string, label: string, defaultText: string, legacyDefaultText?: string }> }>} tools
+ * @returns {boolean} `true` if a migration ran (caller should save settings).
+ */
+function migrateLegacyToolPresets(settings, tools) {
+    if (settings.toolPresets && typeof settings.toolPresets === 'object') return false;
+
+    settings.toolPresets = {};
+    settings.activeToolPreset = {};
+    for (const tool of tools) {
+        settings.toolPresets[tool.toolKey] = {};
+        settings.activeToolPreset[tool.toolKey] = DEFAULT_ID;
+
+        // Saved settings from versions whose default templates predate the
+        // {{macro}} placeholders hold the old default text verbatim. Upgrade
+        // exact matches to the current default so untouched installs don't
+        // show a spurious "(modified)" marker (assembled output is identical
+        // either way).
+        for (const field of tool.fields) {
+            if (field.legacyDefaultText !== undefined
+                && settings[field.key] === field.legacyDefaultText) {
+                settings[field.key] = field.defaultText;
+            }
+        }
+    }
+
+    const legacy = settings.promptTemplates;
+    if (legacy && typeof legacy === 'object') {
+        for (const tool of tools) {
+            const presets = settings.toolPresets[tool.toolKey];
+            for (const field of tool.fields) {
+                const saved = legacy[field.key];
+                if (!saved || typeof saved !== 'object') continue;
+                for (const [name, text] of Object.entries(saved)) {
+                    if (typeof text !== 'string') continue;
+                    let presetName = name;
+                    if (presets[presetName] !== undefined) presetName = `${name} (${field.label})`;
+                    let n = 2;
+                    while (presets[presetName] !== undefined) presetName = `${name} (${field.label} ${n++})`;
+                    const preset = {};
+                    for (const f of tool.fields) {
+                        preset[f.key] = (f.key === field.key) ? text : f.defaultText;
+                    }
+                    presets[presetName] = preset;
+                }
+            }
+        }
+    }
+    return true;
+}
+
+/**
+ * Render a preset dropdown + action buttons for one tool.
+ *
+ * @param {object} opts
+ * @param {string}   opts.toolKey       Tool id, e.g. 'acc'.
+ * @param {string}   opts.label         Human label used in confirm dialogs.
+ * @param {string}   opts.containerId   Id of the empty <div> to render into (no '#').
+ * @param {Array<{ key: string, label: string, textareaId: string, defaultText: string }>} opts.fields
+ *                   The settings keys / textareas bundled into this tool's presets.
+ * @param {object}   opts.settings      Shared mutable settings reference.
+ * @param {Function} opts.saveSettings  () => void — persists settings.
+ */
+function setupToolPresets({ toolKey, label, containerId, fields, settings, saveSettings }) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (!settings.toolPresets) settings.toolPresets = {};
+    if (!settings.activeToolPreset) settings.activeToolPreset = {};
+    if (!settings.toolPresets[toolKey]) settings.toolPresets[toolKey] = {};
+    if (!settings.activeToolPreset[toolKey]) settings.activeToolPreset[toolKey] = DEFAULT_ID;
+
+    container.innerHTML = `
+        <select class="text_pole saints_template_select" id="${containerId}_select"></select>
+        <div class="saints_template_buttons">
+            <div class="menu_button" data-action="save" title="Save the current texts of every ${label} prompt field as a new named preset">
+                <span class="fa-solid fa-plus"></span> Save as New
+            </div>
+            <div class="menu_button" data-action="update" title="Overwrite the selected preset with the current texts">
+                <span class="fa-solid fa-floppy-disk"></span> Update
+            </div>
+            <div class="menu_button" data-action="rename" title="Rename the selected preset">
+                <span class="fa-solid fa-pen"></span> Rename
+            </div>
+            <div class="menu_button" data-action="delete" title="Delete the selected preset">
+                <span class="fa-solid fa-trash"></span> Delete
+            </div>
+        </div>
+    `;
+
+    const select = container.querySelector('select');
+    const buttons = {
+        save:   container.querySelector('[data-action="save"]'),
+        update: container.querySelector('[data-action="update"]'),
+        rename: container.querySelector('[data-action="rename"]'),
+        delete: container.querySelector('[data-action="delete"]'),
+    };
+
+    const presets = () => settings.toolPresets[toolKey];
+
+    function getActiveId() {
+        return settings.activeToolPreset[toolKey] || DEFAULT_ID;
+    }
+
+    function getPresetValues(id) {
+        const values = {};
+        const stored = id === DEFAULT_ID ? null : presets()[id];
+        for (const field of fields) {
+            const text = stored?.[field.key];
+            values[field.key] = (typeof text === 'string') ? text : field.defaultText;
+        }
+        return values;
+    }
+
+    function getCurrentValues() {
+        const values = {};
+        for (const field of fields) {
+            const live = settings[field.key];
+            values[field.key] = (typeof live === 'string') ? live : field.defaultText;
+        }
+        return values;
+    }
+
+    function isDirty() {
+        const current = getCurrentValues();
+        const preset = getPresetValues(getActiveId());
+        return fields.some(f => current[f.key] !== preset[f.key]);
+    }
+
+    function refreshDirtyMarker() {
+        const dirty = isDirty();
+        const active = getActiveId();
+        for (const opt of select.options) {
+            const base = opt.value === DEFAULT_ID ? DEFAULT_LABEL : opt.value;
+            opt.textContent = (opt.value === active && dirty) ? `${base} (modified)` : base;
+        }
+        select.title = dirty
+            ? 'The prompt fields differ from this preset. Use Update or Save as New to keep the changes.'
+            : '';
+    }
+
+    function refreshDropdown() {
+        const active = getActiveId();
+        const names = Object.keys(presets()).sort((a, b) => a.localeCompare(b));
+        select.innerHTML = '';
+        select.appendChild(new Option(DEFAULT_LABEL, DEFAULT_ID, false, active === DEFAULT_ID));
+        for (const name of names) {
+            select.appendChild(new Option(name, name, false, active === name));
+        }
+        refreshButtonStates();
+        refreshDirtyMarker();
+    }
+
+    function refreshButtonStates() {
+        const isDefault = getActiveId() === DEFAULT_ID;
+        buttons.update.classList.toggle('disabled', isDefault);
+        buttons.rename.classList.toggle('disabled', isDefault);
+        buttons.delete.classList.toggle('disabled', isDefault);
+    }
+
+    function loadPresetIntoTextareas(id) {
+        const values = getPresetValues(id);
+        for (const field of fields) {
+            const textarea = document.getElementById(field.textareaId);
+            if (textarea) {
+                textarea.value = values[field.key];
+                // Re-dispatch input so the owning module's live-binding
+                // persists the new text into settings.
+                textarea.dispatchEvent(new Event('input', { bubbles: true }));
+            } else {
+                settings[field.key] = values[field.key];
+            }
+        }
+    }
+
+    function existingNames() {
+        return Object.keys(presets());
+    }
+
+    // ── Actions ──
+
+    buttons.save.addEventListener('click', () => {
+        const raw = window.prompt(`Name for the new ${label} preset:`, '');
+        if (raw === null) return;
+        const result = isValidName(raw, existingNames());
+        if (!result.ok) {
+            window.alert(result.reason);
+            return;
+        }
+        presets()[result.name] = getCurrentValues();
+        settings.activeToolPreset[toolKey] = result.name;
+        saveSettings();
+        refreshDropdown();
+    });
+
+    buttons.update.addEventListener('click', () => {
+        const active = getActiveId();
+        if (active === DEFAULT_ID) return;
+        presets()[active] = getCurrentValues();
+        saveSettings();
+        refreshDirtyMarker();
+    });
+
+    buttons.rename.addEventListener('click', () => {
+        const active = getActiveId();
+        if (active === DEFAULT_ID) return;
+        const raw = window.prompt('Rename preset:', active);
+        if (raw === null) return;
+        const result = isValidName(raw, existingNames(), active);
+        if (!result.ok) {
+            window.alert(result.reason);
+            return;
+        }
+        if (result.name === active) return;
+        presets()[result.name] = presets()[active];
+        delete presets()[active];
+        settings.activeToolPreset[toolKey] = result.name;
+        saveSettings();
+        refreshDropdown();
+    });
+
+    buttons.delete.addEventListener('click', () => {
+        const active = getActiveId();
+        if (active === DEFAULT_ID) return;
+        if (!window.confirm(`Delete preset "${active}"?`)) return;
+        delete presets()[active];
+        // Non-destructive: keep the live texts and fall back to Default —
+        // the dirty marker shows "(modified)" if they differ from it.
+        settings.activeToolPreset[toolKey] = DEFAULT_ID;
+        saveSettings();
+        refreshDropdown();
+    });
+
+    select.addEventListener('change', () => {
+        const previous = getActiveId();
+        if (select.value === previous) return;
+        if (isDirty()) {
+            const ok = window.confirm(
+                `The ${label} prompt fields have unsaved changes that will be replaced by `
+                + `"${select.value === DEFAULT_ID ? DEFAULT_LABEL : select.value}". Discard them?`,
+            );
+            if (!ok) {
+                select.value = previous;
+                return;
+            }
+        }
+        settings.activeToolPreset[toolKey] = select.value;
+        saveSettings();
+        loadPresetIntoTextareas(select.value);
+        refreshButtonStates();
+        refreshDirtyMarker();
+    });
+
+    // ── Dirty tracking ──
+
+    // Modules bind their settings persistence to 'input' before this widget
+    // is set up, so by the time this listener runs the settings value is
+    // already current.
+    for (const field of fields) {
+        document.getElementById(field.textareaId)
+            ?.addEventListener('input', refreshDirtyMarker);
+    }
+
+    // ── Initial paint ──
+
+    // Never overwrite the textareas at init: the modules already loaded the
+    // live settings values into them, and those are the source of truth. If
+    // they differ from the active preset, the dirty marker says so.
+    refreshDropdown();
+}
+
 ;// ./src/index.js
 // Saint's Silly Extensions — Possession, Phrasing, and Assisted Character Creation
 // Allows the user to "possess" a character, enrich messages with AI narration, and create characters with LLM assistance.
+
 
 
 
@@ -5880,6 +6283,7 @@ const defaultSettings = {
     narrativeGuidanceEnabled: false,
     narrativeGuidanceAutoRegen: true,
     narrativeGuidanceDebugMode: false,
+    narrativeGuidancePrompt: DEFAULT_NG_USER_PROMPT,
     narrativeGuidanceGenerationPrompt: DEFAULT_NG_GENERATION_PROMPT,
     narrativeGuidanceInjectionPrompt: DEFAULT_NG_INJECTION_PROMPT,
     narrativeGuidanceDefaultTurnCount: DEFAULT_NG_TURN_COUNT,
@@ -5889,29 +6293,65 @@ const defaultSettings = {
     narrativeGuidanceInjectionRole: DEFAULT_NG_INJECTION_ROLE,
     narrativeGuidanceLoreBookNames: [],
     silentGenerationDebugMode: false,
-    promptTemplates: {
-        phrasingPrompt: {},
-        phrasingInversePrompt: {},
-        accPrompt: {},
-        accPrefill: {},
-        wiaPrompt: {},
-        wiaPrefillTitled: {},
-        wiaPrefillUntitled: {},
-        narrativeGuidanceGenerationPrompt: {},
-        narrativeGuidanceInjectionPrompt: {},
-    },
-    activePromptTemplate: {
-        phrasingPrompt: '__default__',
-        phrasingInversePrompt: '__default__',
-        accPrompt: '__default__',
-        accPrefill: '__default__',
-        wiaPrompt: '__default__',
-        wiaPrefillTitled: '__default__',
-        wiaPrefillUntitled: '__default__',
-        narrativeGuidanceGenerationPrompt: '__default__',
-        narrativeGuidanceInjectionPrompt: '__default__',
-    },
+    // toolPresets / activeToolPreset are intentionally absent here:
+    // migrateLegacyToolPresets initializes them (and converts any legacy
+    // per-field promptTemplates) on first load. Listing them as defaults
+    // would make the merged settings look already-migrated.
 };
+
+// The pre-macro default templates, reconstructed from the current ones so
+// the migration can recognize (and upgrade) untouched installs. Must mirror
+// exactly how the {{context}} / {{brief}} / {{guidance}} placeholders were
+// added to the defaults.
+const LEGACY_DEFAULT_ACC_PROMPT = DEFAULT_ACC_PROMPT
+    .replace('{{context}}', '')
+    .replace('\n\nCharacter Brief:\n{{brief}}', '');
+const LEGACY_DEFAULT_WIA_PROMPT = DEFAULT_WIA_PROMPT
+    .replace('{{context}}', '')
+    .replace('\n\nGuidance from the user:\n{{guidance}}', '');
+
+// Registry of every preset-managed prompt field, grouped per tool. Drives
+// both the legacy-template migration and the per-tool preset widgets.
+const TOOL_PRESET_CONFIG = [
+    {
+        toolKey: 'phrasing',
+        label: 'Phrasing',
+        containerId: 'phrasing_presets',
+        fields: [
+            { key: 'phrasingPrompt', label: 'Prompt', textareaId: 'phrasing_prompt_textarea', defaultText: DEFAULT_PHRASING_PROMPT },
+            { key: 'phrasingInversePrompt', label: 'Inverse Prompt', textareaId: 'phrasing_inverse_prompt_textarea', defaultText: DEFAULT_PHRASING_INVERSE_PROMPT },
+        ],
+    },
+    {
+        toolKey: 'acc',
+        label: 'Character Creation',
+        containerId: 'acc_presets',
+        fields: [
+            { key: 'accPrompt', label: 'Prompt', textareaId: 'acc_prompt_textarea', defaultText: DEFAULT_ACC_PROMPT, legacyDefaultText: LEGACY_DEFAULT_ACC_PROMPT },
+            { key: 'accPrefill', label: 'Prefill', textareaId: 'acc_prefill_textarea', defaultText: DEFAULT_ACC_PREFILL },
+        ],
+    },
+    {
+        toolKey: 'wia',
+        label: 'World Info Assist',
+        containerId: 'wia_presets',
+        fields: [
+            { key: 'wiaPrompt', label: 'Prompt', textareaId: 'wia_prompt_textarea', defaultText: DEFAULT_WIA_PROMPT, legacyDefaultText: LEGACY_DEFAULT_WIA_PROMPT },
+            { key: 'wiaPrefillTitled', label: 'Prefill Titled', textareaId: 'wia_prefill_titled_textarea', defaultText: DEFAULT_WIA_PREFILL_TITLED },
+            { key: 'wiaPrefillUntitled', label: 'Prefill Untitled', textareaId: 'wia_prefill_untitled_textarea', defaultText: DEFAULT_WIA_PREFILL_UNTITLED },
+        ],
+    },
+    {
+        toolKey: 'ng',
+        label: 'Narrative Guidance',
+        containerId: 'ng_presets',
+        fields: [
+            { key: 'narrativeGuidancePrompt', label: 'Instructions', textareaId: 'ng_user_prompt_textarea', defaultText: DEFAULT_NG_USER_PROMPT },
+            { key: 'narrativeGuidanceGenerationPrompt', label: 'Prefill', textareaId: 'ng_generation_prompt_textarea', defaultText: DEFAULT_NG_GENERATION_PROMPT },
+            { key: 'narrativeGuidanceInjectionPrompt', label: 'Injection', textareaId: 'ng_injection_prompt_textarea', defaultText: DEFAULT_NG_INJECTION_PROMPT },
+        ],
+    },
+];
 
 // ─── State ───
 
@@ -5928,6 +6368,10 @@ function saveSettings() {
 
 function loadSettings() {
     src_settings = loadExtensionSettings(EXTENSION_NAME, defaultSettings);
+    if (migrateLegacyToolPresets(src_settings, TOOL_PRESET_CONFIG)) {
+        SSEDebug('Migrated legacy prompt templates to tool presets');
+        saveSettings();
+    }
     SSEDebug('Settings loaded:', JSON.stringify(src_settings));
 }
 
@@ -5945,6 +6389,12 @@ function injectSettingsPanel() {
     bindWIASettings(saveSettings);
     bindNarrativeGuidanceSettings(saveSettings);
     bindSilentGenerationSettings(saveSettings);
+
+    // Preset widgets go last: the module bindings above must attach their
+    // textarea → settings listeners first so preset loads persist correctly.
+    for (const tool of TOOL_PRESET_CONFIG) {
+        setupToolPresets({ ...tool, settings: src_settings, saveSettings });
+    }
 }
 
 // ─── Merged Event Handlers ───

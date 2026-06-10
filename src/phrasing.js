@@ -18,8 +18,8 @@ import {
     confirmActiveMessageEdit,
     getEditingMessageIndex,
     waitForGenerationEnd,
+    showPromptPreview,
 } from './utils.js';
-import { setupPromptTemplates } from './prompt-templates.js';
 
 // ─── Constants ───
 
@@ -455,22 +455,26 @@ export function bindPhrasingSettings(saveSettings) {
         });
     }
 
-    setupPromptTemplates({
-        promptKey: 'phrasingPrompt',
-        defaultText: DEFAULT_PHRASING_PROMPT,
-        textareaId: 'phrasing_prompt_textarea',
-        containerId: 'phrasing_prompt_templates',
-        settings: ctx.settings,
-        saveSettings,
-    });
-    setupPromptTemplates({
-        promptKey: 'phrasingInversePrompt',
-        defaultText: DEFAULT_PHRASING_INVERSE_PROMPT,
-        textareaId: 'phrasing_inverse_prompt_textarea',
-        containerId: 'phrasing_inverse_prompt_templates',
-        settings: ctx.settings,
-        saveSettings,
-    });
+    document.getElementById('phrasing_preview_btn')
+        ?.addEventListener('click', showPhrasingPromptPreview);
+}
+
+function showPhrasingPromptPreview() {
+    const sampleSeed = 'User: (the message text being rephrased)';
+    const sampleSwipes = formatSwipesContext(
+        ['(first existing variation)', '(second existing variation)'],
+        'User',
+    );
+    showPromptPreview('Phrasing! — Injection Preview', [
+        {
+            label: 'Standard injection (added to the chat prompt as a system message at depth 0 for the rephrase generation)',
+            text: assemblePrompt(sampleSeed),
+        },
+        {
+            label: 'Inverse Guidance injection (used instead when Inverse Guidance is on)',
+            text: assemblePrompt(sampleSeed, sampleSwipes),
+        },
+    ]);
 }
 
 // ─── Slash Command ───

@@ -24,7 +24,7 @@ Enrich your messages with LLM-generated narration, actions, and detail that stay
   - **Editing a message** — Confirms the edit, then rephrases that message
   - **Text in input** — Enriches your typed text
 - **Seed text reinjection** — Rephrased messages remember their original seed prompt, so if you Continue a rephrased message the seed is reinjected to guide the continue generation
-- **Custom prompts** — Customize the phrasing prompt and save any number of named template variants (see Prompt Templates below)
+- **Custom prompts** — Customize the phrasing prompt and save any number of named preset variants (see Tool Presets & Prompt Preview below)
 - **Inverse Guidance** — Optional mode that feeds every existing swipe of the target message into the prompt and asks the model to produce a swipe that is wildly different in tone, pacing, and approach. Comes with its own editable prompt template (with `{{phrasingSwipes}}` and `{{phrasingSeed}}` placeholders).
 - **Possession-aware** — When possessing a character, phrasing generates in that character's voice; otherwise it uses the standard ST impersonate feature
 
@@ -32,7 +32,7 @@ Enrich your messages with LLM-generated narration, actions, and detail that stay
 
 A modal-based character creator that adds an **Assist** button to SillyTavern's character creation page, letting you draft a complete character description from a short brief.
 
-- **Customizable prompt template** — A built-in prompt instructs the model to produce a structured, bracketed character sheet covering name, age, physical description, voice, clothing, equipment, personality, motivations, backstory, relationships, secrets, and more. Edit it freely in the settings panel; save named variants and switch between them via the template dropdown (see Prompt Templates below).
+- **Customizable prompt template** — A built-in prompt instructs the model to produce a structured, bracketed character sheet covering name, age, physical description, voice, clothing, equipment, personality, motivations, backstory, relationships, secrets, and more. Edit it freely in the settings panel (with `{{context}}` / `{{brief}}` placeholders); save the prompt + prefill together as named presets and preview the assembled prompt (see Tool Presets & Prompt Preview below).
 - **Max Tokens control** — A token-count input in the modal sets the response length for each generation (default 1000). Persisted between sessions.
 - **Character Brief** — Type a few sentences describing your concept, setting, and any anchor details. The prompt template is sent first, followed by the brief.
 - **Generate** — One-shot full character description from the brief; replaces the textarea.
@@ -54,7 +54,7 @@ Adds an **Assist** button to every World Info / lore book entry, letting you dra
 - **Dedicated Assist Guidance field** — A separate guidance textarea sits between the Assist button row and the entry's content textarea. Type a rough idea, tone, canon notes, or anything else you want the model to consider — it's used as the seed for every Assist / Retry / Continue on that entry. The guidance is saved on the entry itself (in its `extensions` field) so it persists across page reloads and travels with the lorebook on export.
 - **Continue / Retry** — After a generation, the Assist button is replaced by Continue (extends the current entry) and Retry (re-runs Assist with your saved guidance, replacing the content).
 - **Clear buttons** — One-click buttons clear the guidance field or the entry's content independently.
-- **Editable prompt template** — The default prompt instructs the model to emit a `[ Subject: Description ]` world lore artifact with no commentary. You can edit it freely in the settings panel; save named variants and switch between them via the template dropdown (see Prompt Templates below).
+- **Editable prompt template** — The default prompt instructs the model to emit a `[ Subject: Description ]` world lore artifact with no commentary. You can edit it freely in the settings panel (with `{{context}}` / `{{guidance}}` / `{{title}}` placeholders); save the prompt + prefills together as named presets and preview the assembled prompt (see Tool Presets & Prompt Preview below).
 - **No schema** — Unlike Assisted Character Creation, World Info Assist has no schema. The prompt itself defines the desired output format.
 
 ### Narrative Guidance
@@ -64,7 +64,7 @@ Periodically asks the LLM for a short paragraph of story guidance based on the c
 - **Per-chat state** — Active guidance, remaining turn count, and themes/ideas are persisted per chat (via `chatMetadata`) and reload automatically when switching chats.
 - **Auto-regenerate at zero** — When the turn counter hits zero on the AI's reply that decrements it, a new guidance paragraph is generated in the background so it's ready before your next send. A full-screen overlay masks the UI for the duration of the regeneration so you can't accidentally send a message mid-regen. Optional — turn it off to keep the counter purely as a manual prompt.
 - **Manual regenerate** — A **Regenerate Now** button in the settings panel forces a fresh generation at any time. The `-1` and `Reset` buttons next to the remaining-turn display let you nudge or reset the counter without regenerating.
-- **Editable everything** — The generation prompt (used as a prefill for a text-completion-style call), the injection template (with `{{guidance}}` placeholder), and the live guidance paragraph itself are all directly editable. Edits to the active guidance apply on the next AI turn.
+- **Editable everything** — The generation instructions (the user prompt, with `{{context}}` / `{{themes}}` placeholders), the prefill the model continues from, the injection template (with `{{guidance}}` placeholder), and the live guidance paragraph itself are all directly editable. Edits to the active guidance apply on the next AI turn.
 - **Themes / arcs input** — A per-chat textarea where you can offer themes, ideas, or general arcs for the model to weave into the next round of guidance.
 - **Injection controls** — Depth and Role inputs (mirroring SillyTavern's Author's Note) control where in the prompt the guidance is inserted and which role it speaks as.
 - **Lore book picker** — Pick which lore books to feed into the guidance generation's context preamble.
@@ -164,8 +164,9 @@ Open **Extensions** > **Saint's Silly Extensions** in SillyTavern's settings pan
 | Enable Phrasing! | Toggle the phrasing feature on/off |
 | Debug Mode | Log detailed phrasing events to the browser console |
 | Inverse Guidance | When enabled, rephrasing a message includes all of its existing swipes in the prompt and asks the model to produce something wildly different |
-| Prompt Template | Customize the AI prompt used for enrichment. Save named variants via the template dropdown below the textarea. |
-| Inverse Guidance Prompt Template | Customize the prompt used when Inverse Guidance is on. Supports `{{phrasingSeed}}` and `{{phrasingSwipes}}` placeholders. Save named variants via the template dropdown below the textarea. |
+| Preset / Preview Assembled Prompt | Save named bundles of both Phrasing prompt fields and preview exactly what gets injected (see Tool Presets & Prompt Preview below) |
+| Prompt Template | Customize the AI prompt used for enrichment. Supports the `{{phrasingSeed}}` placeholder. |
+| Inverse Guidance Prompt Template | Customize the prompt used when Inverse Guidance is on. Supports `{{phrasingSeed}}` and `{{phrasingSwipes}}` placeholders. |
 
 ### Assisted Character Creation Settings
 
@@ -174,7 +175,9 @@ Open **Extensions** > **Saint's Silly Extensions** in SillyTavern's settings pan
 | Enable Assisted Character Creation | Toggle the ACC feature and its Assist button on the character page |
 | ACC Debug Mode | Log detailed ACC events, prompts, and generations to the browser console |
 | Max Context Override | If > 0, caps how many tokens of chat context the preamble packer uses for ACC generations. 0 = use the model's full context size. |
-| Prompt Template | Customize the prompt sent to the LLM for character generation. Sent first, followed by the user's Character Brief. Save named variants via the template dropdown below the textarea. |
+| Preset / Preview Assembled Prompt | Save named bundles of the ACC prompt + prefill and preview exactly what gets sent (see Tool Presets & Prompt Preview below) |
+| Prompt Template | Customize the prompt sent to the LLM for character generation. Supports `{{context}}` and `{{brief}}` placeholders; if missing, the context is prepended and the brief appended automatically. |
+| Prefill Template | The assistant prefix the model continues from, also kept at the top of the final description. If the backend ignores prefills and the model repeats it, the echo is stripped automatically. |
 
 ### World Info Assist Settings
 
@@ -183,7 +186,9 @@ Open **Extensions** > **Saint's Silly Extensions** in SillyTavern's settings pan
 | Enable World Info Assist | Toggle the WI Assist feature and inject/remove its per-entry Assist buttons |
 | WI Assist Debug Mode | Log detailed WI Assist events, prompts, and generations to the browser console |
 | Max Context Override | If > 0, caps how many tokens of chat context the preamble packer uses for WIA generations. 0 = use the model's full context size. |
-| Prompt Template | Customize the prompt sent to the LLM for World Info entry generation. Save named variants via the template dropdown below the textarea. |
+| Preset / Preview Assembled Prompt | Save named bundles of the WIA prompt + both prefills and preview exactly what gets sent (see Tool Presets & Prompt Preview below) |
+| Prompt Template | Customize the prompt sent to the LLM for World Info entry generation. Supports `{{context}}`, `{{guidance}}`, and `{{title}}` placeholders; if context/guidance are missing, those blocks are added automatically. |
+| Prefill Templates (Titled / Untitled) | The assistant prefixes used when the entry has / lacks a title, also kept at the start of the entry on success. Titled supports `{{title}}`. Prefill echoes from backends that ignore prefills are stripped automatically. |
 
 ### Narrative Guidance Settings
 
@@ -195,7 +200,9 @@ Open **Extensions** > **Saint's Silly Extensions** in SillyTavern's settings pan
 | Turns Between Regenerations | How many AI replies elapse between automatic regenerations (default 10) |
 | Response Token Limit | Maximum tokens the model may use for each guidance paragraph (default 400) |
 | Max Context Override | If > 0, caps how many tokens of chat context the preamble packer uses for guidance generations. 0 = use the model's full context size. |
-| Generation Prompt | Prefill text the LLM continues to produce the guidance paragraph |
+| Preset / Preview Assembled Prompt | Save named bundles of the three NG prompt fields and preview exactly what gets sent (see Tool Presets & Prompt Preview below) |
+| Generation Instructions Template | The user prompt for each guidance generation. Supports `{{context}}` and `{{themes}}` placeholders; if missing, the blocks are prepended automatically. |
+| Prefill Template | The assistant prefix the LLM continues to produce the guidance paragraph; kept at the start of the stored guidance. Outer brackets are stripped at injection time. |
 | Injection Prompt Template | Template injected before each AI turn. Supports the `{{guidance}}` placeholder. |
 | Depth | Number of recent chat messages to insert the guidance after (0 = at the bottom) |
 | Role | Role used when injecting the guidance (System / User / Assistant) |
@@ -210,19 +217,32 @@ Open **Extensions** > **Saint's Silly Extensions** in SillyTavern's settings pan
 |---------|-------------|
 | Silent Generation Debug Mode | Log the silent-generation manager's lifecycle (job start/abort/completion, stop-listener events, stream token counts) to the browser console. Useful when diagnosing why a Stop button does or doesn't halt the LLM backend across ACC, WIA, and Narrative Guidance. |
 
-### Prompt Templates
+### Tool Presets & Prompt Preview
 
-Every editable prompt in the settings panel (Phrasing standard, Phrasing inverse, Assisted Character Creation, World Info Assist, Narrative Guidance generation, Narrative Guidance injection) has its own template dropdown directly below the textarea, plus four actions:
+Each tool's settings drawer (Phrasing, Assisted Character Creation, World Info Assist, Narrative Guidance) has a **Preset** block that saves and restores *all* of that tool's editable prompt fields together — so a prompt that describes its prefill's format always travels with that prefill:
 
 | Control | Description |
 |---------|-------------|
-| Dropdown | Pick a saved template to load it into the textarea. The first entry, **Default**, is always present and non-deletable — it loads the built-in default text. |
-| Save as New | Save the current textarea content as a new named template. |
-| Update | Overwrite the currently selected template with the textarea content. Disabled when Default is selected. |
-| Rename | Rename the currently selected template. Disabled when Default is selected. |
-| Delete | Delete the currently selected template; selection falls back to Default. Disabled when Default is selected. |
+| Dropdown | Pick a saved preset to load its texts into every prompt field of the tool. The first entry, **Default**, is always present and non-deletable — it loads the built-in default texts. The active entry shows **(modified)** whenever any field differs from the saved preset; switching presets with unsaved changes asks for confirmation first. |
+| Save as New | Save the current texts of all of the tool's prompt fields as a new named preset. |
+| Update | Overwrite the currently selected preset with the current texts. Disabled when Default is selected. |
+| Rename | Rename the currently selected preset. Disabled when Default is selected. |
+| Delete | Delete the currently selected preset; selection falls back to Default without touching the current texts. Disabled when Default is selected. |
 
-Templates persist at the extension-settings level and are shared across all chats. Phrasing! no longer offers a "Save to Chat" prompt-override; templates supersede it.
+Presets persist at the extension-settings level and are shared across all chats. Templates saved with the older per-field system are converted to presets automatically on first load.
+
+Next to each Preset block, **Preview Assembled Prompt** opens a read-only popup showing exactly what the tool will send to the model — the fixed system prompt, the fully assembled user prompt (with sample values in place of your brief/guidance/context), and the prefill(s) — so there is never any mystery about what surrounds your template.
+
+#### Template placeholders
+
+Generation templates support tool-specific placeholders, substituted in place. If a placeholder is omitted, the corresponding block is added automatically in the legacy position (context prepended, brief/guidance appended), so older custom templates keep working unchanged.
+
+| Tool | Placeholders |
+|------|--------------|
+| Phrasing | `{{phrasingSeed}}`, `{{phrasingSwipes}}` (inverse prompt only) |
+| Assisted Character Creation | `{{context}}`, `{{brief}}` |
+| World Info Assist | `{{context}}`, `{{guidance}}`, `{{title}}` |
+| Narrative Guidance | `{{context}}`, `{{themes}}` (generation instructions); `{{guidance}}` (injection template) |
 
 ## Slash Commands
 

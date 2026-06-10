@@ -24,23 +24,39 @@ import {
     createLoreBookPicker,
     streamingGenerate,
     withSingleLineDisabled,
+    applyTemplateMacros,
+    stripPrefillEcho,
+    showPromptPreview,
 } from './utils.js';
 import {
     isSilentGenerationAbort,
     abortAllGenerations,
 } from './silent-generation.js';
-import { setupPromptTemplates } from './prompt-templates.js';
 
 // ─── Constants ───
 
 const NG_INJECTION_KEY = 'narrative_guidance';
 const NG_METADATA_KEY = 'narrativeGuidance';
 
+// User-prompt template for guidance generation. {{context}} and {{themes}}
+// are replaced by the packed chat/lore preamble and the per-chat themes
+// block; if either placeholder is missing, the block is prepended instead.
+export const DEFAULT_NG_USER_PROMPT =
+    '{{context}}{{themes}}Continue the bracketed paragraph below. Output a single short paragraph ' +
+    '(2–4 sentences) proposing where the story should head over the next several turns. ' +
+    'Describe direction, mood, complications, and beats — not direct dialogue or scene actions. ' +
+    'Close the bracket when done.';
+
 export const DEFAULT_NG_GENERATION_PROMPT =
     '[The following paragraph is based on the given context, and will guide the actions of the characters for the next several turns:';
 
 export const DEFAULT_NG_INJECTION_PROMPT =
     '[Guide the story in the following direction: {{guidance}}]';
+
+const NG_GENERATION_SYSTEM_PROMPT =
+    'You are a story-direction assistant. Output only a single short paragraph ' +
+    'of narrative guidance in the requested bracketed format. ' +
+    'No commentary, no preamble, no explanations.';
 
 export const DEFAULT_NG_TURN_COUNT = 10;
 export const DEFAULT_NG_INJECTION_DEPTH = 0;
@@ -154,6 +170,45 @@ function stripBracketWrap(text) {
     return out;
 }
 
+/**
+ * Assemble the guidance-generation user prompt from the editable template.
+ * {{context}} / {{themes}} are substituted in place; when a placeholder is
+ * absent the corresponding block is prepended (context first), matching the
+ * pre-template behavior.
+ */
+function composeGenerationPrompt(preambleBlock, themesBlock) {
+    const tpl = (typeof moduleSettings?.narrativeGuidancePrompt === 'string'
+        && moduleSettings.narrativeGuidancePrompt.trim())
+        ? moduleSettings.narrativeGuidancePrompt
+        : DEFAULT_NG_USER_PROMPT;
+    const { text, used } = applyTemplateMacros(tpl, {
+        context: preambleBlock || '',
+        themes: themesBlock || '',
+    });
+    let prompt = text;
+    if (!used.has('themes') && themesBlock) prompt = themesBlock + prompt;
+    if (!used.has('context') && preambleBlock) prompt = preambleBlock + prompt;
+    return prompt;
+}
+
+function showNGPromptPreview() {
+    const sampleContext =
+        'Existing context to consider when generating (do not repeat verbatim):\n'
+        + '(character cards, persona, selected lore books, and recent chat)\n\n';
+    const sampleThemes = 'Themes / story arcs to weave in:\n(your Themes / Story Arcs text)\n\n';
+    const prefill = moduleSettings.narrativeGuidanceGenerationPrompt || DEFAULT_NG_GENERATION_PROMPT;
+    const injectionTpl = moduleSettings.narrativeGuidanceInjectionPrompt || DEFAULT_NG_INJECTION_PROMPT;
+    const injection = substituteParamsExtended(injectionTpl, {
+        guidance: '(the generated guidance text, outer brackets stripped)',
+    });
+    showPromptPreview('Narrative Guidance — Prompt Preview', [
+        { label: 'System Prompt (fixed)', text: NG_GENERATION_SYSTEM_PROMPT },
+        { label: 'User Prompt (Generation Instructions template with sample values)', text: composeGenerationPrompt(sampleContext, sampleThemes) },
+        { label: 'Prefill (assistant prefix; kept at the start of the stored guidance)', text: prefill },
+        { label: 'Injection (added to the chat prompt before each AI turn while guidance is active)', text: injection },
+    ]);
+}
+
 async function regenGuidance(reason) {
     if (regenInProgress) {
         debug('regenGuidance — skipped (already running)');
@@ -200,17 +255,8 @@ async function regenGuidance(reason) {
         const prefill = moduleSettings.narrativeGuidanceGenerationPrompt
             || DEFAULT_NG_GENERATION_PROMPT;
 
-        const userPrompt =
-            `${preambleBlock}${themesBlock}` +
-            'Continue the bracketed paragraph below. Output a single short paragraph ' +
-            '(2–4 sentences) proposing where the story should head over the next several turns. ' +
-            'Describe direction, mood, complications, and beats — not direct dialogue or scene actions. ' +
-            'Close the bracket when done.';
-
-        const systemPrompt =
-            'You are a story-direction assistant. Output only a single short paragraph ' +
-            'of narrative guidance in the requested bracketed format. ' +
-            'No commentary, no preamble, no explanations.';
+        const userPrompt = composeGenerationPrompt(preambleBlock, themesBlock);
+        const systemPrompt = NG_GENERATION_SYSTEM_PROMPT;
 
         debug('System prompt:', systemPrompt);
         debug('User prompt length:', userPrompt.length);
@@ -227,7 +273,9 @@ async function regenGuidance(reason) {
         // textarea shows prefill + model output as one block. The bracket
         // wrappers are stripped only at injection time (see reapplyInjection)
         // so the injected payload doesn't end up nested inside two brackets.
-        const cleaned = removeReasoningFromString(raw).trim();
+        // Backends that ignore the assistant prefix may re-emit the prefill;
+        // strip the echo so the stored block doesn't double its opening.
+        const cleaned = stripPrefillEcho(removeReasoningFromString(raw).trim(), prefill);
         if (!cleaned) {
             throw new Error('Model returned empty guidance.');
         }
@@ -555,6 +603,15 @@ export function bindNarrativeGuidanceSettings(saveSettings) {
         });
     }
 
+    const userPromptArea = document.getElementById('ng_user_prompt_textarea');
+    if (userPromptArea) {
+        userPromptArea.value = moduleSettings.narrativeGuidancePrompt || DEFAULT_NG_USER_PROMPT;
+        userPromptArea.addEventListener('input', () => {
+            moduleSettings.narrativeGuidancePrompt = userPromptArea.value;
+            saveSettings();
+        });
+    }
+
     const genArea = document.getElementById('ng_generation_prompt_textarea');
     if (genArea) {
         genArea.value = moduleSettings.narrativeGuidanceGenerationPrompt || DEFAULT_NG_GENERATION_PROMPT;
@@ -563,15 +620,6 @@ export function bindNarrativeGuidanceSettings(saveSettings) {
             saveSettings();
         });
     }
-
-    setupPromptTemplates({
-        promptKey: 'narrativeGuidanceGenerationPrompt',
-        defaultText: DEFAULT_NG_GENERATION_PROMPT,
-        textareaId: 'ng_generation_prompt_textarea',
-        containerId: 'ng_generation_prompt_templates',
-        settings: moduleSettings,
-        saveSettings,
-    });
 
     const injectArea = document.getElementById('ng_injection_prompt_textarea');
     if (injectArea) {
@@ -587,14 +635,8 @@ export function bindNarrativeGuidanceSettings(saveSettings) {
         });
     }
 
-    setupPromptTemplates({
-        promptKey: 'narrativeGuidanceInjectionPrompt',
-        defaultText: DEFAULT_NG_INJECTION_PROMPT,
-        textareaId: 'ng_injection_prompt_textarea',
-        containerId: 'ng_injection_prompt_templates',
-        settings: moduleSettings,
-        saveSettings,
-    });
+    document.getElementById('ng_preview_btn')
+        ?.addEventListener('click', showNGPromptPreview);
 
     const depthInput = document.getElementById('ng_injection_depth');
     if (depthInput) {

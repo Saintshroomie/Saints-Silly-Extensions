@@ -809,3 +809,54 @@
     pointer-events: none;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════════
+   TOOL PRESET BLOCK & PROMPT PREVIEW
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+#saints_silly_settings .saints_preset_block {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 8px 0;
+    padding: 8px;
+    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));
+    border-radius: 6px;
+}
+
+#saints_silly_settings .saints_preview_btn {
+    align-self: flex-start;
+    white-space: nowrap;
+}
+
+.sse-prompt-preview {
+    text-align: left;
+}
+
+.sse-prompt-preview h3 {
+    margin: 0 0 10px 0;
+}
+
+.sse-preview-section {
+    margin-bottom: 12px;
+}
+
+.sse-preview-label {
+    font-weight: bold;
+    opacity: 0.8;
+    margin-bottom: 4px;
+}
+
+.sse-preview-text {
+    white-space: pre-wrap;
+    word-break: break-word;
+    text-align: left;
+    font-size: calc(var(--mainFontSize, 14px) * 0.85);
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));
+    border-radius: 6px;
+    padding: 8px;
+    margin: 0;
+    max-height: 40vh;
+    overflow-y: auto;
+}
+

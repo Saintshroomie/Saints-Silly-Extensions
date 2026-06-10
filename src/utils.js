@@ -19,6 +19,7 @@ import {
 } from '../../../../world-info.js';
 import { getMaxPromptTokens } from '../../../../../script.js';
 import { getTokenCountAsync } from '../../../../tokenizers.js';
+import { Popup, POPUP_TYPE } from '../../../../popup.js';
 import { cancellableStreamingGenerate } from './silent-generation.js';
 
 // ─── Context ───
@@ -217,6 +218,110 @@ export async function withSingleLineDisabled(fn) {
     } finally {
         if (pus && original !== undefined) pus.single_line = original;
     }
+}
+
+// ─── Template Macros ───
+
+/**
+ * Replace this extension's own `{{key}}` placeholders in a prompt template.
+ *
+ * Deliberately NOT SillyTavern's macro engine: ST macros run on Phrasing's
+ * injection templates already, but the ACC/WIA templates contain literal
+ * `{{ .fooOverride ?? bar }}` override syntax that must pass through
+ * untouched, so generation prompts only get this narrow substitution.
+ *
+ * @param {string} template - Template text possibly containing `{{key}}` placeholders.
+ * @param {Record<string, string>} macros - key → replacement value.
+ * @returns {{ text: string, used: Set<string> }} The substituted text plus the
+ *          set of macro keys that were actually present. Callers use `used`
+ *          to fall back to appending/prepending a block when its placeholder
+ *          is absent, which keeps old templates working unchanged.
+ */
+export function applyTemplateMacros(template, macros) {
+    let text = template || '';
+    const used = new Set();
+    for (const [key, value] of Object.entries(macros)) {
+        const re = new RegExp(`\\{\\{\\s*${key}\\s*\\}\\}`, 'gi');
+        if (re.test(text)) {
+            used.add(key);
+            text = text.replace(new RegExp(re.source, 'gi'), () => value ?? '');
+        }
+    }
+    return { text, used };
+}
+
+// ─── Prefill Echo Stripping ───
+
+/**
+ * Strip a prefill echo from the start of a generation result.
+ *
+ * Backends that support assistant-prefix continuation return only the new
+ * text, so callers prepend the prefill to the result. Chat-completion
+ * backends that ignore the prefix (e.g. OpenAI) often start over and re-emit
+ * the prefill (or its final line), which would produce a doubled opening
+ * once the prefill is prepended. Detects a full-prefill echo or a final-line
+ * echo and removes it. Conservative: requires an exact match of at least a
+ * few characters, so legitimate output is never trimmed.
+ *
+ * @param {string} output  - Cleaned (trimmed) generation result.
+ * @param {string} prefill - The prefill that was sent as the assistant prefix.
+ * @returns {string} The output with any leading prefill echo removed.
+ */
+export function stripPrefillEcho(output, prefill) {
+    if (!output || !prefill) return output;
+    const whole = prefill.trim();
+    if (whole.length >= 3 && output.startsWith(whole)) {
+        return output.slice(whole.length).replace(/^\s+/, '');
+    }
+    const lines = prefill.split('\n').map(l => l.trim()).filter(Boolean);
+    const lastLine = lines[lines.length - 1];
+    if (lastLine && lastLine.length >= 4 && output.startsWith(lastLine)) {
+        return output.slice(lastLine.length).replace(/^\s+/, '');
+    }
+    return output;
+}
+
+// ─── Prompt Preview Popup ───
+
+/**
+ * Show a read-only popup laying out exactly what a tool will send to the
+ * model: system prompt, assembled user prompt, prefill, injection, etc.
+ *
+ * @param {string} title - Popup heading.
+ * @param {Array<{ label: string, text: string|null }>} sections - Sections to
+ *        render in order. Sections with `text == null` are skipped; empty
+ *        strings render as "(empty)".
+ */
+export function showPromptPreview(title, sections) {
+    const root = document.createElement('div');
+    root.className = 'sse-prompt-preview';
+
+    const heading = document.createElement('h3');
+    heading.textContent = title;
+    root.appendChild(heading);
+
+    for (const { label, text } of sections) {
+        if (text == null) continue;
+        const section = document.createElement('div');
+        section.className = 'sse-preview-section';
+        const labelEl = document.createElement('div');
+        labelEl.className = 'sse-preview-label';
+        labelEl.textContent = label;
+        const pre = document.createElement('pre');
+        pre.className = 'sse-preview-text';
+        pre.textContent = text || '(empty)';
+        section.appendChild(labelEl);
+        section.appendChild(pre);
+        root.appendChild(section);
+    }
+
+    const popup = new Popup(root, POPUP_TYPE.TEXT, '', {
+        okButton: 'Close',
+        wide: true,
+        large: true,
+        allowVerticalScrolling: true,
+    });
+    popup.show();
 }
 
 // ─── Generation Context Preamble ───
