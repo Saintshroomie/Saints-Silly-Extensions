@@ -538,13 +538,21 @@
 }
 
 /* Inline Clear-content button on the WIA controls row */
-.wia-controls .wia-btn-clear-content {
-    font-size: 0.85em;
-    padding: 4px 8px;
+/* Content-clear row — sits directly above the entry's content textarea so
+   it's unambiguous which field the button clears. */
+.wia-content-clear-row {
+    display: flex;
+    justify-content: flex-end;
+    margin: 2px 0 4px 0;
+}
+
+.wia-content-clear-row .wia-btn-clear-content {
+    font-size: 0.8em;
+    padding: 2px 8px;
     opacity: 0.85;
 }
 
-.wia-controls .wia-btn-clear-content:hover {
+.wia-content-clear-row .wia-btn-clear-content:hover {
     opacity: 1;
 }
 

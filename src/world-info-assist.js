@@ -192,10 +192,14 @@ export function rescanAllForms() {
 }
 
 /**
- * Remove all injected controls (used when the feature is disabled).
+ * Remove all injected controls (used when the feature is disabled). Must
+ * cover every element injectControls creates — the controls row, the
+ * guidance block, and the content-clear row — or a disable/enable cycle
+ * leaves orphans behind and then injects duplicates next to them.
  */
 export function removeAllControls() {
-    document.querySelectorAll('.wia-controls').forEach(el => el.remove());
+    document.querySelectorAll('.wia-controls, .wia-guidance-block, .wia-content-clear-row')
+        .forEach(el => el.remove());
 }
 
 function injectControls(formEl) {
@@ -237,9 +241,6 @@ function injectControls(formEl) {
         <div class="wia-btn wia-btn-retry menu_button interactable wia-hidden" title="Retry using your saved guidance">
             <span class="fa-solid fa-rotate-right"></span>
         </div>
-        <div class="wia-btn wia-btn-clear-content menu_button interactable" title="Clear this entry's content">
-            <span class="fa-solid fa-eraser"></span>
-        </div>
         <div class="wia-spinner wia-hidden" title="Generating..."><span class="fa-solid fa-spinner fa-spin"></span></div>
         <div class="wia-tokens-row">
             <label class="wia-tokens-label"><span class="fa-solid fa-coins"></span> Max Tokens:</label>
@@ -261,8 +262,8 @@ function injectControls(formEl) {
             <label class="wia-guidance-label" title="Free-form guidance for the LLM. Saved on the entry — persists across page reloads.">
                 <span class="fa-solid fa-pen"></span> Assist Guidance
             </label>
-            <div class="wia-btn wia-btn-clear-guidance menu_button interactable" title="Clear the guidance field">
-                <span class="fa-solid fa-eraser"></span> Clear
+            <div class="wia-btn wia-btn-clear-guidance menu_button interactable" title="Clear the guidance field (the field below)">
+                <span class="fa-solid fa-eraser"></span> Clear Guidance
             </div>
         </div>
         <textarea class="text_pole wia-guidance-textarea" rows="3"
@@ -271,12 +272,24 @@ function injectControls(formEl) {
     // Insert after the controls row, before the original label/textarea.
     controls.insertAdjacentElement('afterend', guidanceBlock);
 
+    // The content-clear button sits directly above the entry's content
+    // textarea (not in the top controls row) so it's unambiguous which
+    // field it clears — the guidance field has its own Clear in its header.
+    const contentClearRow = document.createElement('div');
+    contentClearRow.className = 'wia-content-clear-row';
+    contentClearRow.innerHTML = `
+        <div class="wia-btn wia-btn-clear-content menu_button interactable" title="Clear this entry's content (the field below)">
+            <span class="fa-solid fa-eraser"></span> Clear Content
+        </div>
+    `;
+    contentTextarea.insertAdjacentElement('beforebegin', contentClearRow);
+
     const guidanceTextarea = guidanceBlock.querySelector('.wia-guidance-textarea');
     const clearGuidanceBtn = guidanceBlock.querySelector('.wia-btn-clear-guidance');
     const assistBtn = controls.querySelector('.wia-btn-assist');
     const continueBtn = controls.querySelector('.wia-btn-continue');
     const retryBtn = controls.querySelector('.wia-btn-retry');
-    const clearContentBtn = controls.querySelector('.wia-btn-clear-content');
+    const clearContentBtn = contentClearRow.querySelector('.wia-btn-clear-content');
     const tokensInput = controls.querySelector('.wia-tokens-input');
 
     // Wire up persistence for the guidance field — read on mount, save on
