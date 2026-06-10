@@ -536,6 +536,9 @@ const PREAMBLE_FALLBACK_MESSAGE_LIMIT = 20;
  * Format a single chat message for inclusion in the preamble.
  */
 function formatChatLine(m, ctx) {
+    // Hidden / system messages are excluded from ST's own prompt building;
+    // keep them out of the preamble too.
+    if (m.is_system) return '';
     const who = m.name || (m.is_user ? (ctx.name1 || 'User') : (ctx.name2 || 'Character'));
     const text = (m.mes || '').trim();
     return text ? `${who}: ${text}` : '';

@@ -361,10 +361,12 @@ export function onGenerationStarted() {
 }
 
 export function onGenerationEnded() {
-    if (phrasingActive) {
-        clearPhrasingInjection();
-        phrasingActive = false;
-    }
+    // Always drop the injection — the generation that just ended has already
+    // consumed it. The Continue seed-reinjection path injects while
+    // phrasingActive is false, so a conditional clear would leave the rewrite
+    // instruction stuck in the prompt for every subsequent generation.
+    clearPhrasingInjection();
+    phrasingActive = false;
     showAllPhrasingButtons();
 }
 

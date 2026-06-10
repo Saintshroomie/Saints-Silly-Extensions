@@ -267,9 +267,14 @@ export async function cancellableStreamingGenerate(params, targetEl, { append = 
 
     return runCancellableSilentGeneration({
         name: jobName,
-        run: async (_signal) => {
+        run: async (signal) => {
             const result = await generateRaw(params);
             debug(`${jobName} — generateRaw resolved, length: ${(result || '').length}`);
+            // If the job was cancelled while generateRaw was in flight, the
+            // race in runCancellableSilentGeneration already rejected and the
+            // caller moved on — don't clobber the target with the discarded
+            // result (the user may have edited the field since).
+            if (signal.aborted) return result;
             if (targetEl && result) {
                 targetEl.value = append ? ((targetEl.value || '') + result) : result;
                 targetEl.scrollTop = targetEl.scrollHeight;

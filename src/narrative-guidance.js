@@ -71,21 +71,30 @@ function loadChatState() {
     };
 }
 
-function saveChatState(state) {
+function writeChatState(state) {
     const context = getContext();
     context.chatMetadata[NG_METADATA_KEY] = {
         guidance: state.guidance || '',
         turnsRemaining: Number.isFinite(state.turnsRemaining) ? state.turnsRemaining : 0,
         themes: state.themes || '',
     };
-    context.saveMetadata();
+}
+
+function saveChatState(state) {
+    writeChatState(state);
+    getContext().saveMetadata();
 }
 
 function scheduleChatStateSave(state) {
+    // Write through to chatMetadata immediately so a concurrent edit to the
+    // other textarea (which reloads state via loadChatState) or a chat switch
+    // never observes — or persists — stale state. Only the saveMetadata call
+    // is debounced.
+    writeChatState(state);
     if (saveTimer) clearTimeout(saveTimer);
     saveTimer = setTimeout(() => {
         saveTimer = null;
-        saveChatState(state);
+        getContext().saveMetadata();
     }, 200);
 }
 
@@ -242,7 +251,9 @@ async function regenGuidance(reason) {
             console.error('Narrative Guidance generation error:', err);
             toast(`Narrative guidance failed: ${err.message}`, 'error');
         }
-        // Restore whatever injection we had before clearing.
+        // Resync the textarea (the failed run may have left discarded model
+        // output in it) and restore whatever injection we had before clearing.
+        refreshPanelFromState();
         reapplyInjection();
     } finally {
         regenInProgress = false;
@@ -315,6 +326,9 @@ async function continueGuidance() {
             console.error('Narrative Guidance continue error:', err);
             toast(`Continue failed: ${err.message}`, 'error');
         }
+        // Resync the textarea — the failed run may have appended discarded
+        // model output that never made it into the saved state.
+        refreshPanelFromState();
     } finally {
         regenInProgress = false;
         ngActiveAction = null;
