@@ -538,13 +538,21 @@
 }
 
 /* Inline Clear-content button on the WIA controls row */
-.wia-controls .wia-btn-clear-content {
-    font-size: 0.85em;
-    padding: 4px 8px;
+/* Content-clear row — sits directly above the entry's content textarea so
+   it's unambiguous which field the button clears. */
+.wia-content-clear-row {
+    display: flex;
+    justify-content: flex-end;
+    margin: 2px 0 4px 0;
+}
+
+.wia-content-clear-row .wia-btn-clear-content {
+    font-size: 0.8em;
+    padding: 2px 8px;
     opacity: 0.85;
 }
 
-.wia-controls .wia-btn-clear-content:hover {
+.wia-content-clear-row .wia-btn-clear-content:hover {
     opacity: 1;
 }
 
@@ -807,5 +815,56 @@
 #saints_silly_settings .saints_template_buttons .menu_button.disabled {
     opacity: 0.5;
     pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   TOOL PRESET BLOCK & PROMPT PREVIEW
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+#saints_silly_settings .saints_preset_block {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 8px 0;
+    padding: 8px;
+    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));
+    border-radius: 6px;
+}
+
+#saints_silly_settings .saints_preview_btn {
+    align-self: flex-start;
+    white-space: nowrap;
+}
+
+.sse-prompt-preview {
+    text-align: left;
+}
+
+.sse-prompt-preview h3 {
+    margin: 0 0 10px 0;
+}
+
+.sse-preview-section {
+    margin-bottom: 12px;
+}
+
+.sse-preview-label {
+    font-weight: bold;
+    opacity: 0.8;
+    margin-bottom: 4px;
+}
+
+.sse-preview-text {
+    white-space: pre-wrap;
+    word-break: break-word;
+    text-align: left;
+    font-size: calc(var(--mainFontSize, 14px) * 0.85);
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));
+    border-radius: 6px;
+    padding: 8px;
+    margin: 0;
+    max-height: 40vh;
+    overflow-y: auto;
 }
 

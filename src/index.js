@@ -68,6 +68,7 @@ import {
     onNarrativeGuidanceChatChanged,
     onNarrativeGuidanceMessageSent,
     onNarrativeGuidanceMessageReceived,
+    DEFAULT_NG_USER_PROMPT,
     DEFAULT_NG_GENERATION_PROMPT,
     DEFAULT_NG_INJECTION_PROMPT,
     DEFAULT_NG_TURN_COUNT,
@@ -75,6 +76,10 @@ import {
     DEFAULT_NG_INJECTION_ROLE,
     DEFAULT_NG_RESPONSE_LENGTH,
 } from './narrative-guidance.js';
+import {
+    setupToolPresets,
+    migrateLegacyToolPresets,
+} from './prompt-templates.js';
 
 // ─── Constants ───
 
@@ -105,6 +110,7 @@ const defaultSettings = {
     narrativeGuidanceEnabled: false,
     narrativeGuidanceAutoRegen: true,
     narrativeGuidanceDebugMode: false,
+    narrativeGuidancePrompt: DEFAULT_NG_USER_PROMPT,
     narrativeGuidanceGenerationPrompt: DEFAULT_NG_GENERATION_PROMPT,
     narrativeGuidanceInjectionPrompt: DEFAULT_NG_INJECTION_PROMPT,
     narrativeGuidanceDefaultTurnCount: DEFAULT_NG_TURN_COUNT,
@@ -114,29 +120,65 @@ const defaultSettings = {
     narrativeGuidanceInjectionRole: DEFAULT_NG_INJECTION_ROLE,
     narrativeGuidanceLoreBookNames: [],
     silentGenerationDebugMode: false,
-    promptTemplates: {
-        phrasingPrompt: {},
-        phrasingInversePrompt: {},
-        accPrompt: {},
-        accPrefill: {},
-        wiaPrompt: {},
-        wiaPrefillTitled: {},
-        wiaPrefillUntitled: {},
-        narrativeGuidanceGenerationPrompt: {},
-        narrativeGuidanceInjectionPrompt: {},
-    },
-    activePromptTemplate: {
-        phrasingPrompt: '__default__',
-        phrasingInversePrompt: '__default__',
-        accPrompt: '__default__',
-        accPrefill: '__default__',
-        wiaPrompt: '__default__',
-        wiaPrefillTitled: '__default__',
-        wiaPrefillUntitled: '__default__',
-        narrativeGuidanceGenerationPrompt: '__default__',
-        narrativeGuidanceInjectionPrompt: '__default__',
-    },
+    // toolPresets / activeToolPreset are intentionally absent here:
+    // migrateLegacyToolPresets initializes them (and converts any legacy
+    // per-field promptTemplates) on first load. Listing them as defaults
+    // would make the merged settings look already-migrated.
 };
+
+// The pre-macro default templates, reconstructed from the current ones so
+// the migration can recognize (and upgrade) untouched installs. Must mirror
+// exactly how the {{context}} / {{brief}} / {{guidance}} placeholders were
+// added to the defaults.
+const LEGACY_DEFAULT_ACC_PROMPT = DEFAULT_ACC_PROMPT
+    .replace('{{context}}', '')
+    .replace('\n\nCharacter Brief:\n{{brief}}', '');
+const LEGACY_DEFAULT_WIA_PROMPT = DEFAULT_WIA_PROMPT
+    .replace('{{context}}', '')
+    .replace('\n\nGuidance from the user:\n{{guidance}}', '');
+
+// Registry of every preset-managed prompt field, grouped per tool. Drives
+// both the legacy-template migration and the per-tool preset widgets.
+const TOOL_PRESET_CONFIG = [
+    {
+        toolKey: 'phrasing',
+        label: 'Phrasing',
+        containerId: 'phrasing_presets',
+        fields: [
+            { key: 'phrasingPrompt', label: 'Prompt', textareaId: 'phrasing_prompt_textarea', defaultText: DEFAULT_PHRASING_PROMPT },
+            { key: 'phrasingInversePrompt', label: 'Inverse Prompt', textareaId: 'phrasing_inverse_prompt_textarea', defaultText: DEFAULT_PHRASING_INVERSE_PROMPT },
+        ],
+    },
+    {
+        toolKey: 'acc',
+        label: 'Character Creation',
+        containerId: 'acc_presets',
+        fields: [
+            { key: 'accPrompt', label: 'Prompt', textareaId: 'acc_prompt_textarea', defaultText: DEFAULT_ACC_PROMPT, legacyDefaultText: LEGACY_DEFAULT_ACC_PROMPT },
+            { key: 'accPrefill', label: 'Prefill', textareaId: 'acc_prefill_textarea', defaultText: DEFAULT_ACC_PREFILL },
+        ],
+    },
+    {
+        toolKey: 'wia',
+        label: 'World Info Assist',
+        containerId: 'wia_presets',
+        fields: [
+            { key: 'wiaPrompt', label: 'Prompt', textareaId: 'wia_prompt_textarea', defaultText: DEFAULT_WIA_PROMPT, legacyDefaultText: LEGACY_DEFAULT_WIA_PROMPT },
+            { key: 'wiaPrefillTitled', label: 'Prefill Titled', textareaId: 'wia_prefill_titled_textarea', defaultText: DEFAULT_WIA_PREFILL_TITLED },
+            { key: 'wiaPrefillUntitled', label: 'Prefill Untitled', textareaId: 'wia_prefill_untitled_textarea', defaultText: DEFAULT_WIA_PREFILL_UNTITLED },
+        ],
+    },
+    {
+        toolKey: 'ng',
+        label: 'Narrative Guidance',
+        containerId: 'ng_presets',
+        fields: [
+            { key: 'narrativeGuidancePrompt', label: 'Instructions', textareaId: 'ng_user_prompt_textarea', defaultText: DEFAULT_NG_USER_PROMPT },
+            { key: 'narrativeGuidanceGenerationPrompt', label: 'Prefill', textareaId: 'ng_generation_prompt_textarea', defaultText: DEFAULT_NG_GENERATION_PROMPT },
+            { key: 'narrativeGuidanceInjectionPrompt', label: 'Injection', textareaId: 'ng_injection_prompt_textarea', defaultText: DEFAULT_NG_INJECTION_PROMPT },
+        ],
+    },
+];
 
 // ─── State ───
 
@@ -153,6 +195,10 @@ function saveSettings() {
 
 function loadSettings() {
     settings = loadExtensionSettings(EXTENSION_NAME, defaultSettings);
+    if (migrateLegacyToolPresets(settings, TOOL_PRESET_CONFIG)) {
+        SSEDebug('Migrated legacy prompt templates to tool presets');
+        saveSettings();
+    }
     SSEDebug('Settings loaded:', JSON.stringify(settings));
 }
 
@@ -170,6 +216,12 @@ function injectSettingsPanel() {
     bindWIASettings(saveSettings);
     bindNarrativeGuidanceSettings(saveSettings);
     bindSilentGenerationSettings(saveSettings);
+
+    // Preset widgets go last: the module bindings above must attach their
+    // textarea → settings listeners first so preset loads persist correctly.
+    for (const tool of TOOL_PRESET_CONFIG) {
+        setupToolPresets({ ...tool, settings, saveSettings });
+    }
 }
 
 // ─── Merged Event Handlers ───

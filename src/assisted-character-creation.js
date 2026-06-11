@@ -19,16 +19,22 @@ import {
     createLoreBookPicker,
     streamingGenerate,
     withSingleLineDisabled,
+    applyTemplateMacros,
+    stripPrefillEcho,
+    showPromptPreview,
 } from './utils.js';
 import {
     abortAllGenerations,
     isSilentGenerationAbort,
 } from './silent-generation.js';
-import { setupPromptTemplates } from './prompt-templates.js';
 
 // ─── Default Prompt ───
 
-export const DEFAULT_ACC_PROMPT = `[
+// {{context}} and {{brief}} are this extension's placeholders (substituted
+// by applyTemplateMacros, not ST's macro engine — the literal
+// {{ .fooOverride ?? ... }} syntax below must pass through untouched). If a
+// placeholder is removed, the block is prepended/appended automatically.
+export const DEFAULT_ACC_PROMPT = `{{context}}[
 Role:
 You are an AI that produces detailed, concise character description sheets for text-based roleplaying games across any genre.
 
@@ -104,7 +110,19 @@ Secrets: The thorn-scar pulses near corrupted creatures and may be bonding with 
 Quirks: Names all her knives, refuses to eat mushrooms (no stated reason), instinctively catches falling objects — unnervingly fast reflexes;
 Current Goal: {{ .sableGoalOverride ?? Reach the Greenmarch interior and locate the Thornblight's origin before the scar reaches her chest }};
 ]
-]`;
+]
+
+Character Brief:
+{{brief}}`;
+
+const ACC_GENERATE_SYSTEM_PROMPT =
+    'You are a character creation assistant. Follow the instructions and output format '
+    + 'in the prompt exactly. Output only the character sheet — no preamble, no commentary.';
+
+const ACC_CONTINUE_SYSTEM_PROMPT =
+    'You are a character creation assistant. Continue the existing character sheet seamlessly '
+    + 'in the same format. Output only the continuation — no headers, no meta-commentary, '
+    + 'no repetition of prior text.';
 
 // Prefill is configured as a named template (like the prompt). It is passed
 // to the model as an assistant-prefix so the reply continues from it, and
@@ -218,15 +236,6 @@ export function bindACCSettings(saveSettings) {
         });
     }
 
-    setupPromptTemplates({
-        promptKey: 'accPrompt',
-        defaultText: DEFAULT_ACC_PROMPT,
-        textareaId: 'acc_prompt_textarea',
-        containerId: 'acc_prompt_templates',
-        settings: moduleSettings,
-        saveSettings,
-    });
-
     const prefillArea = document.getElementById('acc_prefill_textarea');
     if (prefillArea) {
         prefillArea.value = moduleSettings.accPrefill || DEFAULT_ACC_PREFILL;
@@ -235,14 +244,27 @@ export function bindACCSettings(saveSettings) {
             saveSettings();
         });
     }
-    setupPromptTemplates({
-        promptKey: 'accPrefill',
-        defaultText: DEFAULT_ACC_PREFILL,
-        textareaId: 'acc_prefill_textarea',
-        containerId: 'acc_prefill_templates',
-        settings: moduleSettings,
-        saveSettings,
-    });
+
+    document.getElementById('acc_preview_btn')
+        ?.addEventListener('click', showACCPromptPreview);
+}
+
+function showACCPromptPreview() {
+    const sampleContext =
+        'Existing context to consider when generating (do not repeat verbatim):\n'
+        + '(character cards, persona, selected lore books, and recent chat — included when '
+        + 'enabled in the Assist modal)\n\n';
+    const prompt = composeGeneratePrompt(sampleContext, '(your character brief)');
+    showPromptPreview('Assisted Character Creation — Prompt Preview (Generate)', [
+        { label: 'System Prompt (fixed)', text: ACC_GENERATE_SYSTEM_PROMPT },
+        { label: 'User Prompt (template with sample values)', text: prompt },
+        { label: 'Prefill (assistant prefix; kept at the top of the final description)', text: getPrefill() },
+        {
+            label: 'Note',
+            text: 'Continue uses the same template plus a fixed "Description so far: …" block and '
+                + `continuation instructions, with this system prompt:\n\n${ACC_CONTINUE_SYSTEM_PROMPT}`,
+        },
+    ]);
 }
 
 // ─── Modal ───
@@ -609,11 +631,43 @@ function needsSeparator(text) {
     return last !== ' ' && last !== '\n' && last !== '\t';
 }
 
+/**
+ * Assemble the Generate-mode user prompt. {{context}} / {{brief}} are
+ * substituted in place; when a placeholder is absent the block is added the
+ * old way (context prepended, brief appended) so legacy templates keep
+ * working unchanged.
+ */
+function composeGeneratePrompt(preambleBlock, brief) {
+    const { text, used } = applyTemplateMacros(getPromptTemplate(), {
+        context: preambleBlock || '',
+        brief,
+    });
+    let prompt = text;
+    if (!used.has('context') && preambleBlock) prompt = preambleBlock + prompt;
+    if (!used.has('brief')) prompt = `${prompt}\n\nCharacter Brief:\n${brief}`;
+    return prompt;
+}
+
+/**
+ * Assemble the Continue-mode user prompt: same template + macros, then the
+ * description-so-far and continuation instructions.
+ */
+function composeContinuePrompt(preambleBlock, brief, existing) {
+    const briefValue = brief || '(none provided)';
+    const { text, used } = applyTemplateMacros(getPromptTemplate(), {
+        context: preambleBlock || '',
+        brief: briefValue,
+    });
+    let prompt = text;
+    if (!used.has('context') && preambleBlock) prompt = preambleBlock + prompt;
+    if (!used.has('brief') && brief) prompt = `${prompt}\n\nCharacter Brief:\n${brief}`;
+    return `${prompt}\n\nDescription so far:\n${existing}\n\nContinue exactly where the text leaves off. Do not repeat any text already present. Maintain the same format and style. Output only the continuation.`;
+}
+
 async function generateDescription(brief, ctxOptions) {
     const preambleBlock = await buildPreambleBlock(ctxOptions);
-    const promptTemplate = getPromptTemplate();
-    const prompt = `${preambleBlock}${promptTemplate}\n\nCharacter Brief:\n${brief}`;
-    const systemPrompt = 'You are a character creation assistant. Follow the instructions and output format in the prompt exactly. Output only the character sheet — no preamble, no commentary.';
+    const prompt = composeGeneratePrompt(preambleBlock, brief);
+    const systemPrompt = ACC_GENERATE_SYSTEM_PROMPT;
     const responseLength = getResponseLength();
     const prefill = getPrefill();
 
@@ -628,16 +682,16 @@ async function generateDescription(brief, ctxOptions) {
         outputEl,
         { append: false },
     ));
-    const cleaned = removeReasoningFromString(result).trim();
+    // Backends that ignore the assistant prefix may re-emit the prefill;
+    // strip the echo so prepending it doesn't double the opening.
+    const cleaned = stripPrefillEcho(removeReasoningFromString(result).trim(), prefill);
     return (prefill || '') + cleaned;
 }
 
 async function generateContinuation(brief, existing, ctxOptions) {
     const preambleBlock = await buildPreambleBlock(ctxOptions);
-    const promptTemplate = getPromptTemplate();
-    const briefBlock = brief ? `Character Brief:\n${brief}\n\n` : '';
-    const prompt = `${preambleBlock}${promptTemplate}\n\n${briefBlock}Description so far:\n${existing}\n\nContinue exactly where the text leaves off. Do not repeat any text already present. Maintain the same format and style. Output only the continuation.`;
-    const systemPrompt = 'You are a character creation assistant. Continue the existing character sheet seamlessly in the same format. Output only the continuation — no headers, no meta-commentary, no repetition of prior text.';
+    const prompt = composeContinuePrompt(preambleBlock, brief, existing);
+    const systemPrompt = ACC_CONTINUE_SYSTEM_PROMPT;
     const responseLength = getResponseLength();
 
     debug('Continuing with existing length', existing.length, 'tokens', responseLength);

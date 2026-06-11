@@ -18,6 +18,9 @@ import {
     createLoreBookPicker,
     streamingGenerate,
     withSingleLineDisabled,
+    applyTemplateMacros,
+    stripPrefillEcho,
+    showPromptPreview,
     getCurrentWorldEditorName,
     getEntryUidFromForm,
     readWIAEntryGuidance,
@@ -28,11 +31,13 @@ import {
     isSilentGenerationAbort,
     abortAllGenerations,
 } from './silent-generation.js';
-import { setupPromptTemplates } from './prompt-templates.js';
 
 // ─── Default Prompt ───
 
-export const DEFAULT_WIA_PROMPT = `[
+// {{context}} and {{guidance}} are this extension's placeholders
+// (substituted by applyTemplateMacros). If a placeholder is removed, the
+// block is prepended/appended automatically. {{title}} is also available.
+export const DEFAULT_WIA_PROMPT = `{{context}}[
 The next reply will be an out-of-story World Lore Description: a setting reference entry codifying key facts about an event, person, place, institution, or artifact so they remain consistent and reusable.
 
 Write as a worldbook gazetteer entry, NOT as a story excerpt. Treat the reader as a setting researcher who needs canonical facts, not a vivid scene.
@@ -63,7 +68,15 @@ Anti-patterns — do NOT write like a story:
 
 Example — World Lore:
 [ The Ashen Concord: Five-member city-state pact, signed 47 AB after the Ember War; covers river-trade routes, standardized coinage (the Concord drachma), and a continent-wide ban on pyromancy; enforcement body is the Cinder Court at Vellis; pyromancers operate covertly as the Hedge League; remains nominally active but strained by ongoing arson reprisals. ]
-]`;
+]
+
+Guidance from the user:
+{{guidance}}`;
+
+const WIA_SYSTEM_PROMPT =
+    'You are a world-building assistant. Output only the requested '
+    + 'World Lore Description in the exact bracketed format described. '
+    + 'No commentary, no preamble, no explanations.';
 
 // Prefills are configured as named templates (like prompts). They are passed
 // to the model as an assistant-prefix so the reply continues from them, and
@@ -179,10 +192,14 @@ export function rescanAllForms() {
 }
 
 /**
- * Remove all injected controls (used when the feature is disabled).
+ * Remove all injected controls (used when the feature is disabled). Must
+ * cover every element injectControls creates — the controls row, the
+ * guidance block, and the content-clear row — or a disable/enable cycle
+ * leaves orphans behind and then injects duplicates next to them.
  */
 export function removeAllControls() {
-    document.querySelectorAll('.wia-controls').forEach(el => el.remove());
+    document.querySelectorAll('.wia-controls, .wia-guidance-block, .wia-content-clear-row')
+        .forEach(el => el.remove());
 }
 
 function injectControls(formEl) {
@@ -224,9 +241,6 @@ function injectControls(formEl) {
         <div class="wia-btn wia-btn-retry menu_button interactable wia-hidden" title="Retry using your saved guidance">
             <span class="fa-solid fa-rotate-right"></span>
         </div>
-        <div class="wia-btn wia-btn-clear-content menu_button interactable" title="Clear this entry's content">
-            <span class="fa-solid fa-eraser"></span>
-        </div>
         <div class="wia-spinner wia-hidden" title="Generating..."><span class="fa-solid fa-spinner fa-spin"></span></div>
         <div class="wia-tokens-row">
             <label class="wia-tokens-label"><span class="fa-solid fa-coins"></span> Max Tokens:</label>
@@ -248,8 +262,8 @@ function injectControls(formEl) {
             <label class="wia-guidance-label" title="Free-form guidance for the LLM. Saved on the entry — persists across page reloads.">
                 <span class="fa-solid fa-pen"></span> Assist Guidance
             </label>
-            <div class="wia-btn wia-btn-clear-guidance menu_button interactable" title="Clear the guidance field">
-                <span class="fa-solid fa-eraser"></span> Clear
+            <div class="wia-btn wia-btn-clear-guidance menu_button interactable" title="Clear the guidance field (the field below)">
+                <span class="fa-solid fa-eraser"></span> Clear Guidance
             </div>
         </div>
         <textarea class="text_pole wia-guidance-textarea" rows="3"
@@ -258,12 +272,24 @@ function injectControls(formEl) {
     // Insert after the controls row, before the original label/textarea.
     controls.insertAdjacentElement('afterend', guidanceBlock);
 
+    // The content-clear button sits directly above the entry's content
+    // textarea (not in the top controls row) so it's unambiguous which
+    // field it clears — the guidance field has its own Clear in its header.
+    const contentClearRow = document.createElement('div');
+    contentClearRow.className = 'wia-content-clear-row';
+    contentClearRow.innerHTML = `
+        <div class="wia-btn wia-btn-clear-content menu_button interactable" title="Clear this entry's content (the field below)">
+            <span class="fa-solid fa-eraser"></span> Clear Content
+        </div>
+    `;
+    contentTextarea.insertAdjacentElement('beforebegin', contentClearRow);
+
     const guidanceTextarea = guidanceBlock.querySelector('.wia-guidance-textarea');
     const clearGuidanceBtn = guidanceBlock.querySelector('.wia-btn-clear-guidance');
     const assistBtn = controls.querySelector('.wia-btn-assist');
     const continueBtn = controls.querySelector('.wia-btn-continue');
     const retryBtn = controls.querySelector('.wia-btn-retry');
-    const clearContentBtn = controls.querySelector('.wia-btn-clear-content');
+    const clearContentBtn = contentClearRow.querySelector('.wia-btn-clear-content');
     const tokensInput = controls.querySelector('.wia-tokens-input');
 
     // Wire up persistence for the guidance field — read on mount, save on
@@ -421,6 +447,42 @@ function setUIState(formEl, state, activeAction = null) {
 
 // ─── Generation ───
 
+function getWIAPromptTemplate() {
+    return (moduleSettings?.wiaPrompt && moduleSettings.wiaPrompt.trim())
+        ? moduleSettings.wiaPrompt
+        : DEFAULT_WIA_PROMPT;
+}
+
+/**
+ * Assemble the Assist/Continue user prompt. {{context}} / {{guidance}} /
+ * {{title}} are substituted in place; when context or guidance placeholders
+ * are absent the blocks are added the old way (context prepended, guidance
+ * appended) so legacy templates keep working unchanged. The mode-specific
+ * tail (prefill pointer or entry-so-far + continuation instructions) is
+ * always appended.
+ */
+function composeWIAPrompt({ preambleBlock, seed, title, isContinue, currentText }) {
+    const guidanceValue = seed
+        || (isContinue ? '(none provided)' : '(no specific guidance — invent a fitting entry)');
+    const { text, used } = applyTemplateMacros(getWIAPromptTemplate(), {
+        context: preambleBlock || '',
+        guidance: guidanceValue,
+        title: (title || '').trim(),
+    });
+    let prompt = text;
+    if (!used.has('context') && preambleBlock) prompt = preambleBlock + prompt;
+    if (!used.has('guidance')) prompt = `${prompt}\n\nGuidance from the user:\n${guidanceValue}`;
+
+    if (isContinue) {
+        return `${prompt}\n\nThe entry so far:\n${currentText}\n\n` +
+            'Continue exactly where the entry left off. Do not repeat any text. ' +
+            'Maintain the bracketed format and close the bracket when the entry is complete.';
+    }
+    return `${prompt}\n\n` + (title
+        ? `Write the entry for "${title}". The reply has been prefilled with the opening bracket, a tone anchor, and the subject name — continue from where the prefill ends with the factual description, then close the bracket.`
+        : 'No title was provided — invent a fitting subject name. The reply has been prefilled with the opening bracket and a tone anchor — continue from where the prefill ends with the subject name, colon, factual description, then close the bracket.');
+}
+
 async function onAssist(formEl, id, isContinue) {
     const state = entryStates.get(id)
         || { hasGenerated: false, generating: false, activeAction: null };
@@ -456,10 +518,6 @@ async function onAssist(formEl, id, isContinue) {
         const seed = readGuidance(formEl);
         const currentText = contentEl.value || '';
 
-        const promptTemplate = (moduleSettings.wiaPrompt && moduleSettings.wiaPrompt.trim())
-            ? moduleSettings.wiaPrompt
-            : DEFAULT_WIA_PROMPT;
-
         // Optional preamble assembled from chat / character / lore books.
         const controls = formEl.querySelector('.wia-controls');
         const ctxOptions = readContextOptions(controls);
@@ -476,31 +534,11 @@ async function onAssist(formEl, id, isContinue) {
             ? `Existing context to consider when generating (do not repeat verbatim):\n${preamble}\n\n`
             : '';
 
-        let userPrompt;
-        let prefill;
-
-        if (isContinue) {
-            userPrompt =
-                `${preambleBlock}${promptTemplate}\n\n` +
-                `Guidance from the user:\n${seed || '(none provided)'}\n\n` +
-                `The entry so far:\n${currentText}\n\n` +
-                'Continue exactly where the entry left off. Do not repeat any text. ' +
-                'Maintain the bracketed format and close the bracket when the entry is complete.';
-            prefill = '';
-        } else {
-            userPrompt =
-                `${preambleBlock}${promptTemplate}\n\n` +
-                `Guidance from the user:\n${seed || '(no specific guidance — invent a fitting entry)'}\n\n` +
-                (title
-                    ? `Write the entry for "${title}". The reply has been prefilled with the opening bracket, a tone anchor, and the subject name — continue from where the prefill ends with the factual description, then close the bracket.`
-                    : 'No title was provided — invent a fitting subject name. The reply has been prefilled with the opening bracket and a tone anchor — continue from where the prefill ends with the subject name, colon, factual description, then close the bracket.');
-            prefill = resolveWIAPrefill(title);
-        }
-
-        const systemPrompt =
-            'You are a world-building assistant. Output only the requested ' +
-            'World Lore Description in the exact bracketed format described. ' +
-            'No commentary, no preamble, no explanations.';
+        const userPrompt = composeWIAPrompt({
+            preambleBlock, seed, title, isContinue, currentText,
+        });
+        const prefill = isContinue ? '' : resolveWIAPrefill(title);
+        const systemPrompt = WIA_SYSTEM_PROMPT;
 
         debug('System prompt:', systemPrompt);
         debug('User prompt:', userPrompt);
@@ -518,6 +556,9 @@ async function onAssist(formEl, id, isContinue) {
         ));
 
         let cleaned = removeReasoningFromString(raw).trim();
+        // Backends that ignore the assistant prefix may re-emit the prefill;
+        // strip the echo so prepending it doesn't double the opening.
+        if (!isContinue) cleaned = stripPrefillEcho(cleaned, prefill);
 
         if (isContinue) {
             const sep =
@@ -635,15 +676,6 @@ export function bindWIASettings(saveSettings) {
         });
     }
 
-    setupPromptTemplates({
-        promptKey: 'wiaPrompt',
-        defaultText: DEFAULT_WIA_PROMPT,
-        textareaId: 'wia_prompt_textarea',
-        containerId: 'wia_prompt_templates',
-        settings: moduleSettings,
-        saveSettings,
-    });
-
     const prefillTitledArea = document.getElementById('wia_prefill_titled_textarea');
     if (prefillTitledArea) {
         prefillTitledArea.value = moduleSettings.wiaPrefillTitled || DEFAULT_WIA_PREFILL_TITLED;
@@ -652,14 +684,6 @@ export function bindWIASettings(saveSettings) {
             saveSettings();
         });
     }
-    setupPromptTemplates({
-        promptKey: 'wiaPrefillTitled',
-        defaultText: DEFAULT_WIA_PREFILL_TITLED,
-        textareaId: 'wia_prefill_titled_textarea',
-        containerId: 'wia_prefill_titled_templates',
-        settings: moduleSettings,
-        saveSettings,
-    });
 
     const prefillUntitledArea = document.getElementById('wia_prefill_untitled_textarea');
     if (prefillUntitledArea) {
@@ -669,12 +693,34 @@ export function bindWIASettings(saveSettings) {
             saveSettings();
         });
     }
-    setupPromptTemplates({
-        promptKey: 'wiaPrefillUntitled',
-        defaultText: DEFAULT_WIA_PREFILL_UNTITLED,
-        textareaId: 'wia_prefill_untitled_textarea',
-        containerId: 'wia_prefill_untitled_templates',
-        settings: moduleSettings,
-        saveSettings,
+
+    document.getElementById('wia_preview_btn')
+        ?.addEventListener('click', showWIAPromptPreview);
+}
+
+function showWIAPromptPreview() {
+    const sampleContext =
+        'Existing context to consider when generating (do not repeat verbatim):\n'
+        + '(character cards, persona, selected lore books, and recent chat — included when '
+        + 'enabled on the entry\'s Assist row)\n\n';
+    const sampleTitle = 'The Ashen Concord';
+    const prompt = composeWIAPrompt({
+        preambleBlock: sampleContext,
+        seed: '(your Assist Guidance text)',
+        title: sampleTitle,
+        isContinue: false,
+        currentText: '',
     });
+    showPromptPreview('World Info Assist — Prompt Preview (Assist, titled entry)', [
+        { label: 'System Prompt (fixed)', text: WIA_SYSTEM_PROMPT },
+        { label: 'User Prompt (template with sample values)', text: prompt },
+        { label: `Prefill — titled entry (sample title "${sampleTitle}")`, text: resolveWIAPrefill(sampleTitle) },
+        { label: 'Prefill — untitled entry', text: resolveWIAPrefill('') },
+        {
+            label: 'Note',
+            text: 'The prefill is sent as an assistant prefix and kept at the start of the entry on '
+                + 'success. Continue uses the same template plus a fixed "The entry so far: …" block '
+                + 'and continuation instructions, with no prefill.',
+        },
+    ]);
 }
