@@ -802,9 +802,9 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Saint's Silly Extensions — Combin
     font-style: italic;
 }
 
-#saints_silly_settings #ng_regenerate_now.disabled,
-#saints_silly_settings #ng_continue_now.disabled,
-#saints_silly_settings #ng_retry_now.disabled {
+#saints_silly_settings [id\$="_regenerate_now"].disabled,
+#saints_silly_settings [id\$="_continue_now"].disabled,
+#saints_silly_settings [id\$="_retry_now"].disabled {
     opacity: 0.6;
     pointer-events: none;
 }
@@ -893,7 +893,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Saint's Silly Extensions — Combin
     overflow-y: auto;
 }
 
-`, "",{"version":3,"sources":["webpack://./src/style.css"],"names":[],"mappings":"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","sourcesContent":["/* Saint's Silly Extensions — Combined Styles */\n\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   POSSESSION STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Group Chat: Radio Button Toggle ── */\n\n.possession_radio_wrapper {\n    display: inline-flex;\n    align-items: center;\n    margin-left: 4px;\n    cursor: pointer;\n}\n\n.possession_radio {\n    width: 16px;\n    height: 16px;\n    border-radius: 50%;\n    border: 2px solid var(--SmartThemeBorderColor, #555);\n    background: transparent;\n    cursor: pointer;\n    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;\n    position: relative;\n    flex-shrink: 0;\n}\n\n.possession_radio:hover {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.possession_radio.possession_active {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n    background: var(--SmartThemeQuoteColor, #e8a23a);\n    box-shadow: inset 0 0 0 3px var(--SmartThemeBlurTintColor, #1a1a2e);\n}\n\n/* ── Solo Chat: Possess Toggle Button ── */\n\n#possession_solo_btn {\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    cursor: pointer;\n    position: relative;\n}\n\n#possession_solo_btn:hover {\n    opacity: 1;\n}\n\n#possession_solo_btn.possession_active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n#possession_solo_btn.possession_active::after {\n    content: '';\n    position: absolute;\n    bottom: -2px;\n    left: 50%;\n    transform: translateX(-50%);\n    width: 6px;\n    height: 6px;\n    border-radius: 50%;\n    background-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Group member highlight when possessed ── */\n\n.group_member.possession_possessed {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n/* ── Possession Impersonate Button (Character Avatar) ── */\n\n#possession_impersonate_btn {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease;\n    padding: 2px;\n}\n\n#possession_impersonate_btn:hover {\n    opacity: 1;\n}\n\n.possession_impersonate_avatar {\n    width: 26px;\n    height: 26px;\n    border-radius: 50%;\n    object-fit: cover;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    transition: border-color 0.15s ease;\n}\n\n#possession_impersonate_btn:hover .possession_impersonate_avatar {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hide controls when extension is disabled ── */\n\n.possession_hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PHRASING STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Input Area Button (next to Send) ── */\n\n#phrasing_send_button {\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    padding: 3px;\n    font-size: 1.2em;\n}\n\n#phrasing_send_button:hover {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hamburger Menu Item ── */\n\n#phrasing_menu_button {\n    cursor: pointer;\n}\n\n#phrasing_menu_button .fa-solid {\n    margin-right: 5px;\n    width: 1em;\n    text-align: center;\n}\n\n/* ── Hide buttons during generation ── */\n\n.phrasing-hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SETTINGS PANEL STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .inline-drawer-content {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n    padding: 8px 0;\n}\n\n/* Nested drawers (template fields inside each tool's panel) — slightly\n   indented and with a smaller, dimmer header so they read as a sub-section\n   rather than a peer of the top-level tool drawer. */\n#saints_silly_settings .saints_nested_drawer {\n    margin: 4px 0 4px 4px;\n    border-left: 2px solid var(--SmartThemeBorderColor, #555);\n    padding-left: 8px;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-toggle {\n    font-size: 0.95em;\n    opacity: 0.85;\n    padding: 2px 0;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-toggle:hover {\n    opacity: 1;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-content {\n    padding: 4px 0 4px 0;\n}\n\n#saints_silly_settings .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_section_header {\n    margin: 4px 0 2px 0;\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_divider {\n    border: none;\n    border-top: 1px solid var(--SmartThemeBorderColor, #555);\n    margin: 8px 0;\n}\n\n#saints_silly_settings .phrasing_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #phrasing_prompt_textarea {\n    width: 100%;\n    min-height: 120px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .acc_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #acc_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC MODAL STYLES (rendered inside ST's Popup; chrome is provided by Popup)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n.acc-modal-body {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n    text-align: left;\n}\n\n.acc-brief-section {\n    margin-bottom: 12px;\n}\n\n.acc-brief-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.acc-action-row {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    margin-bottom: 8px;\n}\n\n.acc-tokens-row {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 6px;\n    margin-bottom: 12px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.acc-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.acc-tokens-input {\n    width: 80px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n.acc-action-btn {\n    flex: 1 1 0;\n    min-width: 110px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n.acc-action-btn.acc-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.acc-generate-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.acc-status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    background: var(--SmartThemeBodyColor, #222);\n    border-radius: 4px;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 0.9em;\n}\n\n.acc-description-section {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.acc-description-section label {\n    margin-bottom: 4px;\n}\n\n.acc-description-output {\n    width: 100%;\n    flex: 1 1 0%;\n    min-height: 200px;\n    resize: vertical;\n}\n\n.acc-description-output[disabled] {\n    opacity: 0.5;\n    cursor: not-allowed;\n}\n\n.acc-hidden {\n    display: none !important;\n}\n\n/* ACC Launch button in character creator */\n#acc_launch_btn {\n    display: flex;\n    align-items: center;\n    gap: 4px;\n}\n\n/* Field header row: label on the left, Clear button on the right. */\n.acc-modal-body .acc-field-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin-bottom: 4px;\n}\n\n.acc-modal-body .acc-clear-btn {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.acc-modal-body .acc-clear-btn:hover {\n    opacity: 1;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   WORLD INFO ASSIST STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Settings panel */\n#saints_silly_settings .wia_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #wia_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* Per-entry assist controls injected into each WI entry form */\n.wia-controls {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    flex-wrap: wrap;\n    margin: 6px 0 6px 0;\n}\n\n.wia-controls .wia-btn {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    cursor: pointer;\n    font-size: 0.85em;\n    padding: 4px 8px;\n}\n\n.wia-controls .wia-btn-assist {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.wia-controls .wia-btn-label {\n    font-weight: 500;\n}\n\n.wia-controls .wia-spinner {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 1em;\n    display: inline-flex;\n    align-items: center;\n    padding: 4px 6px;\n}\n\n.wia-controls .wia-hidden {\n    display: none !important;\n}\n\n/* Use Chat Context checkbox */\n.wia-controls .wia-context-toggle {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    font-size: 0.85em;\n    cursor: pointer;\n    opacity: 0.85;\n    user-select: none;\n}\n\n.wia-controls .wia-context-toggle:hover {\n    opacity: 1;\n}\n\n/* Lore book multi-select picker (per-entry) */\n.wia-controls .wia-lorebook-picker {\n    position: relative;\n    font-size: 0.85em;\n}\n\n.wia-controls .wia-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.wia-controls .wia-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.wia-controls .wia-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.wia-controls .wia-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 50;\n    min-width: 220px;\n    max-height: 240px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);\n}\n\n.wia-controls .wia-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.wia-controls .wia-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Inline Clear-content button on the WIA controls row */\n/* Content-clear row — sits directly above the entry's content textarea so\n   it's unambiguous which field the button clears. */\n.wia-content-clear-row {\n    display: flex;\n    justify-content: flex-end;\n    margin: 2px 0 4px 0;\n}\n\n.wia-content-clear-row .wia-btn-clear-content {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.wia-content-clear-row .wia-btn-clear-content:hover {\n    opacity: 1;\n}\n\n/* Per-entry guidance section — sits between the controls and the entry's\n   content textarea so it's clearly the user's *input* to the assist. */\n.wia-guidance-block {\n    margin: 0 0 8px 0;\n}\n\n.wia-guidance-block .wia-guidance-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin: 0 0 4px 0;\n}\n\n.wia-guidance-block .wia-guidance-label {\n    font-size: 0.9em;\n    font-weight: 500;\n    opacity: 0.9;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n}\n\n.wia-guidance-block .wia-btn-clear-guidance {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.wia-guidance-block .wia-btn-clear-guidance:hover {\n    opacity: 1;\n}\n\n.wia-guidance-block .wia-guidance-textarea {\n    width: 100%;\n    resize: vertical;\n    min-height: 60px;\n    font-size: 0.9em;\n}\n\n/* Per-entry token limit row */\n.wia-controls .wia-tokens-row {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.85em;\n    opacity: 0.85;\n    margin-left: auto;\n}\n\n.wia-controls .wia-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.wia-controls .wia-tokens-input {\n    width: 72px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n/* ── ACC modal: context preamble controls ── */\n\n.acc-context-section {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: wrap;\n    margin-bottom: 12px;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.acc-context-section .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.9em;\n    cursor: pointer;\n}\n\n.acc-lorebook-picker {\n    position: relative;\n    font-size: 0.9em;\n}\n\n.acc-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.acc-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.acc-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.acc-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 10002;\n    min-width: 240px;\n    max-height: 260px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\n}\n\n.acc-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.acc-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   NARRATIVE GUIDANCE SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_subsection_header {\n    margin: 12px 0 4px 0;\n    opacity: 0.85;\n}\n\n#saints_silly_settings .ng_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings .ng_prompt_section textarea {\n    width: 100%;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .ng_inline_row {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin: 6px 0;\n}\n\n#saints_silly_settings .ng_number_input {\n    width: 5em;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng_select_input {\n    width: auto;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng-lorebook-picker {\n    margin: 8px 0;\n}\n\n#saints_silly_settings .ng-lorebook-list {\n    margin-top: 4px;\n    padding: 6px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n}\n\n#saints_silly_settings .ng-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n#saints_silly_settings .ng-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n#saints_silly_settings #ng_regenerate_now.disabled,\n#saints_silly_settings #ng_continue_now.disabled,\n#saints_silly_settings #ng_retry_now.disabled {\n    opacity: 0.6;\n    pointer-events: none;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PROMPT TEMPLATE CONTROLS (shared, one row per prompt)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_template_controls {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin-top: 6px;\n}\n\n#saints_silly_settings .saints_template_select {\n    width: 100%;\n}\n\n#saints_silly_settings .saints_template_buttons {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button {\n    flex: 1 1 0;\n    min-width: 100px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button.disabled {\n    opacity: 0.5;\n    pointer-events: none;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   TOOL PRESET BLOCK & PROMPT PREVIEW\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_preset_block {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin: 8px 0;\n    padding: 8px;\n    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));\n    border-radius: 6px;\n}\n\n#saints_silly_settings .saints_preview_btn {\n    align-self: flex-start;\n    white-space: nowrap;\n}\n\n.sse-prompt-preview {\n    text-align: left;\n}\n\n.sse-prompt-preview h3 {\n    margin: 0 0 10px 0;\n}\n\n.sse-preview-section {\n    margin-bottom: 12px;\n}\n\n.sse-preview-label {\n    font-weight: bold;\n    opacity: 0.8;\n    margin-bottom: 4px;\n}\n\n.sse-preview-text {\n    white-space: pre-wrap;\n    word-break: break-word;\n    text-align: left;\n    font-size: calc(var(--mainFontSize, 14px) * 0.85);\n    background-color: rgba(0, 0, 0, 0.2);\n    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));\n    border-radius: 6px;\n    padding: 8px;\n    margin: 0;\n    max-height: 40vh;\n    overflow-y: auto;\n}\n\n"],"sourceRoot":""}]);
+`, "",{"version":3,"sources":["webpack://./src/style.css"],"names":[],"mappings":"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","sourcesContent":["/* Saint's Silly Extensions — Combined Styles */\n\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   POSSESSION STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Group Chat: Radio Button Toggle ── */\n\n.possession_radio_wrapper {\n    display: inline-flex;\n    align-items: center;\n    margin-left: 4px;\n    cursor: pointer;\n}\n\n.possession_radio {\n    width: 16px;\n    height: 16px;\n    border-radius: 50%;\n    border: 2px solid var(--SmartThemeBorderColor, #555);\n    background: transparent;\n    cursor: pointer;\n    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;\n    position: relative;\n    flex-shrink: 0;\n}\n\n.possession_radio:hover {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.possession_radio.possession_active {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n    background: var(--SmartThemeQuoteColor, #e8a23a);\n    box-shadow: inset 0 0 0 3px var(--SmartThemeBlurTintColor, #1a1a2e);\n}\n\n/* ── Solo Chat: Possess Toggle Button ── */\n\n#possession_solo_btn {\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    cursor: pointer;\n    position: relative;\n}\n\n#possession_solo_btn:hover {\n    opacity: 1;\n}\n\n#possession_solo_btn.possession_active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n#possession_solo_btn.possession_active::after {\n    content: '';\n    position: absolute;\n    bottom: -2px;\n    left: 50%;\n    transform: translateX(-50%);\n    width: 6px;\n    height: 6px;\n    border-radius: 50%;\n    background-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Group member highlight when possessed ── */\n\n.group_member.possession_possessed {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n/* ── Possession Impersonate Button (Character Avatar) ── */\n\n#possession_impersonate_btn {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease;\n    padding: 2px;\n}\n\n#possession_impersonate_btn:hover {\n    opacity: 1;\n}\n\n.possession_impersonate_avatar {\n    width: 26px;\n    height: 26px;\n    border-radius: 50%;\n    object-fit: cover;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    transition: border-color 0.15s ease;\n}\n\n#possession_impersonate_btn:hover .possession_impersonate_avatar {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hide controls when extension is disabled ── */\n\n.possession_hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PHRASING STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Input Area Button (next to Send) ── */\n\n#phrasing_send_button {\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    padding: 3px;\n    font-size: 1.2em;\n}\n\n#phrasing_send_button:hover {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hamburger Menu Item ── */\n\n#phrasing_menu_button {\n    cursor: pointer;\n}\n\n#phrasing_menu_button .fa-solid {\n    margin-right: 5px;\n    width: 1em;\n    text-align: center;\n}\n\n/* ── Hide buttons during generation ── */\n\n.phrasing-hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SETTINGS PANEL STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .inline-drawer-content {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n    padding: 8px 0;\n}\n\n/* Nested drawers (template fields inside each tool's panel) — slightly\n   indented and with a smaller, dimmer header so they read as a sub-section\n   rather than a peer of the top-level tool drawer. */\n#saints_silly_settings .saints_nested_drawer {\n    margin: 4px 0 4px 4px;\n    border-left: 2px solid var(--SmartThemeBorderColor, #555);\n    padding-left: 8px;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-toggle {\n    font-size: 0.95em;\n    opacity: 0.85;\n    padding: 2px 0;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-toggle:hover {\n    opacity: 1;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-content {\n    padding: 4px 0 4px 0;\n}\n\n#saints_silly_settings .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_section_header {\n    margin: 4px 0 2px 0;\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_divider {\n    border: none;\n    border-top: 1px solid var(--SmartThemeBorderColor, #555);\n    margin: 8px 0;\n}\n\n#saints_silly_settings .phrasing_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #phrasing_prompt_textarea {\n    width: 100%;\n    min-height: 120px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .acc_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #acc_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC MODAL STYLES (rendered inside ST's Popup; chrome is provided by Popup)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n.acc-modal-body {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n    text-align: left;\n}\n\n.acc-brief-section {\n    margin-bottom: 12px;\n}\n\n.acc-brief-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.acc-action-row {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    margin-bottom: 8px;\n}\n\n.acc-tokens-row {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 6px;\n    margin-bottom: 12px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.acc-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.acc-tokens-input {\n    width: 80px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n.acc-action-btn {\n    flex: 1 1 0;\n    min-width: 110px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n.acc-action-btn.acc-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.acc-generate-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.acc-status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    background: var(--SmartThemeBodyColor, #222);\n    border-radius: 4px;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 0.9em;\n}\n\n.acc-description-section {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.acc-description-section label {\n    margin-bottom: 4px;\n}\n\n.acc-description-output {\n    width: 100%;\n    flex: 1 1 0%;\n    min-height: 200px;\n    resize: vertical;\n}\n\n.acc-description-output[disabled] {\n    opacity: 0.5;\n    cursor: not-allowed;\n}\n\n.acc-hidden {\n    display: none !important;\n}\n\n/* ACC Launch button in character creator */\n#acc_launch_btn {\n    display: flex;\n    align-items: center;\n    gap: 4px;\n}\n\n/* Field header row: label on the left, Clear button on the right. */\n.acc-modal-body .acc-field-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin-bottom: 4px;\n}\n\n.acc-modal-body .acc-clear-btn {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.acc-modal-body .acc-clear-btn:hover {\n    opacity: 1;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   WORLD INFO ASSIST STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Settings panel */\n#saints_silly_settings .wia_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #wia_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* Per-entry assist controls injected into each WI entry form */\n.wia-controls {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    flex-wrap: wrap;\n    margin: 6px 0 6px 0;\n}\n\n.wia-controls .wia-btn {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    cursor: pointer;\n    font-size: 0.85em;\n    padding: 4px 8px;\n}\n\n.wia-controls .wia-btn-assist {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.wia-controls .wia-btn-label {\n    font-weight: 500;\n}\n\n.wia-controls .wia-spinner {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 1em;\n    display: inline-flex;\n    align-items: center;\n    padding: 4px 6px;\n}\n\n.wia-controls .wia-hidden {\n    display: none !important;\n}\n\n/* Use Chat Context checkbox */\n.wia-controls .wia-context-toggle {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    font-size: 0.85em;\n    cursor: pointer;\n    opacity: 0.85;\n    user-select: none;\n}\n\n.wia-controls .wia-context-toggle:hover {\n    opacity: 1;\n}\n\n/* Lore book multi-select picker (per-entry) */\n.wia-controls .wia-lorebook-picker {\n    position: relative;\n    font-size: 0.85em;\n}\n\n.wia-controls .wia-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.wia-controls .wia-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.wia-controls .wia-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.wia-controls .wia-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 50;\n    min-width: 220px;\n    max-height: 240px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);\n}\n\n.wia-controls .wia-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.wia-controls .wia-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Inline Clear-content button on the WIA controls row */\n/* Content-clear row — sits directly above the entry's content textarea so\n   it's unambiguous which field the button clears. */\n.wia-content-clear-row {\n    display: flex;\n    justify-content: flex-end;\n    margin: 2px 0 4px 0;\n}\n\n.wia-content-clear-row .wia-btn-clear-content {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.wia-content-clear-row .wia-btn-clear-content:hover {\n    opacity: 1;\n}\n\n/* Per-entry guidance section — sits between the controls and the entry's\n   content textarea so it's clearly the user's *input* to the assist. */\n.wia-guidance-block {\n    margin: 0 0 8px 0;\n}\n\n.wia-guidance-block .wia-guidance-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin: 0 0 4px 0;\n}\n\n.wia-guidance-block .wia-guidance-label {\n    font-size: 0.9em;\n    font-weight: 500;\n    opacity: 0.9;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n}\n\n.wia-guidance-block .wia-btn-clear-guidance {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.wia-guidance-block .wia-btn-clear-guidance:hover {\n    opacity: 1;\n}\n\n.wia-guidance-block .wia-guidance-textarea {\n    width: 100%;\n    resize: vertical;\n    min-height: 60px;\n    font-size: 0.9em;\n}\n\n/* Per-entry token limit row */\n.wia-controls .wia-tokens-row {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.85em;\n    opacity: 0.85;\n    margin-left: auto;\n}\n\n.wia-controls .wia-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.wia-controls .wia-tokens-input {\n    width: 72px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n/* ── ACC modal: context preamble controls ── */\n\n.acc-context-section {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: wrap;\n    margin-bottom: 12px;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.acc-context-section .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.9em;\n    cursor: pointer;\n}\n\n.acc-lorebook-picker {\n    position: relative;\n    font-size: 0.9em;\n}\n\n.acc-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.acc-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.acc-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.acc-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 10002;\n    min-width: 240px;\n    max-height: 260px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\n}\n\n.acc-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.acc-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   NARRATIVE GUIDANCE SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_subsection_header {\n    margin: 12px 0 4px 0;\n    opacity: 0.85;\n}\n\n#saints_silly_settings .ng_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings .ng_prompt_section textarea {\n    width: 100%;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .ng_inline_row {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin: 6px 0;\n}\n\n#saints_silly_settings .ng_number_input {\n    width: 5em;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng_select_input {\n    width: auto;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng-lorebook-picker {\n    margin: 8px 0;\n}\n\n#saints_silly_settings .ng-lorebook-list {\n    margin-top: 4px;\n    padding: 6px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n}\n\n#saints_silly_settings .ng-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n#saints_silly_settings .ng-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n#saints_silly_settings [id$=\"_regenerate_now\"].disabled,\n#saints_silly_settings [id$=\"_continue_now\"].disabled,\n#saints_silly_settings [id$=\"_retry_now\"].disabled {\n    opacity: 0.6;\n    pointer-events: none;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PROMPT TEMPLATE CONTROLS (shared, one row per prompt)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_template_controls {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin-top: 6px;\n}\n\n#saints_silly_settings .saints_template_select {\n    width: 100%;\n}\n\n#saints_silly_settings .saints_template_buttons {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button {\n    flex: 1 1 0;\n    min-width: 100px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button.disabled {\n    opacity: 0.5;\n    pointer-events: none;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   TOOL PRESET BLOCK & PROMPT PREVIEW\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_preset_block {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin: 8px 0;\n    padding: 8px;\n    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));\n    border-radius: 6px;\n}\n\n#saints_silly_settings .saints_preview_btn {\n    align-self: flex-start;\n    white-space: nowrap;\n}\n\n.sse-prompt-preview {\n    text-align: left;\n}\n\n.sse-prompt-preview h3 {\n    margin: 0 0 10px 0;\n}\n\n.sse-preview-section {\n    margin-bottom: 12px;\n}\n\n.sse-preview-label {\n    font-weight: bold;\n    opacity: 0.8;\n    margin-bottom: 4px;\n}\n\n.sse-preview-text {\n    white-space: pre-wrap;\n    word-break: break-word;\n    text-align: left;\n    font-size: calc(var(--mainFontSize, 14px) * 0.85);\n    background-color: rgba(0, 0, 0, 0.2);\n    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));\n    border-radius: 6px;\n    padding: 8px;\n    margin: 0;\n    max-height: 40vh;\n    overflow-y: auto;\n}\n\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -1375,7 +1375,7 @@ var update = injectStylesIntoStyleTag_default()(style/* default */.A, options);
 
 ;// ./src/settings.html
 // Module
-var code = `<div id="saints_silly_settings" class="extension_settings"> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-ghost"></span> SSE Possession</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="possession_enabled" type="checkbox"/> <span>Enable Possession</span> </label> <label class="checkbox_label"> <input id="possession_show_toast" type="checkbox"/> <span>Show Toast on Possess/Unpossess</span> </label> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-pen-fancy"></span> SSE Phrasing!</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="phrasing_enabled" type="checkbox" checked="checked"/> <span>Enable Phrasing!</span> </label> <label class="checkbox_label" title="When enabled, rephrasing a message includes every existing swipe in the prompt and asks the model to produce something wildly different."> <input id="phrasing_inverse_guidance" type="checkbox"/> <span>Inverse Guidance</span> </label> <div class="saints_preset_block"> <label title="Save and switch named bundles of every Phrasing prompt field below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="phrasing_presets"></div> <div class="menu_button saints_preview_btn" id="phrasing_preview_btn" title="Show exactly what Phrasing! will inject into the chat prompt, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrasing_prompt_section"> <textarea id="phrasing_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Phrasing! prompt template..."></textarea> <small>Injected into the chat prompt as a system message for the rephrase generation. Placeholder: <code>{{phrasingSeed}}</code> — the speaker-prefixed message being rephrased.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Inverse Guidance Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrasing_prompt_section"> <textarea id="phrasing_inverse_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Inverse Guidance prompt template..."></textarea> <small>Used instead of the standard prompt when Inverse Guidance is on. Placeholders: <code>{{phrasingSeed}}</code>, <code>{{phrasingSwipes}}</code> — the existing swipes to avoid resembling.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-wand-magic-sparkles"></span> SSE Assisted Character Creation</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="acc_enabled" type="checkbox"/> <span>Enable Assisted Character Creation</span> </label> <div class="ng_inline_row"> <label for="acc_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="acc_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for ACC generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the ACC prompt + prefill below. The prompt describes the prefill's opening, so they are saved together."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="acc_presets"></div> <div class="menu_button saints_preview_btn" id="acc_preview_btn" title="Show the exact system prompt, assembled user prompt, and prefill ACC will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="acc_prompt_section"> <textarea id="acc_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your ACC prompt template..."></textarea> <small>Sent as the user prompt for each generation. Placeholders: <code>{{context}}</code> (chat/lore preamble, when enabled in the modal), <code>{{brief}}</code> (your Character Brief). If a placeholder is missing, the context is prepended and the brief appended automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="acc_prompt_section"> <textarea id="acc_prefill_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix the model continues. Also prepended to the description on success."></textarea> <small>Sent as an assistant prefix the model continues from, and kept at the top of the final description. If the backend ignores prefills and the model repeats it, the echo is stripped automatically. Keep it in sync with the format the Prompt Template describes.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-book-atlas"></span> SSE World Info Assist</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="wia_enabled" type="checkbox"/> <span>Enable World Info Assist</span> </label> <div class="ng_inline_row"> <label for="wia_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="wia_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for World Info Assist generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="wia_response_length"><b><span class="fa-solid fa-coins"></span> Response Token Limit:</b></label> <input id="wia_response_length" type="number" min="50" max="8192" step="50" class="text_pole ng_number_input" title="Maximum tokens the model may use for each World Info Assist generation."/> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the WIA prompt + both prefills below. The prompt describes the prefill's opening, so they are saved together."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="wia_presets"></div> <div class="menu_button saints_preview_btn" id="wia_preview_btn" title="Show the exact system prompt, assembled user prompt, and prefills WIA will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="wia_prompt_section"> <textarea id="wia_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your World Info Assist prompt template..."></textarea> <small>Sent as the user prompt for each Assist/Continue. Placeholders: <code>{{context}}</code> (chat/lore preamble, when enabled on the entry's Assist row), <code>{{guidance}}</code> (the entry's Assist Guidance text), <code>{{title}}</code> (the entry's title). If context or guidance placeholders are missing, those blocks are added automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template — Titled Entry</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="wia_prompt_section"> <textarea id="wia_prefill_titled_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix used when the entry has a title."></textarea> <small>Sent as an assistant prefix when the entry has a title, and kept at the start of the entry on success. Placeholder: <code>{{title}}</code>. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template — Untitled Entry</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="wia_prompt_section"> <textarea id="wia_prefill_untitled_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix used when the entry has no title yet."></textarea> <small>Sent as an assistant prefix when the entry has no title, and kept at the start of the entry on success. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-compass"></span> SSE Narrative Guidance</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="ng_enabled" type="checkbox"/> <span>Enable Narrative Guidance</span> </label> <label class="checkbox_label" title="When on, regenerates guidance automatically when the turn counter hits zero. When off, only the Regenerate Now button updates the guidance."> <input id="ng_auto_regen" type="checkbox"/> <span>Auto-Regenerate at Zero</span> </label> <div class="ng_inline_row"> <label for="ng_default_turn_count"><b>Turns Between Regenerations:</b></label> <input id="ng_default_turn_count" type="number" min="1" step="1" class="text_pole ng_number_input"/> </div> <div class="ng_inline_row"> <label for="ng_response_length"><b>Response Token Limit:</b></label> <input id="ng_response_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="Maximum number of tokens the model may use for each generated guidance paragraph."/> </div> <div class="ng_inline_row"> <label for="ng_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="ng_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for Narrative Guidance generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="ng_injection_depth"><b>Depth:</b></label> <input id="ng_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the guidance after (0 = bottom)."/> <label for="ng_injection_role"><b>Role:</b></label> <select id="ng_injection_role" class="text_pole ng_select_input" title="Role used when injecting the guidance into the prompt."> <option value="system">System</option> <option value="user">User</option> <option value="assistant">Assistant</option> </select> </div> <div id="ng_lorebooks_host"></div> <div class="ng_inline_row"> <span><b>Turns Remaining:</b> <span id="ng_remaining_display">0</span></span> <div class="menu_button" id="ng_decrement_button" title="Decrement remaining by 1"> <span class="fa-solid fa-minus"></span> </div> <div class="menu_button" id="ng_reset_button" title="Reset remaining to default turn count"> <span class="fa-solid fa-rotate-right"></span> Reset </div> <div class="menu_button disabled" id="ng_continue_now" title="Continue the current guidance paragraph"> <span class="fa-solid fa-arrow-right"></span> Continue </div> <div class="menu_button disabled" id="ng_retry_now" title="Restore previous guidance and regenerate"> <span class="fa-solid fa-rotate-right"></span> Retry </div> <div class="menu_button" id="ng_regenerate_now" title="Regenerate guidance now"> <span class="ng-regen-icon fa-solid fa-wand-sparkles"></span> Regenerate Now </div> </div> <div class="ng_prompt_section"> <label for="ng_themes_textarea"><b>Themes / Story Arcs:</b></label> <textarea id="ng_themes_textarea" class="text_pole" rows="4" placeholder="Optional themes, ideas, or arcs for the AI to consider..."></textarea> </div> <div class="ng_prompt_section"> <label for="ng_active_guidance_textarea"><b>Active Guidance:</b></label> <textarea id="ng_active_guidance_textarea" class="text_pole" rows="6" placeholder="The currently active guidance paragraph. Edit freely; changes apply on the next AI turn."></textarea> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the three Narrative Guidance prompt fields below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="ng_presets"></div> <div class="menu_button saints_preview_btn" id="ng_preview_btn" title="Show the exact system prompt, assembled user prompt, prefill, and injection Narrative Guidance will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Generation Instructions Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_user_prompt_textarea" class="text_pole" rows="5" placeholder="Instructions sent as the user prompt for each guidance generation..."></textarea> <small>Sent as the user prompt for each guidance generation. Placeholders: <code>{{context}}</code> (chat/lore preamble), <code>{{themes}}</code> (your Themes / Story Arcs block). If a placeholder is missing, the blocks are prepended automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_generation_prompt_textarea" class="text_pole" rows="4" placeholder="Enter the prefill that the LLM will continue..."></textarea> <small>Sent as an assistant prefix the model continues from; the prefill plus the reply becomes the active guidance. If it opens with "[", the brackets are stripped when the guidance is injected into the chat prompt. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Injection Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_injection_prompt_textarea" class="text_pole" rows="3" placeholder="Template injected before each AI turn..."></textarea> <small>Added to the chat prompt before each AI turn while guidance is active. Placeholder: <code>{{guidance}}</code> — the active guidance text (outer brackets stripped).</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-bug"></span> SSE Diagnostics</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label" title="Log detailed Possession events to the browser console."> <input id="possession_debug_mode" type="checkbox"/> <span>Possession Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Phrasing events to the browser console."> <input id="phrasing_debug_mode" type="checkbox"/> <span>Phrasing Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Assisted Character Creation events, prompts, and generations to the browser console."> <input id="acc_debug_mode" type="checkbox"/> <span>ACC Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed World Info Assist events, prompts, and generations to the browser console."> <input id="wia_debug_mode" type="checkbox"/> <span>WI Assist Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Narrative Guidance events to the browser console."> <input id="ng_debug_mode" type="checkbox"/> <span>Narrative Guidance Debug Mode</span> </label> <label class="checkbox_label" title="Log silent-generation lifecycle (job start/abort/completion, stop-listener events, stream token counts) to the browser console. Useful when diagnosing stop-button behavior across backends."> <input id="silent_generation_debug_mode" type="checkbox"/> <span>Silent Generation Debug Mode</span> </label> </div> </div> </div> `;
+var code = `<div id="saints_silly_settings" class="extension_settings"> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-ghost"></span> SSE Possession</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="possession_enabled" type="checkbox"/> <span>Enable Possession</span> </label> <label class="checkbox_label"> <input id="possession_show_toast" type="checkbox"/> <span>Show Toast on Possess/Unpossess</span> </label> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-pen-fancy"></span> SSE Phrasing!</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="phrasing_enabled" type="checkbox" checked="checked"/> <span>Enable Phrasing!</span> </label> <label class="checkbox_label" title="When enabled, rephrasing a message includes every existing swipe in the prompt and asks the model to produce something wildly different."> <input id="phrasing_inverse_guidance" type="checkbox"/> <span>Inverse Guidance</span> </label> <div class="saints_preset_block"> <label title="Save and switch named bundles of every Phrasing prompt field below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="phrasing_presets"></div> <div class="menu_button saints_preview_btn" id="phrasing_preview_btn" title="Show exactly what Phrasing! will inject into the chat prompt, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrasing_prompt_section"> <textarea id="phrasing_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Phrasing! prompt template..."></textarea> <small>Injected into the chat prompt as a system message for the rephrase generation. Placeholder: <code>{{phrasingSeed}}</code> — the speaker-prefixed message being rephrased.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Inverse Guidance Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrasing_prompt_section"> <textarea id="phrasing_inverse_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Inverse Guidance prompt template..."></textarea> <small>Used instead of the standard prompt when Inverse Guidance is on. Placeholders: <code>{{phrasingSeed}}</code>, <code>{{phrasingSwipes}}</code> — the existing swipes to avoid resembling.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-wand-magic-sparkles"></span> SSE Assisted Character Creation</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="acc_enabled" type="checkbox"/> <span>Enable Assisted Character Creation</span> </label> <div class="ng_inline_row"> <label for="acc_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="acc_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for ACC generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the ACC prompt + prefill below. The prompt describes the prefill's opening, so they are saved together."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="acc_presets"></div> <div class="menu_button saints_preview_btn" id="acc_preview_btn" title="Show the exact system prompt, assembled user prompt, and prefill ACC will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="acc_prompt_section"> <textarea id="acc_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your ACC prompt template..."></textarea> <small>Sent as the user prompt for each generation. Placeholders: <code>{{context}}</code> (chat/lore preamble, when enabled in the modal), <code>{{brief}}</code> (your Character Brief). If a placeholder is missing, the context is prepended and the brief appended automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="acc_prompt_section"> <textarea id="acc_prefill_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix the model continues. Also prepended to the description on success."></textarea> <small>Sent as an assistant prefix the model continues from, and kept at the top of the final description. If the backend ignores prefills and the model repeats it, the echo is stripped automatically. Keep it in sync with the format the Prompt Template describes.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-book-atlas"></span> SSE World Info Assist</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="wia_enabled" type="checkbox"/> <span>Enable World Info Assist</span> </label> <div class="ng_inline_row"> <label for="wia_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="wia_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for World Info Assist generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="wia_response_length"><b><span class="fa-solid fa-coins"></span> Response Token Limit:</b></label> <input id="wia_response_length" type="number" min="50" max="8192" step="50" class="text_pole ng_number_input" title="Maximum tokens the model may use for each World Info Assist generation."/> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the WIA prompt + both prefills below. The prompt describes the prefill's opening, so they are saved together."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="wia_presets"></div> <div class="menu_button saints_preview_btn" id="wia_preview_btn" title="Show the exact system prompt, assembled user prompt, and prefills WIA will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="wia_prompt_section"> <textarea id="wia_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your World Info Assist prompt template..."></textarea> <small>Sent as the user prompt for each Assist/Continue. Placeholders: <code>{{context}}</code> (chat/lore preamble, when enabled on the entry's Assist row), <code>{{guidance}}</code> (the entry's Assist Guidance text), <code>{{title}}</code> (the entry's title). If context or guidance placeholders are missing, those blocks are added automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template — Titled Entry</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="wia_prompt_section"> <textarea id="wia_prefill_titled_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix used when the entry has a title."></textarea> <small>Sent as an assistant prefix when the entry has a title, and kept at the start of the entry on success. Placeholder: <code>{{title}}</code>. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template — Untitled Entry</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="wia_prompt_section"> <textarea id="wia_prefill_untitled_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix used when the entry has no title yet."></textarea> <small>Sent as an assistant prefix when the entry has no title, and kept at the start of the entry on success. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-compass"></span> SSE Narrative Guidance</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <small>Two independent tiers of story direction. <b>Long-term</b> sets the overarching arc on a slow refresh horizon; <b>Short-term</b> sets the immediate beats on a fast one and is seeded with the active long-term arc so the two stay aligned. Each tier has its own toggle, cadence, prompts, lore books and guidance text.</small> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-mountain-sun"></span> Long-term (the overarching arc)</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="ng_long_enabled" type="checkbox"/> <span>Enable Long-term Guidance</span> </label> <label class="checkbox_label" title="When on, regenerates the long-term arc automatically when its turn counter hits zero. When off, only the Regenerate Now button updates it."> <input id="ng_long_auto_regen" type="checkbox"/> <span>Auto-Regenerate at Zero</span> </label> <div class="ng_inline_row"> <label for="ng_long_default_turn_count"><b>Turns Between Regenerations:</b></label> <input id="ng_long_default_turn_count" type="number" min="1" step="1" class="text_pole ng_number_input"/> </div> <div class="ng_inline_row"> <label for="ng_long_response_length"><b>Response Token Limit:</b></label> <input id="ng_long_response_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="Maximum number of tokens the model may use for each generated guidance paragraph."/> </div> <div class="ng_inline_row"> <label for="ng_long_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="ng_long_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for long-term generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="ng_long_injection_depth"><b>Depth:</b></label> <input id="ng_long_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the guidance after (0 = bottom)."/> <label for="ng_long_injection_role"><b>Role:</b></label> <select id="ng_long_injection_role" class="text_pole ng_select_input" title="Role used when injecting the guidance into the prompt."> <option value="system">System</option> <option value="user">User</option> <option value="assistant">Assistant</option> </select> </div> <div id="ng_long_lorebooks_host"></div> <div class="ng_inline_row"> <span><b>Turns Remaining:</b> <span id="ng_long_remaining_display">0</span></span> <div class="menu_button" id="ng_long_decrement_button" title="Decrement remaining by 1"> <span class="fa-solid fa-minus"></span> </div> <div class="menu_button" id="ng_long_reset_button" title="Reset remaining to default turn count"> <span class="fa-solid fa-rotate-right"></span> Reset </div> <div class="menu_button disabled" id="ng_long_continue_now" title="Continue the current guidance paragraph"> <span class="fa-solid fa-arrow-right"></span> Continue </div> <div class="menu_button disabled" id="ng_long_retry_now" title="Restore previous guidance and regenerate"> <span class="fa-solid fa-rotate-right"></span> Retry </div> <div class="menu_button" id="ng_long_regenerate_now" title="Regenerate guidance now"> <span class="ng-regen-icon fa-solid fa-wand-sparkles"></span> Regenerate Now </div> </div> <div class="ng_prompt_section"> <label for="ng_long_themes_textarea"><b>Themes / Story Arcs:</b></label> <textarea id="ng_long_themes_textarea" class="text_pole" rows="4" placeholder="Optional themes, ideas, or arcs for the AI to consider..."></textarea> </div> <div class="ng_prompt_section"> <label for="ng_long_active_guidance_textarea"><b>Active Guidance:</b></label> <textarea id="ng_long_active_guidance_textarea" class="text_pole" rows="6" placeholder="The currently active long-term arc. Edit freely; changes apply on the next AI turn."></textarea> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the three long-term prompt fields below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="ng_long_presets"></div> <div class="menu_button saints_preview_btn" id="ng_long_preview_btn" title="Show the exact system prompt, assembled user prompt, prefill, and injection long-term guidance will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Generation Instructions Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_long_user_prompt_textarea" class="text_pole" rows="5" placeholder="Instructions sent as the user prompt for each generation..."></textarea> <small>Sent as the user prompt for each generation. Placeholders: <code>{{context}}</code> (chat/lore preamble), <code>{{themes}}</code> (your Themes / Story Arcs block). If a placeholder is missing, the blocks are prepended automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_long_generation_prompt_textarea" class="text_pole" rows="4" placeholder="Enter the prefill that the LLM will continue..."></textarea> <small>Sent as an assistant prefix the model continues from; the prefill plus the reply becomes the active guidance. If it opens with "[", the brackets are stripped when the guidance is injected into the chat prompt. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Injection Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_long_injection_prompt_textarea" class="text_pole" rows="3" placeholder="Template injected before each AI turn..."></textarea> <small>Added to the chat prompt before each AI turn while guidance is active. Placeholder: <code>{{guidance}}</code> — the active guidance text (outer brackets stripped).</small> </div> </div> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-bolt"></span> Short-term (the immediate beats)</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="ng_short_enabled" type="checkbox"/> <span>Enable Short-term Guidance</span> </label> <label class="checkbox_label" title="When on, regenerates the short-term beats automatically when its turn counter hits zero (and whenever the long-term arc refreshes). When off, only the Regenerate Now button updates it."> <input id="ng_short_auto_regen" type="checkbox"/> <span>Auto-Regenerate at Zero</span> </label> <div class="ng_inline_row"> <label for="ng_short_default_turn_count"><b>Turns Between Regenerations:</b></label> <input id="ng_short_default_turn_count" type="number" min="1" step="1" class="text_pole ng_number_input"/> </div> <div class="ng_inline_row"> <label for="ng_short_response_length"><b>Response Token Limit:</b></label> <input id="ng_short_response_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="Maximum number of tokens the model may use for each generated guidance paragraph."/> </div> <div class="ng_inline_row"> <label for="ng_short_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="ng_short_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for short-term generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="ng_short_injection_depth"><b>Depth:</b></label> <input id="ng_short_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the guidance after (0 = bottom)."/> <label for="ng_short_injection_role"><b>Role:</b></label> <select id="ng_short_injection_role" class="text_pole ng_select_input" title="Role used when injecting the guidance into the prompt."> <option value="system">System</option> <option value="user">User</option> <option value="assistant">Assistant</option> </select> </div> <div id="ng_short_lorebooks_host"></div> <div class="ng_inline_row"> <span><b>Turns Remaining:</b> <span id="ng_short_remaining_display">0</span></span> <div class="menu_button" id="ng_short_decrement_button" title="Decrement remaining by 1"> <span class="fa-solid fa-minus"></span> </div> <div class="menu_button" id="ng_short_reset_button" title="Reset remaining to default turn count"> <span class="fa-solid fa-rotate-right"></span> Reset </div> <div class="menu_button disabled" id="ng_short_continue_now" title="Continue the current guidance paragraph"> <span class="fa-solid fa-arrow-right"></span> Continue </div> <div class="menu_button disabled" id="ng_short_retry_now" title="Restore previous guidance and regenerate"> <span class="fa-solid fa-rotate-right"></span> Retry </div> <div class="menu_button" id="ng_short_regenerate_now" title="Regenerate guidance now"> <span class="ng-regen-icon fa-solid fa-wand-sparkles"></span> Regenerate Now </div> </div> <div class="ng_prompt_section"> <label for="ng_short_themes_textarea"><b>Themes / Story Arcs:</b></label> <textarea id="ng_short_themes_textarea" class="text_pole" rows="4" placeholder="Optional themes, ideas, or arcs for the AI to consider..."></textarea> </div> <div class="ng_prompt_section"> <label for="ng_short_active_guidance_textarea"><b>Active Guidance:</b></label> <textarea id="ng_short_active_guidance_textarea" class="text_pole" rows="6" placeholder="The currently active short-term beats. Edit freely; changes apply on the next AI turn."></textarea> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the three short-term prompt fields below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="ng_short_presets"></div> <div class="menu_button saints_preview_btn" id="ng_short_preview_btn" title="Show the exact system prompt, assembled user prompt, prefill, and injection short-term guidance will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Generation Instructions Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_short_user_prompt_textarea" class="text_pole" rows="5" placeholder="Instructions sent as the user prompt for each generation..."></textarea> <small>Sent as the user prompt for each generation. Placeholders: <code>{{context}}</code> (chat/lore preamble), <code>{{longGuidance}}</code> (the active long-term arc), <code>{{themes}}</code> (your Themes / Story Arcs block). If a placeholder is missing, the blocks are prepended automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_short_generation_prompt_textarea" class="text_pole" rows="4" placeholder="Enter the prefill that the LLM will continue..."></textarea> <small>Sent as an assistant prefix the model continues from; the prefill plus the reply becomes the active guidance. If it opens with "[", the brackets are stripped when the guidance is injected into the chat prompt. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Injection Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_short_injection_prompt_textarea" class="text_pole" rows="3" placeholder="Template injected before each AI turn..."></textarea> <small>Added to the chat prompt before each AI turn while guidance is active. Placeholder: <code>{{guidance}}</code> — the active guidance text (outer brackets stripped).</small> </div> </div> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-bug"></span> SSE Diagnostics</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label" title="Log detailed Possession events to the browser console."> <input id="possession_debug_mode" type="checkbox"/> <span>Possession Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Phrasing events to the browser console."> <input id="phrasing_debug_mode" type="checkbox"/> <span>Phrasing Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Assisted Character Creation events, prompts, and generations to the browser console."> <input id="acc_debug_mode" type="checkbox"/> <span>ACC Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed World Info Assist events, prompts, and generations to the browser console."> <input id="wia_debug_mode" type="checkbox"/> <span>WI Assist Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Narrative Guidance events to the browser console."> <input id="ng_debug_mode" type="checkbox"/> <span>Narrative Guidance Debug Mode</span> </label> <label class="checkbox_label" title="Log silent-generation lifecycle (job start/abort/completion, stop-listener events, stream token counts) to the browser console. Useful when diagnosing stop-button behavior across backends."> <input id="silent_generation_debug_mode" type="checkbox"/> <span>Silent Generation Debug Mode</span> </label> </div> </div> </div> `;
 // Exports
 /* harmony default export */ const settings = (code);
 ;// external "../../../../world-info.js"
@@ -5243,9 +5243,19 @@ function showWIAPromptPreview() {
  * context, then injects that paragraph as a system prompt before every AI
  * turn until a per-chat turn counter expires, at which point it regenerates.
  *
- * Per-chat state (active guidance, remaining turns, themes) lives in
- * `context.chatMetadata.narrativeGuidance`. Prompt templates and the
- * default turn count live in extension settings.
+ * Guidance comes in two independent tiers ("tracks"):
+ *   - Long-term  — the overarching arc, with a long refresh horizon.
+ *   - Short-term — the immediate beats, with a short refresh horizon.
+ * The tiers are fully separate (own themes, prompts, lore books, counter and
+ * toggles) but operate identically; everything track-specific is captured in
+ * the NG_TRACKS descriptors so the generation/injection/counter logic is
+ * shared. Short-term generation is hierarchical: it is seeded with the
+ * current long-term guidance so the immediate beats serve the larger arc, and
+ * a long-term refresh re-aligns short-term.
+ *
+ * Per-chat state lives under `context.chatMetadata.narrativeGuidance` as
+ * `{ long: { guidance, turnsRemaining, themes }, short: { … } }`. Legacy
+ * single-track state is mapped onto the short-term track on read.
  */
 
 
@@ -5255,78 +5265,173 @@ function showWIAPromptPreview() {
 
 // ─── Constants ───
 
-const NG_INJECTION_KEY = 'narrative_guidance';
 const NG_METADATA_KEY = 'narrativeGuidance';
 
-// User-prompt template for guidance generation. {{context}} and {{themes}}
-// are replaced by the packed chat/lore preamble and the per-chat themes
-// block; if either placeholder is missing, the block is prepended instead.
-const DEFAULT_NG_USER_PROMPT =
+// User-prompt templates for guidance generation. {{context}}, {{themes}} and
+// (short-term only) {{longGuidance}} are replaced by the packed chat/lore
+// preamble, the per-track themes block, and the active long-term arc; if a
+// placeholder is missing the block is prepended instead.
+const DEFAULT_NG_LONG_USER_PROMPT =
     '{{context}}{{themes}}Continue the bracketed paragraph below. Output a single short paragraph ' +
-    '(2–4 sentences) proposing where the story should head over the next several turns. ' +
-    'Describe direction, mood, complications, and beats — not direct dialogue or scene actions. ' +
+    '(2–4 sentences) describing the overarching direction of the story across the next many turns — ' +
+    'the larger arc, the escalating stakes, and where events are ultimately heading. ' +
+    'Describe the broad trajectory and mood, not immediate dialogue or scene actions. ' +
     'Close the bracket when done.';
 
-const DEFAULT_NG_GENERATION_PROMPT =
-    '[The following paragraph is based on the given context, and will guide the actions of the characters for the next several turns:';
+const DEFAULT_NG_SHORT_USER_PROMPT =
+    '{{context}}{{longGuidance}}{{themes}}Continue the bracketed paragraph below. Output a single short paragraph ' +
+    '(2–4 sentences) proposing where the story should head over the next few turns — ' +
+    'immediate direction, mood, complications, and beats that move the scene toward the overarching arc. ' +
+    'Describe direction, not direct dialogue or scene actions. Close the bracket when done.';
 
-const DEFAULT_NG_INJECTION_PROMPT =
-    '[Guide the story in the following direction: {{guidance}}]';
+const DEFAULT_NG_LONG_GENERATION_PROMPT =
+    '[The following paragraph describes the overarching story arc, and will guide the long-term direction of the story:';
+
+const DEFAULT_NG_SHORT_GENERATION_PROMPT =
+    '[The following paragraph is based on the given context, and will guide the actions of the characters for the next few turns:';
+
+const DEFAULT_NG_LONG_INJECTION_PROMPT =
+    '[Overall story direction: {{guidance}}]';
+
+const DEFAULT_NG_SHORT_INJECTION_PROMPT =
+    '[Guide the story in the following direction over the next few turns: {{guidance}}]';
 
 const NG_GENERATION_SYSTEM_PROMPT =
     'You are a story-direction assistant. Output only a single short paragraph ' +
     'of narrative guidance in the requested bracketed format. ' +
     'No commentary, no preamble, no explanations.';
 
-const DEFAULT_NG_TURN_COUNT = 10;
+const DEFAULT_NG_LONG_TURN_COUNT = 40;
+const DEFAULT_NG_SHORT_TURN_COUNT = 8;
 const DEFAULT_NG_INJECTION_DEPTH = 0;
 const DEFAULT_NG_INJECTION_ROLE = 'system';
 const DEFAULT_NG_RESPONSE_LENGTH = 400;
+
+// ─── Track Descriptors ───
+
+// Everything track-specific lives here so the shared logic below can be
+// parameterized by track. `settingPrefix` + a suffix yields the extension
+// settings key (e.g. 'narrativeGuidanceLongEnabled'); `domPrefix` + a suffix
+// yields the settings-panel element id (e.g. 'ng_long_enabled').
+const NG_TRACKS = {
+    long: {
+        id: 'long',
+        label: 'Long-term',
+        injectionKey: 'narrative_guidance_long',
+        countedFlag: 'ngLongCounted',
+        settingPrefix: 'narrativeGuidanceLong',
+        domPrefix: 'ng_long',
+        hierarchical: false,
+        defaultTurnCount: DEFAULT_NG_LONG_TURN_COUNT,
+        defaultUserPrompt: DEFAULT_NG_LONG_USER_PROMPT,
+        defaultGenerationPrompt: DEFAULT_NG_LONG_GENERATION_PROMPT,
+        defaultInjectionPrompt: DEFAULT_NG_LONG_INJECTION_PROMPT,
+    },
+    short: {
+        id: 'short',
+        label: 'Short-term',
+        injectionKey: 'narrative_guidance_short',
+        countedFlag: 'ngShortCounted',
+        settingPrefix: 'narrativeGuidanceShort',
+        domPrefix: 'ng_short',
+        hierarchical: true,
+        defaultTurnCount: DEFAULT_NG_SHORT_TURN_COUNT,
+        defaultUserPrompt: DEFAULT_NG_SHORT_USER_PROMPT,
+        defaultGenerationPrompt: DEFAULT_NG_SHORT_GENERATION_PROMPT,
+        defaultInjectionPrompt: DEFAULT_NG_SHORT_INJECTION_PROMPT,
+    },
+};
+
+// Long first so short (hierarchical) sees a freshly-bootstrapped arc.
+const NG_TRACK_LIST = [NG_TRACKS.long, NG_TRACKS.short];
+
+function settingKey(track, suffix) {
+    return `${track.settingPrefix}${suffix}`;
+}
+
+function getSetting(track, suffix) {
+    return narrative_guidance_moduleSettings?.[settingKey(track, suffix)];
+}
+
+function domId(track, suffix) {
+    return `${track.domPrefix}_${suffix}`;
+}
+
+function trackEl(track, suffix) {
+    return document.getElementById(domId(track, suffix));
+}
 
 // ─── Module State ───
 
 let narrative_guidance_moduleSettings = null;
 let narrative_guidance_saveSettingsCb = null;
 let narrative_guidance_debug = () => {};
-let regenInProgress = false;
-// Which action is currently running: 'regen' | 'continue' | null.
-// Used to swap the active button to Stop and route its click to cancel.
-let ngActiveAction = null;
-let ngLastGuidanceSnapshot = null; // guidance text before last regen, for Retry
 let saveTimer = null;
+
+// Per-track runtime: in-progress flag, the action currently running
+// ('regen' | 'continue' | null) used to swap the active button to Stop, and
+// the pre-regen guidance snapshot for Retry.
+const runtime = {
+    long: { regenInProgress: false, activeAction: null, lastSnapshot: null },
+    short: { regenInProgress: false, activeAction: null, lastSnapshot: null },
+};
 
 // ─── Per-chat State ───
 
-function loadChatState() {
+/**
+ * Read the per-chat NG container, normalizing legacy single-track state onto
+ * the short-term track. Pure read — never mutates chatMetadata, so the
+ * migration is only persisted on the next write.
+ */
+function readContainer() {
     const context = getContext();
     const raw = context.chatMetadata?.[NG_METADATA_KEY];
+    if (raw && (raw.long !== undefined || raw.short !== undefined)) {
+        return raw;
+    }
+    // Empty or legacy single-track shape → map any legacy guidance to short.
     return {
-        guidance: typeof raw?.guidance === 'string' ? raw.guidance : '',
-        turnsRemaining: Number.isFinite(raw?.turnsRemaining) ? raw.turnsRemaining : 0,
-        themes: typeof raw?.themes === 'string' ? raw.themes : '',
+        long: { guidance: '', turnsRemaining: 0, themes: '' },
+        short: {
+            guidance: typeof raw?.guidance === 'string' ? raw.guidance : '',
+            turnsRemaining: Number.isFinite(raw?.turnsRemaining) ? raw.turnsRemaining : 0,
+            themes: typeof raw?.themes === 'string' ? raw.themes : '',
+        },
     };
 }
 
-function writeChatState(state) {
+function loadChatState(track) {
+    const raw = readContainer()[track.id] || {};
+    return {
+        guidance: typeof raw.guidance === 'string' ? raw.guidance : '',
+        turnsRemaining: Number.isFinite(raw.turnsRemaining) ? raw.turnsRemaining : 0,
+        themes: typeof raw.themes === 'string' ? raw.themes : '',
+    };
+}
+
+function writeChatState(track, state) {
     const context = getContext();
-    context.chatMetadata[NG_METADATA_KEY] = {
+    const container = readContainer();
+    container[track.id] = {
         guidance: state.guidance || '',
         turnsRemaining: Number.isFinite(state.turnsRemaining) ? state.turnsRemaining : 0,
         themes: state.themes || '',
     };
+    context.chatMetadata[NG_METADATA_KEY] = container;
 }
 
-function saveChatState(state) {
-    writeChatState(state);
+function saveChatState(track, state) {
+    writeChatState(track, state);
     getContext().saveMetadata();
 }
 
-function scheduleChatStateSave(state) {
-    // Write through to chatMetadata immediately so a concurrent edit to the
-    // other textarea (which reloads state via loadChatState) or a chat switch
-    // never observes — or persists — stale state. Only the saveMetadata call
-    // is debounced.
-    writeChatState(state);
+function scheduleChatStateSave(track, state) {
+    // Write through to chatMetadata immediately so a concurrent edit to
+    // another textarea (which reloads state via loadChatState) or a chat
+    // switch never observes — or persists — stale state. Only the
+    // saveMetadata call is debounced. A single shared timer is fine because
+    // saveMetadata persists the whole container.
+    writeChatState(track, state);
     if (saveTimer) clearTimeout(saveTimer);
     saveTimer = setTimeout(() => {
         saveTimer = null;
@@ -5334,42 +5439,50 @@ function scheduleChatStateSave(state) {
     }, 200);
 }
 
-// ─── Injection ───
-
-function clearInjection() {
-    __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_setExtensionPrompt__(NG_INJECTION_KEY, '', __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_types__.NONE, 0);
+function resolveTurnCount(track) {
+    const n = getSetting(track, 'DefaultTurnCount');
+    return Number.isFinite(n) && n > 0 ? n : track.defaultTurnCount;
 }
 
-function reapplyInjection() {
-    if (!narrative_guidance_moduleSettings?.narrativeGuidanceEnabled) {
-        clearInjection();
+function resolveResponseLength(track) {
+    const n = getSetting(track, 'ResponseLength');
+    return Number.isFinite(n) && n > 0 ? n : DEFAULT_NG_RESPONSE_LENGTH;
+}
+
+// ─── Injection ───
+
+function clearInjection(track) {
+    __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_setExtensionPrompt__(track.injectionKey, '', __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_types__.NONE, 0);
+}
+
+function reapplyInjection(track) {
+    if (!getSetting(track, 'Enabled')) {
+        clearInjection(track);
         return;
     }
-    const state = loadChatState();
+    const state = loadChatState(track);
     if (!state.guidance) {
-        clearInjection();
+        clearInjection(track);
         return;
     }
-    const tpl = narrative_guidance_moduleSettings.narrativeGuidanceInjectionPrompt || DEFAULT_NG_INJECTION_PROMPT;
+    const tpl = getSetting(track, 'InjectionPrompt') || track.defaultInjectionPrompt;
     // state.guidance retains the generation prefill (so the textarea shows
     // it). Strip outer brackets here so {{guidance}} substitutes cleanly
     // into whatever injection template the user has configured.
     const guidanceForInjection = stripBracketWrap(state.guidance);
     const body = __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParamsExtended__(tpl, { guidance: guidanceForInjection });
-    const depth = Number.isFinite(narrative_guidance_moduleSettings.narrativeGuidanceInjectionDepth)
-        && narrative_guidance_moduleSettings.narrativeGuidanceInjectionDepth >= 0
-        ? narrative_guidance_moduleSettings.narrativeGuidanceInjectionDepth
-        : 0;
-    const role = resolveInjectionRole(narrative_guidance_moduleSettings.narrativeGuidanceInjectionRole);
+    const configuredDepth = getSetting(track, 'InjectionDepth');
+    const depth = Number.isFinite(configuredDepth) && configuredDepth >= 0 ? configuredDepth : 0;
+    const role = resolveInjectionRole(getSetting(track, 'InjectionRole'));
     __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_setExtensionPrompt__(
-        NG_INJECTION_KEY,
+        track.injectionKey,
         body,
         __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_types__.IN_CHAT,
         depth,
         false,
         role,
     );
-    narrative_guidance_debug('Injected guidance — depth:', depth, 'role:', narrative_guidance_moduleSettings.narrativeGuidanceInjectionRole, 'body length:', body.length);
+    narrative_guidance_debug(`[${track.id}] Injected guidance — depth:`, depth, 'role:', getSetting(track, 'InjectionRole'), 'body length:', body.length);
 }
 
 function resolveInjectionRole(name) {
@@ -5392,78 +5505,104 @@ function stripBracketWrap(text) {
 
 /**
  * Assemble the guidance-generation user prompt from the editable template.
- * {{context}} / {{themes}} are substituted in place; when a placeholder is
- * absent the corresponding block is prepended (context first), matching the
- * pre-template behavior.
+ * {{context}} / {{themes}} / {{longGuidance}} are substituted in place; when a
+ * placeholder is absent the corresponding block is prepended (context first,
+ * then long-term arc, then themes), matching the pre-template behavior.
  */
-function composeGenerationPrompt(preambleBlock, themesBlock) {
-    const tpl = (typeof narrative_guidance_moduleSettings?.narrativeGuidancePrompt === 'string'
-        && narrative_guidance_moduleSettings.narrativeGuidancePrompt.trim())
-        ? narrative_guidance_moduleSettings.narrativeGuidancePrompt
-        : DEFAULT_NG_USER_PROMPT;
+function composeGenerationPrompt(track, preambleBlock, themesBlock, longGuidanceBlock) {
+    const configured = getSetting(track, 'Prompt');
+    const tpl = (typeof configured === 'string' && configured.trim())
+        ? configured
+        : track.defaultUserPrompt;
     const { text, used } = applyTemplateMacros(tpl, {
         context: preambleBlock || '',
         themes: themesBlock || '',
+        longGuidance: longGuidanceBlock || '',
     });
     let prompt = text;
     if (!used.has('themes') && themesBlock) prompt = themesBlock + prompt;
+    if (track.hierarchical && !used.has('longGuidance') && longGuidanceBlock) prompt = longGuidanceBlock + prompt;
     if (!used.has('context') && preambleBlock) prompt = preambleBlock + prompt;
     return prompt;
 }
 
-function showNGPromptPreview() {
+/** Build the long-term arc block fed into short-term (hierarchical) prompts. */
+function buildLongGuidanceBlock() {
+    const longText = stripBracketWrap(loadChatState(NG_TRACKS.long).guidance || '');
+    return longText
+        ? `Long-term story direction to stay consistent with:\n${longText}\n\n`
+        : '';
+}
+
+function showNGPromptPreview(track) {
     const sampleContext =
         'Existing context to consider when generating (do not repeat verbatim):\n'
         + '(character cards, persona, selected lore books, and recent chat)\n\n';
     const sampleThemes = 'Themes / story arcs to weave in:\n(your Themes / Story Arcs text)\n\n';
-    const prefill = narrative_guidance_moduleSettings.narrativeGuidanceGenerationPrompt || DEFAULT_NG_GENERATION_PROMPT;
-    const injectionTpl = narrative_guidance_moduleSettings.narrativeGuidanceInjectionPrompt || DEFAULT_NG_INJECTION_PROMPT;
+    const sampleLong = track.hierarchical
+        ? 'Long-term story direction to stay consistent with:\n(the active long-term guidance)\n\n'
+        : '';
+    const prefill = getSetting(track, 'GenerationPrompt') || track.defaultGenerationPrompt;
+    const injectionTpl = getSetting(track, 'InjectionPrompt') || track.defaultInjectionPrompt;
     const injection = __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParamsExtended__(injectionTpl, {
         guidance: '(the generated guidance text, outer brackets stripped)',
     });
-    showPromptPreview('Narrative Guidance — Prompt Preview', [
+    showPromptPreview(`Narrative Guidance (${track.label}) — Prompt Preview`, [
         { label: 'System Prompt (fixed)', text: NG_GENERATION_SYSTEM_PROMPT },
-        { label: 'User Prompt (Generation Instructions template with sample values)', text: composeGenerationPrompt(sampleContext, sampleThemes) },
+        { label: 'User Prompt (Generation Instructions template with sample values)', text: composeGenerationPrompt(track, sampleContext, sampleThemes, sampleLong) },
         { label: 'Prefill (assistant prefix; kept at the start of the stored guidance)', text: prefill },
         { label: 'Injection (added to the chat prompt before each AI turn while guidance is active)', text: injection },
     ]);
 }
 
-async function regenGuidance(reason) {
-    if (regenInProgress) {
-        narrative_guidance_debug('regenGuidance — skipped (already running)');
+/**
+ * If a long-term refresh just landed, re-align short-term to it (when
+ * short-term is enabled and auto-regenerating). Fire-and-forget — the new
+ * short-term guidance lands before the user's next send.
+ */
+function maybeCascadeShortRegen(reason) {
+    const short = NG_TRACKS.short;
+    if (!getSetting(short, 'Enabled')) return;
+    if (!getSetting(short, 'AutoRegen')) return;
+    if (runtime.short.regenInProgress) return;
+    narrative_guidance_debug('Cascading short-term regen after long-term refresh');
+    regenGuidance(short, `long-term refreshed (${reason})`).catch(err => {
+        console.error('Narrative Guidance short-term cascade failed:', err);
+    });
+}
+
+async function regenGuidance(track, reason) {
+    const rt = runtime[track.id];
+    if (rt.regenInProgress) {
+        narrative_guidance_debug(`[${track.id}] regenGuidance — skipped (already running)`);
         return;
     }
-    if (!narrative_guidance_moduleSettings?.narrativeGuidanceEnabled) {
-        narrative_guidance_debug('regenGuidance — skipped (disabled)');
+    if (!getSetting(track, 'Enabled')) {
+        narrative_guidance_debug(`[${track.id}] regenGuidance — skipped (disabled)`);
         return;
     }
 
     // Snapshot current guidance before overwriting so Retry can restore it.
-    const preRegenState = loadChatState();
-    ngLastGuidanceSnapshot = preRegenState.guidance || '';
+    rt.lastSnapshot = loadChatState(track).guidance || '';
 
-    regenInProgress = true;
-    ngActiveAction = 'regen';
-    setNGActionButtonsRunning(true);
-    clearInjection();
-    narrative_guidance_debug('regenGuidance — starting, reason:', reason);
+    rt.regenInProgress = true;
+    rt.activeAction = 'regen';
+    setNGActionButtonsRunning(track, true);
+    clearInjection(track);
+    narrative_guidance_debug(`[${track.id}] regenGuidance — starting, reason:`, reason);
 
-    const dismissProgressToast = stickyToast('Generating narrative guidance…', 'info');
+    const dismissProgressToast = stickyToast(`Generating ${track.label.toLowerCase()} narrative guidance…`, 'info');
 
     try {
-        const responseLength = Number.isFinite(narrative_guidance_moduleSettings.narrativeGuidanceResponseLength)
-            && narrative_guidance_moduleSettings.narrativeGuidanceResponseLength > 0
-            ? narrative_guidance_moduleSettings.narrativeGuidanceResponseLength
-            : DEFAULT_NG_RESPONSE_LENGTH;
-        const state = loadChatState();
+        const responseLength = resolveResponseLength(track);
+        const state = loadChatState(track);
         const preamble = await buildContextPreamble({
             includeChat: true,
-            loreBookNames: Array.isArray(narrative_guidance_moduleSettings.narrativeGuidanceLoreBookNames)
-                ? narrative_guidance_moduleSettings.narrativeGuidanceLoreBookNames
+            loreBookNames: Array.isArray(getSetting(track, 'LoreBookNames'))
+                ? getSetting(track, 'LoreBookNames')
                 : [],
             responseLength,
-            maxContextOverride: narrative_guidance_moduleSettings.narrativeGuidanceMaxContextOverride || 0,
+            maxContextOverride: getSetting(track, 'MaxContextOverride') || 0,
         });
 
         const themesBlock = state.themes && state.themes.trim()
@@ -5474,17 +5613,16 @@ async function regenGuidance(reason) {
             ? `Existing context to consider when generating (do not repeat verbatim):\n${preamble}\n\n`
             : '';
 
-        const prefill = narrative_guidance_moduleSettings.narrativeGuidanceGenerationPrompt
-            || DEFAULT_NG_GENERATION_PROMPT;
+        const longGuidanceBlock = track.hierarchical ? buildLongGuidanceBlock() : '';
 
-        const userPrompt = composeGenerationPrompt(preambleBlock, themesBlock);
+        const prefill = getSetting(track, 'GenerationPrompt') || track.defaultGenerationPrompt;
+
+        const userPrompt = composeGenerationPrompt(track, preambleBlock, themesBlock, longGuidanceBlock);
         const systemPrompt = NG_GENERATION_SYSTEM_PROMPT;
 
-        narrative_guidance_debug('System prompt:', systemPrompt);
-        narrative_guidance_debug('User prompt length:', userPrompt.length);
-        narrative_guidance_debug('Prefill:', prefill);
+        narrative_guidance_debug(`[${track.id}] User prompt length:`, userPrompt.length, 'prefill:', prefill);
 
-        const guidanceArea = document.getElementById('ng_active_guidance_textarea');
+        const guidanceArea = trackEl(track, 'active_guidance_textarea');
         const raw = await withSingleLineDisabled(() => streamingGenerate(
             { prompt: userPrompt, systemPrompt, responseLength, prefill },
             guidanceArea,
@@ -5503,63 +5641,60 @@ async function regenGuidance(reason) {
         }
 
         state.guidance = (prefill || '') + cleaned;
-        const defaultTurns = Number.isFinite(narrative_guidance_moduleSettings.narrativeGuidanceDefaultTurnCount)
-            && narrative_guidance_moduleSettings.narrativeGuidanceDefaultTurnCount > 0
-            ? narrative_guidance_moduleSettings.narrativeGuidanceDefaultTurnCount
-            : DEFAULT_NG_TURN_COUNT;
-        state.turnsRemaining = defaultTurns;
-        saveChatState(state);
+        state.turnsRemaining = resolveTurnCount(track);
+        saveChatState(track, state);
 
-        refreshPanelFromState();
-        reapplyInjection();
-        toast('Narrative guidance regenerated.', 'success');
-        narrative_guidance_debug('regenGuidance — complete, length:', cleaned.length);
+        refreshPanelFromState(track);
+        reapplyInjection(track);
+        toast(`${track.label} narrative guidance regenerated.`, 'success');
+        narrative_guidance_debug(`[${track.id}] regenGuidance — complete, length:`, cleaned.length);
+
+        // A fresh long-term arc re-aligns the short-term track.
+        if (track.id === 'long') maybeCascadeShortRegen(reason);
     } catch (err) {
         if (isSilentGenerationAbort(err)) {
-            narrative_guidance_debug('regenGuidance — cancelled by user');
+            narrative_guidance_debug(`[${track.id}] regenGuidance — cancelled by user`);
         } else {
-            console.error('Narrative Guidance generation error:', err);
-            toast(`Narrative guidance failed: ${err.message}`, 'error');
+            console.error(`Narrative Guidance (${track.label}) generation error:`, err);
+            toast(`${track.label} narrative guidance failed: ${err.message}`, 'error');
         }
         // Resync the textarea (the failed run may have left discarded model
         // output in it) and restore whatever injection we had before clearing.
-        refreshPanelFromState();
-        reapplyInjection();
+        refreshPanelFromState(track);
+        reapplyInjection(track);
     } finally {
         dismissProgressToast();
-        regenInProgress = false;
-        ngActiveAction = null;
-        setNGActionButtonsRunning(false);
+        rt.regenInProgress = false;
+        rt.activeAction = null;
+        setNGActionButtonsRunning(track, false);
     }
 }
 
-async function continueGuidance() {
-    if (regenInProgress) {
-        narrative_guidance_debug('continueGuidance — skipped (already running)');
+async function continueGuidance(track) {
+    const rt = runtime[track.id];
+    if (rt.regenInProgress) {
+        narrative_guidance_debug(`[${track.id}] continueGuidance — skipped (already running)`);
         return;
     }
-    if (!narrative_guidance_moduleSettings?.narrativeGuidanceEnabled) {
-        narrative_guidance_debug('continueGuidance — skipped (disabled)');
+    if (!getSetting(track, 'Enabled')) {
+        narrative_guidance_debug(`[${track.id}] continueGuidance — skipped (disabled)`);
         return;
     }
-    const state = loadChatState();
+    const state = loadChatState(track);
     if (!state.guidance) {
         toast('No active guidance to continue. Regenerate first.', 'warning');
         return;
     }
 
-    regenInProgress = true;
-    ngActiveAction = 'continue';
-    setNGActionButtonsRunning(true);
-    narrative_guidance_debug('continueGuidance — starting');
+    rt.regenInProgress = true;
+    rt.activeAction = 'continue';
+    setNGActionButtonsRunning(track, true);
+    narrative_guidance_debug(`[${track.id}] continueGuidance — starting`);
 
-    const dismissProgressToast = stickyToast('Continuing narrative guidance…', 'info');
+    const dismissProgressToast = stickyToast(`Continuing ${track.label.toLowerCase()} narrative guidance…`, 'info');
 
     try {
-        const responseLength = Number.isFinite(narrative_guidance_moduleSettings.narrativeGuidanceResponseLength)
-            && narrative_guidance_moduleSettings.narrativeGuidanceResponseLength > 0
-            ? narrative_guidance_moduleSettings.narrativeGuidanceResponseLength
-            : DEFAULT_NG_RESPONSE_LENGTH;
+        const responseLength = resolveResponseLength(track);
 
         const continuePrompt =
             `The following narrative guidance paragraph is in progress:\n\n${state.guidance}\n\n` +
@@ -5571,9 +5706,9 @@ async function continueGuidance() {
             'You are a story-direction assistant. Output only the continuation of the guidance. ' +
             'No commentary, no preamble, no explanations.';
 
-        narrative_guidance_debug('Continue prompt length:', continuePrompt.length);
+        narrative_guidance_debug(`[${track.id}] Continue prompt length:`, continuePrompt.length);
 
-        const guidanceArea = document.getElementById('ng_active_guidance_textarea');
+        const guidanceArea = trackEl(track, 'active_guidance_textarea');
         const raw = await withSingleLineDisabled(() => streamingGenerate(
             { prompt: continuePrompt, systemPrompt, responseLength },
             guidanceArea,
@@ -5583,104 +5718,115 @@ async function continueGuidance() {
         const continuation = __WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(raw).trim();
         if (!continuation) throw new Error('Model returned empty continuation.');
 
-        ngLastGuidanceSnapshot = state.guidance;
+        rt.lastSnapshot = state.guidance;
         const sep = state.guidance.endsWith(' ') || continuation.startsWith(' ') ? '' : ' ';
         state.guidance = state.guidance + sep + continuation;
-        saveChatState(state);
+        saveChatState(track, state);
 
-        refreshPanelFromState();
-        reapplyInjection();
-        toast('Narrative guidance continued.', 'success');
-        narrative_guidance_debug('continueGuidance — complete, added length:', continuation.length);
+        refreshPanelFromState(track);
+        reapplyInjection(track);
+        toast(`${track.label} narrative guidance continued.`, 'success');
+        narrative_guidance_debug(`[${track.id}] continueGuidance — complete, added length:`, continuation.length);
     } catch (err) {
         if (isSilentGenerationAbort(err)) {
-            narrative_guidance_debug('continueGuidance — cancelled by user');
+            narrative_guidance_debug(`[${track.id}] continueGuidance — cancelled by user`);
         } else {
-            console.error('Narrative Guidance continue error:', err);
-            toast(`Continue failed: ${err.message}`, 'error');
+            console.error(`Narrative Guidance (${track.label}) continue error:`, err);
+            toast(`${track.label} continue failed: ${err.message}`, 'error');
         }
         // Resync the textarea — the failed run may have appended discarded
         // model output that never made it into the saved state.
-        refreshPanelFromState();
+        refreshPanelFromState(track);
     } finally {
         dismissProgressToast();
-        regenInProgress = false;
-        ngActiveAction = null;
-        setNGActionButtonsRunning(false);
-        refreshNGActionButtonStates();
+        rt.regenInProgress = false;
+        rt.activeAction = null;
+        setNGActionButtonsRunning(track, false);
+        refreshNGActionButtonStates(track);
     }
 }
 
 // ─── Event Handlers ───
 
 function onNarrativeGuidanceChatChanged() {
-    refreshPanelFromState();
-    reapplyInjection();
+    for (const track of NG_TRACK_LIST) {
+        refreshPanelFromState(track);
+        reapplyInjection(track);
+    }
     narrative_guidance_debug('Chat changed, state reloaded');
 }
 
 async function onNarrativeGuidanceMessageSent(_messageIndex) {
-    if (!narrative_guidance_moduleSettings?.narrativeGuidanceEnabled) return;
-    if (regenInProgress) return;
-    if (!narrative_guidance_moduleSettings.narrativeGuidanceAutoRegen) {
-        reapplyInjection();
-        return;
-    }
-    const state = loadChatState();
-    if (!state.guidance) {
-        // First-turn bootstrap: block briefly so the next AI turn sees guidance.
-        await regenGuidance('no guidance yet');
-    } else {
-        reapplyInjection();
+    // Long-term first so a freshly-bootstrapped arc is available to seed a
+    // short-term bootstrap on the same turn.
+    for (const track of NG_TRACK_LIST) {
+        if (!getSetting(track, 'Enabled')) continue;
+        if (runtime[track.id].regenInProgress) continue;
+        if (!getSetting(track, 'AutoRegen')) {
+            reapplyInjection(track);
+            continue;
+        }
+        const state = loadChatState(track);
+        if (!state.guidance) {
+            // First-turn bootstrap: block briefly so the next AI turn sees
+            // guidance. (A long-term bootstrap may cascade short-term, which
+            // sets short's in-progress flag before this loop reaches it.)
+            await regenGuidance(track, 'no guidance yet');
+        } else {
+            reapplyInjection(track);
+        }
     }
 }
 
 function onNarrativeGuidanceMessageReceived(messageIndex) {
-    if (!narrative_guidance_moduleSettings?.narrativeGuidanceEnabled) return;
-    if (regenInProgress) return;
     const ctx = getContext();
     const idx = typeof messageIndex === 'number' ? messageIndex : ctx.chat.length - 1;
     const msg = ctx.chat?.[idx];
     if (!msg) return;
     if (msg.is_user || msg.is_system) return;
-    if (msg.extra?.narrativeGuidanceCounted) return;
 
-    const state = loadChatState();
-    if (state.turnsRemaining > 0) {
-        state.turnsRemaining -= 1;
-        saveChatState(state);
-        refreshRemainingDisplay(state.turnsRemaining);
-    }
-    msg.extra = { ...(msg.extra || {}), narrativeGuidanceCounted: true };
-    narrative_guidance_debug('Counter decremented, turnsRemaining:', state.turnsRemaining);
+    for (const track of NG_TRACK_LIST) {
+        if (!getSetting(track, 'Enabled')) continue;
+        if (runtime[track.id].regenInProgress) continue;
+        if (msg.extra?.[track.countedFlag]) continue;
 
-    if (state.turnsRemaining <= 0 && narrative_guidance_moduleSettings.narrativeGuidanceAutoRegen) {
-        // Fire-and-forget so the new guidance is in place before the user's next send.
-        regenGuidance('counter expired').catch(err => {
-            console.error('Narrative Guidance auto-regen failed:', err);
-        });
+        const state = loadChatState(track);
+        if (state.turnsRemaining > 0) {
+            state.turnsRemaining -= 1;
+            saveChatState(track, state);
+            refreshRemainingDisplay(track, state.turnsRemaining);
+        }
+        msg.extra = { ...(msg.extra || {}), [track.countedFlag]: true };
+        narrative_guidance_debug(`[${track.id}] Counter decremented, turnsRemaining:`, state.turnsRemaining);
+
+        if (state.turnsRemaining <= 0 && getSetting(track, 'AutoRegen')) {
+            // Fire-and-forget so new guidance is in place before the next send.
+            regenGuidance(track, 'counter expired').catch(err => {
+                console.error(`Narrative Guidance (${track.label}) auto-regen failed:`, err);
+            });
+        }
     }
 }
 
 // ─── Settings Panel ───
 
-function refreshRemainingDisplay(remaining) {
-    const display = document.getElementById('ng_remaining_display');
+function refreshRemainingDisplay(track, remaining) {
+    const display = trackEl(track, 'remaining_display');
     if (display) display.textContent = String(remaining);
 }
 
-function refreshPanelFromState() {
-    const state = loadChatState();
-    const themesArea = document.getElementById('ng_themes_textarea');
+function refreshPanelFromState(track) {
+    const state = loadChatState(track);
+    const themesArea = trackEl(track, 'themes_textarea');
     if (themesArea && document.activeElement !== themesArea) {
         themesArea.value = state.themes || '';
     }
-    const guidanceArea = document.getElementById('ng_active_guidance_textarea');
+    const guidanceArea = trackEl(track, 'active_guidance_textarea');
     if (guidanceArea && document.activeElement !== guidanceArea) {
         guidanceArea.value = state.guidance || '';
     }
-    refreshRemainingDisplay(state.turnsRemaining);
-    refreshNGActionButtonStates();
+    refreshRemainingDisplay(track, state.turnsRemaining);
+    refreshNGActionButtonStates(track);
 }
 
 // Original button HTML, captured so we can restore it when leaving the
@@ -5689,15 +5835,15 @@ const NG_REGEN_BTN_HTML = '<span class="ng-regen-icon fa-solid fa-wand-sparkles"
 const NG_CONTINUE_BTN_HTML = '<span class="fa-solid fa-arrow-right"></span> Continue';
 const NG_STOP_BTN_HTML = '<span class="fa-solid fa-stop"></span> Stop';
 
-function setNGActionButtonsRunning(running) {
-    const regenBtn = document.getElementById('ng_regenerate_now');
-    const continueBtn = document.getElementById('ng_continue_now');
-    const retryBtn = document.getElementById('ng_retry_now');
+function setNGActionButtonsRunning(track, running) {
+    const regenBtn = trackEl(track, 'regenerate_now');
+    const continueBtn = trackEl(track, 'continue_now');
+    const retryBtn = trackEl(track, 'retry_now');
 
     if (running) {
         // Active button becomes Stop; the others get the disabled class so the
         // user can't fire off a second job mid-flight.
-        if (ngActiveAction === 'continue') {
+        if (runtime[track.id].activeAction === 'continue') {
             if (regenBtn) {
                 regenBtn.innerHTML = NG_REGEN_BTN_HTML;
                 regenBtn.classList.add('disabled');
@@ -5731,61 +5877,241 @@ function setNGActionButtonsRunning(running) {
     }
 }
 
-function refreshNGActionButtonStates() {
-    if (regenInProgress) return;
-    const state = loadChatState();
-    document.getElementById('ng_retry_now')
-        ?.classList.toggle('disabled', ngLastGuidanceSnapshot === null);
-    document.getElementById('ng_continue_now')
+function refreshNGActionButtonStates(track) {
+    if (runtime[track.id].regenInProgress) return;
+    const state = loadChatState(track);
+    trackEl(track, 'retry_now')
+        ?.classList.toggle('disabled', runtime[track.id].lastSnapshot === null);
+    trackEl(track, 'continue_now')
         ?.classList.toggle('disabled', !(state.guidance && state.guidance.trim()));
 }
 
-function populateLoreBookPicker() {
-    const host = document.getElementById('ng_lorebooks_host');
+function populateLoreBookPicker(track) {
+    const host = trackEl(track, 'lorebooks_host');
     if (!host) return;
 
-    const initial = Array.isArray(narrative_guidance_moduleSettings.narrativeGuidanceLoreBookNames)
-        ? narrative_guidance_moduleSettings.narrativeGuidanceLoreBookNames
+    const initial = Array.isArray(getSetting(track, 'LoreBookNames'))
+        ? getSetting(track, 'LoreBookNames')
         : [];
 
     const { element } = createLoreBookPicker({
         initialSelection: initial,
+        // Shared styling class across both tracks; the element id differs.
         classPrefix: 'ng-lorebook',
         onChange: (names) => {
-            narrative_guidance_moduleSettings.narrativeGuidanceLoreBookNames = names;
+            narrative_guidance_moduleSettings[settingKey(track, 'LoreBookNames')] = names;
             narrative_guidance_saveSettingsCb?.();
         },
     });
-    element.id = 'ng_lorebooks_details';
+    element.id = domId(track, 'lorebooks_details');
     host.replaceChildren(element);
+}
+
+/** Bind every per-track control in the settings panel for one track. */
+function bindTrackControls(track, saveSettings) {
+    const enabledCb = trackEl(track, 'enabled');
+    if (enabledCb) {
+        enabledCb.checked = !!getSetting(track, 'Enabled');
+        enabledCb.addEventListener('change', () => {
+            narrative_guidance_moduleSettings[settingKey(track, 'Enabled')] = enabledCb.checked;
+            saveSettings();
+            if (enabledCb.checked) {
+                reapplyInjection(track);
+            } else {
+                clearInjection(track);
+            }
+        });
+    }
+
+    const autoRegenCb = trackEl(track, 'auto_regen');
+    if (autoRegenCb) {
+        autoRegenCb.checked = !!getSetting(track, 'AutoRegen');
+        autoRegenCb.addEventListener('change', () => {
+            narrative_guidance_moduleSettings[settingKey(track, 'AutoRegen')] = autoRegenCb.checked;
+            saveSettings();
+        });
+    }
+
+    const turnCountInput = trackEl(track, 'default_turn_count');
+    if (turnCountInput) {
+        turnCountInput.value = getSetting(track, 'DefaultTurnCount') || track.defaultTurnCount;
+        turnCountInput.addEventListener('input', () => {
+            const n = parseInt(turnCountInput.value, 10);
+            if (Number.isFinite(n) && n > 0) {
+                narrative_guidance_moduleSettings[settingKey(track, 'DefaultTurnCount')] = n;
+                saveSettings();
+            }
+        });
+    }
+
+    const responseLengthInput = trackEl(track, 'response_length');
+    if (responseLengthInput) {
+        responseLengthInput.value = getSetting(track, 'ResponseLength') || DEFAULT_NG_RESPONSE_LENGTH;
+        responseLengthInput.addEventListener('input', () => {
+            const n = parseInt(responseLengthInput.value, 10);
+            if (Number.isFinite(n) && n > 0) {
+                narrative_guidance_moduleSettings[settingKey(track, 'ResponseLength')] = n;
+                saveSettings();
+            }
+        });
+    }
+
+    const maxContextInput = trackEl(track, 'max_context_override');
+    if (maxContextInput) {
+        maxContextInput.value = getSetting(track, 'MaxContextOverride') || 0;
+        maxContextInput.addEventListener('input', () => {
+            const n = parseInt(maxContextInput.value, 10);
+            narrative_guidance_moduleSettings[settingKey(track, 'MaxContextOverride')] = Number.isFinite(n) && n > 0 ? n : 0;
+            saveSettings();
+        });
+    }
+
+    const userPromptArea = trackEl(track, 'user_prompt_textarea');
+    if (userPromptArea) {
+        userPromptArea.value = getSetting(track, 'Prompt') || track.defaultUserPrompt;
+        userPromptArea.addEventListener('input', () => {
+            narrative_guidance_moduleSettings[settingKey(track, 'Prompt')] = userPromptArea.value;
+            saveSettings();
+        });
+    }
+
+    const genArea = trackEl(track, 'generation_prompt_textarea');
+    if (genArea) {
+        genArea.value = getSetting(track, 'GenerationPrompt') || track.defaultGenerationPrompt;
+        genArea.addEventListener('input', () => {
+            narrative_guidance_moduleSettings[settingKey(track, 'GenerationPrompt')] = genArea.value;
+            saveSettings();
+        });
+    }
+
+    const injectArea = trackEl(track, 'injection_prompt_textarea');
+    if (injectArea) {
+        injectArea.value = getSetting(track, 'InjectionPrompt') || track.defaultInjectionPrompt;
+        injectArea.addEventListener('input', () => {
+            const value = injectArea.value;
+            narrative_guidance_moduleSettings[settingKey(track, 'InjectionPrompt')] = value;
+            saveSettings();
+            if (value.trim() && !value.includes('{{guidance}}')) {
+                toast('Warning: Injection template lacks {{guidance}}; the AI won\'t see the guidance text.', 'warning');
+            }
+            reapplyInjection(track);
+        });
+    }
+
+    trackEl(track, 'preview_btn')
+        ?.addEventListener('click', () => showNGPromptPreview(track));
+
+    const depthInput = trackEl(track, 'injection_depth');
+    if (depthInput) {
+        const configuredDepth = getSetting(track, 'InjectionDepth');
+        depthInput.value = Number.isFinite(configuredDepth) ? configuredDepth : DEFAULT_NG_INJECTION_DEPTH;
+        depthInput.addEventListener('input', () => {
+            const n = parseInt(depthInput.value, 10);
+            if (Number.isFinite(n) && n >= 0) {
+                narrative_guidance_moduleSettings[settingKey(track, 'InjectionDepth')] = n;
+                saveSettings();
+                reapplyInjection(track);
+            }
+        });
+    }
+
+    const roleSelect = trackEl(track, 'injection_role');
+    if (roleSelect) {
+        roleSelect.value = getSetting(track, 'InjectionRole') || DEFAULT_NG_INJECTION_ROLE;
+        roleSelect.addEventListener('change', () => {
+            narrative_guidance_moduleSettings[settingKey(track, 'InjectionRole')] = roleSelect.value;
+            saveSettings();
+            reapplyInjection(track);
+        });
+    }
+
+    const themesArea = trackEl(track, 'themes_textarea');
+    if (themesArea) {
+        themesArea.addEventListener('input', () => {
+            const state = loadChatState(track);
+            state.themes = themesArea.value;
+            scheduleChatStateSave(track, state);
+        });
+    }
+
+    const guidanceArea = trackEl(track, 'active_guidance_textarea');
+    if (guidanceArea) {
+        guidanceArea.addEventListener('input', () => {
+            const state = loadChatState(track);
+            state.guidance = guidanceArea.value;
+            scheduleChatStateSave(track, state);
+            reapplyInjection(track);
+        });
+    }
+
+    trackEl(track, 'decrement_button')?.addEventListener('click', () => {
+        const state = loadChatState(track);
+        if (state.turnsRemaining > 0) {
+            state.turnsRemaining -= 1;
+            saveChatState(track, state);
+            refreshRemainingDisplay(track, state.turnsRemaining);
+        }
+    });
+
+    trackEl(track, 'reset_button')?.addEventListener('click', () => {
+        const state = loadChatState(track);
+        state.turnsRemaining = resolveTurnCount(track);
+        saveChatState(track, state);
+        refreshRemainingDisplay(track, state.turnsRemaining);
+    });
+
+    trackEl(track, 'regenerate_now')?.addEventListener('click', async () => {
+        // While running, the regenerate button is the Stop affordance for an
+        // active regen. Clicks during a `continue` job are ignored (that
+        // button is disabled in the UI).
+        if (runtime[track.id].regenInProgress) {
+            if (runtime[track.id].activeAction === 'regen') {
+                abortAllGenerations('ng-cancel');
+                narrative_guidance_debug(`[${track.id}] Stop requested via regenerate button`);
+            }
+            return;
+        }
+        await regenGuidance(track, 'manual');
+    });
+
+    trackEl(track, 'continue_now')?.addEventListener('click', async () => {
+        if (runtime[track.id].regenInProgress) {
+            if (runtime[track.id].activeAction === 'continue') {
+                abortAllGenerations('ng-cancel');
+                narrative_guidance_debug(`[${track.id}] Stop requested via continue button`);
+            }
+            return;
+        }
+        await continueGuidance(track);
+    });
+
+    trackEl(track, 'retry_now')?.addEventListener('click', async () => {
+        if (runtime[track.id].regenInProgress) return;
+        if (runtime[track.id].lastSnapshot === null) {
+            toast('Nothing to retry — no previous generation in this session.', 'warning');
+            return;
+        }
+        const state = loadChatState(track);
+        state.guidance = runtime[track.id].lastSnapshot;
+        saveChatState(track, state);
+        refreshPanelFromState(track);
+        reapplyInjection(track);
+        await regenGuidance(track, 'retry');
+    });
+
+    populateLoreBookPicker(track);
+    refreshPanelFromState(track);
+    refreshNGActionButtonStates(track);
 }
 
 function bindNarrativeGuidanceSettings(saveSettings) {
     narrative_guidance_saveSettingsCb = saveSettings;
 
-    const enabledCb = document.getElementById('ng_enabled');
-    if (enabledCb) {
-        enabledCb.checked = !!narrative_guidance_moduleSettings.narrativeGuidanceEnabled;
-        enabledCb.addEventListener('change', () => {
-            narrative_guidance_moduleSettings.narrativeGuidanceEnabled = enabledCb.checked;
-            saveSettings();
-            if (narrative_guidance_moduleSettings.narrativeGuidanceEnabled) {
-                reapplyInjection();
-            } else {
-                clearInjection();
-            }
-        });
+    for (const track of NG_TRACK_LIST) {
+        bindTrackControls(track, saveSettings);
     }
 
-    const autoRegenCb = document.getElementById('ng_auto_regen');
-    if (autoRegenCb) {
-        autoRegenCb.checked = !!narrative_guidance_moduleSettings.narrativeGuidanceAutoRegen;
-        autoRegenCb.addEventListener('change', () => {
-            narrative_guidance_moduleSettings.narrativeGuidanceAutoRegen = autoRegenCb.checked;
-            saveSettings();
-        });
-    }
-
+    // Shared (non per-track) controls.
     const debugCb = document.getElementById('ng_debug_mode');
     if (debugCb) {
         debugCb.checked = !!narrative_guidance_moduleSettings.narrativeGuidanceDebugMode;
@@ -5794,179 +6120,73 @@ function bindNarrativeGuidanceSettings(saveSettings) {
             saveSettings();
         });
     }
+}
 
-    const turnCountInput = document.getElementById('ng_default_turn_count');
-    if (turnCountInput) {
-        turnCountInput.value = narrative_guidance_moduleSettings.narrativeGuidanceDefaultTurnCount || DEFAULT_NG_TURN_COUNT;
-        turnCountInput.addEventListener('input', () => {
-            const n = parseInt(turnCountInput.value, 10);
-            if (Number.isFinite(n) && n > 0) {
-                narrative_guidance_moduleSettings.narrativeGuidanceDefaultTurnCount = n;
-                saveSettings();
-            }
-        });
-    }
+// ─── Settings Migration ───
 
-    const responseLengthInput = document.getElementById('ng_response_length');
-    if (responseLengthInput) {
-        responseLengthInput.value = narrative_guidance_moduleSettings.narrativeGuidanceResponseLength || DEFAULT_NG_RESPONSE_LENGTH;
-        responseLengthInput.addEventListener('input', () => {
-            const n = parseInt(responseLengthInput.value, 10);
-            if (Number.isFinite(n) && n > 0) {
-                narrative_guidance_moduleSettings.narrativeGuidanceResponseLength = n;
-                saveSettings();
-            }
-        });
-    }
+// Legacy single-track NG settings keys → short-term track keys. Run once on
+// load so users keep their customized prompts, cadence and lore-book picks
+// after the long/short split (existing guidance maps to short-term too).
+const NG_LEGACY_SETTING_SUFFIXES = [
+    'Enabled', 'AutoRegen', 'Prompt', 'GenerationPrompt', 'InjectionPrompt',
+    'DefaultTurnCount', 'ResponseLength', 'MaxContextOverride',
+    'InjectionDepth', 'InjectionRole', 'LoreBookNames',
+];
 
-    const maxContextInput = document.getElementById('ng_max_context_override');
-    if (maxContextInput) {
-        maxContextInput.value = narrative_guidance_moduleSettings.narrativeGuidanceMaxContextOverride || 0;
-        maxContextInput.addEventListener('input', () => {
-            const n = parseInt(maxContextInput.value, 10);
-            narrative_guidance_moduleSettings.narrativeGuidanceMaxContextOverride = Number.isFinite(n) && n > 0 ? n : 0;
-            saveSettings();
-        });
-    }
+/**
+ * Migrate pre-split NG settings (and any `ng` tool-preset bundle) onto the
+ * short-term track. Idempotent: keyed off the presence of legacy keys.
+ *
+ * @param {object} settings - Shared mutable settings reference.
+ * @returns {boolean} `true` if anything changed (caller should save settings).
+ */
+function migrateNarrativeGuidanceSettings(settings) {
+    let changed = false;
 
-    const userPromptArea = document.getElementById('ng_user_prompt_textarea');
-    if (userPromptArea) {
-        userPromptArea.value = narrative_guidance_moduleSettings.narrativeGuidancePrompt || DEFAULT_NG_USER_PROMPT;
-        userPromptArea.addEventListener('input', () => {
-            narrative_guidance_moduleSettings.narrativeGuidancePrompt = userPromptArea.value;
-            saveSettings();
-        });
-    }
-
-    const genArea = document.getElementById('ng_generation_prompt_textarea');
-    if (genArea) {
-        genArea.value = narrative_guidance_moduleSettings.narrativeGuidanceGenerationPrompt || DEFAULT_NG_GENERATION_PROMPT;
-        genArea.addEventListener('input', () => {
-            narrative_guidance_moduleSettings.narrativeGuidanceGenerationPrompt = genArea.value;
-            saveSettings();
-        });
-    }
-
-    const injectArea = document.getElementById('ng_injection_prompt_textarea');
-    if (injectArea) {
-        injectArea.value = narrative_guidance_moduleSettings.narrativeGuidanceInjectionPrompt || DEFAULT_NG_INJECTION_PROMPT;
-        injectArea.addEventListener('input', () => {
-            const value = injectArea.value;
-            narrative_guidance_moduleSettings.narrativeGuidanceInjectionPrompt = value;
-            saveSettings();
-            if (value.trim() && !value.includes('{{guidance}}')) {
-                toast('Warning: Injection template lacks {{guidance}}; the AI won\'t see the guidance text.', 'warning');
-            }
-            reapplyInjection();
-        });
-    }
-
-    document.getElementById('ng_preview_btn')
-        ?.addEventListener('click', showNGPromptPreview);
-
-    const depthInput = document.getElementById('ng_injection_depth');
-    if (depthInput) {
-        const initialDepth = Number.isFinite(narrative_guidance_moduleSettings.narrativeGuidanceInjectionDepth)
-            ? narrative_guidance_moduleSettings.narrativeGuidanceInjectionDepth
-            : DEFAULT_NG_INJECTION_DEPTH;
-        depthInput.value = initialDepth;
-        depthInput.addEventListener('input', () => {
-            const n = parseInt(depthInput.value, 10);
-            if (Number.isFinite(n) && n >= 0) {
-                narrative_guidance_moduleSettings.narrativeGuidanceInjectionDepth = n;
-                saveSettings();
-                reapplyInjection();
-            }
-        });
-    }
-
-    const roleSelect = document.getElementById('ng_injection_role');
-    if (roleSelect) {
-        roleSelect.value = narrative_guidance_moduleSettings.narrativeGuidanceInjectionRole || DEFAULT_NG_INJECTION_ROLE;
-        roleSelect.addEventListener('change', () => {
-            narrative_guidance_moduleSettings.narrativeGuidanceInjectionRole = roleSelect.value;
-            saveSettings();
-            reapplyInjection();
-        });
-    }
-
-    const themesArea = document.getElementById('ng_themes_textarea');
-    if (themesArea) {
-        themesArea.addEventListener('input', () => {
-            const state = loadChatState();
-            state.themes = themesArea.value;
-            scheduleChatStateSave(state);
-        });
-    }
-
-    const guidanceArea = document.getElementById('ng_active_guidance_textarea');
-    if (guidanceArea) {
-        guidanceArea.addEventListener('input', () => {
-            const state = loadChatState();
-            state.guidance = guidanceArea.value;
-            scheduleChatStateSave(state);
-            reapplyInjection();
-        });
-    }
-
-    document.getElementById('ng_decrement_button')?.addEventListener('click', () => {
-        const state = loadChatState();
-        if (state.turnsRemaining > 0) {
-            state.turnsRemaining -= 1;
-            saveChatState(state);
-            refreshRemainingDisplay(state.turnsRemaining);
+    for (const suffix of NG_LEGACY_SETTING_SUFFIXES) {
+        const legacyKey = `narrativeGuidance${suffix}`;
+        const shortKey = `narrativeGuidanceShort${suffix}`;
+        // A legacy key only survives on a pre-split saved blob, where the
+        // short-track key was never persisted (it's still at the merged-in
+        // default). So copy unconditionally — the default would otherwise
+        // mask the user's real value.
+        if (settings[legacyKey] !== undefined) {
+            settings[shortKey] = settings[legacyKey];
+            delete settings[legacyKey];
+            changed = true;
         }
-    });
+    }
 
-    document.getElementById('ng_reset_button')?.addEventListener('click', () => {
-        const state = loadChatState();
-        state.turnsRemaining = narrative_guidance_moduleSettings.narrativeGuidanceDefaultTurnCount || DEFAULT_NG_TURN_COUNT;
-        saveChatState(state);
-        refreshRemainingDisplay(state.turnsRemaining);
-    });
-
-    document.getElementById('ng_regenerate_now')?.addEventListener('click', async () => {
-        // While running, the regenerate button is the Stop affordance for an
-        // active regen. Clicks during a `continue` job are ignored (that
-        // button is disabled in the UI).
-        if (regenInProgress) {
-            if (ngActiveAction === 'regen') {
-                abortAllGenerations('ng-cancel');
-                narrative_guidance_debug('Stop requested via regenerate button');
+    // Carry named NG presets over to the short-term tool, renaming the bundled
+    // field keys (the long-term tool starts with just its Default).
+    const presets = settings.toolPresets;
+    if (presets && typeof presets === 'object' && presets.ng && !presets['ng-short']) {
+        const fieldRename = {
+            narrativeGuidancePrompt: 'narrativeGuidanceShortPrompt',
+            narrativeGuidanceGenerationPrompt: 'narrativeGuidanceShortGenerationPrompt',
+            narrativeGuidanceInjectionPrompt: 'narrativeGuidanceShortInjectionPrompt',
+        };
+        const migrated = {};
+        for (const [name, bundle] of Object.entries(presets.ng)) {
+            if (!bundle || typeof bundle !== 'object') continue;
+            const next = {};
+            for (const [oldKey, value] of Object.entries(bundle)) {
+                next[fieldRename[oldKey] || oldKey] = value;
             }
-            return;
+            migrated[name] = next;
         }
-        await regenGuidance('manual');
-    });
-
-    document.getElementById('ng_continue_now')?.addEventListener('click', async () => {
-        if (regenInProgress) {
-            if (ngActiveAction === 'continue') {
-                abortAllGenerations('ng-cancel');
-                narrative_guidance_debug('Stop requested via continue button');
+        presets['ng-short'] = migrated;
+        delete presets.ng;
+        if (settings.activeToolPreset && typeof settings.activeToolPreset === 'object') {
+            if (settings.activeToolPreset.ng !== undefined) {
+                settings.activeToolPreset['ng-short'] = settings.activeToolPreset.ng;
+                delete settings.activeToolPreset.ng;
             }
-            return;
         }
-        await continueGuidance();
-    });
+        changed = true;
+    }
 
-    document.getElementById('ng_retry_now')?.addEventListener('click', async () => {
-        if (regenInProgress) return;
-        if (ngLastGuidanceSnapshot === null) {
-            toast('Nothing to retry — no previous generation in this session.', 'warning');
-            return;
-        }
-        const state = loadChatState();
-        state.guidance = ngLastGuidanceSnapshot;
-        saveChatState(state);
-        refreshPanelFromState();
-        reapplyInjection();
-        await regenGuidance('retry');
-    });
-
-    populateLoreBookPicker();
-    refreshPanelFromState();
-    refreshNGActionButtonStates();
+    return changed;
 }
 
 // ─── Init ───
@@ -6335,18 +6555,32 @@ const defaultSettings = {
     wiaPrefillUntitled: DEFAULT_WIA_PREFILL_UNTITLED,
     wiaResponseLength: DEFAULT_WIA_RESPONSE_LENGTH,
     wiaMaxContextOverride: 0,
-    narrativeGuidanceEnabled: false,
-    narrativeGuidanceAutoRegen: true,
     narrativeGuidanceDebugMode: false,
-    narrativeGuidancePrompt: DEFAULT_NG_USER_PROMPT,
-    narrativeGuidanceGenerationPrompt: DEFAULT_NG_GENERATION_PROMPT,
-    narrativeGuidanceInjectionPrompt: DEFAULT_NG_INJECTION_PROMPT,
-    narrativeGuidanceDefaultTurnCount: DEFAULT_NG_TURN_COUNT,
-    narrativeGuidanceResponseLength: DEFAULT_NG_RESPONSE_LENGTH,
-    narrativeGuidanceMaxContextOverride: 0,
-    narrativeGuidanceInjectionDepth: DEFAULT_NG_INJECTION_DEPTH,
-    narrativeGuidanceInjectionRole: DEFAULT_NG_INJECTION_ROLE,
-    narrativeGuidanceLoreBookNames: [],
+    // Long-term track — the overarching arc on a slow refresh horizon.
+    narrativeGuidanceLongEnabled: false,
+    narrativeGuidanceLongAutoRegen: true,
+    narrativeGuidanceLongPrompt: DEFAULT_NG_LONG_USER_PROMPT,
+    narrativeGuidanceLongGenerationPrompt: DEFAULT_NG_LONG_GENERATION_PROMPT,
+    narrativeGuidanceLongInjectionPrompt: DEFAULT_NG_LONG_INJECTION_PROMPT,
+    narrativeGuidanceLongDefaultTurnCount: DEFAULT_NG_LONG_TURN_COUNT,
+    narrativeGuidanceLongResponseLength: DEFAULT_NG_RESPONSE_LENGTH,
+    narrativeGuidanceLongMaxContextOverride: 0,
+    narrativeGuidanceLongInjectionDepth: DEFAULT_NG_INJECTION_DEPTH,
+    narrativeGuidanceLongInjectionRole: DEFAULT_NG_INJECTION_ROLE,
+    narrativeGuidanceLongLoreBookNames: [],
+    // Short-term track — the immediate beats on a fast refresh horizon,
+    // seeded with the active long-term arc.
+    narrativeGuidanceShortEnabled: false,
+    narrativeGuidanceShortAutoRegen: true,
+    narrativeGuidanceShortPrompt: DEFAULT_NG_SHORT_USER_PROMPT,
+    narrativeGuidanceShortGenerationPrompt: DEFAULT_NG_SHORT_GENERATION_PROMPT,
+    narrativeGuidanceShortInjectionPrompt: DEFAULT_NG_SHORT_INJECTION_PROMPT,
+    narrativeGuidanceShortDefaultTurnCount: DEFAULT_NG_SHORT_TURN_COUNT,
+    narrativeGuidanceShortResponseLength: DEFAULT_NG_RESPONSE_LENGTH,
+    narrativeGuidanceShortMaxContextOverride: 0,
+    narrativeGuidanceShortInjectionDepth: DEFAULT_NG_INJECTION_DEPTH,
+    narrativeGuidanceShortInjectionRole: DEFAULT_NG_INJECTION_ROLE,
+    narrativeGuidanceShortLoreBookNames: [],
     silentGenerationDebugMode: false,
     // toolPresets / activeToolPreset are intentionally absent here:
     // migrateLegacyToolPresets initializes them (and converts any legacy
@@ -6397,13 +6631,23 @@ const TOOL_PRESET_CONFIG = [
         ],
     },
     {
-        toolKey: 'ng',
-        label: 'Narrative Guidance',
-        containerId: 'ng_presets',
+        toolKey: 'ng-long',
+        label: 'Narrative Guidance (Long-term)',
+        containerId: 'ng_long_presets',
         fields: [
-            { key: 'narrativeGuidancePrompt', label: 'Instructions', textareaId: 'ng_user_prompt_textarea', defaultText: DEFAULT_NG_USER_PROMPT },
-            { key: 'narrativeGuidanceGenerationPrompt', label: 'Prefill', textareaId: 'ng_generation_prompt_textarea', defaultText: DEFAULT_NG_GENERATION_PROMPT },
-            { key: 'narrativeGuidanceInjectionPrompt', label: 'Injection', textareaId: 'ng_injection_prompt_textarea', defaultText: DEFAULT_NG_INJECTION_PROMPT },
+            { key: 'narrativeGuidanceLongPrompt', label: 'Instructions', textareaId: 'ng_long_user_prompt_textarea', defaultText: DEFAULT_NG_LONG_USER_PROMPT },
+            { key: 'narrativeGuidanceLongGenerationPrompt', label: 'Prefill', textareaId: 'ng_long_generation_prompt_textarea', defaultText: DEFAULT_NG_LONG_GENERATION_PROMPT },
+            { key: 'narrativeGuidanceLongInjectionPrompt', label: 'Injection', textareaId: 'ng_long_injection_prompt_textarea', defaultText: DEFAULT_NG_LONG_INJECTION_PROMPT },
+        ],
+    },
+    {
+        toolKey: 'ng-short',
+        label: 'Narrative Guidance (Short-term)',
+        containerId: 'ng_short_presets',
+        fields: [
+            { key: 'narrativeGuidanceShortPrompt', label: 'Instructions', textareaId: 'ng_short_user_prompt_textarea', defaultText: DEFAULT_NG_SHORT_USER_PROMPT },
+            { key: 'narrativeGuidanceShortGenerationPrompt', label: 'Prefill', textareaId: 'ng_short_generation_prompt_textarea', defaultText: DEFAULT_NG_SHORT_GENERATION_PROMPT },
+            { key: 'narrativeGuidanceShortInjectionPrompt', label: 'Injection', textareaId: 'ng_short_injection_prompt_textarea', defaultText: DEFAULT_NG_SHORT_INJECTION_PROMPT },
         ],
     },
 ];
@@ -6423,10 +6667,18 @@ function saveSettings() {
 
 function loadSettings() {
     src_settings = loadExtensionSettings(EXTENSION_NAME, defaultSettings);
+    let migrated = false;
     if (migrateLegacyToolPresets(src_settings, TOOL_PRESET_CONFIG)) {
         SSEDebug('Migrated legacy prompt templates to tool presets');
-        saveSettings();
+        migrated = true;
     }
+    // Fold pre-split, single-track Narrative Guidance settings (and any saved
+    // NG presets) onto the new short-term track.
+    if (migrateNarrativeGuidanceSettings(src_settings)) {
+        SSEDebug('Migrated legacy Narrative Guidance settings to the short-term track');
+        migrated = true;
+    }
+    if (migrated) saveSettings();
     SSEDebug('Settings loaded:', JSON.stringify(src_settings));
 }
 

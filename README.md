@@ -61,14 +61,21 @@ Adds an **Assist** button to every World Info / lore book entry, letting you dra
 
 Periodically asks the LLM for a short paragraph of story guidance based on the current chat, character cards, and selected lore books, then injects that paragraph as a system prompt before every AI turn until a per-chat turn counter expires — at which point it auto-regenerates.
 
-- **Per-chat state** — Active guidance, remaining turn count, and themes/ideas are persisted per chat (via `chatMetadata`) and reload automatically when switching chats.
-- **Auto-regenerate at zero** — When the turn counter hits zero on the AI's reply that decrements it, a new guidance paragraph is generated in the background so it's ready before your next send. A full-screen overlay masks the UI for the duration of the regeneration so you can't accidentally send a message mid-regen. Optional — turn it off to keep the counter purely as a manual prompt.
-- **Manual regenerate** — A **Regenerate Now** button in the settings panel forces a fresh generation at any time. The `-1` and `Reset` buttons next to the remaining-turn display let you nudge or reset the counter without regenerating.
-- **Editable everything** — The generation instructions (the user prompt, with `{{context}}` / `{{themes}}` placeholders), the prefill the model continues from, the injection template (with `{{guidance}}` placeholder), and the live guidance paragraph itself are all directly editable. Edits to the active guidance apply on the next AI turn.
-- **Themes / arcs input** — A per-chat textarea where you can offer themes, ideas, or general arcs for the model to weave into the next round of guidance.
-- **Injection controls** — Depth and Role inputs (mirroring SillyTavern's Author's Note) control where in the prompt the guidance is inserted and which role it speaks as.
-- **Lore book picker** — Pick which lore books to feed into the guidance generation's context preamble.
-- **Configurable token limits** — Set the response token limit for the generation, and optionally cap how much chat history feeds into the context preamble.
+Guidance comes in **two independent tiers** that operate the same way but on different clocks:
+
+- **Long-term** — the overarching arc, where the whole thread is heading, on a slow refresh horizon (default every **40** AI turns).
+- **Short-term** — the immediate beats for the next few turns, on a fast horizon (default every **8** AI turns). Short-term generation is **hierarchical**: it's seeded with the current long-term arc so the immediate beats serve the larger destination, and whenever long-term refreshes, short-term re-aligns to it.
+
+Enable either tier on its own or both together. Each tier is fully self-contained — its own enable/auto-regen toggles, refresh horizon, prompts, lore-book picks, themes box, counter, and live guidance paragraph.
+
+- **Per-chat state** — Each tier's active guidance, remaining turn count, and themes/ideas are persisted per chat (via `chatMetadata`) and reload automatically when switching chats. (Pre-split chats keep their guidance — it lands on the short-term tier.)
+- **Auto-regenerate at zero** — When a tier's turn counter hits zero on the AI's reply that decrements it, a new guidance paragraph is generated in the background so it's ready before your next send. A full-screen overlay masks the UI for the duration of the regeneration so you can't accidentally send a message mid-regen. Optional per tier — turn it off to keep the counter purely as a manual prompt. A progress toast stays up while a generation runs.
+- **Manual regenerate** — A **Regenerate Now** button in each tier forces a fresh generation at any time. The `-1` and `Reset` buttons next to the remaining-turn display let you nudge or reset that tier's counter without regenerating.
+- **Editable everything** — Per tier: the generation instructions (the user prompt, with `{{context}}` / `{{themes}}` placeholders, plus `{{longGuidance}}` for short-term), the prefill the model continues from, the injection template (with `{{guidance}}` placeholder), and the live guidance paragraph itself are all directly editable. Edits to the active guidance apply on the next AI turn.
+- **Themes / arcs input** — Each tier has a per-chat textarea where you can offer themes, ideas, or general arcs for the model to weave into the next round of guidance.
+- **Injection controls** — Per tier: Depth and Role inputs (mirroring SillyTavern's Author's Note) control where in the prompt the guidance is inserted and which role it speaks as.
+- **Lore book picker** — Per tier: pick which lore books to feed into the guidance generation's context preamble.
+- **Configurable token limits** — Per tier: set the response token limit for the generation, and optionally cap how much chat history feeds into the context preamble.
 
 ### How to Use Possession
 
@@ -116,13 +123,13 @@ When Possession and Phrasing are used together, you can quickly take over charac
 
 ### How to Use Narrative Guidance
 
-1. Open **Extensions** > **Saint's Silly Extensions** and find the **Narrative Guidance** section. Tick **Enable Narrative Guidance**.
-2. (Optional) Adjust **Turns Between Regenerations** (default 10). This is how many AI replies elapse between automatic regenerations.
-3. (Optional) Edit the **Themes / Story Arcs** textarea with anything you want the next round of guidance to weave in — ideas, arcs, "introduce a mysterious stranger", etc.
-4. (Optional) Tick lore books in the picker to fold their entries into the guidance generation's context.
-5. Send a message in your chat. With **Auto-Regenerate at Zero** on, the first generation kicks off automatically (the UI is masked while it runs) and the resulting paragraph fills the **Active Guidance** textarea.
-6. From there, every subsequent AI turn is steered by the active guidance until the counter hits zero, at which point fresh guidance is generated based on the now-updated chat context (and your latest themes).
-7. Click **Regenerate Now** at any time to force an immediate regeneration. Use **-1** and **Reset** to nudge the counter without regenerating. Edit the **Active Guidance** textarea directly to hand-tune the steering.
+1. Open **Extensions** > **Saint's Silly Extensions** and find the **Narrative Guidance** section. It holds two tiers — **Long-term** (the overarching arc) and **Short-term** (the immediate beats). Open either sub-drawer and tick its **Enable** box. You can run one tier or both.
+2. (Optional) Adjust that tier's **Turns Between Regenerations** — how many AI replies elapse between automatic regenerations (defaults: long-term 40, short-term 8).
+3. (Optional) Edit the tier's **Themes / Story Arcs** textarea with anything you want its next round of guidance to weave in — ideas, arcs, "introduce a mysterious stranger", etc.
+4. (Optional) Tick lore books in the tier's picker to fold their entries into that tier's guidance generation context.
+5. Send a message in your chat. With **Auto-Regenerate at Zero** on, the first generation for each enabled tier kicks off automatically (the UI is masked while it runs, and a progress toast stays up) and the resulting paragraph fills that tier's **Active Guidance** textarea. If both tiers are enabled, long-term generates first and short-term is seeded from it.
+6. From there, every subsequent AI turn is steered by the active guidance until a tier's counter hits zero, at which point that tier regenerates from the now-updated chat context (and your latest themes). When long-term refreshes, short-term re-aligns to the new arc.
+7. Click a tier's **Regenerate Now** at any time to force an immediate regeneration. Use **-1** and **Reset** to nudge that tier's counter without regenerating. Edit the **Active Guidance** textarea directly to hand-tune the steering.
 
 
 ## Installation
@@ -192,24 +199,26 @@ Open **Extensions** > **Saint's Silly Extensions** in SillyTavern's settings pan
 
 ### Narrative Guidance Settings
 
+The drawer holds two self-contained tiers — **Long-term** (the overarching arc) and **Short-term** (the immediate beats, seeded with the active long-term arc). Every setting below exists **per tier**, except **Narrative Guidance Debug Mode**, which is shared and lives in the Diagnostics drawer. Defaults differ only in the refresh horizon: long-term **40** turns, short-term **8**.
+
 | Setting | Description |
 |---------|-------------|
-| Enable Narrative Guidance | Toggle the feature on/off |
-| Auto-Regenerate at Zero | When on, automatically regenerates guidance the moment the turn counter hits zero. When off, the counter still decrements but only **Regenerate Now** updates the guidance. |
-| Narrative Guidance Debug Mode | Log detailed Narrative Guidance events to the browser console |
-| Turns Between Regenerations | How many AI replies elapse between automatic regenerations (default 10) |
+| Enable (Long-term / Short-term) | Toggle that tier on/off. Run one tier or both. |
+| Auto-Regenerate at Zero | When on, automatically regenerates that tier the moment its turn counter hits zero (and, for short-term, whenever long-term refreshes). When off, the counter still decrements but only **Regenerate Now** updates the guidance. |
+| Narrative Guidance Debug Mode | Log detailed Narrative Guidance events to the browser console (shared across both tiers; in the Diagnostics drawer) |
+| Turns Between Regenerations | How many AI replies elapse between automatic regenerations (defaults: long-term 40, short-term 8) |
 | Response Token Limit | Maximum tokens the model may use for each guidance paragraph (default 400) |
-| Max Context Override | If > 0, caps how many tokens of chat context the preamble packer uses for guidance generations. 0 = use the model's full context size. |
-| Preset / Preview Assembled Prompt | Save named bundles of the three NG prompt fields and preview exactly what gets sent (see Tool Presets & Prompt Preview below) |
-| Generation Instructions Template | The user prompt for each guidance generation. Supports `{{context}}` and `{{themes}}` placeholders; if missing, the blocks are prepended automatically. |
+| Max Context Override | If > 0, caps how many tokens of chat context the preamble packer uses for that tier's generations. 0 = use the model's full context size. |
+| Preset / Preview Assembled Prompt | Save named bundles of the tier's three prompt fields and preview exactly what gets sent (see Tool Presets & Prompt Preview below) |
+| Generation Instructions Template | The user prompt for each generation. Supports `{{context}}` and `{{themes}}` placeholders (short-term also supports `{{longGuidance}}` — the active long-term arc); if missing, the blocks are prepended automatically. |
 | Prefill Template | The assistant prefix the LLM continues to produce the guidance paragraph; kept at the start of the stored guidance. Outer brackets are stripped at injection time. |
 | Injection Prompt Template | Template injected before each AI turn. Supports the `{{guidance}}` placeholder. |
 | Depth | Number of recent chat messages to insert the guidance after (0 = at the bottom) |
 | Role | Role used when injecting the guidance (System / User / Assistant) |
-| Lore Books | Optional picker for lore books to feed into the guidance generation's context |
-| Themes / Story Arcs (per-chat) | Themes, ideas, or arcs for the model to weave into the next round of guidance |
-| Active Guidance (per-chat) | The currently active guidance paragraph. Edit directly to hand-tune steering; edits apply on the next AI turn. |
-| Turns Remaining / -1 / Reset / Regenerate Now | Manual controls over the per-chat counter and on-demand regeneration |
+| Lore Books | Optional picker for lore books to feed into that tier's generation context |
+| Themes / Story Arcs (per-chat) | Themes, ideas, or arcs for the model to weave into the tier's next round of guidance |
+| Active Guidance (per-chat) | The tier's currently active guidance paragraph. Edit directly to hand-tune steering; edits apply on the next AI turn. |
+| Turns Remaining / -1 / Reset / Regenerate Now | Manual controls over that tier's per-chat counter and on-demand regeneration |
 
 ### Diagnostics
 
@@ -242,7 +251,7 @@ Generation templates support tool-specific placeholders, substituted in place. I
 | Phrasing | `{{phrasingSeed}}`, `{{phrasingSwipes}}` (inverse prompt only) |
 | Assisted Character Creation | `{{context}}`, `{{brief}}` |
 | World Info Assist | `{{context}}`, `{{guidance}}`, `{{title}}` |
-| Narrative Guidance | `{{context}}`, `{{themes}}` (generation instructions); `{{guidance}}` (injection template) |
+| Narrative Guidance | `{{context}}`, `{{themes}}`, plus `{{longGuidance}}` for the short-term tier (generation instructions); `{{guidance}}` (injection template) |
 
 ## Slash Commands
 
