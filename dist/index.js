@@ -1718,6 +1718,34 @@ function toast(message, type = 'info', title = undefined) {
     }
 }
 
+/**
+ * Show a "sticky" toast that stays visible until it is explicitly dismissed.
+ * Useful for signalling an in-progress background generation. Returns a
+ * function that removes the toast; calling it more than once is safe.
+ *
+ * @param {string} message  - Text to display.
+ * @param {string} [type]   - One of 'info', 'success', 'warning', 'error'.
+ * @param {string} [title]  - Optional toast title.
+ * @returns {() => void} Dismiss callback.
+ */
+function stickyToast(message, type = 'info', title = undefined) {
+    if (typeof toastr === 'undefined' || !toastr[type]) {
+        return () => {};
+    }
+    const $toast = toastr[type](message, title, {
+        timeOut: 0,
+        extendedTimeOut: 0,
+        tapToDismiss: false,
+        closeButton: false,
+    });
+    let dismissed = false;
+    return () => {
+        if (dismissed) return;
+        dismissed = true;
+        if ($toast) toastr.clear($toast);
+    };
+}
+
 // ─── Debug Logger Factory ───
 
 /**
@@ -5421,6 +5449,8 @@ async function regenGuidance(reason) {
     clearInjection();
     narrative_guidance_debug('regenGuidance — starting, reason:', reason);
 
+    const dismissProgressToast = stickyToast('Generating narrative guidance…', 'info');
+
     try {
         const responseLength = Number.isFinite(narrative_guidance_moduleSettings.narrativeGuidanceResponseLength)
             && narrative_guidance_moduleSettings.narrativeGuidanceResponseLength > 0
@@ -5496,6 +5526,7 @@ async function regenGuidance(reason) {
         refreshPanelFromState();
         reapplyInjection();
     } finally {
+        dismissProgressToast();
         regenInProgress = false;
         ngActiveAction = null;
         setNGActionButtonsRunning(false);
@@ -5521,6 +5552,8 @@ async function continueGuidance() {
     ngActiveAction = 'continue';
     setNGActionButtonsRunning(true);
     narrative_guidance_debug('continueGuidance — starting');
+
+    const dismissProgressToast = stickyToast('Continuing narrative guidance…', 'info');
 
     try {
         const responseLength = Number.isFinite(narrative_guidance_moduleSettings.narrativeGuidanceResponseLength)
@@ -5570,6 +5603,7 @@ async function continueGuidance() {
         // model output that never made it into the saved state.
         refreshPanelFromState();
     } finally {
+        dismissProgressToast();
         regenInProgress = false;
         ngActiveAction = null;
         setNGActionButtonsRunning(false);

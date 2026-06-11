@@ -20,6 +20,7 @@ import {
     getContext,
     createDebugLogger,
     toast,
+    stickyToast,
     buildContextPreamble,
     createLoreBookPicker,
     streamingGenerate,
@@ -229,6 +230,8 @@ async function regenGuidance(reason) {
     clearInjection();
     debug('regenGuidance — starting, reason:', reason);
 
+    const dismissProgressToast = stickyToast('Generating narrative guidance…', 'info');
+
     try {
         const responseLength = Number.isFinite(moduleSettings.narrativeGuidanceResponseLength)
             && moduleSettings.narrativeGuidanceResponseLength > 0
@@ -304,6 +307,7 @@ async function regenGuidance(reason) {
         refreshPanelFromState();
         reapplyInjection();
     } finally {
+        dismissProgressToast();
         regenInProgress = false;
         ngActiveAction = null;
         setNGActionButtonsRunning(false);
@@ -329,6 +333,8 @@ async function continueGuidance() {
     ngActiveAction = 'continue';
     setNGActionButtonsRunning(true);
     debug('continueGuidance — starting');
+
+    const dismissProgressToast = stickyToast('Continuing narrative guidance…', 'info');
 
     try {
         const responseLength = Number.isFinite(moduleSettings.narrativeGuidanceResponseLength)
@@ -378,6 +384,7 @@ async function continueGuidance() {
         // model output that never made it into the saved state.
         refreshPanelFromState();
     } finally {
+        dismissProgressToast();
         regenInProgress = false;
         ngActiveAction = null;
         setNGActionButtonsRunning(false);
