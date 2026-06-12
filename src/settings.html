@@ -565,6 +565,20 @@
 
                 <div class="inline-drawer saints_nested_drawer">
                     <div class="inline-drawer-toggle inline-drawer-header">
+                        <b>System Prompt</b>
+                        <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                    </div>
+                    <div class="inline-drawer-content" style="display: none;">
+                        <div class="reformatting_prompt_section">
+                            <textarea id="reformatting_system_prompt_textarea" class="text_pole" rows="4"
+                                placeholder="Enter the system prompt for the LLM reformatter..."></textarea>
+                            <small>Sent as the system prompt for each LLM reformat. Sets the model's role and overall instructions.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="inline-drawer saints_nested_drawer">
+                    <div class="inline-drawer-toggle inline-drawer-header">
                         <b>Prompt Template</b>
                         <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
                     </div>

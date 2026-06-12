@@ -90,6 +90,7 @@ import {
     registerReformattingSlashCommand,
     DEFAULT_REFORMATTING_PROMPT,
     DEFAULT_REFORMATTING_PREFILL,
+    DEFAULT_REFORMATTING_SYSTEM_PROMPT,
     DEFAULT_REFORMATTING_RESPONSE_LENGTH,
 } from './reformatting.js';
 import {
@@ -155,6 +156,7 @@ const defaultSettings = {
     reformattingDebugMode: false,
     reformattingAsteriskMode: 'strip',
     reformattingCollapseWhitespace: false,
+    reformattingSystemPrompt: DEFAULT_REFORMATTING_SYSTEM_PROMPT,
     reformattingPrompt: DEFAULT_REFORMATTING_PROMPT,
     reformattingPrefill: DEFAULT_REFORMATTING_PREFILL,
     reformattingResponseLength: DEFAULT_REFORMATTING_RESPONSE_LENGTH,
@@ -232,6 +234,7 @@ const TOOL_PRESET_CONFIG = [
         label: 'Reformatting',
         containerId: 'reformatting_presets',
         fields: [
+            { key: 'reformattingSystemPrompt', label: 'System Prompt', textareaId: 'reformatting_system_prompt_textarea', defaultText: DEFAULT_REFORMATTING_SYSTEM_PROMPT },
             { key: 'reformattingPrompt', label: 'Prompt', textareaId: 'reformatting_prompt_textarea', defaultText: DEFAULT_REFORMATTING_PROMPT },
             { key: 'reformattingPrefill', label: 'Prefill', textareaId: 'reformatting_prefill_textarea', defaultText: DEFAULT_REFORMATTING_PREFILL },
         ],

@@ -52,7 +52,7 @@ export const DEFAULT_REFORMATTING_PREFILL = '';
 
 export const DEFAULT_REFORMATTING_RESPONSE_LENGTH = 800;
 
-const REFORMATTING_SYSTEM_PROMPT =
+export const DEFAULT_REFORMATTING_SYSTEM_PROMPT =
     'You are a text-formatting assistant. You reformat a single message to ' +
     'match a requested style without changing its meaning, dialogue, or ' +
     'wording. Output only the reformatted message — no commentary, no preamble.';
@@ -175,6 +175,12 @@ function getReformattingPromptTemplate() {
         : DEFAULT_REFORMATTING_PROMPT;
 }
 
+function getReformattingSystemPrompt() {
+    return (moduleSettings?.reformattingSystemPrompt && moduleSettings.reformattingSystemPrompt.trim())
+        ? moduleSettings.reformattingSystemPrompt
+        : DEFAULT_REFORMATTING_SYSTEM_PROMPT;
+}
+
 /**
  * Assemble the LLM reformatting user prompt. {{message}} is substituted in
  * place; if it's absent the message is appended so old templates still work.
@@ -202,7 +208,7 @@ async function runLLMReformat(text) {
     const raw = await withSingleLineDisabled(() => streamingGenerate(
         {
             prompt: userPrompt,
-            systemPrompt: REFORMATTING_SYSTEM_PROMPT,
+            systemPrompt: getReformattingSystemPrompt(),
             responseLength: getReformattingResponseLength(),
             ...(prefill ? { prefill } : {}),
         },
@@ -497,6 +503,15 @@ export function bindReformattingSettings(saveSettings) {
         });
     }
 
+    const systemPromptArea = document.getElementById('reformatting_system_prompt_textarea');
+    if (systemPromptArea) {
+        systemPromptArea.value = moduleSettings.reformattingSystemPrompt || DEFAULT_REFORMATTING_SYSTEM_PROMPT;
+        systemPromptArea.addEventListener('input', () => {
+            moduleSettings.reformattingSystemPrompt = systemPromptArea.value;
+            saveSettings();
+        });
+    }
+
     const promptArea = document.getElementById('reformatting_prompt_textarea');
     if (promptArea) {
         promptArea.value = moduleSettings.reformattingPrompt || DEFAULT_REFORMATTING_PROMPT;
@@ -538,7 +553,7 @@ function showReformattingPromptPreview() {
         ? moduleSettings.reformattingPrefill
         : DEFAULT_REFORMATTING_PREFILL;
     showPromptPreview('Reformatting — LLM Prompt Preview', [
-        { label: 'System Prompt (fixed)', text: REFORMATTING_SYSTEM_PROMPT },
+        { label: 'System Prompt', text: getReformattingSystemPrompt() },
         { label: 'User Prompt (template with a sample message)', text: composeReformattingPrompt(sampleMessage) },
         { label: 'Prefill (assistant prefix; kept at the start of the result)', text: prefill || '(none)' },
         {

@@ -149,7 +149,7 @@ When Possession and Phrasing are used together, you can quickly take over charac
 1. Open **Extensions** > **Saint's Silly Extensions** and find the **Reformatting** section. Tick **Enable Reformatting**.
 2. Choose an **Engine**:
    - **Rules** — pick how asterisks are handled (**Strip asterisks** handles the common "remove the italics" case; **Wrap narration in asterisks** does the inverse), and optionally enable **Collapse Extra Whitespace**.
-   - **LLM** — set a Response Token Limit and edit the prompt (with the `{{message}}` placeholder) / optional prefill. Use **Preview Assembled Prompt** to see exactly what gets sent, and save variants as presets.
+   - **LLM** — set a Response Token Limit and edit the system prompt, the user prompt (with the `{{message}}` placeholder), and the optional prefill. Use **Preview Assembled Prompt** to see exactly what gets sent, and save variants as presets.
 3. Leave **Auto-Reformat AI Messages** on to reformat every reply as it arrives, or turn it off to keep it manual-only.
 4. To reformat a single message at any time, click the <span title="text-slash icon">✂</span> button in that message's button row, or run `/reformat` to reformat the last message.
 5. The reformatted text becomes the active version of the message; the original is kept as a swipe, so you can always swipe back to it.
@@ -253,7 +253,8 @@ The drawer holds two self-contained tiers — **Long-term** (the overarching arc
 | Asterisks (Rules) | Mutually-exclusive choice: **Leave as-is**, **Strip asterisks** (remove every italic / bold marker), or **Wrap narration in asterisks** (wrap everything outside quoted dialogue; strips existing asterisks first so the result is consistent) |
 | Collapse Extra Whitespace (Rules) | Independent option: collapse runs of 3+ blank lines to one and trim trailing spaces |
 | Response Token Limit (LLM) | Maximum tokens the model may use to reformat a message (default 800) |
-| Preset / Preview Assembled Prompt (LLM) | Save named bundles of the LLM prompt + prefill and preview exactly what gets sent (see Tool Presets & Prompt Preview below) |
+| Preset / Preview Assembled Prompt (LLM) | Save named bundles of the LLM system prompt + prompt + prefill and preview exactly what gets sent (see Tool Presets & Prompt Preview below) |
+| System Prompt (LLM) | The system prompt sent for each LLM reformat — sets the model's role and overall instructions |
 | Prompt Template (LLM) | The user prompt sent for each LLM reformat. Supports the `{{message}}` placeholder; if missing, the message is appended automatically |
 | Prefill Template (LLM) | Optional assistant prefix the model continues from, kept at the start of the result. Prefill echoes from backends that ignore prefills are stripped automatically |
 | Reformatting Debug Mode | Log detailed Reformatting events to the browser console (in the Diagnostics drawer) |
