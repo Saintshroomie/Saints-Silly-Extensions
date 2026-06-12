@@ -435,6 +435,12 @@ async function regenGuidance(track, reason) {
     } catch (err) {
         if (isSilentGenerationAbort(err)) {
             debug(`[${track.id}] regenGuidance — cancelled by user`);
+            // A deliberate stop keeps whatever streamed so far as the active
+            // guidance; only resync the panel when nothing usable streamed.
+            if (adoptStreamedPartial(track, { resetCounter: true })) {
+                toast(`${track.label} generation stopped — keeping the partial guidance.`, 'info');
+                return;
+            }
         } else {
             console.error(`Narrative Guidance (${track.label}) generation error:`, err);
             toast(`${track.label} narrative guidance failed: ${err.message}`, 'error');
@@ -511,6 +517,12 @@ async function continueGuidance(track) {
     } catch (err) {
         if (isSilentGenerationAbort(err)) {
             debug(`[${track.id}] continueGuidance — cancelled by user`);
+            // A deliberate stop keeps the partial continuation as part of
+            // the active guidance; only resync when nothing streamed.
+            if (adoptStreamedPartial(track, { resetCounter: false })) {
+                toast(`${track.label} continue stopped — keeping the partial continuation.`, 'info');
+                return;
+            }
         } else {
             console.error(`Narrative Guidance (${track.label}) continue error:`, err);
             toast(`${track.label} continue failed: ${err.message}`, 'error');
@@ -594,6 +606,36 @@ export function onNarrativeGuidanceMessageReceived(messageIndex) {
 function refreshRemainingDisplay(track, remaining) {
     const display = trackEl(track, 'remaining_display');
     if (display) display.textContent = String(remaining);
+}
+
+/**
+ * Adopt whatever a stopped generation left in the active-guidance textarea
+ * as the track's guidance — the user often stops precisely because they
+ * already like the partial, and keeping it saved lets them edit it or hit
+ * Continue. Returns false when there is no usable partial (nothing
+ * streamed, or the field matches the saved guidance); the caller should
+ * resync the panel instead.
+ *
+ * @param {object} track - NG track config.
+ * @param {{ resetCounter: boolean }} opts - Reset the turn counter like a
+ *   successful regen (so auto-regen doesn't immediately overwrite the kept
+ *   partial); continues leave the counter alone, mirroring their success path.
+ * @returns {boolean} Whether a partial was adopted.
+ */
+function adoptStreamedPartial(track, { resetCounter }) {
+    const guidanceArea = trackEl(track, 'active_guidance_textarea');
+    const partial = guidanceArea?.value?.trim() || '';
+    const state = loadChatState(track);
+    if (!partial || partial === (state.guidance || '').trim()) return false;
+
+    state.guidance = partial;
+    if (resetCounter) state.turnsRemaining = resolveTurnCount(track);
+    saveChatState(track, state);
+
+    refreshPanelFromState(track);
+    reapplyInjection(track);
+    debug(`[${track.id}] Adopted streamed partial as active guidance, length:`, partial.length);
+    return true;
 }
 
 function refreshPanelFromState(track) {

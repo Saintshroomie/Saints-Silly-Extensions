@@ -420,8 +420,15 @@ async function openRawStream(params, signal) {
  * @returns {Promise<string>} The cleaned final message.
  */
 async function streamRawGenerate(params, targetEl, append, signal, jobName, progress) {
-    const streamFn = await openRawStream(params, signal);
     const baseText = (append && targetEl) ? (targetEl.value || '') : '';
+    // Reset the field before the request goes out — a fresh run clears
+    // stale content immediately instead of waiting for the first token, so
+    // the user sees the generation begin (append mode keeps the existing
+    // text as the prefix).
+    if (targetEl) {
+        targetEl.value = baseText;
+    }
+    const streamFn = await openRawStream(params, signal);
     let rawText = '';
 
     for await (const chunk of streamFn()) {
@@ -470,6 +477,12 @@ async function streamRawGenerate(params, targetEl, append, signal, jobName, prog
  * `jsonSchema`. Everything else — and any streaming attempt that dies
  * before the first token — goes through plain `generateRaw` and fills
  * `targetEl` in a single write when the promise resolves.
+ *
+ * A fresh (non-append) streaming run clears `targetEl` as soon as the job
+ * starts. On cancel, whatever streamed so far is deliberately left in the
+ * field — callers that want to keep the partial just leave the field
+ * alone in their abort handling; callers that don't must reset it
+ * themselves.
  *
  * @param {object} params - generateRaw parameters.
  * @param {HTMLTextAreaElement|null} targetEl - Element to stream/write the result into, or null.

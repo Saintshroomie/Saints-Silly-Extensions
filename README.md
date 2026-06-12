@@ -263,7 +263,7 @@ The drawer holds two self-contained tiers — **Long-term** (the overarching arc
 
 | Setting | Description |
 |---------|-------------|
-| Stream output into fields | Live-stream silent generations (Assisted Character Creation, World Info Assist, Narrative Guidance, LLM Reformatting) into their output fields token by token, instead of waiting for the full response. Supported for Chat Completion, Text Completion, KoboldAI Classic (streaming-capable KoboldCpp), and NovelAI (with its streaming toggle on); other backends — or a stream that fails before the first token — fall back to a single write when the response completes. Default: on. |
+| Stream output into fields | Live-stream silent generations (Assisted Character Creation, World Info Assist, Narrative Guidance, LLM Reformatting) into their output fields token by token, instead of waiting for the full response. Each fresh generation clears the field as it starts; stopping mid-stream keeps whatever has arrived in the field — Narrative Guidance saves the kept partial as the active guidance — so you can edit it or hit Continue. Supported for Chat Completion, Text Completion, KoboldAI Classic (streaming-capable KoboldCpp), and NovelAI (with its streaming toggle on); other backends — or a stream that fails before the first token — fall back to a single write when the response completes. Default: on. |
 
 ### Diagnostics
 
