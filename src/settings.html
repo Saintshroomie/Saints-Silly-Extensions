@@ -492,6 +492,103 @@
         </div>
     </div>
 
+    <!-- ─── SSE Reformatting ─── -->
+    <div class="inline-drawer">
+        <div class="inline-drawer-toggle inline-drawer-header">
+            <b><span class="fa-solid fa-text-slash"></span> SSE Reformatting</b>
+            <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+        </div>
+        <div class="inline-drawer-content" style="display: none;">
+
+            <small>Normalizes the formatting of AI character messages after they're
+                generated. Runs automatically on each reply, or manually via the
+                <span class="fa-solid fa-text-slash"></span> button on each message.
+                The original text is always kept as a swipe, so a reformat is
+                reversible.</small>
+
+            <label class="checkbox_label">
+                <input id="reformatting_enabled" type="checkbox" />
+                <span>Enable Reformatting</span>
+            </label>
+
+            <label class="checkbox_label" title="When on, every AI character message is reformatted as it arrives. When off, only the per-message button (or /reformat) reformats.">
+                <input id="reformatting_auto" type="checkbox" />
+                <span>Auto-Reformat AI Messages</span>
+            </label>
+
+            <div class="ng_inline_row">
+                <label for="reformatting_engine"><b>Engine:</b></label>
+                <select id="reformatting_engine" class="text_pole ng_select_input" title="Rules — fast, free, deterministic transforms. LLM — send the message to the model with the prompt below.">
+                    <option value="rules">Rules (deterministic)</option>
+                    <option value="llm">LLM (prompt-based)</option>
+                </select>
+            </div>
+
+            <!-- ─── Rules engine options ─── -->
+            <div id="reformatting_rules_section" class="reformatting_section">
+                <label class="checkbox_label" title="Remove every asterisk (markdown italic / bold emphasis marker). Turns *He danced.* into He danced.">
+                    <input id="reformatting_strip_asterisks" type="checkbox" />
+                    <span>Strip Asterisks</span>
+                </label>
+                <label class="checkbox_label" title="Wrap narration (everything outside quoted dialogue) in asterisks. Strips existing asterisks first, so the result is consistent. Turns He danced. &quot;Hi.&quot; into *He danced.* &quot;Hi.&quot;">
+                    <input id="reformatting_wrap_narration" type="checkbox" />
+                    <span>Wrap Narration in Asterisks</span>
+                </label>
+                <label class="checkbox_label" title="Collapse runs of 3+ blank lines to one and trim trailing spaces.">
+                    <input id="reformatting_collapse_whitespace" type="checkbox" />
+                    <span>Collapse Extra Whitespace</span>
+                </label>
+            </div>
+
+            <!-- ─── LLM engine options ─── -->
+            <div id="reformatting_llm_section" class="reformatting_section">
+
+                <div class="ng_inline_row">
+                    <label for="reformatting_response_length"><b><span class="fa-solid fa-coins"></span> Response Token Limit:</b></label>
+                    <input id="reformatting_response_length" type="number" min="50" max="8192" step="50" class="text_pole ng_number_input" title="Maximum tokens the model may use to reformat a message." />
+                </div>
+
+                <div class="saints_preset_block">
+                    <label title="Save and switch named bundles of the Reformatting prompt + prefill below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label>
+                    <div class="saints_template_controls" id="reformatting_presets"></div>
+                    <div class="menu_button saints_preview_btn" id="reformatting_preview_btn" title="Show the exact system prompt, assembled user prompt, and prefill the LLM engine will send, with a sample message.">
+                        <span class="fa-solid fa-eye"></span> Preview Assembled Prompt
+                    </div>
+                </div>
+
+                <div class="inline-drawer saints_nested_drawer">
+                    <div class="inline-drawer-toggle inline-drawer-header">
+                        <b>Prompt Template</b>
+                        <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                    </div>
+                    <div class="inline-drawer-content" style="display: none;">
+                        <div class="reformatting_prompt_section">
+                            <textarea id="reformatting_prompt_textarea" class="text_pole" rows="10"
+                                placeholder="Enter your Reformatting prompt template..."></textarea>
+                            <small>Sent as the user prompt for each LLM reformat. Placeholder: <code>{{message}}</code> — the message being reformatted. If it's missing, the message is appended automatically.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="inline-drawer saints_nested_drawer">
+                    <div class="inline-drawer-toggle inline-drawer-header">
+                        <b>Prefill Template</b>
+                        <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                    </div>
+                    <div class="inline-drawer-content" style="display: none;">
+                        <div class="reformatting_prompt_section">
+                            <textarea id="reformatting_prefill_textarea" class="text_pole" rows="3"
+                                placeholder="Optional assistant prefix the model continues from (leave empty for none)."></textarea>
+                            <small>Optional. Sent as an assistant prefix the model continues from, and kept at the start of the result. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
     <!-- ─── SSE Diagnostics ─── -->
     <div class="inline-drawer">
         <div class="inline-drawer-toggle inline-drawer-header">
@@ -523,6 +620,11 @@
             <label class="checkbox_label" title="Log detailed Narrative Guidance events to the browser console.">
                 <input id="ng_debug_mode" type="checkbox" />
                 <span>Narrative Guidance Debug Mode</span>
+            </label>
+
+            <label class="checkbox_label" title="Log detailed Reformatting events (engine, per-message decisions, LLM prompts) to the browser console.">
+                <input id="reformatting_debug_mode" type="checkbox" />
+                <span>Reformatting Debug Mode</span>
             </label>
 
             <label class="checkbox_label" title="Log silent-generation lifecycle (job start/abort/completion, stop-listener events, stream token counts) to the browser console. Useful when diagnosing stop-button behavior across backends.">

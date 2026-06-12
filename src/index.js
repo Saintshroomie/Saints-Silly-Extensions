@@ -82,6 +82,17 @@ import {
     DEFAULT_NG_RESPONSE_LENGTH,
 } from './narrative-guidance.js';
 import {
+    initReformatting,
+    bindReformattingSettings,
+    onReformattingMessageReceived,
+    startReformattingObserver,
+    rescanReformatButtons,
+    registerReformattingSlashCommand,
+    DEFAULT_REFORMATTING_PROMPT,
+    DEFAULT_REFORMATTING_PREFILL,
+    DEFAULT_REFORMATTING_RESPONSE_LENGTH,
+} from './reformatting.js';
+import {
     setupToolPresets,
     migrateLegacyToolPresets,
 } from './prompt-templates.js';
@@ -138,6 +149,16 @@ const defaultSettings = {
     narrativeGuidanceShortInjectionDepth: DEFAULT_NG_INJECTION_DEPTH,
     narrativeGuidanceShortInjectionRole: DEFAULT_NG_INJECTION_ROLE,
     narrativeGuidanceShortLoreBookNames: [],
+    reformattingEnabled: false,
+    reformattingAuto: true,
+    reformattingEngine: 'rules',
+    reformattingDebugMode: false,
+    reformattingStripAsterisks: true,
+    reformattingWrapNarration: false,
+    reformattingCollapseWhitespace: false,
+    reformattingPrompt: DEFAULT_REFORMATTING_PROMPT,
+    reformattingPrefill: DEFAULT_REFORMATTING_PREFILL,
+    reformattingResponseLength: DEFAULT_REFORMATTING_RESPONSE_LENGTH,
     silentGenerationDebugMode: false,
     // toolPresets / activeToolPreset are intentionally absent here:
     // migrateLegacyToolPresets initializes them (and converts any legacy
@@ -207,6 +228,15 @@ const TOOL_PRESET_CONFIG = [
             { key: 'narrativeGuidanceShortInjectionPrompt', label: 'Injection', textareaId: 'ng_short_injection_prompt_textarea', defaultText: DEFAULT_NG_SHORT_INJECTION_PROMPT },
         ],
     },
+    {
+        toolKey: 'reformatting',
+        label: 'Reformatting',
+        containerId: 'reformatting_presets',
+        fields: [
+            { key: 'reformattingPrompt', label: 'Prompt', textareaId: 'reformatting_prompt_textarea', defaultText: DEFAULT_REFORMATTING_PROMPT },
+            { key: 'reformattingPrefill', label: 'Prefill', textareaId: 'reformatting_prefill_textarea', defaultText: DEFAULT_REFORMATTING_PREFILL },
+        ],
+    },
 ];
 
 // ─── State ───
@@ -252,6 +282,7 @@ function injectSettingsPanel() {
     bindACCSettings(saveSettings);
     bindWIASettings(saveSettings);
     bindNarrativeGuidanceSettings(saveSettings);
+    bindReformattingSettings(saveSettings);
     bindSilentGenerationSettings(saveSettings);
 
     // Preset widgets go last: the module bindings above must attach their
@@ -293,6 +324,7 @@ function onChatChanged() {
     loadPossessionState();
     syncAllPossessionUI();
     onNarrativeGuidanceChatChanged();
+    rescanReformatButtons();
     SSEDebug('Chat changed, state reloaded');
 }
 
@@ -327,12 +359,16 @@ jQuery(async () => {
     initACC({ settings, saveSettings });
     initWIA({ settings });
     initNarrativeGuidance({ settings });
+    initReformatting({ settings });
 
     loadPossessionState();
     injectSettingsPanel();
 
     // Watch the DOM for World Info entry forms and inject assist controls.
     startWIAObserver();
+
+    // Watch the chat for messages and inject per-message reformat buttons.
+    startReformattingObserver();
 
     // Possession UI
     attachContinueInterceptor();
@@ -359,11 +395,15 @@ jQuery(async () => {
         onMessageSent(idx);
         await onNarrativeGuidanceMessageSent(idx);
     });
-    eventSource.on(eventTypes.MESSAGE_RECEIVED, onNarrativeGuidanceMessageReceived);
+    eventSource.on(eventTypes.MESSAGE_RECEIVED, async (idx) => {
+        onNarrativeGuidanceMessageReceived(idx);
+        await onReformattingMessageReceived(idx);
+    });
 
     // Slash commands
     registerPossessionSlashCommands();
     registerPhrasingSlashCommand();
+    registerReformattingSlashCommand();
 
     // Initial state
     syncAllPossessionUI();

@@ -1,6 +1,6 @@
 # Saint's Silly Extensions
 
-A [SillyTavern](https://github.com/SillyTavern/SillyTavern) third-party extension that adds five integrated roleplay tools: **Possession**, **Phrasing**, **Assisted Character Creation**, **World Info Assist**, and **Narrative Guidance**
+A [SillyTavern](https://github.com/SillyTavern/SillyTavern) third-party extension that adds six integrated roleplay tools: **Possession**, **Phrasing**, **Assisted Character Creation**, **World Info Assist**, **Narrative Guidance**, and **Reformatting**
 
 ## Features
 
@@ -77,6 +77,20 @@ Enable either tier on its own or both together. Each tier is fully self-containe
 - **Lore book picker** — Per tier: pick which lore books to feed into the guidance generation's context preamble.
 - **Configurable token limits** — Per tier: set the response token limit for the generation, and optionally cap how much chat history feeds into the context preamble.
 
+### Reformatting
+
+Normalizes the formatting of AI character messages *after* they're generated, so they always match the prose style you want — for example, stripping the italic asterisks out of `*He danced around the room.*` to leave `He danced around the room.`
+
+- **Two interchangeable engines** (pick one in the settings):
+  - **Rules** — fast, free, deterministic transforms with no risk of the content changing:
+    - **Strip Asterisks** — removes every italic / bold asterisk marker.
+    - **Wrap Narration in Asterisks** — the inverse: splits quoted dialogue from narration and wraps the narration in asterisks (e.g. `He danced. "Hi."` → `*He danced.* "Hi."`). Strips existing asterisks first so the result is always consistent.
+    - **Collapse Extra Whitespace** — collapses runs of blank lines and trims trailing spaces.
+  - **LLM** — sends the message to the model with an editable prompt (and optional prefill) and lets it rewrite the formatting. More flexible, but slower and token-using; routed through the shared silent-generation manager so SillyTavern's Stop button cancels it. Joins the Tool Presets system.
+- **Automatic or manual** — With **Auto-Reformat** on, every AI reply is reformatted as it arrives. With it off (or any time), reformat a single message with the <span title="text-slash icon">✂</span> button injected into that message's button row, or with `/reformat` for the last message.
+- **AI messages only** — User and system messages are never touched.
+- **Non-destructive** — The original text is always preserved as a swipe, so you can swipe back to it at any time. Reformatting never re-processes a swipe it already produced.
+
 ### How to Use Possession
 
 Possession allows you to "possess" an active character in your solo or group chat (more useful for group chats). When possessing, your messages will be sent as that character rather than your active persona.
@@ -130,6 +144,16 @@ When Possession and Phrasing are used together, you can quickly take over charac
 5. Send a message in your chat. With **Auto-Regenerate at Zero** on, the first generation for each enabled tier kicks off automatically (the UI is masked while it runs, and a progress toast stays up) and the resulting paragraph fills that tier's **Active Guidance** textarea. If both tiers are enabled, long-term generates first and short-term is seeded from it.
 6. From there, every subsequent AI turn is steered by the active guidance until a tier's counter hits zero, at which point that tier regenerates from the now-updated chat context (and your latest themes). When long-term refreshes, short-term re-aligns to the new arc.
 7. Click a tier's **Regenerate Now** at any time to force an immediate regeneration. Use **-1** and **Reset** to nudge that tier's counter without regenerating. Edit the **Active Guidance** textarea directly to hand-tune the steering.
+
+### How to Use Reformatting
+
+1. Open **Extensions** > **Saint's Silly Extensions** and find the **Reformatting** section. Tick **Enable Reformatting**.
+2. Choose an **Engine**:
+   - **Rules** — tick the transforms you want (**Strip Asterisks** handles the common "remove the italics" case; **Wrap Narration in Asterisks** does the inverse).
+   - **LLM** — set a Response Token Limit and edit the prompt (with the `{{message}}` placeholder) / optional prefill. Use **Preview Assembled Prompt** to see exactly what gets sent, and save variants as presets.
+3. Leave **Auto-Reformat AI Messages** on to reformat every reply as it arrives, or turn it off to keep it manual-only.
+4. To reformat a single message at any time, click the <span title="text-slash icon">✂</span> button in that message's button row, or run `/reformat` to reformat the last message.
+5. The reformatted text becomes the active version of the message; the original is kept as a swipe, so you can always swipe back to it.
 
 
 ## Installation
@@ -220,6 +244,22 @@ The drawer holds two self-contained tiers — **Long-term** (the overarching arc
 | Active Guidance (per-chat) | The tier's currently active guidance paragraph. Edit directly to hand-tune steering; edits apply on the next AI turn. |
 | Turns Remaining / -1 / Reset / Regenerate Now | Manual controls over that tier's per-chat counter and on-demand regeneration |
 
+### Reformatting Settings
+
+| Setting | Description |
+|---------|-------------|
+| Enable Reformatting | Toggle the Reformatting feature, its per-message buttons, and `/reformat` on/off |
+| Auto-Reformat AI Messages | When on, every AI character message is reformatted as it arrives. When off, only the per-message button or `/reformat` reformats |
+| Engine | Which engine to use: **Rules** (deterministic transforms) or **LLM** (prompt-based rewrite) |
+| Strip Asterisks (Rules) | Remove every asterisk (italic / bold emphasis marker) |
+| Wrap Narration in Asterisks (Rules) | Wrap narration (everything outside quoted dialogue) in asterisks; strips existing asterisks first so the result is consistent |
+| Collapse Extra Whitespace (Rules) | Collapse runs of 3+ blank lines to one and trim trailing spaces |
+| Response Token Limit (LLM) | Maximum tokens the model may use to reformat a message (default 800) |
+| Preset / Preview Assembled Prompt (LLM) | Save named bundles of the LLM prompt + prefill and preview exactly what gets sent (see Tool Presets & Prompt Preview below) |
+| Prompt Template (LLM) | The user prompt sent for each LLM reformat. Supports the `{{message}}` placeholder; if missing, the message is appended automatically |
+| Prefill Template (LLM) | Optional assistant prefix the model continues from, kept at the start of the result. Prefill echoes from backends that ignore prefills are stripped automatically |
+| Reformatting Debug Mode | Log detailed Reformatting events to the browser console (in the Diagnostics drawer) |
+
 ### Diagnostics
 
 | Setting | Description |
@@ -228,7 +268,7 @@ The drawer holds two self-contained tiers — **Long-term** (the overarching arc
 
 ### Tool Presets & Prompt Preview
 
-Each tool's settings drawer (Phrasing, Assisted Character Creation, World Info Assist, Narrative Guidance) has a **Preset** block that saves and restores *all* of that tool's editable prompt fields together — so a prompt that describes its prefill's format always travels with that prefill:
+Each tool's settings drawer (Phrasing, Assisted Character Creation, World Info Assist, Narrative Guidance, Reformatting) has a **Preset** block that saves and restores *all* of that tool's editable prompt fields together — so a prompt that describes its prefill's format always travels with that prefill:
 
 | Control | Description |
 |---------|-------------|
@@ -252,6 +292,7 @@ Generation templates support tool-specific placeholders, substituted in place. I
 | Assisted Character Creation | `{{context}}`, `{{brief}}` |
 | World Info Assist | `{{context}}`, `{{guidance}}`, `{{title}}` |
 | Narrative Guidance | `{{context}}`, `{{themes}}`, plus `{{longGuidance}}` for the short-term tier (generation instructions); `{{guidance}}` (injection template) |
+| Reformatting | `{{message}}` (LLM prompt) |
 
 ## Slash Commands
 
@@ -260,6 +301,7 @@ Generation templates support tool-specific placeholders, substituted in place. I
 | `/possess [name]` | Possess a character by name (partial matching supported) |
 | `/unpossess` | Release the currently possessed character |
 | `/phrasing` | Enrich the text in the input box or the last message |
+| `/reformat` | Reformat the last message using the configured engine (keeps the original as a swipe) |
 
 ## License
 
