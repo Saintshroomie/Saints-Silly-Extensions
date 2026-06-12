@@ -28,6 +28,17 @@ Enrich your messages with LLM-generated narration, actions, and detail that stay
 - **Inverse Guidance** — Optional mode that feeds every existing swipe of the target message into the prompt and asks the model to produce a swipe that is wildly different in tone, pacing, and approach. Comes with its own editable prompt template (with `{{phrasingSwipes}}` and `{{phrasingSeed}}` placeholders).
 - **Possession-aware** — When possessing a character, phrasing generates in that character's voice; otherwise it uses the standard ST impersonate feature
 
+### Phrase Ban
+
+Tired of the model reusing the same tics — "his voice was thick with something he didn't want to name", "she did X, despite the Y"? Phrase Ban keeps a regex ban list and automatically rewrites any AI reply that matches it.
+
+- **Regex ban list** — One JavaScript regular expression per line, matched against the raw text of every incoming AI reply. Case-insensitive by default, `/pattern/flags` for custom flags, `#` for comments. Invalid patterns are skipped, with a live validity readout under the textarea.
+- **Detect → rewrite loop** — On a match, the message is rewritten through the Phrasing! engine: the actual matched phrases are listed in a rewrite prompt and the message is regenerated as a new swipe. If the rewrite *still* matches, it retries up to **Max Rewrite Attempts** (default 2), then gives up with a warning toast.
+- **Notify-only mode** — Set Max Rewrite Attempts to 0 to be warned about matches without ever auto-rewriting.
+- **Non-destructive** — Every rewrite is a swipe; the original (and each intermediate attempt) stays one swipe away.
+- **Automatic or manual** — With **Auto-Scan** on, every AI reply is scanned as it arrives (a reply is never re-scanned once checked). Run `/phraseban` to scan and fix the last message on demand.
+- **Custom rewrite prompt + presets** — The rewrite prompt template is editable (placeholders `{{phrasingSeed}}` and `{{bannedPhrases}}`), and the pattern list + prompt save together as named presets, so you can keep per-model or per-genre ban lists.
+
 ### Assisted Character Creation
 
 A modal-based character creator that adds an **Assist** button to SillyTavern's character creation page, letting you draft a complete character description from a short brief.
@@ -116,6 +127,19 @@ When Possession and Phrasing are used together, you can quickly take over charac
 2. Type a paraphrase of what you want your possessed character to do or say or feel, and press the quill button to let the LLM do the hard work.
 3. Pressing the quill button again will perform a swipe using the active message as the guiding seed.
 
+### How to Use Phrase Ban
+
+1. Open **Extensions** > **Saint's Silly Extensions** and find the **Phrase Ban** section. Tick **Enable Phrase Ban**.
+2. Open **Banned Phrase Patterns** and add one regex per line for the phrasing you never want to see again, e.g.:
+   - `voice was (thick|heavy) with` — catches every pronoun/verb variation of the cliché
+   - `something (he|she|they) (didn't|couldn't) want to name`
+   - `despite the \w+ (around|between) them`
+3. Leave **Auto-Scan AI Messages** on. From now on, any AI reply matching a pattern is automatically rewritten (the matched phrases are quoted to the model so it knows exactly what to avoid), and the original stays available as a swipe.
+4. Tune **Max Rewrite Attempts** to taste: raise it for stubborn models, or set it to **0** to only get a warning toast instead of a rewrite.
+5. Run `/phraseban` at any time to scan and fix the last message manually — useful after editing the pattern list.
+
+Notes: detection happens after the reply arrives (regex can't run inside the model's sampler), so you'll briefly see the original before the rewrite lands. In group chats only the round's final message can be auto-rewritten, since SillyTavern can only swipe the last message in the chat.
+
 ### How to Use Assisted Character Creation
 
 1. Open SillyTavern's **Create Character** page and click the **Assist** button (wand icon) in the character creation button row.
@@ -198,6 +222,18 @@ Open **Extensions** > **Saint's Silly Extensions** in SillyTavern's settings pan
 | Prompt Template | Customize the AI prompt used for enrichment. Supports the `{{phrasingSeed}}` placeholder. |
 | Inverse Guidance Prompt Template | Customize the prompt used when Inverse Guidance is on. Supports `{{phrasingSeed}}` and `{{phrasingSwipes}}` placeholders. |
 
+### Phrase Ban Settings
+
+| Setting | Description |
+|---------|-------------|
+| Enable Phrase Ban | Toggle the Phrase Ban feature and `/phraseban` on/off |
+| Auto-Scan AI Messages | When on, every AI character message is scanned against the ban list as it arrives. When off, only `/phraseban` scans |
+| Max Rewrite Attempts | How many times to rewrite a reply that still matches the ban list before giving up (default 2). **0** = detect and notify only, never rewrite |
+| Preset / Preview Assembled Prompt | Save named bundles of the pattern list + rewrite prompt and preview exactly what gets injected (see Tool Presets & Prompt Preview below) |
+| Banned Phrase Patterns | One JavaScript regex per line, matched against the raw message text. Case-insensitive by default; wrap a line in `/…/flags` for custom flags; `#` starts a comment line. Invalid patterns are skipped and reported under the textarea |
+| Rewrite Prompt Template | The instruction injected for the rewrite generation. Supports `{{phrasingSeed}}` (the speaker-prefixed message) and `{{bannedPhrases}}` (the list of matched phrases) placeholders |
+| Phrase Ban Debug Mode | Log pattern compilation, matches, and rewrite attempts to the browser console (in the Diagnostics drawer) |
+
 ### Assisted Character Creation Settings
 
 | Setting | Description |
@@ -273,7 +309,7 @@ The drawer holds two self-contained tiers — **Long-term** (the overarching arc
 
 ### Tool Presets & Prompt Preview
 
-Each tool's settings drawer (Phrasing, Assisted Character Creation, World Info Assist, Narrative Guidance, Reformatting) has a **Preset** block that saves and restores *all* of that tool's editable prompt fields together — so a prompt that describes its prefill's format always travels with that prefill:
+Each tool's settings drawer (Phrasing, Phrase Ban, Assisted Character Creation, World Info Assist, Narrative Guidance, Reformatting) has a **Preset** block that saves and restores *all* of that tool's editable prompt fields together — so a prompt that describes its prefill's format always travels with that prefill:
 
 | Control | Description |
 |---------|-------------|
@@ -294,6 +330,7 @@ Generation templates support tool-specific placeholders, substituted in place. I
 | Tool | Placeholders |
 |------|--------------|
 | Phrasing | `{{phrasingSeed}}`, `{{phrasingSwipes}}` (inverse prompt only) |
+| Phrase Ban | `{{phrasingSeed}}`, `{{bannedPhrases}}` (rewrite prompt) |
 | Assisted Character Creation | `{{context}}`, `{{brief}}` |
 | World Info Assist | `{{context}}`, `{{guidance}}`, `{{title}}` |
 | Narrative Guidance | `{{context}}`, `{{themes}}`, plus `{{longGuidance}}` for the short-term tier (generation instructions); `{{guidance}}` (injection template) |
@@ -306,6 +343,7 @@ Generation templates support tool-specific placeholders, substituted in place. I
 | `/possess [name]` | Possess a character by name (partial matching supported) |
 | `/unpossess` | Release the currently possessed character |
 | `/phrasing` | Enrich the text in the input box or the last message |
+| `/phraseban` | Scan the last message against the Phrase Ban regex list and rewrite it (as a new swipe) if banned phrasing is found |
 | `/reformat` | Reformat the last message using the configured engine (keeps the original as a swipe) |
 
 ## License

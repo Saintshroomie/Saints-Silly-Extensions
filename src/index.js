@@ -42,9 +42,18 @@ import {
     registerPhrasingSlashCommand,
     onGenerationStarted as phrasingGenStarted,
     onGenerationEnded as phrasingGenEnded,
+    rewriteMessageWithTemplate,
     DEFAULT_PHRASING_PROMPT,
     DEFAULT_PHRASING_INVERSE_PROMPT,
 } from './phrasing.js';
+import {
+    initPhraseBan,
+    bindPhraseBanSettings,
+    onPhraseBanMessageReceived,
+    registerPhraseBanSlashCommand,
+    DEFAULT_PHRASE_BAN_PROMPT,
+    DEFAULT_PHRASE_BAN_MAX_RETRIES,
+} from './phrase-ban.js';
 import {
     initACC,
     onCharacterPageLoaded as accOnCharacterPageLoaded,
@@ -111,6 +120,12 @@ const defaultSettings = {
     phrasingInverseGuidance: false,
     phrasingPrompt: DEFAULT_PHRASING_PROMPT,
     phrasingInversePrompt: DEFAULT_PHRASING_INVERSE_PROMPT,
+    phraseBanEnabled: false,
+    phraseBanAuto: true,
+    phraseBanDebugMode: false,
+    phraseBanMaxRetries: DEFAULT_PHRASE_BAN_MAX_RETRIES,
+    phraseBanPatterns: '',
+    phraseBanPrompt: DEFAULT_PHRASE_BAN_PROMPT,
     accEnabled: true,
     accDebugMode: false,
     accPrompt: DEFAULT_ACC_PROMPT,
@@ -189,6 +204,15 @@ const TOOL_PRESET_CONFIG = [
         fields: [
             { key: 'phrasingPrompt', label: 'Prompt', textareaId: 'phrasing_prompt_textarea', defaultText: DEFAULT_PHRASING_PROMPT },
             { key: 'phrasingInversePrompt', label: 'Inverse Prompt', textareaId: 'phrasing_inverse_prompt_textarea', defaultText: DEFAULT_PHRASING_INVERSE_PROMPT },
+        ],
+    },
+    {
+        toolKey: 'phrase-ban',
+        label: 'Phrase Ban',
+        containerId: 'phrase_ban_presets',
+        fields: [
+            { key: 'phraseBanPatterns', label: 'Patterns', textareaId: 'phrase_ban_patterns_textarea', defaultText: '' },
+            { key: 'phraseBanPrompt', label: 'Rewrite Prompt', textareaId: 'phrase_ban_prompt_textarea', defaultText: DEFAULT_PHRASE_BAN_PROMPT },
         ],
     },
     {
@@ -282,6 +306,7 @@ function injectSettingsPanel() {
 
     bindPossessionSettings(saveSettings);
     bindPhrasingSettings(saveSettings);
+    bindPhraseBanSettings(saveSettings);
     bindACCSettings(saveSettings);
     bindWIASettings(saveSettings);
     bindNarrativeGuidanceSettings(saveSettings);
@@ -359,6 +384,10 @@ jQuery(async () => {
         settings,
         possessionApi: { isPossessing, getPossessedCharName, postPossessedMessage },
     });
+    initPhraseBan({
+        settings,
+        phrasingApi: { rewriteMessageWithTemplate },
+    });
     initACC({ settings, saveSettings });
     initWIA({ settings });
     initNarrativeGuidance({ settings });
@@ -401,11 +430,15 @@ jQuery(async () => {
     eventSource.on(eventTypes.MESSAGE_RECEIVED, async (idx) => {
         onNarrativeGuidanceMessageReceived(idx);
         await onReformattingMessageReceived(idx);
+        // After Reformatting so the scan sees the final text. Detached
+        // internally — it must never block this emit chain.
+        onPhraseBanMessageReceived(idx);
     });
 
     // Slash commands
     registerPossessionSlashCommands();
     registerPhrasingSlashCommand();
+    registerPhraseBanSlashCommand();
     registerReformattingSlashCommand();
 
     // Initial state
