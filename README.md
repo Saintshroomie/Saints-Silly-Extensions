@@ -259,6 +259,12 @@ The drawer holds two self-contained tiers — **Long-term** (the overarching arc
 | Prefill Template (LLM) | Optional assistant prefix the model continues from, kept at the start of the result. Prefill echoes from backends that ignore prefills are stripped automatically |
 | Reformatting Debug Mode | Log detailed Reformatting events to the browser console (in the Diagnostics drawer) |
 
+### Silent Generation
+
+| Setting | Description |
+|---------|-------------|
+| Stream output into fields | Live-stream silent generations (Assisted Character Creation, World Info Assist, Narrative Guidance, LLM Reformatting) into their output fields token by token, instead of waiting for the full response. Supported for Chat Completion, Text Completion, KoboldAI Classic (streaming-capable KoboldCpp), and NovelAI (with its streaming toggle on); other backends — or a stream that fails before the first token — fall back to a single write when the response completes. Default: on. |
+
 ### Diagnostics
 
 | Setting | Description |

@@ -208,7 +208,10 @@ export function waitForGenerationEnd(timeoutMs = 5 * 60 * 1000) {
 // ─── Streaming Generation Helper ───
 
 /**
- * Call generateRaw and optionally stream tokens into targetEl as they arrive.
+ * Run a raw silent generation, streaming tokens into targetEl as they
+ * arrive when the backend supports it (see `cancellableStreamingGenerate`
+ * for the support matrix); unsupported backends fall back to a single
+ * write of the full response.
  *
  * Routes through the silent-generation cancellation manager so the call can
  * be aborted by ST's stop button or by `abortAllSilentGenerations()`. On

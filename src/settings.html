@@ -610,6 +610,23 @@
         </div>
     </div>
 
+    <!-- ─── SSE Silent Generation ─── -->
+    <div class="inline-drawer">
+        <div class="inline-drawer-toggle inline-drawer-header">
+            <b><span class="fa-solid fa-bolt"></span> SSE Silent Generation</b>
+            <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+        </div>
+        <div class="inline-drawer-content" style="display: none;">
+
+            <label class="checkbox_label" title="Stream ACC, World Info Assist, Narrative Guidance, and LLM Reformatting output into their fields token by token, instead of waiting for the full response.">
+                <input id="silent_generation_streaming" type="checkbox" />
+                <span>Stream output into fields</span>
+            </label>
+            <small>Live-streams silent generations (ACC, WIA, Narrative Guidance, LLM Reformatting) into their output fields. Supported for Chat Completion, Text Completion, KoboldAI Classic (streaming-capable KoboldCpp), and NovelAI (with its streaming toggle on); other backends — or a stream that fails before the first token — fall back to a single write when the response completes.</small>
+
+        </div>
+    </div>
+
     <!-- ─── SSE Diagnostics ─── -->
     <div class="inline-drawer">
         <div class="inline-drawer-toggle inline-drawer-header">
