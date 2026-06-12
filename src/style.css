@@ -777,9 +777,9 @@
     font-style: italic;
 }
 
-#saints_silly_settings #ng_regenerate_now.disabled,
-#saints_silly_settings #ng_continue_now.disabled,
-#saints_silly_settings #ng_retry_now.disabled {
+#saints_silly_settings [id$="_regenerate_now"].disabled,
+#saints_silly_settings [id$="_continue_now"].disabled,
+#saints_silly_settings [id$="_retry_now"].disabled {
     opacity: 0.6;
     pointer-events: none;
 }

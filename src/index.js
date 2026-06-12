@@ -68,10 +68,15 @@ import {
     onNarrativeGuidanceChatChanged,
     onNarrativeGuidanceMessageSent,
     onNarrativeGuidanceMessageReceived,
-    DEFAULT_NG_USER_PROMPT,
-    DEFAULT_NG_GENERATION_PROMPT,
-    DEFAULT_NG_INJECTION_PROMPT,
-    DEFAULT_NG_TURN_COUNT,
+    migrateNarrativeGuidanceSettings,
+    DEFAULT_NG_LONG_USER_PROMPT,
+    DEFAULT_NG_SHORT_USER_PROMPT,
+    DEFAULT_NG_LONG_GENERATION_PROMPT,
+    DEFAULT_NG_SHORT_GENERATION_PROMPT,
+    DEFAULT_NG_LONG_INJECTION_PROMPT,
+    DEFAULT_NG_SHORT_INJECTION_PROMPT,
+    DEFAULT_NG_LONG_TURN_COUNT,
+    DEFAULT_NG_SHORT_TURN_COUNT,
     DEFAULT_NG_INJECTION_DEPTH,
     DEFAULT_NG_INJECTION_ROLE,
     DEFAULT_NG_RESPONSE_LENGTH,
@@ -107,18 +112,32 @@ const defaultSettings = {
     wiaPrefillUntitled: DEFAULT_WIA_PREFILL_UNTITLED,
     wiaResponseLength: DEFAULT_WIA_RESPONSE_LENGTH,
     wiaMaxContextOverride: 0,
-    narrativeGuidanceEnabled: false,
-    narrativeGuidanceAutoRegen: true,
     narrativeGuidanceDebugMode: false,
-    narrativeGuidancePrompt: DEFAULT_NG_USER_PROMPT,
-    narrativeGuidanceGenerationPrompt: DEFAULT_NG_GENERATION_PROMPT,
-    narrativeGuidanceInjectionPrompt: DEFAULT_NG_INJECTION_PROMPT,
-    narrativeGuidanceDefaultTurnCount: DEFAULT_NG_TURN_COUNT,
-    narrativeGuidanceResponseLength: DEFAULT_NG_RESPONSE_LENGTH,
-    narrativeGuidanceMaxContextOverride: 0,
-    narrativeGuidanceInjectionDepth: DEFAULT_NG_INJECTION_DEPTH,
-    narrativeGuidanceInjectionRole: DEFAULT_NG_INJECTION_ROLE,
-    narrativeGuidanceLoreBookNames: [],
+    // Long-term track — the overarching arc on a slow refresh horizon.
+    narrativeGuidanceLongEnabled: false,
+    narrativeGuidanceLongAutoRegen: true,
+    narrativeGuidanceLongPrompt: DEFAULT_NG_LONG_USER_PROMPT,
+    narrativeGuidanceLongGenerationPrompt: DEFAULT_NG_LONG_GENERATION_PROMPT,
+    narrativeGuidanceLongInjectionPrompt: DEFAULT_NG_LONG_INJECTION_PROMPT,
+    narrativeGuidanceLongDefaultTurnCount: DEFAULT_NG_LONG_TURN_COUNT,
+    narrativeGuidanceLongResponseLength: DEFAULT_NG_RESPONSE_LENGTH,
+    narrativeGuidanceLongMaxContextOverride: 0,
+    narrativeGuidanceLongInjectionDepth: DEFAULT_NG_INJECTION_DEPTH,
+    narrativeGuidanceLongInjectionRole: DEFAULT_NG_INJECTION_ROLE,
+    narrativeGuidanceLongLoreBookNames: [],
+    // Short-term track — the immediate beats on a fast refresh horizon,
+    // seeded with the active long-term arc.
+    narrativeGuidanceShortEnabled: false,
+    narrativeGuidanceShortAutoRegen: true,
+    narrativeGuidanceShortPrompt: DEFAULT_NG_SHORT_USER_PROMPT,
+    narrativeGuidanceShortGenerationPrompt: DEFAULT_NG_SHORT_GENERATION_PROMPT,
+    narrativeGuidanceShortInjectionPrompt: DEFAULT_NG_SHORT_INJECTION_PROMPT,
+    narrativeGuidanceShortDefaultTurnCount: DEFAULT_NG_SHORT_TURN_COUNT,
+    narrativeGuidanceShortResponseLength: DEFAULT_NG_RESPONSE_LENGTH,
+    narrativeGuidanceShortMaxContextOverride: 0,
+    narrativeGuidanceShortInjectionDepth: DEFAULT_NG_INJECTION_DEPTH,
+    narrativeGuidanceShortInjectionRole: DEFAULT_NG_INJECTION_ROLE,
+    narrativeGuidanceShortLoreBookNames: [],
     silentGenerationDebugMode: false,
     // toolPresets / activeToolPreset are intentionally absent here:
     // migrateLegacyToolPresets initializes them (and converts any legacy
@@ -169,13 +188,23 @@ const TOOL_PRESET_CONFIG = [
         ],
     },
     {
-        toolKey: 'ng',
-        label: 'Narrative Guidance',
-        containerId: 'ng_presets',
+        toolKey: 'ng-long',
+        label: 'Narrative Guidance (Long-term)',
+        containerId: 'ng_long_presets',
         fields: [
-            { key: 'narrativeGuidancePrompt', label: 'Instructions', textareaId: 'ng_user_prompt_textarea', defaultText: DEFAULT_NG_USER_PROMPT },
-            { key: 'narrativeGuidanceGenerationPrompt', label: 'Prefill', textareaId: 'ng_generation_prompt_textarea', defaultText: DEFAULT_NG_GENERATION_PROMPT },
-            { key: 'narrativeGuidanceInjectionPrompt', label: 'Injection', textareaId: 'ng_injection_prompt_textarea', defaultText: DEFAULT_NG_INJECTION_PROMPT },
+            { key: 'narrativeGuidanceLongPrompt', label: 'Instructions', textareaId: 'ng_long_user_prompt_textarea', defaultText: DEFAULT_NG_LONG_USER_PROMPT },
+            { key: 'narrativeGuidanceLongGenerationPrompt', label: 'Prefill', textareaId: 'ng_long_generation_prompt_textarea', defaultText: DEFAULT_NG_LONG_GENERATION_PROMPT },
+            { key: 'narrativeGuidanceLongInjectionPrompt', label: 'Injection', textareaId: 'ng_long_injection_prompt_textarea', defaultText: DEFAULT_NG_LONG_INJECTION_PROMPT },
+        ],
+    },
+    {
+        toolKey: 'ng-short',
+        label: 'Narrative Guidance (Short-term)',
+        containerId: 'ng_short_presets',
+        fields: [
+            { key: 'narrativeGuidanceShortPrompt', label: 'Instructions', textareaId: 'ng_short_user_prompt_textarea', defaultText: DEFAULT_NG_SHORT_USER_PROMPT },
+            { key: 'narrativeGuidanceShortGenerationPrompt', label: 'Prefill', textareaId: 'ng_short_generation_prompt_textarea', defaultText: DEFAULT_NG_SHORT_GENERATION_PROMPT },
+            { key: 'narrativeGuidanceShortInjectionPrompt', label: 'Injection', textareaId: 'ng_short_injection_prompt_textarea', defaultText: DEFAULT_NG_SHORT_INJECTION_PROMPT },
         ],
     },
 ];
@@ -195,10 +224,18 @@ function saveSettings() {
 
 function loadSettings() {
     settings = loadExtensionSettings(EXTENSION_NAME, defaultSettings);
+    let migrated = false;
     if (migrateLegacyToolPresets(settings, TOOL_PRESET_CONFIG)) {
         SSEDebug('Migrated legacy prompt templates to tool presets');
-        saveSettings();
+        migrated = true;
     }
+    // Fold pre-split, single-track Narrative Guidance settings (and any saved
+    // NG presets) onto the new short-term track.
+    if (migrateNarrativeGuidanceSettings(settings)) {
+        SSEDebug('Migrated legacy Narrative Guidance settings to the short-term track');
+        migrated = true;
+    }
+    if (migrated) saveSettings();
     SSEDebug('Settings loaded:', JSON.stringify(settings));
 }
 
