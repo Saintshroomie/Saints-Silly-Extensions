@@ -1841,8 +1841,10 @@ async function openRawStream(params, signal) {
  * @param {boolean} append - Preserve the field's existing text as a prefix.
  * @param {AbortSignal} signal - Cancellation signal from the job manager.
  * @param {string} jobName - Debug name.
- * @param {{ receivedChunks: number }} progress - Out-param so the caller can
- *   tell a pre-stream failure (safe to fall back) from a mid-stream one.
+ * @param {{ receivedChunks: number, text: string }} progress - Out-param: the
+ *   live chunk count and accumulated raw text, so the caller can tell a
+ *   pre-stream failure (safe to fall back) from a mid-stream one and can
+ *   recover the streamed partial after an abort.
  * @returns {Promise<string>} The cleaned final message.
  */
 async function streamRawGenerate(params, targetEl, append, signal, jobName, progress) {
@@ -1855,23 +1857,22 @@ async function streamRawGenerate(params, targetEl, append, signal, jobName, prog
         targetEl.value = baseText;
     }
     const streamFn = await openRawStream(params, signal);
-    let rawText = '';
 
     for await (const chunk of streamFn()) {
         if (signal.aborted) break;
-        if (typeof chunk?.text === 'string') rawText = chunk.text;
+        if (typeof chunk?.text === 'string') progress.text = chunk.text;
         progress.receivedChunks++;
         if (targetEl) {
-            targetEl.value = baseText + rawText;
+            targetEl.value = baseText + progress.text;
             targetEl.scrollTop = targetEl.scrollHeight;
         }
     }
-    debug(`${jobName} — stream closed after ${progress.receivedChunks} chunk(s), raw length: ${rawText.length}`);
+    debug(`${jobName} — stream closed after ${progress.receivedChunks} chunk(s), raw length: ${progress.text.length}`);
     signal.throwIfAborted();
 
     const trimNames = params.trimNames !== false;
     const message = __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_cleanUpMessage__({
-        getMessage: rawText,
+        getMessage: progress.text,
         isImpersonate: false,
         isContinue: false,
         displayIncompleteSentences: true,
@@ -1906,15 +1907,17 @@ async function streamRawGenerate(params, targetEl, append, signal, jobName, prog
  *
  * A fresh (non-append) streaming run clears `targetEl` as soon as the job
  * starts. On cancel, whatever streamed so far is deliberately left in the
- * field — callers that want to keep the partial just leave the field
- * alone in their abort handling; callers that don't must reset it
- * themselves.
+ * field, and the thrown AbortError carries it as `err.streamedPartial`
+ * (the raw streamed text, without the append-mode prefix) — abort handlers
+ * that want to keep the partial should read it from there rather than from
+ * the field, which other code may have reset or re-rendered by the time
+ * the handler runs.
  *
  * @param {object} params - generateRaw parameters.
  * @param {HTMLTextAreaElement|null} targetEl - Element to stream/write the result into, or null.
  * @param {{ append?: boolean, name?: string }} [opts]
  * @returns {Promise<string>} The full generated text.
- * @throws {DOMException} AbortError if cancelled.
+ * @throws {DOMException} AbortError if cancelled, with `streamedPartial` attached.
  */
 async function cancellableStreamingGenerate(params, targetEl, { append = false, name } = {}) {
     const jobName = name || 'streamingGenerate';
@@ -1922,35 +1925,45 @@ async function cancellableStreamingGenerate(params, targetEl, { append = false, 
     const wantStreaming = isStreamingPreferred() && !params?.jsonSchema && canStreamApi(api);
     debug(`cancellableStreamingGenerate — name: ${jobName}, api: ${api}, streaming: ${wantStreaming}, hasTarget: ${!!targetEl}, append: ${append}, promptLen: ${params?.prompt?.length ?? 0}, responseLength: ${params?.responseLength ?? '(default)'}`);
 
-    return runCancellableSilentGeneration({
-        name: jobName,
-        run: async (signal) => {
-            if (wantStreaming) {
-                const progress = { receivedChunks: 0 };
-                try {
-                    return await streamRawGenerate(params, targetEl, append, signal, jobName, progress);
-                } catch (err) {
-                    if (signal.aborted || err?.name === 'AbortError' || progress.receivedChunks > 0) {
-                        throw err;
+    const progress = { receivedChunks: 0, text: '' };
+    try {
+        return await runCancellableSilentGeneration({
+            name: jobName,
+            run: async (signal) => {
+                if (wantStreaming) {
+                    try {
+                        return await streamRawGenerate(params, targetEl, append, signal, jobName, progress);
+                    } catch (err) {
+                        if (signal.aborted || err?.name === 'AbortError' || progress.receivedChunks > 0) {
+                            throw err;
+                        }
+                        debug(`${jobName} — streaming failed before any tokens arrived (${err?.message || err}); falling back to generateRaw`);
                     }
-                    debug(`${jobName} — streaming failed before any tokens arrived (${err?.message || err}); falling back to generateRaw`);
                 }
-            }
 
-            const result = await __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__(params);
-            debug(`${jobName} — generateRaw resolved, length: ${(result || '').length}`);
-            // If the job was cancelled while generateRaw was in flight, the
-            // race in runCancellableSilentGeneration already rejected and the
-            // caller moved on — don't clobber the target with the discarded
-            // result (the user may have edited the field since).
-            if (signal.aborted) return result;
-            if (targetEl && result) {
-                targetEl.value = append ? ((targetEl.value || '') + result) : result;
-                targetEl.scrollTop = targetEl.scrollHeight;
-            }
-            return result;
-        },
-    });
+                const result = await __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__(params);
+                debug(`${jobName} — generateRaw resolved, length: ${(result || '').length}`);
+                // If the job was cancelled while generateRaw was in flight, the
+                // race in runCancellableSilentGeneration already rejected and the
+                // caller moved on — don't clobber the target with the discarded
+                // result (the user may have edited the field since).
+                if (signal.aborted) return result;
+                if (targetEl && result) {
+                    targetEl.value = append ? ((targetEl.value || '') + result) : result;
+                    targetEl.scrollTop = targetEl.scrollHeight;
+                }
+                return result;
+            },
+        });
+    } catch (err) {
+        // Hand abort handlers the streamed partial directly — the field may
+        // already have been reset or re-rendered by the time they run.
+        if (err && typeof err === 'object' && err.name === 'AbortError') {
+            err.streamedPartial = progress.text;
+        }
+        debug(`${jobName} — rejected (${err?.name || 'Error'}), streamed partial length: ${progress.text.length}`);
+        throw err;
+    }
 }
 
 ;// ./src/utils.js
@@ -5939,7 +5952,7 @@ async function regenGuidance(track, reason) {
             narrative_guidance_debug(`[${track.id}] regenGuidance — cancelled by user`);
             // A deliberate stop keeps whatever streamed so far as the active
             // guidance; only resync the panel when nothing usable streamed.
-            if (adoptStreamedPartial(track, { resetCounter: true })) {
+            if (adoptStreamedPartial(track, recoverRegenPartial(track, err), { resetCounter: true })) {
                 toast(`${track.label} generation stopped — keeping the partial guidance.`, 'info');
                 return;
             }
@@ -6021,7 +6034,7 @@ async function continueGuidance(track) {
             narrative_guidance_debug(`[${track.id}] continueGuidance — cancelled by user`);
             // A deliberate stop keeps the partial continuation as part of
             // the active guidance; only resync when nothing streamed.
-            if (adoptStreamedPartial(track, { resetCounter: false })) {
+            if (adoptStreamedPartial(track, recoverContinuePartial(track, err), { resetCounter: false })) {
                 toast(`${track.label} continue stopped — keeping the partial continuation.`, 'info');
                 return;
             }
@@ -6111,33 +6124,65 @@ function refreshRemainingDisplay(track, remaining) {
 }
 
 /**
- * Adopt whatever a stopped generation left in the active-guidance textarea
- * as the track's guidance — the user often stops precisely because they
- * already like the partial, and keeping it saved lets them edit it or hit
- * Continue. Returns false when there is no usable partial (nothing
- * streamed, or the field matches the saved guidance); the caller should
- * resync the panel instead.
+ * Adopt the text a stopped generation produced as the track's guidance —
+ * the user often stops precisely because they already like the partial,
+ * and keeping it saved lets them edit it or hit Continue. Returns false
+ * when there is no usable text (nothing streamed, or it matches the saved
+ * guidance); the caller should resync the panel instead.
+ *
+ * The text comes from the AbortError's `streamedPartial` (attached by the
+ * silent-generation engine), not from the textarea — the field may already
+ * have been reset by the time the abort handler runs.
  *
  * @param {object} track - NG track config.
+ * @param {string} fullText - The complete guidance text to adopt (for
+ *   continues, the caller composes previous guidance + partial).
  * @param {{ resetCounter: boolean }} opts - Reset the turn counter like a
  *   successful regen (so auto-regen doesn't immediately overwrite the kept
  *   partial); continues leave the counter alone, mirroring their success path.
- * @returns {boolean} Whether a partial was adopted.
+ * @returns {boolean} Whether the text was adopted.
  */
-function adoptStreamedPartial(track, { resetCounter }) {
-    const guidanceArea = trackEl(track, 'active_guidance_textarea');
-    const partial = guidanceArea?.value?.trim() || '';
+function adoptStreamedPartial(track, fullText, { resetCounter }) {
+    const text = (fullText || '').trim();
     const state = loadChatState(track);
-    if (!partial || partial === (state.guidance || '').trim()) return false;
+    if (!text || text === (state.guidance || '').trim()) return false;
 
-    state.guidance = partial;
+    state.guidance = text;
     if (resetCounter) state.turnsRemaining = resolveTurnCount(track);
     saveChatState(track, state);
 
     refreshPanelFromState(track);
     reapplyInjection(track);
-    narrative_guidance_debug(`[${track.id}] Adopted streamed partial as active guidance, length:`, partial.length);
+    narrative_guidance_debug(`[${track.id}] Adopted streamed partial as active guidance, length:`, text.length);
     return true;
+}
+
+/**
+ * The full guidance text to adopt after a stopped regen: the streamed
+ * partial carried by the AbortError, falling back to the live textarea
+ * contents when the engine didn't attach one (non-streamed runs leave the
+ * field untouched, so the read is safe there).
+ */
+function recoverRegenPartial(track, err) {
+    if (typeof err?.streamedPartial === 'string') return err.streamedPartial.trim();
+    return trackEl(track, 'active_guidance_textarea')?.value?.trim() || '';
+}
+
+/**
+ * The full guidance text to adopt after a stopped continue: the previous
+ * guidance plus the streamed continuation from the AbortError (composed the
+ * same way the success path does), or the live textarea contents — which
+ * already hold previous + partial — when the engine didn't attach one.
+ */
+function recoverContinuePartial(track, err) {
+    if (typeof err?.streamedPartial === 'string') {
+        const continuation = err.streamedPartial.trim();
+        if (!continuation) return '';
+        const prev = loadChatState(track).guidance || '';
+        const sep = !prev || prev.endsWith(' ') || prev.endsWith('\n') ? '' : ' ';
+        return prev + sep + continuation;
+    }
+    return trackEl(track, 'active_guidance_textarea')?.value?.trim() || '';
 }
 
 function refreshPanelFromState(track) {
