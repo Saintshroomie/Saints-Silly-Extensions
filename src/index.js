@@ -161,6 +161,7 @@ const defaultSettings = {
     reformattingPrefill: DEFAULT_REFORMATTING_PREFILL,
     reformattingResponseLength: DEFAULT_REFORMATTING_RESPONSE_LENGTH,
     silentGenerationDebugMode: false,
+    silentGenerationStreaming: true,
     // toolPresets / activeToolPreset are intentionally absent here:
     // migrateLegacyToolPresets initializes them (and converts any legacy
     // per-field promptTemplates) on first load. Listing them as defaults

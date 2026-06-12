@@ -435,6 +435,12 @@ async function regenGuidance(track, reason) {
     } catch (err) {
         if (isSilentGenerationAbort(err)) {
             debug(`[${track.id}] regenGuidance — cancelled by user`);
+            // A deliberate stop keeps whatever streamed so far as the active
+            // guidance; only resync the panel when nothing usable streamed.
+            if (adoptStreamedPartial(track, recoverRegenPartial(track, err), { resetCounter: true })) {
+                toast(`${track.label} generation stopped — keeping the partial guidance.`, 'info');
+                return;
+            }
         } else {
             console.error(`Narrative Guidance (${track.label}) generation error:`, err);
             toast(`${track.label} narrative guidance failed: ${err.message}`, 'error');
@@ -511,6 +517,12 @@ async function continueGuidance(track) {
     } catch (err) {
         if (isSilentGenerationAbort(err)) {
             debug(`[${track.id}] continueGuidance — cancelled by user`);
+            // A deliberate stop keeps the partial continuation as part of
+            // the active guidance; only resync when nothing streamed.
+            if (adoptStreamedPartial(track, recoverContinuePartial(track, err), { resetCounter: false })) {
+                toast(`${track.label} continue stopped — keeping the partial continuation.`, 'info');
+                return;
+            }
         } else {
             console.error(`Narrative Guidance (${track.label}) continue error:`, err);
             toast(`${track.label} continue failed: ${err.message}`, 'error');
@@ -594,6 +606,68 @@ export function onNarrativeGuidanceMessageReceived(messageIndex) {
 function refreshRemainingDisplay(track, remaining) {
     const display = trackEl(track, 'remaining_display');
     if (display) display.textContent = String(remaining);
+}
+
+/**
+ * Adopt the text a stopped generation produced as the track's guidance —
+ * the user often stops precisely because they already like the partial,
+ * and keeping it saved lets them edit it or hit Continue. Returns false
+ * when there is no usable text (nothing streamed, or it matches the saved
+ * guidance); the caller should resync the panel instead.
+ *
+ * The text comes from the AbortError's `streamedPartial` (attached by the
+ * silent-generation engine), not from the textarea — the field may already
+ * have been reset by the time the abort handler runs.
+ *
+ * @param {object} track - NG track config.
+ * @param {string} fullText - The complete guidance text to adopt (for
+ *   continues, the caller composes previous guidance + partial).
+ * @param {{ resetCounter: boolean }} opts - Reset the turn counter like a
+ *   successful regen (so auto-regen doesn't immediately overwrite the kept
+ *   partial); continues leave the counter alone, mirroring their success path.
+ * @returns {boolean} Whether the text was adopted.
+ */
+function adoptStreamedPartial(track, fullText, { resetCounter }) {
+    const text = (fullText || '').trim();
+    const state = loadChatState(track);
+    if (!text || text === (state.guidance || '').trim()) return false;
+
+    state.guidance = text;
+    if (resetCounter) state.turnsRemaining = resolveTurnCount(track);
+    saveChatState(track, state);
+
+    refreshPanelFromState(track);
+    reapplyInjection(track);
+    debug(`[${track.id}] Adopted streamed partial as active guidance, length:`, text.length);
+    return true;
+}
+
+/**
+ * The full guidance text to adopt after a stopped regen: the streamed
+ * partial carried by the AbortError, falling back to the live textarea
+ * contents when the engine didn't attach one (non-streamed runs leave the
+ * field untouched, so the read is safe there).
+ */
+function recoverRegenPartial(track, err) {
+    if (typeof err?.streamedPartial === 'string') return err.streamedPartial.trim();
+    return trackEl(track, 'active_guidance_textarea')?.value?.trim() || '';
+}
+
+/**
+ * The full guidance text to adopt after a stopped continue: the previous
+ * guidance plus the streamed continuation from the AbortError (composed the
+ * same way the success path does), or the live textarea contents — which
+ * already hold previous + partial — when the engine didn't attach one.
+ */
+function recoverContinuePartial(track, err) {
+    if (typeof err?.streamedPartial === 'string') {
+        const continuation = err.streamedPartial.trim();
+        if (!continuation) return '';
+        const prev = loadChatState(track).guidance || '';
+        const sep = !prev || prev.endsWith(' ') || prev.endsWith('\n') ? '' : ' ';
+        return prev + sep + continuation;
+    }
+    return trackEl(track, 'active_guidance_textarea')?.value?.trim() || '';
 }
 
 function refreshPanelFromState(track) {

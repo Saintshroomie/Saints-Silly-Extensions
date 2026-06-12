@@ -29,9 +29,40 @@
  *
  * Callers that opt in via `runCancellableSilentGeneration` or the
  * cancellation-aware `streamingGenerate` get AbortError-on-cancel for free.
+ *
+ * It also owns the streaming engine for those silent generations. ST's
+ * `generateRaw` cannot stream — `generateRawData` tags every request as
+ * 'quiet' (which hard-disables streaming for chat completion) and reads the
+ * text-completion response with a single `response.json()` — so awaiting it
+ * means the output field stays empty until the whole response lands. The
+ * streaming engine borrows `generateRaw`'s prompt construction
+ * (`createRawPrompt`) and per-API payload builders verbatim, flips only the
+ * stream flag, and consumes the SSE token stream into the target field
+ * live, finishing with the same `cleanUpMessage` post-processing
+ * `generateRaw` applies. APIs without a usable token stream (Horde, and
+ * Kobold/NovelAI without their streaming prerequisites) fall back to the
+ * legacy single-write `generateRaw` path, as does any streaming attempt
+ * that fails before the first token arrives.
  */
 
-import { generateRaw, stopGeneration as stStopGeneration } from '../../../../../script.js';
+import {
+    generateRaw,
+    stopGeneration as stStopGeneration,
+    createRawPrompt,
+    cleanUpMessage,
+    main_api,
+    amount_gen,
+    max_context,
+    koboldai_settings,
+    koboldai_setting_names,
+    novelai_settings,
+    novelai_setting_names,
+} from '../../../../../script.js';
+import { ChatCompletionService, TextCompletionService } from '../../../../custom-request.js';
+import { oai_settings, getChatCompletionModel, createGenerationParameters } from '../../../../openai.js';
+import { getTextGenGenerationData } from '../../../../textgen-settings.js';
+import { kai_settings, kai_flags, getKoboldGenerationData, generateKoboldWithStreaming } from '../../../../kai-settings.js';
+import { nai_settings, getNovelGenerationData, generateNovelWithStreaming } from '../../../../nai-settings.js';
 import { getContext, createDebugLogger } from './utils.js';
 
 // ─── Module State ───
@@ -75,6 +106,15 @@ export function bindSilentGenerationSettings(saveSettings) {
             debug('Debug mode toggled:', debugCb.checked);
         });
     }
+    const streamingCb = document.getElementById('silent_generation_streaming');
+    if (streamingCb) {
+        streamingCb.checked = moduleSettings?.silentGenerationStreaming !== false;
+        streamingCb.addEventListener('change', () => {
+            if (moduleSettings) moduleSettings.silentGenerationStreaming = streamingCb.checked;
+            saveSettings();
+            debug('Streaming toggled:', streamingCb.checked);
+        });
+    }
 }
 
 // ─── Public API ───
@@ -105,11 +145,13 @@ export function installSilentGenerationStopListener() {
 /**
  * Abort every in-flight silent generation by aborting our own local
  * AbortControllers. This frees the awaiting extension code (the
- * `Promise.race` against the abort signal resolves) but does NOT cancel
- * the underlying `generateRaw` fetch — only ST's `GENERATION_STOPPED`
- * event does that. Used by the global stop listener (where the event is
- * the trigger) and as a building block for `abortAllGenerations`. Most
- * extension UI code should call `abortAllGenerations` instead.
+ * `Promise.race` against the abort signal resolves) and cancels streaming
+ * fetches (their signal is wired into the request), but it does NOT cancel
+ * a legacy non-streaming `generateRaw` fetch — only ST's
+ * `GENERATION_STOPPED` event does that. Used by the global stop listener
+ * (where the event is the trigger) and as a building block for
+ * `abortAllGenerations`. Most extension UI code should call
+ * `abortAllGenerations` instead.
  *
  * @param {string} [reason] - Reason recorded on the AbortError.
  * @returns {number} The number of jobs aborted.
@@ -244,42 +286,256 @@ export function isSilentGenerationAbort(err) {
     return msg.includes('aborted') || msg.includes('cancelled by stop event');
 }
 
+// ─── Streaming Engine ───
+
+/**
+ * Whether the user wants silent generations streamed into their output
+ * fields. Defaults to on when the setting is absent.
+ */
+function isStreamingPreferred() {
+    return moduleSettings?.silentGenerationStreaming !== false;
+}
+
+/**
+ * Whether the streaming engine can serve the given API with the current
+ * connection settings. Horde polls (there is no token stream to read),
+ * Kobold's GUI preset bypasses the sampler payload the streaming endpoint
+ * expects, classic Kobold needs a streaming-capable KoboldCpp, and
+ * NovelAI's streaming generator reads the user's streaming toggle
+ * internally — so each of those gates a fallback to plain `generateRaw`.
+ *
+ * @param {string} api - ST main-API identifier.
+ * @returns {boolean}
+ */
+function canStreamApi(api) {
+    switch (api) {
+        case 'openai':
+        case 'textgenerationwebui':
+            return true;
+        case 'kobold':
+            return kai_settings.preset_settings !== 'gui' && !!kai_flags.can_use_streaming;
+        case 'novel':
+            return !!nai_settings.streaming_novel;
+        default:
+            return false;
+    }
+}
+
+/**
+ * Build the request payload for the given API and open the token stream.
+ *
+ * Prompt construction is borrowed wholesale from ST's `generateRaw` family:
+ * `createRawPrompt` handles role mapping, instruct formatting, the system
+ * prompt, and the prefill exactly as the non-streaming path does, and the
+ * per-API payload builders are the same ones `generateRawData` calls — the
+ * only deliberate difference is the stream flag (which `generateRawData`
+ * never sets because everything it sends is typed 'quiet').
+ *
+ * @param {object} params - generateRaw-style parameters.
+ * @param {AbortSignal} signal - Abort signal wired into the fetch.
+ * @returns {Promise<() => AsyncGenerator<{ text: string }>>} Stream generator factory.
+ */
+async function openRawStream(params, signal) {
+    const api = params.api || main_api;
+    const { eventSource, eventTypes } = getContext();
+
+    let prompt = createRawPrompt(
+        params.prompt ?? '',
+        api,
+        !!params.instructOverride,
+        !!params.quietToLoud,
+        params.systemPrompt ?? '',
+        params.prefill ?? '',
+    );
+
+    // Run the same extension hooks generateRawData fires before sending, so
+    // other extensions that rewrite prompts still see silent generations.
+    if (typeof prompt === 'string' && eventTypes?.GENERATE_AFTER_COMBINE_PROMPTS) {
+        const eventData = { prompt, dryRun: false };
+        await eventSource.emit(eventTypes.GENERATE_AFTER_COMBINE_PROMPTS, eventData);
+        prompt = eventData.prompt;
+    } else if (Array.isArray(prompt) && eventTypes?.CHAT_COMPLETION_PROMPT_READY) {
+        const eventData = { chat: prompt, dryRun: false };
+        await eventSource.emit(eventTypes.CHAT_COMPLETION_PROMPT_READY, eventData);
+        prompt = eventData.chat;
+    }
+
+    const responseLength = (typeof params.responseLength === 'number' && params.responseLength > 0)
+        ? params.responseLength
+        : null;
+    const maxTokens = responseLength ?? amount_gen;
+
+    switch (api) {
+        case 'openai': {
+            const model = getChatCompletionModel();
+            const { generate_data } = await createGenerationParameters(oai_settings, model, 'quiet', prompt);
+            generate_data.stream = true;
+            if (responseLength) {
+                // o-series / gpt-5 payloads carry max_completion_tokens instead.
+                if ('max_completion_tokens' in generate_data) generate_data.max_completion_tokens = responseLength;
+                else generate_data.max_tokens = responseLength;
+            }
+            if (eventTypes?.CHAT_COMPLETION_SETTINGS_READY) {
+                await eventSource.emit(eventTypes.CHAT_COMPLETION_SETTINGS_READY, generate_data);
+            }
+            const stream = await ChatCompletionService.sendRequest(generate_data, true, signal);
+            return /** @type {() => AsyncGenerator<{ text: string }>} */ (stream);
+        }
+        case 'textgenerationwebui': {
+            const generate_data = await getTextGenGenerationData(prompt, maxTokens, false, false, null, 'quiet');
+            generate_data.stream = true;
+            const stream = await TextCompletionService.sendRequest(generate_data, true, signal);
+            return /** @type {() => AsyncGenerator<{ text: string }>} */ (stream);
+        }
+        case 'kobold': {
+            const koboldSettings = koboldai_settings[koboldai_setting_names[kai_settings.preset_settings]];
+            const generate_data = getKoboldGenerationData(String(prompt), koboldSettings, maxTokens, max_context, false, 'quiet');
+            generate_data.streaming = true; // getKoboldGenerationData forces this off for 'quiet'
+            return await generateKoboldWithStreaming(generate_data, signal);
+        }
+        case 'novel': {
+            const novelSettings = novelai_settings[novelai_setting_names[nai_settings.preset_settings_novel]];
+            const generate_data = getNovelGenerationData(prompt, novelSettings, maxTokens, false, false, null, 'quiet');
+            return await generateNovelWithStreaming(generate_data, signal);
+        }
+        default:
+            throw new Error(`Silent generation streaming does not support API: ${api}`);
+    }
+}
+
+/**
+ * Run one streaming silent generation end to end: open the stream, write
+ * each partial into `targetEl` as it arrives, then apply the same
+ * `cleanUpMessage` post-processing `generateRaw` runs and write the cleaned
+ * final text. Mirrors `generateRaw`'s contract by throwing
+ * 'No message generated' on an empty result.
+ *
+ * @param {object} params - generateRaw-style parameters.
+ * @param {HTMLTextAreaElement|null} targetEl - Field streamed into, or null.
+ * @param {boolean} append - Preserve the field's existing text as a prefix.
+ * @param {AbortSignal} signal - Cancellation signal from the job manager.
+ * @param {string} jobName - Debug name.
+ * @param {{ receivedChunks: number, text: string }} progress - Out-param: the
+ *   live chunk count and accumulated raw text, so the caller can tell a
+ *   pre-stream failure (safe to fall back) from a mid-stream one and can
+ *   recover the streamed partial after an abort.
+ * @returns {Promise<string>} The cleaned final message.
+ */
+async function streamRawGenerate(params, targetEl, append, signal, jobName, progress) {
+    const baseText = (append && targetEl) ? (targetEl.value || '') : '';
+    // Reset the field before the request goes out — a fresh run clears
+    // stale content immediately instead of waiting for the first token, so
+    // the user sees the generation begin (append mode keeps the existing
+    // text as the prefix).
+    if (targetEl) {
+        targetEl.value = baseText;
+    }
+    const streamFn = await openRawStream(params, signal);
+
+    for await (const chunk of streamFn()) {
+        if (signal.aborted) break;
+        if (typeof chunk?.text === 'string') progress.text = chunk.text;
+        progress.receivedChunks++;
+        if (targetEl) {
+            targetEl.value = baseText + progress.text;
+            targetEl.scrollTop = targetEl.scrollHeight;
+        }
+    }
+    debug(`${jobName} — stream closed after ${progress.receivedChunks} chunk(s), raw length: ${progress.text.length}`);
+    signal.throwIfAborted();
+
+    const trimNames = params.trimNames !== false;
+    const message = cleanUpMessage({
+        getMessage: progress.text,
+        isImpersonate: false,
+        isContinue: false,
+        displayIncompleteSentences: true,
+        includeUserPromptBias: false,
+        trimNames,
+        trimWrongNames: trimNames,
+    });
+    if (!message) throw new Error('No message generated');
+
+    // Replace the live raw text with the cleaned final message (stopping
+    // strings trimmed, regex scripts applied) so the field matches what the
+    // caller gets back.
+    if (targetEl) {
+        targetEl.value = baseText + message;
+        targetEl.scrollTop = targetEl.scrollHeight;
+    }
+    return message;
+}
+
 // ─── Generation Helper ───
 
 /**
- * Run `generateRaw` under the silent-generation cancel system, optionally
- * writing the final result into a target textarea once it arrives.
+ * Run a silent generation under the cancel system, streaming the output
+ * into `targetEl` token by token when the backend supports it.
  *
- * `generateRaw` does not stream into extension callers — it does one fetch
- * and returns the full text — so this fills `targetEl` in a single write
- * when the promise resolves. The name is kept for historical reasons and
- * because callers conceptually wire this to a streaming-style output area.
+ * Streaming is used for chat completion, Text Completion, classic Kobold
+ * (streaming-capable KoboldCpp), and NovelAI (with its streaming toggle
+ * on), unless disabled via the Silent Generation settings or the call uses
+ * `jsonSchema`. Everything else — and any streaming attempt that dies
+ * before the first token — goes through plain `generateRaw` and fills
+ * `targetEl` in a single write when the promise resolves.
+ *
+ * A fresh (non-append) streaming run clears `targetEl` as soon as the job
+ * starts. On cancel, whatever streamed so far is deliberately left in the
+ * field, and the thrown AbortError carries it as `err.streamedPartial`
+ * (the raw streamed text, without the append-mode prefix) — abort handlers
+ * that want to keep the partial should read it from there rather than from
+ * the field, which other code may have reset or re-rendered by the time
+ * the handler runs.
  *
  * @param {object} params - generateRaw parameters.
- * @param {HTMLTextAreaElement|null} targetEl - Element to write the result into, or null.
+ * @param {HTMLTextAreaElement|null} targetEl - Element to stream/write the result into, or null.
  * @param {{ append?: boolean, name?: string }} [opts]
  * @returns {Promise<string>} The full generated text.
- * @throws {DOMException} AbortError if cancelled.
+ * @throws {DOMException} AbortError if cancelled, with `streamedPartial` attached.
  */
 export async function cancellableStreamingGenerate(params, targetEl, { append = false, name } = {}) {
     const jobName = name || 'streamingGenerate';
-    debug(`cancellableStreamingGenerate — name: ${jobName}, hasTarget: ${!!targetEl}, append: ${append}, promptLen: ${params?.prompt?.length ?? 0}, responseLength: ${params?.responseLength ?? '(default)'}`);
+    const api = params?.api || main_api;
+    const wantStreaming = isStreamingPreferred() && !params?.jsonSchema && canStreamApi(api);
+    debug(`cancellableStreamingGenerate — name: ${jobName}, api: ${api}, streaming: ${wantStreaming}, hasTarget: ${!!targetEl}, append: ${append}, promptLen: ${params?.prompt?.length ?? 0}, responseLength: ${params?.responseLength ?? '(default)'}`);
 
-    return runCancellableSilentGeneration({
-        name: jobName,
-        run: async (signal) => {
-            const result = await generateRaw(params);
-            debug(`${jobName} — generateRaw resolved, length: ${(result || '').length}`);
-            // If the job was cancelled while generateRaw was in flight, the
-            // race in runCancellableSilentGeneration already rejected and the
-            // caller moved on — don't clobber the target with the discarded
-            // result (the user may have edited the field since).
-            if (signal.aborted) return result;
-            if (targetEl && result) {
-                targetEl.value = append ? ((targetEl.value || '') + result) : result;
-                targetEl.scrollTop = targetEl.scrollHeight;
-            }
-            return result;
-        },
-    });
+    const progress = { receivedChunks: 0, text: '' };
+    try {
+        return await runCancellableSilentGeneration({
+            name: jobName,
+            run: async (signal) => {
+                if (wantStreaming) {
+                    try {
+                        return await streamRawGenerate(params, targetEl, append, signal, jobName, progress);
+                    } catch (err) {
+                        if (signal.aborted || err?.name === 'AbortError' || progress.receivedChunks > 0) {
+                            throw err;
+                        }
+                        debug(`${jobName} — streaming failed before any tokens arrived (${err?.message || err}); falling back to generateRaw`);
+                    }
+                }
+
+                const result = await generateRaw(params);
+                debug(`${jobName} — generateRaw resolved, length: ${(result || '').length}`);
+                // If the job was cancelled while generateRaw was in flight, the
+                // race in runCancellableSilentGeneration already rejected and the
+                // caller moved on — don't clobber the target with the discarded
+                // result (the user may have edited the field since).
+                if (signal.aborted) return result;
+                if (targetEl && result) {
+                    targetEl.value = append ? ((targetEl.value || '') + result) : result;
+                    targetEl.scrollTop = targetEl.scrollHeight;
+                }
+                return result;
+            },
+        });
+    } catch (err) {
+        // Hand abort handlers the streamed partial directly — the field may
+        // already have been reset or re-rendered by the time they run.
+        if (err && typeof err === 'object' && err.name === 'AbortError') {
+            err.streamedPartial = progress.text;
+        }
+        debug(`${jobName} — rejected (${err?.name || 'Error'}), streamed partial length: ${progress.text.length}`);
+        throw err;
+    }
 }
