@@ -4,13 +4,14 @@ Guidance for Claude Code when working in this repository.
 
 ## Project Overview
 
-**Saint's Silly Extensions** is a third-party extension for [SillyTavern](https://github.com/SillyTavern/SillyTavern) that bundles five roleplay tools into a single extension package:
+**Saint's Silly Extensions** is a third-party extension for [SillyTavern](https://github.com/SillyTavern/SillyTavern) that bundles six roleplay tools into a single extension package:
 
 1. **Possession** (`src/possession.js`) — Take over an active character and post messages as them. Solo + group chats, with continue/impersonate interception and per-chat state persistence.
 2. **Phrasing** (`src/phrasing.js`) — Rewrite or seed messages via LLM with prompt injection + impersonate/swipe flows. Possession-aware. Optional Inverse Guidance mode feeds existing swipes into the prompt to force a wildly different rewrite.
 3. **Assisted Character Creation / ACC** (`src/assisted-character-creation.js`) — Modal-based character builder: brief in, full bracketed character sheet out, with Generate/Continue/Checkpoint/Retry actions, optional chat/lore-book context, and a configurable prefill. Done writes the result into the description textarea.
 4. **World Info Assist / WIA** (`src/world-info-assist.js`) — Injects an Assist control row + persistent guidance textarea into every World Info entry form for LLM-drafted lore entries.
 5. **Narrative Guidance / NG** (`src/narrative-guidance.js`) — Periodically generates a short story-direction paragraph and injects it before every AI turn until a per-chat turn counter expires, then regenerates.
+6. **Reformatting** (`src/reformatting.js`) — Normalizes the formatting of AI character messages after generation. Two selectable engines: deterministic Rules (a mutually-exclusive asterisk mode — none/strip/wrap narration — plus an independent collapse-whitespace toggle) and LLM (editable system prompt + `{{message}}` user prompt + prefill). Auto (on `MESSAGE_RECEIVED`) + manual (a per-message button injected into `.mes_buttons`, kept present by a `#chat` MutationObserver). Preserves the original as a swipe and guards per-swipe so it never re-processes its own output.
 
 Two infrastructure modules support them:
 
@@ -37,6 +38,7 @@ src/
   assisted-character-creation.js  ACC modal + generation actions
   world-info-assist.js          WIA module
   narrative-guidance.js         Narrative Guidance module
+  reformatting.js               Reformatting module (post-generation message formatting)
   silent-generation.js          Cancellable silent-generation manager
   prompt-templates.js           Per-tool prompt preset widget + legacy migration
   settings.html                 Settings panel markup (loaded via html-loader)
@@ -88,7 +90,7 @@ import { SlashCommandParser } from '../../../../slash-commands/SlashCommandParse
 - **Generation templates use extension macros.** ACC/WIA/NG user-prompt templates support `{{context}}`, `{{brief}}`, `{{guidance}}`, `{{title}}`, `{{themes}}` via `applyTemplateMacros` in `utils.js` — deliberately *not* ST's macro engine, because the ACC template contains literal `{{ .fooOverride ?? … }}` syntax that must pass through. When a placeholder is absent the block is prepended/appended in the legacy position, so old custom templates keep working. Each tool has a `compose…Prompt` helper used by both the real generation and its Preview button (`showPromptPreview` in `utils.js`) — keep them shared so the preview never lies.
 - **Prefills are dual-use and echo-stripped.** A prefill is sent as the assistant prefix *and* prepended to the final output. Backends that ignore assistant prefixes may re-emit the prefill, so every prepend site runs `stripPrefillEcho` first. New prefill consumers must do the same.
 - **Prompt injections must be cleaned up.** Phrasing and NG inject via `setExtensionPrompt`, which persists until overwritten — Phrasing clears unconditionally on `GENERATION_ENDED`/`STOPPED`; NG re-applies or clears on every relevant event. Any new injection needs an equally deliberate clear path.
-- **Slash commands** are registered via each module's `register…SlashCommand(s)()` using `SlashCommandParser` from the host. Currently: `/possess`, `/unpossess`, `/phrasing`.
+- **Slash commands** are registered via each module's `register…SlashCommand(s)()` using `SlashCommandParser` from the host. Currently: `/possess`, `/unpossess`, `/phrasing`, `/reformat`.
 - **Settings panel** is a single HTML blob (`src/settings.html`) injected into `#extensions_settings`, organized as per-tool collapsible drawers plus a Diagnostics drawer for all debug toggles. Each module owns its own `bind…Settings(saveSettings)` to attach listeners after injection. The per-tool preset widgets are wired centrally in `index.js` via `TOOL_PRESET_CONFIG` + `setupToolPresets(...)`, *after* the module binds so preset loads persist through the modules' input listeners.
 - **Debug logging** uses `createDebugLogger(prefix, isEnabled)` from `utils.js`. Each module reads its own `*DebugMode` flag from `settings`. The top-level `SSEDebug` in `index.js` always logs.
 
@@ -107,6 +109,7 @@ import { SlashCommandParser } from '../../../../slash-commands/SlashCommandParse
 - **ACC**: the modal persists its brief/output/context selections across open/close in `persistedModalState`. The prefill is both sent as an assistant prefix and prepended to the final output — keep those two uses in sync. Done writes plain text into `#description_textarea` and dispatches `input`.
 - **WIA**: uses a `MutationObserver` (`startWIAObserver`) on `#world_popup_entries_list` to inject controls into newly created World Info entry forms — verify the row still appears for entries created after page load, and that the hidden `#entry_edit_template` is still skipped (injecting into it bakes dead markup into every clone). Guidance persistence goes through the debounced save helpers in `utils.js`.
 - **NG**: state writes must go through `writeChatState`/`saveChatState`/`scheduleChatStateSave` — the write-through-then-debounce shape prevents cross-field and cross-chat races. Test the turn counter across `MESSAGE_SENT`/`MESSAGE_RECEIVED`, auto-regen at zero, and Stop mid-generation.
+- **Reformatting**: the per-message button is injected by a `#chat` MutationObserver (`startReformattingObserver`) and re-added when ST re-renders message nodes; rescanned on `CHAT_CHANGED`. The auto path runs on `MESSAGE_RECEIVED` for AI messages only (`!is_user && !is_system`) and is guarded per-swipe via `swipe_info[swipe_id].sseReformatted` so it never re-processes (or double-wraps) its own output — preserve that guard. Every reformat preserves the prior text as a swipe and re-renders via `updateMessageBlock` + `swipe.refresh(true)`. The Rules engine's asterisk handling is a single mutually-exclusive mode (`reformattingAsteriskMode`: none/strip/wrap, surfaced as a radio group) with collapse-whitespace as a separate toggle; it must stay deterministic and idempotent enough that a no-op returns the input unchanged (so it adds no swipe). The LLM engine routes through `streamingGenerate`. Test both engines, auto + manual, and swiping back to the original.
 - **Silent generation / Stop buttons**: any new background generation should run through `streamingGenerate` (or `runCancellableSilentGeneration`) and any new Stop affordance should call `abortAllGenerations()`. Check the abort signal before writing late-arriving results into DOM fields.
 - **Settings panel**: when adding a setting, update `defaultSettings` in `index.js`, add the control to `settings.html`, and bind it in the relevant module's `bind…Settings`. For a new editable prompt, also add the field to the tool's entry in `TOOL_PRESET_CONFIG` in `index.js` (key, label, textareaId, defaultText) so it joins the tool's presets, give the textarea a standardized `<small>` placeholder note, and surface it in the tool's `show…PromptPreview`.
 
