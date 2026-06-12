@@ -884,6 +884,14 @@
     display: none;
 }
 
+/* Mutually-exclusive asterisk-handling choice. */
+#saints_silly_settings .reformatting_radio_group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 2px 0 4px 12px;
+}
+
 /* Per-message reformat button — inherits ST's .mes_button sizing; this just
    gives it a subtle hover tint consistent with the other quick buttons. */
 .sse-reformat-button {

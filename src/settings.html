@@ -526,15 +526,22 @@
 
             <!-- ─── Rules engine options ─── -->
             <div id="reformatting_rules_section" class="reformatting_section">
-                <label class="checkbox_label" title="Remove every asterisk (markdown italic / bold emphasis marker). Turns *He danced.* into He danced.">
-                    <input id="reformatting_strip_asterisks" type="checkbox" />
-                    <span>Strip Asterisks</span>
-                </label>
-                <label class="checkbox_label" title="Wrap narration (everything outside quoted dialogue) in asterisks. Strips existing asterisks first, so the result is consistent. Turns He danced. &quot;Hi.&quot; into *He danced.* &quot;Hi.&quot;">
-                    <input id="reformatting_wrap_narration" type="checkbox" />
-                    <span>Wrap Narration in Asterisks</span>
-                </label>
-                <label class="checkbox_label" title="Collapse runs of 3+ blank lines to one and trim trailing spaces.">
+                <label><b>Asterisks:</b></label>
+                <div class="reformatting_radio_group">
+                    <label class="checkbox_label" title="Leave asterisks exactly as the model wrote them.">
+                        <input type="radio" name="reformatting_asterisk_mode" value="none" />
+                        <span>Leave as-is</span>
+                    </label>
+                    <label class="checkbox_label" title="Remove every asterisk (markdown italic / bold emphasis marker). Turns *He danced.* into He danced.">
+                        <input type="radio" name="reformatting_asterisk_mode" value="strip" />
+                        <span>Strip asterisks</span>
+                    </label>
+                    <label class="checkbox_label" title="Wrap narration (everything outside quoted dialogue) in asterisks. Strips existing asterisks first, so the result is consistent. Turns He danced. &quot;Hi.&quot; into *He danced.* &quot;Hi.&quot;">
+                        <input type="radio" name="reformatting_asterisk_mode" value="wrap" />
+                        <span>Wrap narration in asterisks</span>
+                    </label>
+                </div>
+                <label class="checkbox_label" title="Collapse runs of 3+ blank lines to one and trim trailing spaces. Applies on top of the asterisk choice above.">
                     <input id="reformatting_collapse_whitespace" type="checkbox" />
                     <span>Collapse Extra Whitespace</span>
                 </label>

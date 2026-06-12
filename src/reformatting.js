@@ -139,20 +139,22 @@ function collapseWhitespace(text) {
 }
 
 /**
- * Run the configured deterministic rules over `text`. Wrapping narration
- * always strips existing asterisks first so the output is canonical
- * regardless of the input (and the wrap rule never doubles markers).
+ * Run the configured deterministic rules over `text`. Asterisk handling is a
+ * single mutually-exclusive choice ('none' | 'strip' | 'wrap'); 'wrap' strips
+ * existing asterisks first so the output is canonical regardless of the input
+ * (and never doubles markers). Whitespace collapsing is independent and
+ * applies on top of any asterisk mode.
  *
  * @param {string} text
  * @returns {string} The reformatted text (unchanged if no rules apply).
  */
 export function applyRulesReformat(text) {
     let out = text;
-    if (moduleSettings.reformattingStripAsterisks || moduleSettings.reformattingWrapNarration) {
+    const mode = moduleSettings.reformattingAsteriskMode || 'strip';
+    if (mode === 'strip') {
         out = stripAsterisks(out);
-    }
-    if (moduleSettings.reformattingWrapNarration) {
-        out = wrapNarration(out);
+    } else if (mode === 'wrap') {
+        out = wrapNarration(stripAsterisks(out));
     }
     if (moduleSettings.reformattingCollapseWhitespace) {
         out = collapseWhitespace(out);
@@ -464,18 +466,24 @@ export function bindReformattingSettings(saveSettings) {
         syncEngineSections();
     }
 
-    const bindRuleToggle = (id, key) => {
-        const cb = document.getElementById(id);
-        if (!cb) return;
-        cb.checked = !!moduleSettings[key];
-        cb.addEventListener('change', () => {
-            moduleSettings[key] = cb.checked;
+    const asteriskMode = moduleSettings.reformattingAsteriskMode || 'strip';
+    document.querySelectorAll('input[name="reformatting_asterisk_mode"]').forEach((radio) => {
+        radio.checked = radio.value === asteriskMode;
+        radio.addEventListener('change', () => {
+            if (!radio.checked) return;
+            moduleSettings.reformattingAsteriskMode = radio.value;
             saveSettings();
         });
-    };
-    bindRuleToggle('reformatting_strip_asterisks', 'reformattingStripAsterisks');
-    bindRuleToggle('reformatting_wrap_narration', 'reformattingWrapNarration');
-    bindRuleToggle('reformatting_collapse_whitespace', 'reformattingCollapseWhitespace');
+    });
+
+    const collapseCb = document.getElementById('reformatting_collapse_whitespace');
+    if (collapseCb) {
+        collapseCb.checked = !!moduleSettings.reformattingCollapseWhitespace;
+        collapseCb.addEventListener('change', () => {
+            moduleSettings.reformattingCollapseWhitespace = collapseCb.checked;
+            saveSettings();
+        });
+    }
 
     const responseLengthInput = document.getElementById('reformatting_response_length');
     if (responseLengthInput) {

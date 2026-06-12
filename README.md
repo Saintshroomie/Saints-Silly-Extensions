@@ -83,9 +83,8 @@ Normalizes the formatting of AI character messages *after* they're generated, so
 
 - **Two interchangeable engines** (pick one in the settings):
   - **Rules** — fast, free, deterministic transforms with no risk of the content changing:
-    - **Strip Asterisks** — removes every italic / bold asterisk marker.
-    - **Wrap Narration in Asterisks** — the inverse: splits quoted dialogue from narration and wraps the narration in asterisks (e.g. `He danced. "Hi."` → `*He danced.* "Hi."`). Strips existing asterisks first so the result is always consistent.
-    - **Collapse Extra Whitespace** — collapses runs of blank lines and trims trailing spaces.
+    - **Asterisks** — a single choice of **Leave as-is**, **Strip asterisks** (removes every italic / bold marker), or **Wrap narration in asterisks** (the inverse: splits quoted dialogue from narration and wraps the narration, e.g. `He danced. "Hi."` → `*He danced.* "Hi."`, stripping existing asterisks first so the result is always consistent).
+    - **Collapse Extra Whitespace** — an independent option that collapses runs of blank lines and trims trailing spaces, on top of the asterisk choice.
   - **LLM** — sends the message to the model with an editable prompt (and optional prefill) and lets it rewrite the formatting. More flexible, but slower and token-using; routed through the shared silent-generation manager so SillyTavern's Stop button cancels it. Joins the Tool Presets system.
 - **Automatic or manual** — With **Auto-Reformat** on, every AI reply is reformatted as it arrives. With it off (or any time), reformat a single message with the <span title="text-slash icon">✂</span> button injected into that message's button row, or with `/reformat` for the last message.
 - **AI messages only** — User and system messages are never touched.
@@ -149,7 +148,7 @@ When Possession and Phrasing are used together, you can quickly take over charac
 
 1. Open **Extensions** > **Saint's Silly Extensions** and find the **Reformatting** section. Tick **Enable Reformatting**.
 2. Choose an **Engine**:
-   - **Rules** — tick the transforms you want (**Strip Asterisks** handles the common "remove the italics" case; **Wrap Narration in Asterisks** does the inverse).
+   - **Rules** — pick how asterisks are handled (**Strip asterisks** handles the common "remove the italics" case; **Wrap narration in asterisks** does the inverse), and optionally enable **Collapse Extra Whitespace**.
    - **LLM** — set a Response Token Limit and edit the prompt (with the `{{message}}` placeholder) / optional prefill. Use **Preview Assembled Prompt** to see exactly what gets sent, and save variants as presets.
 3. Leave **Auto-Reformat AI Messages** on to reformat every reply as it arrives, or turn it off to keep it manual-only.
 4. To reformat a single message at any time, click the <span title="text-slash icon">✂</span> button in that message's button row, or run `/reformat` to reformat the last message.
@@ -251,9 +250,8 @@ The drawer holds two self-contained tiers — **Long-term** (the overarching arc
 | Enable Reformatting | Toggle the Reformatting feature, its per-message buttons, and `/reformat` on/off |
 | Auto-Reformat AI Messages | When on, every AI character message is reformatted as it arrives. When off, only the per-message button or `/reformat` reformats |
 | Engine | Which engine to use: **Rules** (deterministic transforms) or **LLM** (prompt-based rewrite) |
-| Strip Asterisks (Rules) | Remove every asterisk (italic / bold emphasis marker) |
-| Wrap Narration in Asterisks (Rules) | Wrap narration (everything outside quoted dialogue) in asterisks; strips existing asterisks first so the result is consistent |
-| Collapse Extra Whitespace (Rules) | Collapse runs of 3+ blank lines to one and trim trailing spaces |
+| Asterisks (Rules) | Mutually-exclusive choice: **Leave as-is**, **Strip asterisks** (remove every italic / bold marker), or **Wrap narration in asterisks** (wrap everything outside quoted dialogue; strips existing asterisks first so the result is consistent) |
+| Collapse Extra Whitespace (Rules) | Independent option: collapse runs of 3+ blank lines to one and trim trailing spaces |
 | Response Token Limit (LLM) | Maximum tokens the model may use to reformat a message (default 800) |
 | Preset / Preview Assembled Prompt (LLM) | Save named bundles of the LLM prompt + prefill and preview exactly what gets sent (see Tool Presets & Prompt Preview below) |
 | Prompt Template (LLM) | The user prompt sent for each LLM reformat. Supports the `{{message}}` placeholder; if missing, the message is appended automatically |
