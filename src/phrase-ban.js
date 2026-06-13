@@ -210,6 +210,11 @@ function getProactivePromptTemplate() {
 
 // ─── Proactive: Per-chat Learned List ───
 
+// Debounce for the manual edit textarea: writes go through to chatMetadata
+// immediately (so a chat switch never races a pending save) and only the
+// saveMetadata flush is debounced — mirroring Narrative Guidance.
+let learnedSaveTimer = null;
+
 /** Read the per-chat learned ban list (pure read — never mutates metadata). */
 function loadLearnedPhrases() {
     const list = getContext().chatMetadata?.[PHRASE_BAN_METADATA_KEY]?.bannedPhrases;
@@ -217,30 +222,62 @@ function loadLearnedPhrases() {
 }
 
 /**
- * Merge freshly-detected matches into the per-chat learned list, de-duplicated
- * case-insensitively and capped to the most recent MAX_LEARNED_PHRASES. Each
- * phrase is truncated so a runaway match can't bloat the injection.
+ * Normalize a raw phrase list: trim, drop blanks, truncate each phrase so a
+ * runaway entry can't bloat the injection, de-duplicate case-insensitively
+ * (keeping first occurrence), and cap to the most recent MAX_LEARNED_PHRASES.
+ */
+function normalizeLearnedList(phrases) {
+    const seen = new Set();
+    const out = [];
+    for (const raw of phrases) {
+        const phrase = truncateMatch((raw || '').trim(), MAX_LEARNED_PHRASE_LENGTH);
+        if (!phrase) continue;
+        const key = phrase.toLowerCase();
+        if (seen.has(key)) continue;
+        seen.add(key);
+        out.push(phrase);
+    }
+    return out.slice(-MAX_LEARNED_PHRASES);
+}
+
+/** Write the normalized list through to chatMetadata (removing the key when empty). */
+function storeLearnedPhrases(context, normalized) {
+    if (normalized.length) {
+        context.chatMetadata[PHRASE_BAN_METADATA_KEY] = { bannedPhrases: normalized };
+    } else if (context.chatMetadata?.[PHRASE_BAN_METADATA_KEY]) {
+        delete context.chatMetadata[PHRASE_BAN_METADATA_KEY];
+    }
+}
+
+/**
+ * Merge freshly-detected matches into the per-chat learned list.
  *
  * @returns {boolean} `true` if the stored list changed (caller should reinject).
  */
 function addLearnedPhrases(matches) {
     const context = getContext();
     const existing = loadLearnedPhrases();
-    const seen = new Set(existing.map(p => p.toLowerCase()));
-    let changed = false;
-    for (const raw of matches) {
-        const phrase = truncateMatch((raw || '').trim(), MAX_LEARNED_PHRASE_LENGTH);
-        if (!phrase) continue;
-        const key = phrase.toLowerCase();
-        if (seen.has(key)) continue;
-        seen.add(key);
-        existing.push(phrase);
-        changed = true;
+    const combined = normalizeLearnedList([...existing, ...matches]);
+    if (combined.length === existing.length && combined.every((p, i) => p === existing[i])) {
+        return false;
     }
-    if (!changed) return false;
-    context.chatMetadata[PHRASE_BAN_METADATA_KEY] = { bannedPhrases: existing.slice(-MAX_LEARNED_PHRASES) };
+    storeLearnedPhrases(context, combined);
     context.saveMetadata();
     return true;
+}
+
+/**
+ * Persist a user-edited list from the textarea. Write-through is immediate;
+ * the saveMetadata flush is debounced so typing doesn't thrash the disk.
+ */
+function scheduleLearnedSave(phrases) {
+    const context = getContext();
+    storeLearnedPhrases(context, normalizeLearnedList(phrases));
+    if (learnedSaveTimer) clearTimeout(learnedSaveTimer);
+    learnedSaveTimer = setTimeout(() => {
+        learnedSaveTimer = null;
+        getContext().saveMetadata();
+    }, 300);
 }
 
 /** Drop the per-chat learned list entirely. */
@@ -312,7 +349,7 @@ function learnDetectedPhrases(matches) {
     if (!moduleSettings?.phraseBanProactive || !matches.length) return;
     if (addLearnedPhrases(matches)) {
         reapplyProactiveInjection();
-        refreshLearnedStatus();
+        refreshLearnedPanel();
     }
 }
 
@@ -470,7 +507,7 @@ export function onPhraseBanMessageReceived(messageIndex) {
  */
 export function onPhraseBanChatChanged() {
     reapplyProactiveInjection();
-    refreshLearnedStatus();
+    refreshLearnedPanel();
     debug('Chat changed — proactive injection resynced');
 }
 
@@ -488,13 +525,26 @@ function updatePatternStatus() {
     statusEl.classList.toggle('phrase-ban-status-error', invalid.length > 0);
 }
 
-function refreshLearnedStatus() {
+function updateLearnedCount() {
     const el = document.getElementById('phrase_ban_learned_status');
     if (!el) return;
     const n = loadLearnedPhrases().length;
     el.textContent = n === 0
         ? 'No phrases learned in this chat yet.'
         : (n === 1 ? '1 phrase learned in this chat.' : `${n} phrases learned in this chat.`);
+}
+
+/**
+ * Resync the learned-phrases textarea and count to the current chat's stored
+ * list. The textarea is left alone while focused so an in-progress manual edit
+ * is never clobbered (e.g. by an auto-learn landing mid-edit).
+ */
+function refreshLearnedPanel() {
+    const textarea = document.getElementById('phrase_ban_learned_textarea');
+    if (textarea && document.activeElement !== textarea) {
+        textarea.value = loadLearnedPhrases().join('\n');
+    }
+    updateLearnedCount();
 }
 
 export function bindPhraseBanSettings(saveSettings) {
@@ -565,14 +615,24 @@ export function bindPhraseBanSettings(saveSettings) {
         });
     }
 
+    const learnedArea = document.getElementById('phrase_ban_learned_textarea');
+    if (learnedArea) {
+        learnedArea.addEventListener('input', () => {
+            scheduleLearnedSave(learnedArea.value.split('\n'));
+            reapplyProactiveInjection();
+            // Update the count only — never rewrite the field the user is typing in.
+            updateLearnedCount();
+        });
+    }
+
     document.getElementById('phrase_ban_clear_learned')?.addEventListener('click', () => {
         clearLearnedPhrases();
         clearProactiveInjection();
-        refreshLearnedStatus();
+        refreshLearnedPanel();
         toast('Cleared the learned phrase list for this chat.', 'info', 'Phrase Ban');
     });
 
-    refreshLearnedStatus();
+    refreshLearnedPanel();
 
     const retriesInput = document.getElementById('phrase_ban_max_retries');
     if (retriesInput) {

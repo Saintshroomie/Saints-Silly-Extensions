@@ -132,6 +132,20 @@
                 </div>
             </div>
 
+            <div class="inline-drawer saints_nested_drawer">
+                <div class="inline-drawer-toggle inline-drawer-header">
+                    <b>Learned Phrases (this chat)</b>
+                    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                </div>
+                <div class="inline-drawer-content" style="display: none;">
+                    <div class="phrase_ban_section">
+                        <textarea id="phrase_ban_learned_textarea" class="text_pole" rows="6"
+                            placeholder="Phrases learned in this chat appear here, one per line.&#10;Edit freely — add your own, or delete ones you don't want injected."></textarea>
+                        <small>One phrase per line — the running list injected before every AI turn while Proactive is on. Detected phrases are added here automatically; edit it to add or remove entries. Stored with the chat, not globally.</small>
+                    </div>
+                </div>
+            </div>
+
             <div class="saints_preset_block">
                 <label title="Save and switch named bundles of the pattern list + rewrite prompt below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label>
                 <div class="saints_template_controls" id="phrase_ban_presets"></div>
