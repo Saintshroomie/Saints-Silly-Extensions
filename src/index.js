@@ -50,9 +50,15 @@ import {
     initPhraseBan,
     bindPhraseBanSettings,
     onPhraseBanMessageReceived,
+    onPhraseBanChatChanged,
+    onPhraseBanGenerationStarted,
+    onPhraseBanTextCompletionSettings,
     registerPhraseBanSlashCommand,
     DEFAULT_PHRASE_BAN_PROMPT,
+    DEFAULT_PHRASE_BAN_PROACTIVE_PROMPT,
     DEFAULT_PHRASE_BAN_MAX_RETRIES,
+    DEFAULT_PHRASE_BAN_INJECTION_DEPTH,
+    DEFAULT_PHRASE_BAN_INJECTION_ROLE,
 } from './phrase-ban.js';
 import {
     initACC,
@@ -126,6 +132,11 @@ const defaultSettings = {
     phraseBanMaxRetries: DEFAULT_PHRASE_BAN_MAX_RETRIES,
     phraseBanPatterns: '',
     phraseBanPrompt: DEFAULT_PHRASE_BAN_PROMPT,
+    phraseBanProactive: false,
+    phraseBanProactivePrompt: DEFAULT_PHRASE_BAN_PROACTIVE_PROMPT,
+    phraseBanInjectionDepth: DEFAULT_PHRASE_BAN_INJECTION_DEPTH,
+    phraseBanInjectionRole: DEFAULT_PHRASE_BAN_INJECTION_ROLE,
+    phraseBanHardBan: false,
     accEnabled: true,
     accDebugMode: false,
     accPrompt: DEFAULT_ACC_PROMPT,
@@ -213,6 +224,7 @@ const TOOL_PRESET_CONFIG = [
         fields: [
             { key: 'phraseBanPatterns', label: 'Patterns', textareaId: 'phrase_ban_patterns_textarea', defaultText: '' },
             { key: 'phraseBanPrompt', label: 'Rewrite Prompt', textareaId: 'phrase_ban_prompt_textarea', defaultText: DEFAULT_PHRASE_BAN_PROMPT },
+            { key: 'phraseBanProactivePrompt', label: 'Proactive Prompt', textareaId: 'phrase_ban_proactive_prompt_textarea', defaultText: DEFAULT_PHRASE_BAN_PROACTIVE_PROMPT },
         ],
     },
     {
@@ -330,6 +342,7 @@ function onGenerationStarted(_type, _options, dryRun) {
     if (dryRun) return;
     possessionGenStarted();
     phrasingGenStarted();
+    onPhraseBanGenerationStarted();
     SSEDebug('Generation started');
 }
 
@@ -352,6 +365,7 @@ function onChatChanged() {
     loadPossessionState();
     syncAllPossessionUI();
     onNarrativeGuidanceChatChanged();
+    onPhraseBanChatChanged();
     rescanReformatButtons();
     SSEDebug('Chat changed, state reloaded');
 }
@@ -434,6 +448,11 @@ jQuery(async () => {
         // internally — it must never block this emit chain.
         onPhraseBanMessageReceived(idx);
     });
+    // Text Completion only: append Phrase Ban's learned list to the request's
+    // sampler-level banned_strings when the Hard Token Ban option is on.
+    if (eventTypes.TEXT_COMPLETION_SETTINGS_READY) {
+        eventSource.on(eventTypes.TEXT_COMPLETION_SETTINGS_READY, onPhraseBanTextCompletionSettings);
+    }
 
     // Slash commands
     registerPossessionSlashCommands();
