@@ -50,9 +50,13 @@ import {
     initPhraseBan,
     bindPhraseBanSettings,
     onPhraseBanMessageReceived,
+    onPhraseBanChatChanged,
     registerPhraseBanSlashCommand,
     DEFAULT_PHRASE_BAN_PROMPT,
+    DEFAULT_PHRASE_BAN_PROACTIVE_PROMPT,
     DEFAULT_PHRASE_BAN_MAX_RETRIES,
+    DEFAULT_PHRASE_BAN_INJECTION_DEPTH,
+    DEFAULT_PHRASE_BAN_INJECTION_ROLE,
 } from './phrase-ban.js';
 import {
     initACC,
@@ -126,6 +130,10 @@ const defaultSettings = {
     phraseBanMaxRetries: DEFAULT_PHRASE_BAN_MAX_RETRIES,
     phraseBanPatterns: '',
     phraseBanPrompt: DEFAULT_PHRASE_BAN_PROMPT,
+    phraseBanProactive: false,
+    phraseBanProactivePrompt: DEFAULT_PHRASE_BAN_PROACTIVE_PROMPT,
+    phraseBanInjectionDepth: DEFAULT_PHRASE_BAN_INJECTION_DEPTH,
+    phraseBanInjectionRole: DEFAULT_PHRASE_BAN_INJECTION_ROLE,
     accEnabled: true,
     accDebugMode: false,
     accPrompt: DEFAULT_ACC_PROMPT,
@@ -213,6 +221,7 @@ const TOOL_PRESET_CONFIG = [
         fields: [
             { key: 'phraseBanPatterns', label: 'Patterns', textareaId: 'phrase_ban_patterns_textarea', defaultText: '' },
             { key: 'phraseBanPrompt', label: 'Rewrite Prompt', textareaId: 'phrase_ban_prompt_textarea', defaultText: DEFAULT_PHRASE_BAN_PROMPT },
+            { key: 'phraseBanProactivePrompt', label: 'Proactive Prompt', textareaId: 'phrase_ban_proactive_prompt_textarea', defaultText: DEFAULT_PHRASE_BAN_PROACTIVE_PROMPT },
         ],
     },
     {
@@ -352,6 +361,7 @@ function onChatChanged() {
     loadPossessionState();
     syncAllPossessionUI();
     onNarrativeGuidanceChatChanged();
+    onPhraseBanChatChanged();
     rescanReformatButtons();
     SSEDebug('Chat changed, state reloaded');
 }

@@ -89,7 +89,9 @@
             <small>Scans each AI reply against a regex ban list and, on a match,
                 has the model rewrite the reply without the offending phrasing
                 (through the Phrasing! engine). The original is always kept as a
-                swipe. Set Max Rewrite Attempts to 0 to only be notified.</small>
+                swipe. Set Max Rewrite Attempts to 0 to only be notified. Turn on
+                <b>Proactive Injection</b> to also learn each detected phrase per chat
+                and instruct the model to avoid them before every future reply.</small>
 
             <label class="checkbox_label">
                 <input id="phrase_ban_enabled" type="checkbox" />
@@ -105,6 +107,29 @@
                 <label for="phrase_ban_max_retries"><b><span class="fa-solid fa-rotate-right"></span> Max Rewrite Attempts:</b></label>
                 <input id="phrase_ban_max_retries" type="number" min="0" max="5" step="1" class="text_pole ng_number_input" title="How many times to rewrite a reply that still matches the ban list before giving up. 0 = detect and notify only, never rewrite." />
                 <small>0 = notify only</small>
+            </div>
+
+            <label class="checkbox_label" title="When on, every detected phrase is added to a per-chat learned list and a 'don't reuse these phrases' instruction is injected before every AI turn, so future replies avoid them up front. When off, the module only fixes messages after the fact.">
+                <input id="phrase_ban_proactive" type="checkbox" />
+                <span>Proactive Injection (learn &amp; prevent)</span>
+            </label>
+
+            <div class="ng_inline_row">
+                <label for="phrase_ban_injection_depth"><b>Depth:</b></label>
+                <input id="phrase_ban_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the proactive instruction after (0 = bottom)." />
+                <label for="phrase_ban_injection_role"><b>Role:</b></label>
+                <select id="phrase_ban_injection_role" class="text_pole ng_select_input" title="Role used when injecting the proactive instruction into the prompt.">
+                    <option value="system">System</option>
+                    <option value="user">User</option>
+                    <option value="assistant">Assistant</option>
+                </select>
+            </div>
+
+            <div class="ng_inline_row">
+                <small id="phrase_ban_learned_status"></small>
+                <div class="menu_button" id="phrase_ban_clear_learned" title="Forget every phrase learned in the current chat and remove the proactive injection.">
+                    <span class="fa-solid fa-eraser"></span> Clear Learned Phrases
+                </div>
             </div>
 
             <div class="saints_preset_block">
@@ -140,6 +165,20 @@
                         <textarea id="phrase_ban_prompt_textarea" class="text_pole" rows="8"
                             placeholder="Enter your Phrase Ban rewrite prompt template..."></textarea>
                         <small>Injected into the chat prompt as a system message for the rewrite generation. Placeholders: <code>{{phrasingSeed}}</code> — the speaker-prefixed message being rewritten; <code>{{bannedPhrases}}</code> — the list of matched phrases to avoid.</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="inline-drawer saints_nested_drawer">
+                <div class="inline-drawer-toggle inline-drawer-header">
+                    <b>Proactive Prompt Template</b>
+                    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                </div>
+                <div class="inline-drawer-content" style="display: none;">
+                    <div class="phrase_ban_section">
+                        <textarea id="phrase_ban_proactive_prompt_textarea" class="text_pole" rows="6"
+                            placeholder="Enter your Phrase Ban proactive injection template..."></textarea>
+                        <small>Used only when <b>Proactive Injection</b> is on. Persistently injected before every AI turn while the chat has learned phrases. Placeholder: <code>{{bannedPhrases}}</code> — the running list of phrases learned in this chat.</small>
                     </div>
                 </div>
             </div>

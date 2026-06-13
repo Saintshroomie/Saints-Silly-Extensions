@@ -37,7 +37,8 @@ Tired of the model reusing the same tics — "his voice was thick with something
 - **Notify-only mode** — Set Max Rewrite Attempts to 0 to be warned about matches without ever auto-rewriting.
 - **Non-destructive** — Every rewrite is a swipe; the original (and each intermediate attempt) stays one swipe away.
 - **Automatic or manual** — With **Auto-Scan** on, every AI reply is scanned as it arrives (a reply is never re-scanned once checked). Run `/phraseban` to scan and fix the last message on demand.
-- **Custom rewrite prompt + presets** — The rewrite prompt template is editable (placeholders `{{phrasingSeed}}` and `{{bannedPhrases}}`), and the pattern list + prompt save together as named presets, so you can keep per-model or per-genre ban lists.
+- **Proactive injection (learn & prevent)** — Optionally, instead of only fixing replies after the fact, Phrase Ban keeps a **per-chat learned list** of every phrase it detects and persistently injects a *"don't reuse these phrases"* instruction before every AI turn — so future replies avoid the tics up front. Pair it with **Max Rewrite Attempts = 0** for pure prevention (learn + warn, never rewrite). The injection's depth and role are configurable, the list travels with the chat, and a **Clear Learned Phrases** button resets it. When Proactive is off, nothing is learned or injected and Phrase Ban behaves exactly as the reactive rewrite path.
+- **Custom rewrite + proactive prompts + presets** — Both the rewrite prompt (placeholders `{{phrasingSeed}}` and `{{bannedPhrases}}`) and the proactive injection template (placeholder `{{bannedPhrases}}`) are editable, and the pattern list + both prompts save together as named presets, so you can keep per-model or per-genre ban lists.
 
 ### Assisted Character Creation
 
@@ -137,8 +138,9 @@ When Possession and Phrasing are used together, you can quickly take over charac
 3. Leave **Auto-Scan AI Messages** on. From now on, any AI reply matching a pattern is automatically rewritten (the matched phrases are quoted to the model so it knows exactly what to avoid), and the original stays available as a swipe.
 4. Tune **Max Rewrite Attempts** to taste: raise it for stubborn models, or set it to **0** to only get a warning toast instead of a rewrite.
 5. Run `/phraseban` at any time to scan and fix the last message manually — useful after editing the pattern list.
+6. *(Optional)* Tick **Proactive Injection (learn & prevent)** to build a per-chat list of every detected phrase and have the model instructed to avoid them before every future reply. Adjust the injection **Depth**/**Role**, edit the **Proactive Prompt Template** (must keep `{{bannedPhrases}}`), and use **Clear Learned Phrases** to reset the chat's list. For a "prevent, don't rewrite" workflow, combine it with **Max Rewrite Attempts = 0**.
 
-Notes: detection happens after the reply arrives (regex can't run inside the model's sampler), so you'll briefly see the original before the rewrite lands. In group chats only the round's final message can be auto-rewritten, since SillyTavern can only swipe the last message in the chat.
+Notes: detection happens after the reply arrives (regex can't run inside the model's sampler), so you'll briefly see the original before the rewrite lands. In group chats only the round's final message can be auto-rewritten, since SillyTavern can only swipe the last message in the chat. Proactive mode learns phrases from the same detection pass, so a reply must match (and be scanned) once before its phrasing is added to the list.
 
 ### How to Use Assisted Character Creation
 
@@ -229,9 +231,13 @@ Open **Extensions** > **Saint's Silly Extensions** in SillyTavern's settings pan
 | Enable Phrase Ban | Toggle the Phrase Ban feature and `/phraseban` on/off |
 | Auto-Scan AI Messages | When on, every AI character message is scanned against the ban list as it arrives. When off, only `/phraseban` scans |
 | Max Rewrite Attempts | How many times to rewrite a reply that still matches the ban list before giving up (default 2). **0** = detect and notify only, never rewrite |
-| Preset / Preview Assembled Prompt | Save named bundles of the pattern list + rewrite prompt and preview exactly what gets injected (see Tool Presets & Prompt Preview below) |
+| Proactive Injection (learn & prevent) | When on, every detected phrase is added to a per-chat learned list and a "don't reuse these phrases" instruction is persistently injected before every AI turn. When off, Phrase Ban only fixes replies after the fact (default off) |
+| Depth / Role | Where (how many messages from the bottom) and with which role the proactive instruction is injected |
+| Clear Learned Phrases | Forget every phrase learned in the current chat and remove its proactive injection. Shows a live count of learned phrases |
+| Preset / Preview Assembled Prompt | Save named bundles of the pattern list + rewrite prompt + proactive prompt and preview exactly what gets injected (see Tool Presets & Prompt Preview below) |
 | Banned Phrase Patterns | One JavaScript regex per line, matched against the raw message text. Case-insensitive by default; wrap a line in `/…/flags` for custom flags; `#` starts a comment line. Invalid patterns are skipped and reported under the textarea |
 | Rewrite Prompt Template | The instruction injected for the rewrite generation. Supports `{{phrasingSeed}}` (the speaker-prefixed message) and `{{bannedPhrases}}` (the list of matched phrases) placeholders |
+| Proactive Prompt Template | The persistent instruction injected before every AI turn while Proactive is on and the chat has learned phrases. Supports the `{{bannedPhrases}}` (learned list) placeholder |
 | Phrase Ban Debug Mode | Log pattern compilation, matches, and rewrite attempts to the browser console (in the Diagnostics drawer) |
 
 ### Assisted Character Creation Settings
@@ -330,7 +336,7 @@ Generation templates support tool-specific placeholders, substituted in place. I
 | Tool | Placeholders |
 |------|--------------|
 | Phrasing | `{{phrasingSeed}}`, `{{phrasingSwipes}}` (inverse prompt only) |
-| Phrase Ban | `{{phrasingSeed}}`, `{{bannedPhrases}}` (rewrite prompt) |
+| Phrase Ban | `{{phrasingSeed}}`, `{{bannedPhrases}}` (rewrite prompt); `{{bannedPhrases}}` (proactive prompt) |
 | Assisted Character Creation | `{{context}}`, `{{brief}}` |
 | World Info Assist | `{{context}}`, `{{guidance}}`, `{{title}}` |
 | Narrative Guidance | `{{context}}`, `{{themes}}`, plus `{{longGuidance}}` for the short-term tier (generation instructions); `{{guidance}}` (injection template) |

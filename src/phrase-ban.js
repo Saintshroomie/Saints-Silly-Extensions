@@ -14,11 +14,24 @@
  * onPhraseBanMessageReceived) and manually via `/phraseban`. A rewrite that
  * still matches is retried up to Max Rewrite Attempts; 0 attempts means
  * detect-and-notify only.
+ *
+ * Optionally (Proactive mode), every distinct phrase the scan detects is added
+ * to a per-chat learned list and a "don't reuse these phrases" instruction is
+ * persistently injected before every AI turn — so future replies avoid the
+ * tics up front instead of relying on after-the-fact rewrites. The list lives
+ * under `chatMetadata.phraseBan.bannedPhrases`; when Proactive is off nothing
+ * is learned or injected and the module behaves exactly as the reactive path.
  */
 
 import { SlashCommandParser } from '../../../../slash-commands/SlashCommandParser.js';
 import { SlashCommand } from '../../../../slash-commands/SlashCommand.js';
 import { is_group_generating } from '../../../../group-chats.js';
+import {
+    setExtensionPrompt,
+    extension_prompt_types,
+    extension_prompt_roles,
+    substituteParamsExtended,
+} from '../../../../../script.js';
 import {
     getContext,
     createDebugLogger,
@@ -41,9 +54,30 @@ Message to rewrite:
 
 export const DEFAULT_PHRASE_BAN_MAX_RETRIES = 2;
 
+// Proactive injection: the persistent "don't reuse these phrases" instruction
+// added before every AI turn while the per-chat learned list is non-empty.
+// {{bannedPhrases}} is the formatted learned-phrase list (ST's own macros also
+// resolve via substituteParamsExtended).
+export const DEFAULT_PHRASE_BAN_PROACTIVE_PROMPT = `[Do not reuse any of the following phrases — nor close paraphrases of them — in your reply. They have already been used in this chat and must not appear again; reach for fresh wording and imagery instead:
+{{bannedPhrases}}]`;
+
+export const DEFAULT_PHRASE_BAN_INJECTION_DEPTH = 0;
+export const DEFAULT_PHRASE_BAN_INJECTION_ROLE = 'system';
+
 // Per-swipe guard flag: set on the swipe_info entry of every swipe the auto
 // path has scanned, so re-renders and swipe navigation never re-trigger it.
 const CHECK_FLAG = 'ssePhraseBanChecked';
+
+// Per-chat metadata key holding the learned ban list ({ bannedPhrases: [] }).
+const PHRASE_BAN_METADATA_KEY = 'phraseBan';
+
+// Stable setExtensionPrompt key for the proactive injection.
+const PHRASE_BAN_INJECTION_KEY = 'phrase_ban_proactive';
+
+// Caps on the learned list: keep the most recent N phrases, each truncated so
+// a runaway match never bloats the injected prompt.
+const MAX_LEARNED_PHRASES = 50;
+const MAX_LEARNED_PHRASE_LENGTH = 120;
 
 // Cap on how many distinct matched phrases are listed in the rewrite prompt.
 const MAX_LISTED_MATCHES = 12;
@@ -168,6 +202,120 @@ function getPromptTemplate() {
         : DEFAULT_PHRASE_BAN_PROMPT;
 }
 
+function getProactivePromptTemplate() {
+    return (moduleSettings?.phraseBanProactivePrompt && moduleSettings.phraseBanProactivePrompt.trim())
+        ? moduleSettings.phraseBanProactivePrompt
+        : DEFAULT_PHRASE_BAN_PROACTIVE_PROMPT;
+}
+
+// ─── Proactive: Per-chat Learned List ───
+
+/** Read the per-chat learned ban list (pure read — never mutates metadata). */
+function loadLearnedPhrases() {
+    const list = getContext().chatMetadata?.[PHRASE_BAN_METADATA_KEY]?.bannedPhrases;
+    return Array.isArray(list) ? list.filter(p => typeof p === 'string' && p.trim()) : [];
+}
+
+/**
+ * Merge freshly-detected matches into the per-chat learned list, de-duplicated
+ * case-insensitively and capped to the most recent MAX_LEARNED_PHRASES. Each
+ * phrase is truncated so a runaway match can't bloat the injection.
+ *
+ * @returns {boolean} `true` if the stored list changed (caller should reinject).
+ */
+function addLearnedPhrases(matches) {
+    const context = getContext();
+    const existing = loadLearnedPhrases();
+    const seen = new Set(existing.map(p => p.toLowerCase()));
+    let changed = false;
+    for (const raw of matches) {
+        const phrase = truncateMatch((raw || '').trim(), MAX_LEARNED_PHRASE_LENGTH);
+        if (!phrase) continue;
+        const key = phrase.toLowerCase();
+        if (seen.has(key)) continue;
+        seen.add(key);
+        existing.push(phrase);
+        changed = true;
+    }
+    if (!changed) return false;
+    context.chatMetadata[PHRASE_BAN_METADATA_KEY] = { bannedPhrases: existing.slice(-MAX_LEARNED_PHRASES) };
+    context.saveMetadata();
+    return true;
+}
+
+/** Drop the per-chat learned list entirely. */
+function clearLearnedPhrases() {
+    const context = getContext();
+    if (context.chatMetadata?.[PHRASE_BAN_METADATA_KEY]) {
+        delete context.chatMetadata[PHRASE_BAN_METADATA_KEY];
+        context.saveMetadata();
+    }
+}
+
+// ─── Proactive: Injection ───
+
+function resolveInjectionRole(name) {
+    switch ((name || DEFAULT_PHRASE_BAN_INJECTION_ROLE).toLowerCase()) {
+        case 'user': return extension_prompt_roles.USER;
+        case 'assistant': return extension_prompt_roles.ASSISTANT;
+        case 'system':
+        default: return extension_prompt_roles.SYSTEM;
+    }
+}
+
+function clearProactiveInjection() {
+    setExtensionPrompt(PHRASE_BAN_INJECTION_KEY, '', extension_prompt_types.NONE, 0);
+}
+
+/**
+ * Reapply (or clear) the persistent "don't reuse these phrases" injection from
+ * the current chat's learned list. setExtensionPrompt persists globally until
+ * overwritten, so this is also what swaps the injection on chat change and
+ * clears it the moment Proactive (or Phrase Ban) is turned off or the list
+ * empties.
+ */
+export function reapplyProactiveInjection() {
+    if (!moduleSettings?.phraseBanEnabled || !moduleSettings.phraseBanProactive) {
+        clearProactiveInjection();
+        return;
+    }
+    const phrases = loadLearnedPhrases();
+    if (!phrases.length) {
+        clearProactiveInjection();
+        return;
+    }
+    const body = substituteParamsExtended(getProactivePromptTemplate(), {
+        bannedPhrases: formatMatchList(phrases),
+    });
+    const configuredDepth = moduleSettings.phraseBanInjectionDepth;
+    const depth = Number.isFinite(configuredDepth) && configuredDepth >= 0
+        ? configuredDepth
+        : DEFAULT_PHRASE_BAN_INJECTION_DEPTH;
+    const role = resolveInjectionRole(moduleSettings.phraseBanInjectionRole);
+    setExtensionPrompt(
+        PHRASE_BAN_INJECTION_KEY,
+        body,
+        extension_prompt_types.IN_CHAT,
+        depth,
+        false,
+        role,
+    );
+    debug('Proactive injection applied —', phrases.length, 'learned phrase(s), depth', depth);
+}
+
+/**
+ * Record newly-detected matches into the learned list and refresh the
+ * injection / settings status when Proactive mode is on. No-op otherwise, so
+ * the reactive path is untouched when the feature is disabled.
+ */
+function learnDetectedPhrases(matches) {
+    if (!moduleSettings?.phraseBanProactive || !matches.length) return;
+    if (addLearnedPhrases(matches)) {
+        reapplyProactiveInjection();
+        refreshLearnedStatus();
+    }
+}
+
 // ─── Generation Settling ───
 
 function delay(ms) {
@@ -234,6 +382,7 @@ export async function scanAndRewriteMessage(index, { manual = false } = {}) {
 
             const matches = findBannedMatches(msg.mes, patterns);
             markSwipeChecked(msg);
+            learnDetectedPhrases(matches);
 
             if (!matches.length) {
                 if (attempt === 0) {
@@ -315,6 +464,16 @@ export function onPhraseBanMessageReceived(messageIndex) {
     }, 0);
 }
 
+/**
+ * Swap the proactive injection to the newly-loaded chat's learned list (or
+ * clear it) and refresh the settings status. Fired from CHAT_CHANGED.
+ */
+export function onPhraseBanChatChanged() {
+    reapplyProactiveInjection();
+    refreshLearnedStatus();
+    debug('Chat changed — proactive injection resynced');
+}
+
 // ─── Settings Panel ───
 
 function updatePatternStatus() {
@@ -329,6 +488,15 @@ function updatePatternStatus() {
     statusEl.classList.toggle('phrase-ban-status-error', invalid.length > 0);
 }
 
+function refreshLearnedStatus() {
+    const el = document.getElementById('phrase_ban_learned_status');
+    if (!el) return;
+    const n = loadLearnedPhrases().length;
+    el.textContent = n === 0
+        ? 'No phrases learned in this chat yet.'
+        : (n === 1 ? '1 phrase learned in this chat.' : `${n} phrases learned in this chat.`);
+}
+
 export function bindPhraseBanSettings(saveSettings) {
     const enabledCb = document.getElementById('phrase_ban_enabled');
     if (enabledCb) {
@@ -336,6 +504,7 @@ export function bindPhraseBanSettings(saveSettings) {
         enabledCb.addEventListener('change', () => {
             moduleSettings.phraseBanEnabled = enabledCb.checked;
             saveSettings();
+            reapplyProactiveInjection();
         });
     }
 
@@ -347,6 +516,63 @@ export function bindPhraseBanSettings(saveSettings) {
             saveSettings();
         });
     }
+
+    const proactiveCb = document.getElementById('phrase_ban_proactive');
+    if (proactiveCb) {
+        proactiveCb.checked = !!moduleSettings.phraseBanProactive;
+        proactiveCb.addEventListener('change', () => {
+            moduleSettings.phraseBanProactive = proactiveCb.checked;
+            saveSettings();
+            reapplyProactiveInjection();
+        });
+    }
+
+    const depthInput = document.getElementById('phrase_ban_injection_depth');
+    if (depthInput) {
+        const configuredDepth = moduleSettings.phraseBanInjectionDepth;
+        depthInput.value = Number.isFinite(configuredDepth) ? configuredDepth : DEFAULT_PHRASE_BAN_INJECTION_DEPTH;
+        depthInput.addEventListener('input', () => {
+            const n = parseInt(depthInput.value, 10);
+            if (Number.isFinite(n) && n >= 0) {
+                moduleSettings.phraseBanInjectionDepth = n;
+                saveSettings();
+                reapplyProactiveInjection();
+            }
+        });
+    }
+
+    const roleSelect = document.getElementById('phrase_ban_injection_role');
+    if (roleSelect) {
+        roleSelect.value = moduleSettings.phraseBanInjectionRole || DEFAULT_PHRASE_BAN_INJECTION_ROLE;
+        roleSelect.addEventListener('change', () => {
+            moduleSettings.phraseBanInjectionRole = roleSelect.value;
+            saveSettings();
+            reapplyProactiveInjection();
+        });
+    }
+
+    const proactivePromptArea = document.getElementById('phrase_ban_proactive_prompt_textarea');
+    if (proactivePromptArea) {
+        proactivePromptArea.value = moduleSettings.phraseBanProactivePrompt || DEFAULT_PHRASE_BAN_PROACTIVE_PROMPT;
+        proactivePromptArea.addEventListener('input', () => {
+            const value = proactivePromptArea.value;
+            moduleSettings.phraseBanProactivePrompt = value;
+            saveSettings();
+            if (value.trim() && !value.includes('{{bannedPhrases}}')) {
+                toast('Warning: Proactive template lacks {{bannedPhrases}}; the AI won\'t see the learned list.', 'warning', 'Phrase Ban');
+            }
+            reapplyProactiveInjection();
+        });
+    }
+
+    document.getElementById('phrase_ban_clear_learned')?.addEventListener('click', () => {
+        clearLearnedPhrases();
+        clearProactiveInjection();
+        refreshLearnedStatus();
+        toast('Cleared the learned phrase list for this chat.', 'info', 'Phrase Ban');
+    });
+
+    refreshLearnedStatus();
 
     const retriesInput = document.getElementById('phrase_ban_max_retries');
     if (retriesInput) {
@@ -404,16 +630,24 @@ function showPhraseBanPromptPreview() {
     const assembled = getPromptTemplate()
         .replace(/\{\{\s*bannedPhrases\s*\}\}/gi, sampleMatches)
         .replace(/\{\{\s*phrasingSeed\s*\}\}/gi, sampleSeed);
+    const proactiveAssembled = getProactivePromptTemplate()
+        .replace(/\{\{\s*bannedPhrases\s*\}\}/gi, sampleMatches);
     showPromptPreview('Phrase Ban — Injection Preview', [
         {
-            label: 'Injection (added to the chat prompt as a system message at depth 0 for the rewrite generation, with sample matches)',
+            label: 'Rewrite injection (added to the chat prompt as a system message at depth 0 for the rewrite generation, with sample matches)',
             text: assembled,
+        },
+        {
+            label: `Proactive injection (${moduleSettings?.phraseBanProactive ? 'on' : 'off'} — persistently added before every AI turn while the chat's learned list is non-empty, with sample matches)`,
+            text: proactiveAssembled,
         },
         {
             label: 'Note',
             text: 'The rewrite runs through the Phrasing! engine as a swipe regeneration, so the '
-                + 'original message is always kept as a swipe. SillyTavern macros in the template '
-                + '(e.g. {{char}}) resolve at generation time.',
+                + 'original message is always kept as a swipe. With Proactive mode on, every detected '
+                + 'phrase is also added to a per-chat learned list and the proactive injection above is '
+                + 'kept in the prompt so future replies avoid them up front. SillyTavern macros in the '
+                + 'templates (e.g. {{char}}) resolve at generation time.',
         },
     ]);
 }
