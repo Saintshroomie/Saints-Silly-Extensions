@@ -51,6 +51,8 @@ import {
     bindPhraseBanSettings,
     onPhraseBanMessageReceived,
     onPhraseBanChatChanged,
+    onPhraseBanGenerationStarted,
+    onPhraseBanTextCompletionSettings,
     registerPhraseBanSlashCommand,
     DEFAULT_PHRASE_BAN_PROMPT,
     DEFAULT_PHRASE_BAN_PROACTIVE_PROMPT,
@@ -134,6 +136,7 @@ const defaultSettings = {
     phraseBanProactivePrompt: DEFAULT_PHRASE_BAN_PROACTIVE_PROMPT,
     phraseBanInjectionDepth: DEFAULT_PHRASE_BAN_INJECTION_DEPTH,
     phraseBanInjectionRole: DEFAULT_PHRASE_BAN_INJECTION_ROLE,
+    phraseBanHardBan: false,
     accEnabled: true,
     accDebugMode: false,
     accPrompt: DEFAULT_ACC_PROMPT,
@@ -339,6 +342,7 @@ function onGenerationStarted(_type, _options, dryRun) {
     if (dryRun) return;
     possessionGenStarted();
     phrasingGenStarted();
+    onPhraseBanGenerationStarted();
     SSEDebug('Generation started');
 }
 
@@ -444,6 +448,11 @@ jQuery(async () => {
         // internally — it must never block this emit chain.
         onPhraseBanMessageReceived(idx);
     });
+    // Text Completion only: append Phrase Ban's learned list to the request's
+    // sampler-level banned_strings when the Hard Token Ban option is on.
+    if (eventTypes.TEXT_COMPLETION_SETTINGS_READY) {
+        eventSource.on(eventTypes.TEXT_COMPLETION_SETTINGS_READY, onPhraseBanTextCompletionSettings);
+    }
 
     // Slash commands
     registerPossessionSlashCommands();

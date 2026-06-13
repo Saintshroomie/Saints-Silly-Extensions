@@ -114,6 +114,11 @@
                 <span>Proactive Injection (learn &amp; prevent)</span>
             </label>
 
+            <label class="checkbox_label" title="Requires Proactive. On Text Completion backends (llama.cpp, KoboldCpp, TabbyAPI, etc.), appends the learned list to the request's sampler-level banned strings — a hard ban the backend enforces. This replaces the soft prompt injection on those backends to save context. Chat Completion APIs have no sampler ban, so the soft injection is used there instead.">
+                <input id="phrase_ban_hard_ban" type="checkbox" />
+                <span>Hard Token Ban (Text Completion backends)</span>
+            </label>
+
             <div class="ng_inline_row">
                 <label for="phrase_ban_injection_depth"><b>Depth:</b></label>
                 <input id="phrase_ban_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the proactive instruction after (0 = bottom)." />
