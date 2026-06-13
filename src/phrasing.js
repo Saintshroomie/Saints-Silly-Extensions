@@ -86,13 +86,15 @@ function formatSeedWithSpeaker(seedText, isUser, speakerName) {
     return `${name}: ${seedText}`;
 }
 
-function assemblePrompt(seedText, swipesContext = null) {
+function assemblePrompt(seedText, swipesContext = null, options = {}) {
     const useInverse = !!swipesContext;
-    debug('assemblePrompt — seed length:', seedText.length, '| mode:', useInverse ? 'inverse' : 'standard');
-    const tpl = useInverse ? getActiveInversePrompt() : getActivePrompt();
-    const macros = useInverse
-        ? { phrasingSeed: seedText, phrasingSwipes: swipesContext }
-        : { phrasingSeed: seedText };
+    debug('assemblePrompt — seed length:', seedText.length, '| mode:', options.promptTemplate ? 'custom template' : (useInverse ? 'inverse' : 'standard'));
+    const tpl = options.promptTemplate || (useInverse ? getActiveInversePrompt() : getActivePrompt());
+    const macros = {
+        phrasingSeed: seedText,
+        ...(useInverse ? { phrasingSwipes: swipesContext } : {}),
+        ...(options.extraMacros || {}),
+    };
     const prompt = substituteParamsExtended(tpl, macros);
     debug('assemblePrompt — final length:', prompt.length);
     return prompt;
@@ -214,7 +216,7 @@ async function doPrimaryFlow(seedText) {
 
 // ─── Swipe Mode ───
 
-async function doSwipeMode(messageIndex) {
+async function doSwipeMode(messageIndex, options = {}) {
     debug('doSwipeMode — starting for message index:', messageIndex);
     const context = getContext();
 
@@ -250,14 +252,16 @@ async function doSwipeMode(messageIndex) {
             message.swipe_info = [{}];
         }
 
+        // A caller-supplied template (e.g. Phrase Ban) carries its own
+        // guidance, so Inverse Guidance doesn't apply on top of it.
         let swipesContext = null;
-        if (ctx.settings.phrasingInverseGuidance) {
+        if (!options.promptTemplate && ctx.settings.phrasingInverseGuidance) {
             const speakerName = message.name || (message.is_user ? context.name1 : context.name2);
             swipesContext = formatSwipesContext(message.swipes, speakerName);
             debug('doSwipeMode — inverse guidance ON, swipes included:', message.swipes.length);
         }
 
-        const assembled = assemblePrompt(seedText, swipesContext);
+        const assembled = assemblePrompt(seedText, swipesContext, options);
         injectPhrasingPrompt(assembled);
 
         if (!message.extra) message.extra = {};
@@ -301,6 +305,23 @@ async function doSwipeMode(messageIndex) {
         }
         debug('doSwipeMode — cleanup complete');
     }
+}
+
+// ─── External Rewrite API ───
+
+/**
+ * Rewrite a message as a new swipe using a caller-supplied prompt template
+ * instead of the Phrasing templates. Used by Phrase Ban to force a rewrite
+ * that avoids matched phrases. Same flow as a manual rephrase: the original
+ * stays as a swipe and the injection is cleared when the generation ends.
+ *
+ * @param {number} messageIndex
+ * @param {string} promptTemplate - Template using {{phrasingSeed}} plus any extra macros.
+ * @param {Record<string, string>} [extraMacros] - Additional macro values for the template.
+ * @returns {Promise<string>} The rewritten text, or '' if the rewrite did not run.
+ */
+export async function rewriteMessageWithTemplate(messageIndex, promptTemplate, extraMacros = {}) {
+    return doSwipeMode(messageIndex, { promptTemplate, extraMacros });
 }
 
 // ─── Button Handlers ───

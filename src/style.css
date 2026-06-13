@@ -902,3 +902,32 @@
     color: var(--SmartThemeQuoteColor, #6bf);
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════════
+   PHRASE BAN
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+#saints_silly_settings .phrase_ban_section {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+#saints_silly_settings .phrase_ban_section textarea {
+    width: 100%;
+    resize: vertical;
+    font-family: monospace;
+    font-size: 0.9em;
+    margin-top: 4px;
+}
+
+/* Live pattern-list validation readout under the patterns textarea. */
+#saints_silly_settings #phrase_ban_pattern_status {
+    display: block;
+    margin-top: 4px;
+    opacity: 0.8;
+}
+
+#saints_silly_settings #phrase_ban_pattern_status.phrase-ban-status-error {
+    color: var(--warning, #e8a23a);
+    opacity: 1;
+}
+

@@ -78,6 +78,75 @@
         </div>
     </div>
 
+    <!-- ─── SSE Phrase Ban ─── -->
+    <div class="inline-drawer">
+        <div class="inline-drawer-toggle inline-drawer-header">
+            <b><span class="fa-solid fa-ban"></span> SSE Phrase Ban</b>
+            <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+        </div>
+        <div class="inline-drawer-content" style="display: none;">
+
+            <small>Scans each AI reply against a regex ban list and, on a match,
+                has the model rewrite the reply without the offending phrasing
+                (through the Phrasing! engine). The original is always kept as a
+                swipe. Set Max Rewrite Attempts to 0 to only be notified.</small>
+
+            <label class="checkbox_label">
+                <input id="phrase_ban_enabled" type="checkbox" />
+                <span>Enable Phrase Ban</span>
+            </label>
+
+            <label class="checkbox_label" title="When on, every AI character message is scanned as it arrives. When off, only /phraseban scans.">
+                <input id="phrase_ban_auto" type="checkbox" />
+                <span>Auto-Scan AI Messages</span>
+            </label>
+
+            <div class="ng_inline_row">
+                <label for="phrase_ban_max_retries"><b><span class="fa-solid fa-rotate-right"></span> Max Rewrite Attempts:</b></label>
+                <input id="phrase_ban_max_retries" type="number" min="0" max="5" step="1" class="text_pole ng_number_input" title="How many times to rewrite a reply that still matches the ban list before giving up. 0 = detect and notify only, never rewrite." />
+                <small>0 = notify only</small>
+            </div>
+
+            <div class="saints_preset_block">
+                <label title="Save and switch named bundles of the pattern list + rewrite prompt below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label>
+                <div class="saints_template_controls" id="phrase_ban_presets"></div>
+                <div class="menu_button saints_preview_btn" id="phrase_ban_preview_btn" title="Show exactly what Phrase Ban will inject into the chat prompt for a rewrite, with sample matches.">
+                    <span class="fa-solid fa-eye"></span> Preview Assembled Prompt
+                </div>
+            </div>
+
+            <div class="inline-drawer saints_nested_drawer">
+                <div class="inline-drawer-toggle inline-drawer-header">
+                    <b>Banned Phrase Patterns</b>
+                    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                </div>
+                <div class="inline-drawer-content" style="display: none;">
+                    <div class="phrase_ban_section">
+                        <textarea id="phrase_ban_patterns_textarea" class="text_pole" rows="8"
+                            placeholder="One JavaScript regex per line, e.g.&#10;voice was (thick|heavy) with&#10;something (he|she|they) (didn't|couldn't) want to name&#10;/Anger\? Rage\?/&#10;# lines starting with # are comments"></textarea>
+                        <small>One JavaScript regular expression per line, matched against the raw message text. Case-insensitive by default; wrap a line in <code>/…/flags</code> to set your own flags. Lines starting with <code>#</code> are comments. Invalid patterns are skipped.</small>
+                        <small id="phrase_ban_pattern_status"></small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="inline-drawer saints_nested_drawer">
+                <div class="inline-drawer-toggle inline-drawer-header">
+                    <b>Rewrite Prompt Template</b>
+                    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                </div>
+                <div class="inline-drawer-content" style="display: none;">
+                    <div class="phrase_ban_section">
+                        <textarea id="phrase_ban_prompt_textarea" class="text_pole" rows="8"
+                            placeholder="Enter your Phrase Ban rewrite prompt template..."></textarea>
+                        <small>Injected into the chat prompt as a system message for the rewrite generation. Placeholders: <code>{{phrasingSeed}}</code> — the speaker-prefixed message being rewritten; <code>{{bannedPhrases}}</code> — the list of matched phrases to avoid.</small>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
     <!-- ─── SSE Assisted Character Creation ─── -->
     <div class="inline-drawer">
         <div class="inline-drawer-toggle inline-drawer-header">
@@ -643,6 +712,11 @@
             <label class="checkbox_label" title="Log detailed Phrasing events to the browser console.">
                 <input id="phrasing_debug_mode" type="checkbox" />
                 <span>Phrasing Debug Mode</span>
+            </label>
+
+            <label class="checkbox_label" title="Log detailed Phrase Ban events (pattern compilation, matches, rewrite attempts) to the browser console.">
+                <input id="phrase_ban_debug_mode" type="checkbox" />
+                <span>Phrase Ban Debug Mode</span>
             </label>
 
             <label class="checkbox_label" title="Log detailed Assisted Character Creation events, prompts, and generations to the browser console.">
