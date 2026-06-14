@@ -4425,10 +4425,17 @@ function reapplyProactiveInjection() {
  * the reactive path is untouched when the feature is disabled.
  */
 function learnDetectedPhrases(matches) {
-    if (!phrase_ban_moduleSettings?.phraseBanProactive || !matches.length) return;
+    if (!matches.length) return;
+    if (!phrase_ban_moduleSettings?.phraseBanProactive) {
+        phrase_ban_debug('learn — skipped (Proactive Injection is off), matches:', matches);
+        return;
+    }
     if (addLearnedPhrases(matches)) {
+        phrase_ban_debug('learn — added to chat learned list, now', loadLearnedPhrases().length, 'phrase(s)');
         reapplyProactiveInjection();
         refreshLearnedPanel();
+    } else {
+        phrase_ban_debug('learn — all matches already in the learned list');
     }
 }
 

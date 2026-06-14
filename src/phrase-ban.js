@@ -372,10 +372,17 @@ export function reapplyProactiveInjection() {
  * the reactive path is untouched when the feature is disabled.
  */
 function learnDetectedPhrases(matches) {
-    if (!moduleSettings?.phraseBanProactive || !matches.length) return;
+    if (!matches.length) return;
+    if (!moduleSettings?.phraseBanProactive) {
+        debug('learn — skipped (Proactive Injection is off), matches:', matches);
+        return;
+    }
     if (addLearnedPhrases(matches)) {
+        debug('learn — added to chat learned list, now', loadLearnedPhrases().length, 'phrase(s)');
         reapplyProactiveInjection();
         refreshLearnedPanel();
+    } else {
+        debug('learn — all matches already in the learned list');
     }
 }
 
