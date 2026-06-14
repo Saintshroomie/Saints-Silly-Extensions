@@ -89,9 +89,10 @@
             <small>Scans each AI reply against a regex ban list and, on a match,
                 has the model rewrite the reply without the offending phrasing
                 (through the Phrasing! engine). The original is always kept as a
-                swipe. Set Max Rewrite Attempts to 0 to only be notified. Turn on
-                <b>Proactive Injection</b> to also learn each detected phrase per chat
-                and instruct the model to avoid them before every future reply.</small>
+                swipe. Set Max Rewrite Attempts to 0 to only be notified. Every
+                detected phrase is also collected into a per-chat <b>Learned
+                Phrases</b> list — turn on <b>Proactive Injection</b> to instruct
+                the model to avoid that list before every future reply.</small>
 
             <label class="checkbox_label">
                 <input id="phrase_ban_enabled" type="checkbox" />
@@ -109,12 +110,33 @@
                 <small>0 = notify only</small>
             </div>
 
-            <label class="checkbox_label" title="When on, every detected phrase is added to a per-chat learned list and a 'don't reuse these phrases' instruction is injected before every AI turn, so future replies avoid them up front. When off, the module only fixes messages after the fact.">
+            <div class="ng_inline_row">
+                <small id="phrase_ban_learned_status"></small>
+                <div class="menu_button" id="phrase_ban_clear_learned" title="Forget every phrase learned in the current chat (also removes the proactive injection).">
+                    <span class="fa-solid fa-eraser"></span> Clear Learned Phrases
+                </div>
+            </div>
+
+            <div class="inline-drawer saints_nested_drawer">
+                <div class="inline-drawer-toggle inline-drawer-header">
+                    <b>Learned Phrases (this chat)</b>
+                    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                </div>
+                <div class="inline-drawer-content" style="display: none;">
+                    <div class="phrase_ban_section">
+                        <textarea id="phrase_ban_learned_textarea" class="text_pole" rows="6"
+                            placeholder="Phrases detected in this chat are collected here, one per line.&#10;Edit freely — add your own, or delete ones you don't want used."></textarea>
+                        <small>One phrase per line. Detected phrases are collected here automatically as Phrase Ban scans, whether or not Proactive Injection is on; edit freely to add or remove entries. When Proactive Injection (or Hard Token Ban) is on, this is the list the model is told to avoid. Stored with the chat, not globally.</small>
+                    </div>
+                </div>
+            </div>
+
+            <label class="checkbox_label" title="Injects the Learned Phrases list before every AI turn as a 'don't reuse these phrases' instruction, so future replies avoid them up front. The list is built automatically whether or not this is on — this only controls whether it gets injected.">
                 <input id="phrase_ban_proactive" type="checkbox" />
-                <span>Proactive Injection (learn &amp; prevent)</span>
+                <span>Proactive Injection (avoid learned phrases)</span>
             </label>
 
-            <label class="checkbox_label" title="Requires Proactive. On Text Completion backends (llama.cpp, KoboldCpp, TabbyAPI, etc.), appends the learned list to the request's sampler-level banned strings — a hard ban the backend enforces. This replaces the soft prompt injection on those backends to save context. Chat Completion APIs have no sampler ban, so the soft injection is used there instead.">
+            <label class="checkbox_label" title="Requires Proactive Injection. On Text Completion backends (llama.cpp, KoboldCpp, TabbyAPI, etc.), appends the Learned Phrases list to the request's sampler-level banned strings — a hard ban the backend enforces. This replaces the soft prompt injection on those backends to save context. Chat Completion APIs have no sampler ban, so the soft injection is used there instead.">
                 <input id="phrase_ban_hard_ban" type="checkbox" />
                 <span>Hard Token Ban (Text Completion backends)</span>
             </label>
@@ -128,27 +150,6 @@
                     <option value="user">User</option>
                     <option value="assistant">Assistant</option>
                 </select>
-            </div>
-
-            <div class="ng_inline_row">
-                <small id="phrase_ban_learned_status"></small>
-                <div class="menu_button" id="phrase_ban_clear_learned" title="Forget every phrase learned in the current chat and remove the proactive injection.">
-                    <span class="fa-solid fa-eraser"></span> Clear Learned Phrases
-                </div>
-            </div>
-
-            <div class="inline-drawer saints_nested_drawer">
-                <div class="inline-drawer-toggle inline-drawer-header">
-                    <b>Learned Phrases (this chat)</b>
-                    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
-                </div>
-                <div class="inline-drawer-content" style="display: none;">
-                    <div class="phrase_ban_section">
-                        <textarea id="phrase_ban_learned_textarea" class="text_pole" rows="6"
-                            placeholder="Phrases learned in this chat appear here, one per line.&#10;Edit freely — add your own, or delete ones you don't want injected."></textarea>
-                        <small>One phrase per line — the running list injected before every AI turn while Proactive is on. Detected phrases are added here automatically; edit it to add or remove entries. Stored with the chat, not globally.</small>
-                    </div>
-                </div>
             </div>
 
             <div class="saints_preset_block">

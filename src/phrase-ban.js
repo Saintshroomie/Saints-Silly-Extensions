@@ -371,12 +371,14 @@ export function reapplyProactiveInjection() {
  * injection / settings status when Proactive mode is on. No-op otherwise, so
  * the reactive path is untouched when the feature is disabled.
  */
+/**
+ * Record newly-detected matches into the per-chat learned list. Learning is
+ * part of detection itself — it always runs (the list is just bookkeeping).
+ * Whether that list is then *used* is governed separately by Proactive
+ * Injection / Hard Token Ban, which reapplyProactiveInjection() honors.
+ */
 function learnDetectedPhrases(matches) {
     if (!matches.length) return;
-    if (!moduleSettings?.phraseBanProactive) {
-        debug('learn — skipped (Proactive Injection is off), matches:', matches);
-        return;
-    }
     if (addLearnedPhrases(matches)) {
         debug('learn — added to chat learned list, now', loadLearnedPhrases().length, 'phrase(s)');
         reapplyProactiveInjection();
