@@ -89,9 +89,13 @@
             <small>Scans each AI reply against a regex ban list and, on a match,
                 has the model rewrite the reply without the offending phrasing
                 (through the Phrasing! engine). The original is always kept as a
-                swipe. Set Max Rewrite Attempts to 0 to only be notified. Turn on
-                <b>Proactive Injection</b> to also learn each detected phrase per chat
-                and instruct the model to avoid them before every future reply.</small>
+                swipe. Set Max Rewrite Attempts to 0 to only be notified. Every
+                detected phrase is also collected into a per-chat <b>Learned
+                Phrases</b> list, which (while Phrase Ban is enabled) is appended
+                to your backend's native banned strings on Text Completion. Turn
+                on <b>Proactive Injection</b> to also instruct the model to avoid
+                that list before every reply (useful on Chat Completion APIs,
+                which have no native ban).</small>
 
             <label class="checkbox_label">
                 <input id="phrase_ban_enabled" type="checkbox" />
@@ -109,30 +113,9 @@
                 <small>0 = notify only</small>
             </div>
 
-            <label class="checkbox_label" title="When on, every detected phrase is added to a per-chat learned list and a 'don't reuse these phrases' instruction is injected before every AI turn, so future replies avoid them up front. When off, the module only fixes messages after the fact.">
-                <input id="phrase_ban_proactive" type="checkbox" />
-                <span>Proactive Injection (learn &amp; prevent)</span>
-            </label>
-
-            <label class="checkbox_label" title="Requires Proactive. On Text Completion backends (llama.cpp, KoboldCpp, TabbyAPI, etc.), appends the learned list to the request's sampler-level banned strings — a hard ban the backend enforces. This replaces the soft prompt injection on those backends to save context. Chat Completion APIs have no sampler ban, so the soft injection is used there instead.">
-                <input id="phrase_ban_hard_ban" type="checkbox" />
-                <span>Hard Token Ban (Text Completion backends)</span>
-            </label>
-
-            <div class="ng_inline_row">
-                <label for="phrase_ban_injection_depth"><b>Depth:</b></label>
-                <input id="phrase_ban_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the proactive instruction after (0 = bottom)." />
-                <label for="phrase_ban_injection_role"><b>Role:</b></label>
-                <select id="phrase_ban_injection_role" class="text_pole ng_select_input" title="Role used when injecting the proactive instruction into the prompt.">
-                    <option value="system">System</option>
-                    <option value="user">User</option>
-                    <option value="assistant">Assistant</option>
-                </select>
-            </div>
-
             <div class="ng_inline_row">
                 <small id="phrase_ban_learned_status"></small>
-                <div class="menu_button" id="phrase_ban_clear_learned" title="Forget every phrase learned in the current chat and remove the proactive injection.">
+                <div class="menu_button" id="phrase_ban_clear_learned" title="Forget every phrase learned in the current chat (also removes the proactive injection).">
                     <span class="fa-solid fa-eraser"></span> Clear Learned Phrases
                 </div>
             </div>
@@ -145,10 +128,26 @@
                 <div class="inline-drawer-content" style="display: none;">
                     <div class="phrase_ban_section">
                         <textarea id="phrase_ban_learned_textarea" class="text_pole" rows="6"
-                            placeholder="Phrases learned in this chat appear here, one per line.&#10;Edit freely — add your own, or delete ones you don't want injected."></textarea>
-                        <small>One phrase per line — the running list injected before every AI turn while Proactive is on. Detected phrases are added here automatically; edit it to add or remove entries. Stored with the chat, not globally.</small>
+                            placeholder="Phrases detected in this chat are collected here, one per line.&#10;Edit freely — add your own, or delete ones you don't want used."></textarea>
+                        <small>One phrase per line. Detected phrases are collected here automatically as Phrase Ban scans; edit freely to add or remove entries. While Phrase Ban is enabled, this list is also appended to your backend's native banned strings on Text Completion backends (a sampler-level ban; no effect on Chat Completion APIs). Stored with the chat, not globally.</small>
                     </div>
                 </div>
+            </div>
+
+            <label class="checkbox_label" title="Injects the Learned Phrases list before every AI turn as a 'don't reuse these phrases' instruction, so future replies avoid them up front. Independent of the native sampler-level ban (which is always applied on Text Completion backends while Phrase Ban is enabled); use this for Chat Completion APIs, or as extra reinforcement.">
+                <input id="phrase_ban_proactive" type="checkbox" />
+                <span>Proactive Injection (avoid learned phrases)</span>
+            </label>
+
+            <div class="ng_inline_row">
+                <label for="phrase_ban_injection_depth"><b>Depth:</b></label>
+                <input id="phrase_ban_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the proactive instruction after (0 = bottom)." />
+                <label for="phrase_ban_injection_role"><b>Role:</b></label>
+                <select id="phrase_ban_injection_role" class="text_pole ng_select_input" title="Role used when injecting the proactive instruction into the prompt.">
+                    <option value="system">System</option>
+                    <option value="user">User</option>
+                    <option value="assistant">Assistant</option>
+                </select>
             </div>
 
             <div class="saints_preset_block">

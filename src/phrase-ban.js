@@ -74,11 +74,6 @@ const PHRASE_BAN_METADATA_KEY = 'phraseBan';
 // Stable setExtensionPrompt key for the proactive injection.
 const PHRASE_BAN_INJECTION_KEY = 'phrase_ban_proactive';
 
-// getContext().mainApi value for the Text Completion backends — the only
-// family that exposes a sampler-level (hard) banned-strings ban. Chat
-// Completion APIs have no equivalent, so the hard ban is a no-op there.
-const TEXTGEN_API = 'textgenerationwebui';
-
 // Caps on the learned list: keep the most recent N phrases, each truncated so
 // a runaway match never bloats the injected prompt.
 const MAX_LEARNED_PHRASES = 50;
@@ -310,21 +305,10 @@ function clearProactiveInjection() {
 }
 
 /**
- * Whether the learned list should be enforced as a hard, sampler-level ban on
- * the current backend (Text Completion only). When true, the soft prompt
- * injection is suppressed — the hard ban replaces it — so we don't spend
- * context tokens repeating what the sampler already forbids.
- */
-function shouldUseHardBan() {
-    return !!(moduleSettings?.phraseBanEnabled
-        && moduleSettings.phraseBanProactive
-        && moduleSettings.phraseBanHardBan
-        && getContext().mainApi === TEXTGEN_API);
-}
-
-/**
- * Reapply (or clear) the persistent "don't reuse these phrases" injection from
- * the current chat's learned list. setExtensionPrompt persists globally until
+ * Reapply (or clear) the persistent "don't reuse these phrases" soft injection
+ * from the current chat's learned list. Governed solely by the Proactive
+ * Injection toggle — independent of the native hard ban, which is appended
+ * separately at request time. setExtensionPrompt persists globally until
  * overwritten, so this is also what swaps the injection on chat change and
  * clears it the moment Proactive (or Phrase Ban) is turned off or the list
  * empties.
@@ -337,14 +321,6 @@ export function reapplyProactiveInjection() {
     const phrases = loadLearnedPhrases();
     if (!phrases.length) {
         clearProactiveInjection();
-        return;
-    }
-    // On a backend that enforces a hard sampler-level ban, drop the soft
-    // injection — the hard banned-strings list (appended at request time)
-    // replaces it.
-    if (shouldUseHardBan()) {
-        clearProactiveInjection();
-        debug('Proactive injection suppressed — hard token ban active for this backend');
         return;
     }
     const body = substituteParamsExtended(getProactivePromptTemplate(), {
@@ -367,30 +343,38 @@ export function reapplyProactiveInjection() {
 }
 
 /**
- * Record newly-detected matches into the learned list and refresh the
- * injection / settings status when Proactive mode is on. No-op otherwise, so
- * the reactive path is untouched when the feature is disabled.
+ * Record newly-detected matches into the per-chat learned list. Learning is
+ * part of detection itself — it always runs (the list is just bookkeeping).
+ * Whether that list is then *used* is governed separately by the native hard
+ * ban (always on while Phrase Ban is enabled) and the Proactive Injection
+ * toggle, which reapplyProactiveInjection() honors.
  */
 function learnDetectedPhrases(matches) {
-    if (!moduleSettings?.phraseBanProactive || !matches.length) return;
+    if (!matches.length) return;
     if (addLearnedPhrases(matches)) {
+        debug('learn — added to chat learned list, now', loadLearnedPhrases().length, 'phrase(s)');
         reapplyProactiveInjection();
         refreshLearnedPanel();
+    } else {
+        debug('learn — all matches already in the learned list');
     }
 }
 
-// ─── Proactive: Hard (Sampler-level) Ban ───
+// ─── Native (Sampler-level) Ban ───
 
 /**
  * Append the learned list to the outgoing Text Completion request's
  * `banned_strings` so the backend hard-bans those sequences at the sampler
- * level. Non-destructive: it only mutates the per-request payload passed by
- * TEXT_COMPLETION_SETTINGS_READY, never the user's saved sampler settings.
+ * level. Runs automatically whenever Phrase Ban is enabled (this event only
+ * fires for Text Completion generations; Chat Completion APIs have no
+ * sampler ban). Non-destructive: it only mutates the per-request payload
+ * passed by TEXT_COMPLETION_SETTINGS_READY, never the user's saved sampler
+ * settings.
  *
  * @param {{ banned_strings?: string[] }} params - The generation payload.
  */
 export function onPhraseBanTextCompletionSettings(params) {
-    if (!params || !shouldUseHardBan()) return;
+    if (!params || !moduleSettings?.phraseBanEnabled) return;
     const phrases = loadLearnedPhrases();
     if (!phrases.length) return;
 
@@ -403,17 +387,7 @@ export function onPhraseBanTextCompletionSettings(params) {
         params.banned_strings.push(phrase);
         added += 1;
     }
-    if (added) debug('Hard ban — appended', added, 'learned phrase(s) to banned_strings');
-}
-
-/**
- * Re-evaluate the soft/hard split before each (non-dry-run) generation. The
- * choice hinges on the active backend, which can change between turns; doing
- * this here keeps the soft injection correctly present on Chat Completion and
- * suppressed on Text Completion regardless of when the user switched APIs.
- */
-export function onPhraseBanGenerationStarted() {
-    reapplyProactiveInjection();
+    if (added) debug('Native ban — appended', added, 'learned phrase(s) to banned_strings');
 }
 
 // ─── Generation Settling ───
@@ -640,17 +614,6 @@ export function bindPhraseBanSettings(saveSettings) {
         });
     }
 
-    const hardBanCb = document.getElementById('phrase_ban_hard_ban');
-    if (hardBanCb) {
-        hardBanCb.checked = !!moduleSettings.phraseBanHardBan;
-        hardBanCb.addEventListener('change', () => {
-            moduleSettings.phraseBanHardBan = hardBanCb.checked;
-            saveSettings();
-            // Flip the soft injection on/off to match the new hard/soft split.
-            reapplyProactiveInjection();
-        });
-    }
-
     const depthInput = document.getElementById('phrase_ban_injection_depth');
     if (depthInput) {
         const configuredDepth = moduleSettings.phraseBanInjectionDepth;
@@ -778,13 +741,12 @@ function showPhraseBanPromptPreview() {
         {
             label: 'Note',
             text: 'The rewrite runs through the Phrasing! engine as a swipe regeneration, so the '
-                + 'original message is always kept as a swipe. With Proactive mode on, every detected '
-                + 'phrase is also added to a per-chat learned list and the proactive injection above is '
-                + 'kept in the prompt so future replies avoid them up front. With Hard Token Ban on, the '
-                + 'learned list is instead appended to the request\'s banned_strings on Text Completion '
-                + 'backends (a sampler-level ban that replaces the soft injection there); Chat Completion '
-                + 'APIs have no such ban, so the injection above is used. SillyTavern macros in the '
-                + 'templates (e.g. {{char}}) resolve at generation time.',
+                + 'original message is always kept as a swipe. Every detected phrase is collected into '
+                + 'the per-chat learned list. While Phrase Ban is enabled, that list is automatically '
+                + 'appended to the request\'s banned_strings on Text Completion backends (a sampler-level '
+                + 'ban the backend enforces; Chat Completion APIs have no such ban). The proactive '
+                + 'injection above is added on top only when Proactive Injection is on. SillyTavern '
+                + 'macros in the templates (e.g. {{char}}) resolve at generation time.',
         },
     ]);
 }
