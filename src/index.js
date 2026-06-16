@@ -160,7 +160,7 @@ const defaultSettings = {
     narrativeGuidanceLongMaxContextOverride: 0,
     narrativeGuidanceLongInjectionDepth: DEFAULT_NG_INJECTION_DEPTH,
     narrativeGuidanceLongInjectionRole: DEFAULT_NG_INJECTION_ROLE,
-    narrativeGuidanceLongLoreBookNames: [],
+    // (Lore-book selection is stored per-chat in chatMetadata, not here.)
     // Short-term track — the immediate beats on a fast refresh horizon,
     // seeded with the active long-term arc.
     narrativeGuidanceShortEnabled: false,
@@ -173,7 +173,7 @@ const defaultSettings = {
     narrativeGuidanceShortMaxContextOverride: 0,
     narrativeGuidanceShortInjectionDepth: DEFAULT_NG_INJECTION_DEPTH,
     narrativeGuidanceShortInjectionRole: DEFAULT_NG_INJECTION_ROLE,
-    narrativeGuidanceShortLoreBookNames: [],
+    // (Lore-book selection is stored per-chat in chatMetadata, not here.)
     reformattingEnabled: false,
     reformattingAuto: true,
     reformattingEngine: 'rules',
