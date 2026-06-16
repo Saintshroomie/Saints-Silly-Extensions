@@ -41,6 +41,7 @@ import {
     getContext,
     createDebugLogger,
     toast,
+    stickyToast,
     buildContextPreamble,
     createLoreBookPicker,
     streamingGenerate,
@@ -127,6 +128,12 @@ let activeBody = null;
 
 let guidanceSaveTimer = null;
 
+// Diagnostics: while the modal is open with Compaction Debug Mode on, surface
+// uncaught errors / promise rejections and stream stalls as on-screen toasts
+// so issues can be captured on mobile (where the console isn't reachable).
+let diagnosticsCleanup = null;
+const diagDismissers = [];
+
 // ─── Init ───
 
 /**
@@ -205,6 +212,91 @@ function scheduleGuidanceSave(text) {
         guidanceSaveTimer = null;
         getContext().saveMetadata();
     }, 300);
+}
+
+// ─── Diagnostics (Compaction Debug Mode) ───
+
+/**
+ * Whether on-screen diagnostics are enabled. Tied to Compaction Debug Mode so
+ * normal use is never affected.
+ */
+function diagnosticsEnabled() {
+    return !!moduleSettings?.compactionDebugMode;
+}
+
+/** Push a sticky diagnostic toast (kept until the modal closes) for capture. */
+function diagToast(message, type = 'error') {
+    console[type === 'error' ? 'error' : 'log']('COMPACTION DIAGNOSTIC:', message);
+    diagDismissers.push(stickyToast(message, type, 'Compaction Diagnostic'));
+}
+
+/**
+ * Install window-level error/rejection listeners that surface the actual error
+ * (message + top of stack) as an on-screen toast. This is what catches the
+ * lore-book crash on mobile: if ticking a book throws, the toast shows the
+ * exact error and file:line. If the tab dies with NO toast, that points to a
+ * renderer out-of-memory crash rather than a JS exception.
+ */
+function installCompactionDiagnostics() {
+    if (!diagnosticsEnabled() || diagnosticsCleanup) return;
+    const onError = (event) => {
+        const err = event?.error || event?.reason || event;
+        const msg = err?.message || (typeof err === 'string' ? err : 'Unknown error');
+        const stack = (err?.stack || '').split('\n').slice(0, 4).join('\n');
+        diagToast(`${msg}${stack ? `\n${stack}` : ''}`, 'error');
+    };
+    window.addEventListener('error', onError);
+    window.addEventListener('unhandledrejection', onError);
+    diagnosticsCleanup = () => {
+        window.removeEventListener('error', onError);
+        window.removeEventListener('unhandledrejection', onError);
+        diagnosticsCleanup = null;
+    };
+    debug('Diagnostics installed (error/rejection surface)');
+}
+
+/** Tear down diagnostics and clear any sticky toasts. */
+function removeCompactionDiagnostics() {
+    diagnosticsCleanup?.();
+    while (diagDismissers.length) {
+        try {
+            diagDismissers.pop()();
+        } catch (_) { /* dismissers are best-effort */ }
+    }
+}
+
+/**
+ * Start a watchdog that reports when the summary stream stops producing tokens
+ * for a sustained period — the signature of a backend that hit the token cap
+ * without closing the stream (which hangs the `for await`). Returns a stop fn.
+ */
+function startStallWatchdog() {
+    if (!diagnosticsEnabled()) return () => {};
+    const STALL_SECONDS = 15;
+    let lastLen = -1;
+    let stalls = 0;
+    let warned = false;
+    const timer = setInterval(() => {
+        const out = document.getElementById('cc_summary_output');
+        const len = out?.value?.length ?? 0;
+        if (len === lastLen) {
+            stalls++;
+            if (stalls >= STALL_SECONDS && !warned) {
+                warned = true;
+                diagToast(
+                    `Summary stream produced no new tokens for ~${STALL_SECONDS}s. `
+                    + 'If the backend hit the token cap without closing the stream it will hang here — '
+                    + 'press Stop, then Continue. (This confirms the stream-termination bug.)',
+                    'warning',
+                );
+            }
+        } else {
+            stalls = 0;
+            warned = false;
+            lastLen = len;
+        }
+    }, 1000);
+    return () => clearInterval(timer);
 }
 
 // ─── Token Measurement ───
@@ -573,6 +665,7 @@ async function openCompactionModal({ auto = false } = {}) {
         large: true,
         allowVerticalScrolling: true,
         onOpen: () => {
+            installCompactionDiagnostics();
             bindModalHandlers();
             refreshActionButtonStates();
             updateUsageBanner();
@@ -615,6 +708,7 @@ async function openCompactionModal({ auto = false } = {}) {
             }
         }
     } finally {
+        removeCompactionDiagnostics();
         activePopup = null;
         activeBody = null;
         isGenerating = false;
@@ -836,6 +930,7 @@ async function runSummaryGeneration(action) {
     const isContinue = action === 'continue';
     setGeneratingUI(true, action);
     setStatusBar(isContinue ? 'Continuing summary…' : 'Generating summary…');
+    const stopWatchdog = startStallWatchdog();
 
     try {
         const loreBookNames = readModalLoreBooks();
@@ -868,6 +963,7 @@ async function runSummaryGeneration(action) {
             toast(`Summary generation failed: ${err.message}`, 'error');
         }
     } finally {
+        stopWatchdog();
         isGenerating = false;
         abortRequested = false;
         activeAction = null;
