@@ -2120,17 +2120,19 @@ async function streamRawGenerate(params, targetEl, append, signal, jobName, prog
         targetEl.value = baseText;
     }
     const streamFn = await openRawStream(params, signal);
+    debug(`${jobName} — stream opened, awaiting tokens (api: ${params.api || __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_main_api__})`);
 
     for await (const chunk of streamFn()) {
         if (signal.aborted) break;
         if (typeof chunk?.text === 'string') progress.text = chunk.text;
+        if (progress.receivedChunks === 0) debug(`${jobName} — first chunk received`);
         progress.receivedChunks++;
         if (targetEl) {
             targetEl.value = baseText + progress.text;
             targetEl.scrollTop = targetEl.scrollHeight;
         }
     }
-    debug(`${jobName} — stream closed after ${progress.receivedChunks} chunk(s), raw length: ${progress.text.length}`);
+    debug(`${jobName} — stream LOOP ENDED after ${progress.receivedChunks} chunk(s), raw length: ${progress.text.length} (if this line is missing in the log, the backend never closed the stream)`);
     signal.throwIfAborted();
 
     const trimNames = params.trimNames !== false;
@@ -2808,6 +2810,9 @@ async function flushWIAEntryGuidanceSave(worldName, uid) {
  *        module-specific styles (wia-…, acc-…, ng-…) all share the same shape,
  *        so callers can pass their own prefix to keep their styling intact.
  * @param {string} [opts.title='Lore Books'] - Summary label when nothing is selected.
+ * @param {function} [opts.debug] - Optional logger; called with picker lifecycle
+ *        details (render/toggle/change) so a caller's debug mode can trace
+ *        selection behavior. No-op by default.
  * @returns {{ element: HTMLDetailsElement, getSelected: () => string[] }}
  */
 function createLoreBookPicker({
@@ -2815,6 +2820,7 @@ function createLoreBookPicker({
     onChange = null,
     classPrefix = 'sse-lorebook',
     title = 'Lore Books',
+    debug = () => {},
 } = {}) {
     const details = document.createElement('details');
     details.className = `${classPrefix}-picker`;
@@ -2849,6 +2855,7 @@ function createLoreBookPicker({
         const previouslyChecked = new Set(
             list.children.length === 0 ? initialSelection : getSelected(),
         );
+        debug('picker render — available:', names.length, 'previously checked:', [...previouslyChecked]);
         list.replaceChildren();
         if (!names.length) {
             const empty = document.createElement('div');
@@ -2866,8 +2873,12 @@ function createLoreBookPicker({
             cb.value = name;
             if (previouslyChecked.has(name)) cb.checked = true;
             cb.addEventListener('change', () => {
+                debug('picker change — book:', cb.value, 'checked:', cb.checked);
                 updateSummary();
-                onChange?.(getSelected());
+                const selected = getSelected();
+                debug('picker change — selection now:', selected);
+                onChange?.(selected);
+                debug('picker change — onChange handled');
             });
             const span = document.createElement('span');
             span.textContent = name;
@@ -2888,6 +2899,7 @@ function createLoreBookPicker({
     };
 
     details.addEventListener('toggle', () => {
+        debug('picker toggle — open:', details.open);
         if (details.open) {
             render();
             document.addEventListener('pointerdown', closeIfOutside, true);
@@ -8398,12 +8410,6 @@ let compaction_activeBody = null;
 
 let guidanceSaveTimer = null;
 
-// Diagnostics: while the modal is open with Compaction Debug Mode on, surface
-// uncaught errors / promise rejections and stream stalls as on-screen toasts
-// so issues can be captured on mobile (where the console isn't reachable).
-let diagnosticsCleanup = null;
-const diagDismissers = [];
-
 // ─── Init ───
 
 /**
@@ -8482,91 +8488,6 @@ function scheduleGuidanceSave(text) {
         guidanceSaveTimer = null;
         getContext().saveMetadata();
     }, 300);
-}
-
-// ─── Diagnostics (Compaction Debug Mode) ───
-
-/**
- * Whether on-screen diagnostics are enabled. Tied to Compaction Debug Mode so
- * normal use is never affected.
- */
-function diagnosticsEnabled() {
-    return !!compaction_moduleSettings?.compactionDebugMode;
-}
-
-/** Push a sticky diagnostic toast (kept until the modal closes) for capture. */
-function diagToast(message, type = 'error') {
-    console[type === 'error' ? 'error' : 'log']('COMPACTION DIAGNOSTIC:', message);
-    diagDismissers.push(stickyToast(message, type, 'Compaction Diagnostic'));
-}
-
-/**
- * Install window-level error/rejection listeners that surface the actual error
- * (message + top of stack) as an on-screen toast. This is what catches the
- * lore-book crash on mobile: if ticking a book throws, the toast shows the
- * exact error and file:line. If the tab dies with NO toast, that points to a
- * renderer out-of-memory crash rather than a JS exception.
- */
-function installCompactionDiagnostics() {
-    if (!diagnosticsEnabled() || diagnosticsCleanup) return;
-    const onError = (event) => {
-        const err = event?.error || event?.reason || event;
-        const msg = err?.message || (typeof err === 'string' ? err : 'Unknown error');
-        const stack = (err?.stack || '').split('\n').slice(0, 4).join('\n');
-        diagToast(`${msg}${stack ? `\n${stack}` : ''}`, 'error');
-    };
-    window.addEventListener('error', onError);
-    window.addEventListener('unhandledrejection', onError);
-    diagnosticsCleanup = () => {
-        window.removeEventListener('error', onError);
-        window.removeEventListener('unhandledrejection', onError);
-        diagnosticsCleanup = null;
-    };
-    compaction_debug('Diagnostics installed (error/rejection surface)');
-}
-
-/** Tear down diagnostics and clear any sticky toasts. */
-function removeCompactionDiagnostics() {
-    diagnosticsCleanup?.();
-    while (diagDismissers.length) {
-        try {
-            diagDismissers.pop()();
-        } catch (_) { /* dismissers are best-effort */ }
-    }
-}
-
-/**
- * Start a watchdog that reports when the summary stream stops producing tokens
- * for a sustained period — the signature of a backend that hit the token cap
- * without closing the stream (which hangs the `for await`). Returns a stop fn.
- */
-function startStallWatchdog() {
-    if (!diagnosticsEnabled()) return () => {};
-    const STALL_SECONDS = 15;
-    let lastLen = -1;
-    let stalls = 0;
-    let warned = false;
-    const timer = setInterval(() => {
-        const out = document.getElementById('cc_summary_output');
-        const len = out?.value?.length ?? 0;
-        if (len === lastLen) {
-            stalls++;
-            if (stalls >= STALL_SECONDS && !warned) {
-                warned = true;
-                diagToast(
-                    `Summary stream produced no new tokens for ~${STALL_SECONDS}s. `
-                    + 'If the backend hit the token cap without closing the stream it will hang here — '
-                    + 'press Stop, then Continue. (This confirms the stream-termination bug.)',
-                    'warning',
-                );
-            }
-        } else {
-            stalls = 0;
-            warned = false;
-            lastLen = len;
-        }
-    }, 1000);
-    return () => clearInterval(timer);
 }
 
 // ─── Token Measurement ───
@@ -8904,21 +8825,26 @@ async function buildSummaryPreamble(loreBookNames) {
 // ─── Modal ───
 
 async function openCompactionModal({ auto = false } = {}) {
+    compaction_debug('openCompactionModal — auto:', auto, 'activePopup:', !!compaction_activePopup, 'compacting:', compacting);
     if (compaction_activePopup) return;
     if (!compaction_moduleSettings?.compactionEnabled) {
+        compaction_debug('open refused — Compaction disabled');
         if (!auto) toast('Compaction is disabled. Enable it in the extension settings first.', 'warning');
         return;
     }
     const ctx = getContext();
     if (ctx.isGenerating) {
+        compaction_debug('open refused — generation in progress');
         if (!auto) toast('Wait for the current generation to finish before compacting.', 'warning');
         return;
     }
     if (compacting) return;
     if (!hasActiveCharacterOrGroup(ctx)) {
+        compaction_debug('open refused — no active character/group');
         if (!auto) toast('Select a character or group chat before compacting.', 'warning');
         return;
     }
+    compaction_debug('open allowed — chat length:', ctx.chat?.length, 'groupId:', ctx.groupId ?? '(solo)');
 
     compaction_isGenerating = false;
     compaction_abortRequested = false;
@@ -8935,7 +8861,6 @@ async function openCompactionModal({ auto = false } = {}) {
         large: true,
         allowVerticalScrolling: true,
         onOpen: () => {
-            installCompactionDiagnostics();
             compaction_bindModalHandlers();
             compaction_refreshActionButtonStates();
             updateUsageBanner();
@@ -8978,7 +8903,6 @@ async function openCompactionModal({ auto = false } = {}) {
             }
         }
     } finally {
-        removeCompactionDiagnostics();
         compaction_activePopup = null;
         compaction_activeBody = null;
         compaction_isGenerating = false;
@@ -9051,10 +8975,12 @@ function compaction_buildModalBody() {
     const picker = createLoreBookPicker({
         classPrefix: 'cc-lorebook',
         title: 'Lore Books',
+        debug: compaction_debug,
     });
     root.querySelector('.cc-lorebook-host').replaceWith(picker.element);
     root._ccLorebookPicker = picker;
 
+    compaction_debug('Modal body built — guidance length:', (guidanceEl?.value || '').length, 'response length:', tokenInput?.value);
     return root;
 }
 
@@ -9128,6 +9054,7 @@ function readModalLoreBooks() {
 }
 
 async function compaction_handleGenerate() {
+    compaction_debug('handleGenerate — isGenerating:', compaction_isGenerating, 'activeAction:', compaction_activeAction);
     if (compaction_isGenerating) {
         if (compaction_activeAction === 'generate') {
             compaction_abortRequested = true;
@@ -9146,6 +9073,7 @@ async function compaction_handleGenerate() {
 }
 
 async function compaction_handleContinue() {
+    compaction_debug('handleContinue — isGenerating:', compaction_isGenerating, 'activeAction:', compaction_activeAction);
     if (compaction_isGenerating) {
         if (compaction_activeAction === 'continue') {
             compaction_abortRequested = true;
@@ -9193,6 +9121,7 @@ async function compaction_handleRetry() {
 }
 
 async function runSummaryGeneration(action) {
+    compaction_debug('runSummaryGeneration — action:', action);
     compaction_isGenerating = true;
     compaction_abortRequested = false;
     compaction_activeAction = action;
@@ -9200,7 +9129,6 @@ async function runSummaryGeneration(action) {
     const isContinue = action === 'continue';
     compaction_setGeneratingUI(true, action);
     compaction_setStatusBar(isContinue ? 'Continuing summary…' : 'Generating summary…');
-    const stopWatchdog = startStallWatchdog();
 
     try {
         const loreBookNames = readModalLoreBooks();
@@ -9233,7 +9161,6 @@ async function runSummaryGeneration(action) {
             toast(`Summary generation failed: ${err.message}`, 'error');
         }
     } finally {
-        stopWatchdog();
         compaction_isGenerating = false;
         compaction_abortRequested = false;
         compaction_activeAction = null;
@@ -9256,14 +9183,17 @@ async function generateSummary(loreBookNames, guidance) {
     const responseLength = compaction_getResponseLength();
     const prefill = compaction_getPrefill();
 
-    compaction_debug('Generating summary, tokens', responseLength, 'prefill?', !!prefill);
+    compaction_debug('generateSummary — lore books:', loreBookNames, 'guidance length:', (guidance || '').length,
+        'prompt length:', prompt.length, 'responseLength:', responseLength, 'prefill?', !!prefill);
 
     const outputEl = document.getElementById('cc_summary_output');
+    compaction_debug('generateSummary — streamingGenerate START');
     const result = await withSingleLineDisabled(() => streamingGenerate(
         { prompt, systemPrompt, responseLength, ...(prefill ? { prefill } : {}) },
         outputEl,
-        { append: false },
+        { append: false, name: 'compaction-summary' },
     ));
+    compaction_debug('generateSummary — streamingGenerate RESOLVED, raw length:', (result || '').length);
     const cleaned = stripPrefillEcho(__WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(result).trim(), prefill);
     return (prefill || '') + cleaned;
 }
@@ -9274,14 +9204,16 @@ async function compaction_generateContinuation(loreBookNames, guidance, existing
     const systemPrompt = COMPACTION_CONTINUE_SYSTEM_PROMPT;
     const responseLength = compaction_getResponseLength();
 
-    compaction_debug('Continuing summary, existing length', existing.length);
+    compaction_debug('generateContinuation — existing length:', existing.length, 'prompt length:', prompt.length, 'responseLength:', responseLength);
 
     const outputEl = document.getElementById('cc_summary_output');
+    compaction_debug('generateContinuation — streamingGenerate START');
     const result = await withSingleLineDisabled(() => streamingGenerate(
         { prompt, systemPrompt, responseLength },
         outputEl,
-        { append: true },
+        { append: true, name: 'compaction-continue' },
     ));
+    compaction_debug('generateContinuation — streamingGenerate RESOLVED, raw length:', (result || '').length);
     return __WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(result).trim();
 }
 

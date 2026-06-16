@@ -431,17 +431,19 @@ async function streamRawGenerate(params, targetEl, append, signal, jobName, prog
         targetEl.value = baseText;
     }
     const streamFn = await openRawStream(params, signal);
+    debug(`${jobName} — stream opened, awaiting tokens (api: ${params.api || main_api})`);
 
     for await (const chunk of streamFn()) {
         if (signal.aborted) break;
         if (typeof chunk?.text === 'string') progress.text = chunk.text;
+        if (progress.receivedChunks === 0) debug(`${jobName} — first chunk received`);
         progress.receivedChunks++;
         if (targetEl) {
             targetEl.value = baseText + progress.text;
             targetEl.scrollTop = targetEl.scrollHeight;
         }
     }
-    debug(`${jobName} — stream closed after ${progress.receivedChunks} chunk(s), raw length: ${progress.text.length}`);
+    debug(`${jobName} — stream LOOP ENDED after ${progress.receivedChunks} chunk(s), raw length: ${progress.text.length} (if this line is missing in the log, the backend never closed the stream)`);
     signal.throwIfAborted();
 
     const trimNames = params.trimNames !== false;

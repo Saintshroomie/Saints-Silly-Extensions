@@ -581,6 +581,9 @@ export async function flushWIAEntryGuidanceSave(worldName, uid) {
  *        module-specific styles (wia-…, acc-…, ng-…) all share the same shape,
  *        so callers can pass their own prefix to keep their styling intact.
  * @param {string} [opts.title='Lore Books'] - Summary label when nothing is selected.
+ * @param {function} [opts.debug] - Optional logger; called with picker lifecycle
+ *        details (render/toggle/change) so a caller's debug mode can trace
+ *        selection behavior. No-op by default.
  * @returns {{ element: HTMLDetailsElement, getSelected: () => string[] }}
  */
 export function createLoreBookPicker({
@@ -588,6 +591,7 @@ export function createLoreBookPicker({
     onChange = null,
     classPrefix = 'sse-lorebook',
     title = 'Lore Books',
+    debug = () => {},
 } = {}) {
     const details = document.createElement('details');
     details.className = `${classPrefix}-picker`;
@@ -622,6 +626,7 @@ export function createLoreBookPicker({
         const previouslyChecked = new Set(
             list.children.length === 0 ? initialSelection : getSelected(),
         );
+        debug('picker render — available:', names.length, 'previously checked:', [...previouslyChecked]);
         list.replaceChildren();
         if (!names.length) {
             const empty = document.createElement('div');
@@ -639,8 +644,12 @@ export function createLoreBookPicker({
             cb.value = name;
             if (previouslyChecked.has(name)) cb.checked = true;
             cb.addEventListener('change', () => {
+                debug('picker change — book:', cb.value, 'checked:', cb.checked);
                 updateSummary();
-                onChange?.(getSelected());
+                const selected = getSelected();
+                debug('picker change — selection now:', selected);
+                onChange?.(selected);
+                debug('picker change — onChange handled');
             });
             const span = document.createElement('span');
             span.textContent = name;
@@ -661,6 +670,7 @@ export function createLoreBookPicker({
     };
 
     details.addEventListener('toggle', () => {
+        debug('picker toggle — open:', details.open);
         if (details.open) {
             render();
             document.addEventListener('pointerdown', closeIfOutside, true);
