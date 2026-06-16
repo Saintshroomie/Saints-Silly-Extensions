@@ -1,7 +1,9 @@
-# Plan: Context Compaction ("Continuation")
+# Plan: Compaction
 
 Status: **approved design, not yet implemented**
 Branch: `claude/friendly-cori-t5nxgb`
+
+Feature name: **Compaction**.
 
 ## Problem
 
@@ -11,7 +13,7 @@ token to a new position and invalidates the backend's KV cache from the
 eviction point onward — so every post-fill turn triggers a near-full reprocess
 and generation slows to a crawl.
 
-The only true fix is to make the prompt short again. This feature
+The only true fix is to make the prompt short again. Compaction
 **summarizes the chat, starts a fresh chat seeded with that summary plus the
 recent tail, migrates all per-chat extension state, and resumes** — resetting
 the context window and restoring fast generation. It's periodic context
@@ -45,7 +47,7 @@ conversation.
    (Possession, Narrative Guidance, Phrase Ban). WIA needs nothing — its
    guidance lives on the lorebook entry and travels automatically.
 5. **Auto confirmation:** confirm dialog with a persisted **"Don't ask again"**
-   (flips `contextCompactionConfirmAuto`).
+   (flips `compactionConfirmAuto`).
 6. **Prompt order:** `[packed chat-minus-tail]` → `[summary instructions]` →
    `{{guidance}}` **last**. Chat is relegated to the top/back (weakest by
    recency); the user's demanded details land at the very end where they're
@@ -75,8 +77,9 @@ Verified against `docs/api/` (local) and live ST source.
 `doNewChat` is the intended function (it's the "New Chat" button handler and is
 imported by other extensions) but it does **not** appear in this repo's
 `docs/api/modules/script.md`. **At implementation time:** confirm
-`doNewChat` is exported by the running ST. To avoid a module-load crash if the
-named export is absent, prefer a **namespace import**
+`doNewChat` is exported by the running ST (the SillyTavern repo is available
+this session — check `public/script.js` directly). To avoid a module-load crash
+if the named export is absent, prefer a **namespace import**
 (`import * as hostScript from '../../../../../script.js'`) and call
 `hostScript.doNewChat?.(...)`. If unavailable, fall back to replicating the
 button using confirmed primitives: set
@@ -95,22 +98,22 @@ tagged `extra.sse_summary: true` for styling and recognition.
 
 ## Module & file layout
 
-New module `src/context-compaction.js`, exporting:
+New module `src/compaction.js`, exporting:
 
-- `initContextCompaction({ settings, saveSettings })` — wire events, register
-  slash command, inject the manual button.
-- `bindContextCompactionSettings(saveSettings)` — attach settings listeners.
-- `registerContextCompactionSlashCommand()` — `/compact`.
+- `initCompaction({ settings, saveSettings })` — wire events, register the slash
+  command, inject the manual button.
+- `bindCompactionSettings(saveSettings)` — attach settings listeners.
+- `registerCompactionSlashCommand()` — `/compact`.
 - `composeSummaryPrompt(...)` — shared by real generation + Preview.
-- `showContextCompactionPromptPreview()`.
+- `showCompactionPromptPreview()`.
 - `getContextUsage()` — `{ tokens, max, ratio }` for the UI + trigger.
-- `onContextCompactionGenerationEnded()` — idle auto-trigger check.
-- `onContextCompactionChatChanged()` — reset measured tokens for the new chat.
+- `onCompactionGenerationEnded()` — idle auto-trigger check.
+- `onCompactionChatChanged()` — reset measured tokens for the new chat.
 - Two passive prompt-measurement listeners (registered in `init`).
 
 Touch points:
 
-- `src/index.js` — `defaultSettings` additions; `initContextCompaction(...)`;
+- `src/index.js` — `defaultSettings` additions; `initCompaction(...)`;
   `TOOL_PRESET_CONFIG` entry; event-wiring wrappers; subscribe the two
   measurement events; register the slash command.
 - `src/settings.html` — new collapsible drawer + a Diagnostics debug toggle.
@@ -126,19 +129,19 @@ No directory-depth changes (preserves webpack `../../../../` externals).
 
 | Key | Default | Meaning |
 |---|---|---|
-| `contextCompactionEnabled` | `false` | Master toggle |
-| `contextCompactionAutoEnabled` | `false` | Auto-trigger on threshold |
-| `contextCompactionThresholdPercent` | `90` | % of `getMaxPromptTokens()` |
-| `contextCompactionTailLength` | `20` | Verbatim messages carried over |
-| `contextCompactionConfirmAuto` | `true` | Confirm before auto-restart |
-| `contextCompactionSummaryPrompt` | `<default>` | Editable summary instructions |
-| `contextCompactionSummaryPrefill` | `''` | Optional assistant prefill |
-| `contextCompactionSummaryResponseLength` | `<default>` | Summary token cap |
-| `contextCompactionMaxContextOverride` | `0` | Cap context pulled into the summary gen |
-| `contextCompactionMigrateState` | `true` | Carry over per-chat extension state |
-| `contextCompactionDebugMode` | `false` | Diagnostics logging |
+| `compactionEnabled` | `false` | Master toggle |
+| `compactionAutoEnabled` | `false` | Auto-trigger on threshold |
+| `compactionThresholdPercent` | `90` | % of `getMaxPromptTokens()` |
+| `compactionTailLength` | `20` | Verbatim messages carried over |
+| `compactionConfirmAuto` | `true` | Confirm before auto-restart |
+| `compactionSummaryPrompt` | `<default>` | Editable summary instructions |
+| `compactionSummaryPrefill` | `''` | Optional assistant prefill |
+| `compactionSummaryResponseLength` | `<default>` | Summary token cap |
+| `compactionMaxContextOverride` | `0` | Cap context pulled into the summary gen |
+| `compactionMigrateState` | `true` | Carry over per-chat extension state |
+| `compactionDebugMode` | `false` | Diagnostics logging |
 
-Per-chat state (in `chatMetadata`, key `contextCompaction`):
+Per-chat state (in `chatMetadata`, key `compaction`):
 - `guidance` — the user's demanded-details text, persisted per-chat (NG-like),
   so it survives across opens and across compactions of the same storyline.
 
@@ -176,7 +179,7 @@ Structure (top → bottom):
 
 - **Context-usage banner:** "Context ~92% full (≈X / Y tokens)".
 - **Summary Guidance textarea:** demand specific details to capture. Mirrors
-  ACC's brief field; persisted per-chat in `chatMetadata.contextCompaction.guidance`.
+  ACC's brief field; persisted per-chat in `chatMetadata.compaction.guidance`.
 - **Lore-book picker:** shared `createLoreBookPicker` (enabled entries only),
   feeding `loreBookNames` into the preamble so canon isn't lost.
 - **Action row:** **Generate Summary** / **Continue** / **Checkpoint** /
@@ -252,7 +255,7 @@ No forced first-response generation — the user takes the next turn.
 
 ## State migration
 
-Driven by `contextCompactionMigrateState`, via the snapshot/restore in 4a/4c:
+Driven by `compactionMigrateState`, via the snapshot/restore in 4a/4c:
 
 - **Possession** — `{ name, avatar }`.
 - **Narrative Guidance** — per-track `{ guidance, turnsRemaining, themes, loreBookNames }`.
