@@ -698,6 +698,239 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════
+   COMPACTION MODAL STYLES (rendered inside ST's Popup; mirror the ACC flex chain)
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+.cc-modal-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0%;
+    min-height: 0;
+    text-align: left;
+}
+
+.cc-usage-banner {
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 4px;
+    font-size: 0.9em;
+    opacity: 0.9;
+}
+
+.cc-usage-banner.cc-usage-high {
+    color: var(--SmartThemeQuoteColor, #e8a23a);
+    border-color: var(--SmartThemeQuoteColor, #e8a23a);
+    opacity: 1;
+}
+
+.cc-context-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    padding: 8px 10px;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 4px;
+}
+
+.cc-context-hint {
+    opacity: 0.7;
+}
+
+.cc-guidance-section {
+    margin-bottom: 12px;
+}
+
+.cc-guidance-section textarea {
+    width: 100%;
+    margin-top: 4px;
+    resize: vertical;
+}
+
+.cc-action-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.cc-action-btn {
+    flex: 1 1 0;
+    min-width: 130px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.cc-action-btn.cc-disabled {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.cc-generate-btn {
+    color: var(--SmartThemeQuoteColor, #e8a23a);
+}
+
+.cc-tokens-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-bottom: 12px;
+    font-size: 0.85em;
+    opacity: 0.85;
+}
+
+.cc-tokens-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    user-select: none;
+}
+
+.cc-tokens-input {
+    width: 90px !important;
+    padding: 2px 6px !important;
+    font-size: 0.9em !important;
+    text-align: center;
+}
+
+.cc-status-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    background: var(--SmartThemeBodyColor, #222);
+    border-radius: 4px;
+    color: var(--SmartThemeQuoteColor, #e8a23a);
+    font-size: 0.9em;
+}
+
+.cc-summary-section {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0%;
+    min-height: 0;
+}
+
+.cc-summary-section label {
+    margin-bottom: 4px;
+}
+
+.cc-summary-output {
+    width: 100%;
+    flex: 1 1 0%;
+    min-height: 200px;
+    resize: vertical;
+}
+
+.cc-hidden {
+    display: none !important;
+}
+
+.cc-modal-body .cc-field-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.cc-modal-body .cc-clear-btn {
+    font-size: 0.8em;
+    padding: 2px 8px;
+    opacity: 0.85;
+}
+
+.cc-modal-body .cc-clear-btn:hover {
+    opacity: 1;
+}
+
+.cc-confirm .cc-dont-ask {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Compaction lore-book picker (shares the ACC picker shape) */
+.cc-lorebook-picker {
+    position: relative;
+    font-size: 0.9em;
+}
+
+.cc-lorebook-picker > summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 4px 8px;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0.85;
+}
+
+.cc-lorebook-picker > summary::-webkit-details-marker {
+    display: none;
+}
+
+.cc-lorebook-picker > summary:hover {
+    opacity: 1;
+}
+
+.cc-lorebook-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 2px;
+    z-index: 10002;
+    min-width: 240px;
+    max-height: 260px;
+    overflow-y: auto;
+    background: var(--SmartThemeBlurTintColor, #1a1a2e);
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 4px;
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.cc-lorebook-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.cc-lorebook-empty {
+    opacity: 0.6;
+    font-style: italic;
+}
+
+/* Compaction launch item in the hamburger menu */
+#compaction_menu_button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* The seeded "Story so far" recap message. The class is applied to the .mes
+   node by tagCompactionSummaries() (extra.sse_summary alone has no DOM hook). */
+#chat .mes.cc-summary-message {
+    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;
+}
+
+#chat .mes.cc-summary-message .ch_name .name_text {
+    color: var(--SmartThemeQuoteColor, #e8a23a);
+    font-style: italic;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
    NARRATIVE GUIDANCE SETTINGS STYLES
    ═══════════════════════════════════════════════════════════════════════════════ */
 

@@ -1,5 +1,5 @@
 import { loadWorldInfo as __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_loadWorldInfo__, saveWorldInfo as __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_saveWorldInfo__, setWIOriginalDataValue as __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_setWIOriginalDataValue__, world_names as __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_world_names__ } from "../../../../world-info.js";
-import { amount_gen as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_amount_gen__, cleanUpMessage as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_cleanUpMessage__, createRawPrompt as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_createRawPrompt__, extension_prompt_roles as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_roles__, extension_prompt_types as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_types__, generateRaw as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__, getMaxPromptTokens as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_getMaxPromptTokens__, koboldai_setting_names as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_koboldai_setting_names__, koboldai_settings as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_koboldai_settings__, main_api as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_main_api__, max_context as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_max_context__, novelai_setting_names as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_novelai_setting_names__, novelai_settings as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_novelai_settings__, setExtensionPrompt as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_setExtensionPrompt__, stopGeneration as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_stopGeneration__, substituteParamsExtended as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParamsExtended__ } from "../../../../../script.js";
+import { amount_gen as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_amount_gen__, cleanUpMessage as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_cleanUpMessage__, clearChat as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_clearChat__, createRawPrompt as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_createRawPrompt__, doNewChat as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_doNewChat__, extension_prompt_roles as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_roles__, extension_prompt_types as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_types__, generateRaw as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__, getMaxPromptTokens as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_getMaxPromptTokens__, koboldai_setting_names as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_koboldai_setting_names__, koboldai_settings as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_koboldai_settings__, main_api as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_main_api__, max_context as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_max_context__, novelai_setting_names as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_novelai_setting_names__, novelai_settings as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_novelai_settings__, setExtensionPrompt as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_setExtensionPrompt__, stopGeneration as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_stopGeneration__, substituteParamsExtended as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParamsExtended__ } from "../../../../../script.js";
 import { getTokenCountAsync as __WEBPACK_EXTERNAL_MODULE__tokenizers_js_d5863f55_getTokenCountAsync__ } from "../../../../tokenizers.js";
 import { POPUP_RESULT as __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_POPUP_RESULT__, POPUP_TYPE as __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_POPUP_TYPE__, Popup as __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_Popup__ } from "../../../../popup.js";
 import { ChatCompletionService as __WEBPACK_EXTERNAL_MODULE__custom_request_js_38d658d1_ChatCompletionService__, TextCompletionService as __WEBPACK_EXTERNAL_MODULE__custom_request_js_38d658d1_TextCompletionService__ } from "../../../../custom-request.js";
@@ -10,7 +10,7 @@ import { generateNovelWithStreaming as __WEBPACK_EXTERNAL_MODULE__nai_settings_j
 import { SlashCommandParser as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandParser_js_42c8b851_SlashCommandParser__ } from "../../../../slash-commands/SlashCommandParser.js";
 import { SlashCommand as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommand_js_1b0d5616_SlashCommand__ } from "../../../../slash-commands/SlashCommand.js";
 import { ARGUMENT_TYPE as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandArgument_js_a42b9371_ARGUMENT_TYPE__, SlashCommandArgument as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandArgument_js_a42b9371_SlashCommandArgument__ } from "../../../../slash-commands/SlashCommandArgument.js";
-import { is_group_generating as __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_is_group_generating__ } from "../../../../group-chats.js";
+import { createNewGroupChat as __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_createNewGroupChat__, is_group_generating as __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_is_group_generating__ } from "../../../../group-chats.js";
 import { removeReasoningFromString as __WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__ } from "../../../../reasoning.js";
 /******/ var __webpack_modules__ = ({
 
@@ -729,6 +729,239 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Saint's Silly Extensions — Combin
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════
+   COMPACTION MODAL STYLES (rendered inside ST's Popup; mirror the ACC flex chain)
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+.cc-modal-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0%;
+    min-height: 0;
+    text-align: left;
+}
+
+.cc-usage-banner {
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 4px;
+    font-size: 0.9em;
+    opacity: 0.9;
+}
+
+.cc-usage-banner.cc-usage-high {
+    color: var(--SmartThemeQuoteColor, #e8a23a);
+    border-color: var(--SmartThemeQuoteColor, #e8a23a);
+    opacity: 1;
+}
+
+.cc-context-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    padding: 8px 10px;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 4px;
+}
+
+.cc-context-hint {
+    opacity: 0.7;
+}
+
+.cc-guidance-section {
+    margin-bottom: 12px;
+}
+
+.cc-guidance-section textarea {
+    width: 100%;
+    margin-top: 4px;
+    resize: vertical;
+}
+
+.cc-action-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.cc-action-btn {
+    flex: 1 1 0;
+    min-width: 130px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.cc-action-btn.cc-disabled {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.cc-generate-btn {
+    color: var(--SmartThemeQuoteColor, #e8a23a);
+}
+
+.cc-tokens-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-bottom: 12px;
+    font-size: 0.85em;
+    opacity: 0.85;
+}
+
+.cc-tokens-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    user-select: none;
+}
+
+.cc-tokens-input {
+    width: 90px !important;
+    padding: 2px 6px !important;
+    font-size: 0.9em !important;
+    text-align: center;
+}
+
+.cc-status-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    background: var(--SmartThemeBodyColor, #222);
+    border-radius: 4px;
+    color: var(--SmartThemeQuoteColor, #e8a23a);
+    font-size: 0.9em;
+}
+
+.cc-summary-section {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0%;
+    min-height: 0;
+}
+
+.cc-summary-section label {
+    margin-bottom: 4px;
+}
+
+.cc-summary-output {
+    width: 100%;
+    flex: 1 1 0%;
+    min-height: 200px;
+    resize: vertical;
+}
+
+.cc-hidden {
+    display: none !important;
+}
+
+.cc-modal-body .cc-field-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.cc-modal-body .cc-clear-btn {
+    font-size: 0.8em;
+    padding: 2px 8px;
+    opacity: 0.85;
+}
+
+.cc-modal-body .cc-clear-btn:hover {
+    opacity: 1;
+}
+
+.cc-confirm .cc-dont-ask {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Compaction lore-book picker (shares the ACC picker shape) */
+.cc-lorebook-picker {
+    position: relative;
+    font-size: 0.9em;
+}
+
+.cc-lorebook-picker > summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 4px 8px;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0.85;
+}
+
+.cc-lorebook-picker > summary::-webkit-details-marker {
+    display: none;
+}
+
+.cc-lorebook-picker > summary:hover {
+    opacity: 1;
+}
+
+.cc-lorebook-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 2px;
+    z-index: 10002;
+    min-width: 240px;
+    max-height: 260px;
+    overflow-y: auto;
+    background: var(--SmartThemeBlurTintColor, #1a1a2e);
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 4px;
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.cc-lorebook-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.cc-lorebook-empty {
+    opacity: 0.6;
+    font-style: italic;
+}
+
+/* Compaction launch item in the hamburger menu */
+#compaction_menu_button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* The seeded "Story so far" recap message. The class is applied to the .mes
+   node by tagCompactionSummaries() (extra.sse_summary alone has no DOM hook). */
+#chat .mes.cc-summary-message {
+    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;
+}
+
+#chat .mes.cc-summary-message .ch_name .name_text {
+    color: var(--SmartThemeQuoteColor, #e8a23a);
+    font-style: italic;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
    NARRATIVE GUIDANCE SETTINGS STYLES
    ═══════════════════════════════════════════════════════════════════════════════ */
 
@@ -962,7 +1195,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Saint's Silly Extensions — Combin
     opacity: 1;
 }
 
-`, "",{"version":3,"sources":["webpack://./src/style.css"],"names":[],"mappings":"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","sourcesContent":["/* Saint's Silly Extensions — Combined Styles */\n\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   POSSESSION STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Group Chat: Radio Button Toggle ── */\n\n.possession_radio_wrapper {\n    display: inline-flex;\n    align-items: center;\n    margin-left: 4px;\n    cursor: pointer;\n}\n\n.possession_radio {\n    width: 16px;\n    height: 16px;\n    border-radius: 50%;\n    border: 2px solid var(--SmartThemeBorderColor, #555);\n    background: transparent;\n    cursor: pointer;\n    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;\n    position: relative;\n    flex-shrink: 0;\n}\n\n.possession_radio:hover {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.possession_radio.possession_active {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n    background: var(--SmartThemeQuoteColor, #e8a23a);\n    box-shadow: inset 0 0 0 3px var(--SmartThemeBlurTintColor, #1a1a2e);\n}\n\n/* ── Solo Chat: Possess Toggle Button ── */\n\n#possession_solo_btn {\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    cursor: pointer;\n    position: relative;\n}\n\n#possession_solo_btn:hover {\n    opacity: 1;\n}\n\n#possession_solo_btn.possession_active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n#possession_solo_btn.possession_active::after {\n    content: '';\n    position: absolute;\n    bottom: -2px;\n    left: 50%;\n    transform: translateX(-50%);\n    width: 6px;\n    height: 6px;\n    border-radius: 50%;\n    background-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Group member highlight when possessed ── */\n\n.group_member.possession_possessed {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n/* ── Possession Impersonate Button (Character Avatar) ── */\n\n#possession_impersonate_btn {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease;\n    padding: 2px;\n}\n\n#possession_impersonate_btn:hover {\n    opacity: 1;\n}\n\n.possession_impersonate_avatar {\n    width: 26px;\n    height: 26px;\n    border-radius: 50%;\n    object-fit: cover;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    transition: border-color 0.15s ease;\n}\n\n#possession_impersonate_btn:hover .possession_impersonate_avatar {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hide controls when extension is disabled ── */\n\n.possession_hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PHRASING STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Input Area Button (next to Send) ── */\n\n#phrasing_send_button {\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    padding: 3px;\n    font-size: 1.2em;\n}\n\n#phrasing_send_button:hover {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hamburger Menu Item ── */\n\n#phrasing_menu_button {\n    cursor: pointer;\n}\n\n#phrasing_menu_button .fa-solid {\n    margin-right: 5px;\n    width: 1em;\n    text-align: center;\n}\n\n/* ── Hide buttons during generation ── */\n\n.phrasing-hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SETTINGS PANEL STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .inline-drawer-content {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n    padding: 8px 0;\n}\n\n/* Nested drawers (template fields inside each tool's panel) — slightly\n   indented and with a smaller, dimmer header so they read as a sub-section\n   rather than a peer of the top-level tool drawer. */\n#saints_silly_settings .saints_nested_drawer {\n    margin: 4px 0 4px 4px;\n    border-left: 2px solid var(--SmartThemeBorderColor, #555);\n    padding-left: 8px;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-toggle {\n    font-size: 0.95em;\n    opacity: 0.85;\n    padding: 2px 0;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-toggle:hover {\n    opacity: 1;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-content {\n    padding: 4px 0 4px 0;\n}\n\n#saints_silly_settings .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_section_header {\n    margin: 4px 0 2px 0;\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_divider {\n    border: none;\n    border-top: 1px solid var(--SmartThemeBorderColor, #555);\n    margin: 8px 0;\n}\n\n#saints_silly_settings .phrasing_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #phrasing_prompt_textarea {\n    width: 100%;\n    min-height: 120px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .acc_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #acc_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC MODAL STYLES (rendered inside ST's Popup; chrome is provided by Popup)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n.acc-modal-body {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n    text-align: left;\n}\n\n.acc-brief-section {\n    margin-bottom: 12px;\n}\n\n.acc-brief-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.acc-action-row {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    margin-bottom: 8px;\n}\n\n.acc-tokens-row {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 6px;\n    margin-bottom: 12px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.acc-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.acc-tokens-input {\n    width: 80px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n.acc-action-btn {\n    flex: 1 1 0;\n    min-width: 110px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n.acc-action-btn.acc-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.acc-generate-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.acc-status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    background: var(--SmartThemeBodyColor, #222);\n    border-radius: 4px;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 0.9em;\n}\n\n.acc-description-section {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.acc-description-section label {\n    margin-bottom: 4px;\n}\n\n.acc-description-output {\n    width: 100%;\n    flex: 1 1 0%;\n    min-height: 200px;\n    resize: vertical;\n}\n\n.acc-description-output[disabled] {\n    opacity: 0.5;\n    cursor: not-allowed;\n}\n\n.acc-hidden {\n    display: none !important;\n}\n\n/* ACC Launch button in character creator */\n#acc_launch_btn {\n    display: flex;\n    align-items: center;\n    gap: 4px;\n}\n\n/* Field header row: label on the left, Clear button on the right. */\n.acc-modal-body .acc-field-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin-bottom: 4px;\n}\n\n.acc-modal-body .acc-clear-btn {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.acc-modal-body .acc-clear-btn:hover {\n    opacity: 1;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   WORLD INFO ASSIST STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Settings panel */\n#saints_silly_settings .wia_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #wia_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* Per-entry assist controls injected into each WI entry form */\n.wia-controls {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    flex-wrap: wrap;\n    margin: 6px 0 6px 0;\n}\n\n.wia-controls .wia-btn {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    cursor: pointer;\n    font-size: 0.85em;\n    padding: 4px 8px;\n}\n\n.wia-controls .wia-btn-assist {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.wia-controls .wia-btn-label {\n    font-weight: 500;\n}\n\n.wia-controls .wia-spinner {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 1em;\n    display: inline-flex;\n    align-items: center;\n    padding: 4px 6px;\n}\n\n.wia-controls .wia-hidden {\n    display: none !important;\n}\n\n/* Use Chat Context checkbox */\n.wia-controls .wia-context-toggle {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    font-size: 0.85em;\n    cursor: pointer;\n    opacity: 0.85;\n    user-select: none;\n}\n\n.wia-controls .wia-context-toggle:hover {\n    opacity: 1;\n}\n\n/* Lore book multi-select picker (per-entry) */\n.wia-controls .wia-lorebook-picker {\n    position: relative;\n    font-size: 0.85em;\n}\n\n.wia-controls .wia-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.wia-controls .wia-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.wia-controls .wia-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.wia-controls .wia-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 50;\n    min-width: 220px;\n    max-height: 240px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);\n}\n\n.wia-controls .wia-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.wia-controls .wia-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Inline Clear-content button on the WIA controls row */\n/* Content-clear row — sits directly above the entry's content textarea so\n   it's unambiguous which field the button clears. */\n.wia-content-clear-row {\n    display: flex;\n    justify-content: flex-end;\n    margin: 2px 0 4px 0;\n}\n\n.wia-content-clear-row .wia-btn-clear-content {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.wia-content-clear-row .wia-btn-clear-content:hover {\n    opacity: 1;\n}\n\n/* Per-entry guidance section — sits between the controls and the entry's\n   content textarea so it's clearly the user's *input* to the assist. */\n.wia-guidance-block {\n    margin: 0 0 8px 0;\n}\n\n.wia-guidance-block .wia-guidance-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin: 0 0 4px 0;\n}\n\n.wia-guidance-block .wia-guidance-label {\n    font-size: 0.9em;\n    font-weight: 500;\n    opacity: 0.9;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n}\n\n.wia-guidance-block .wia-btn-clear-guidance {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.wia-guidance-block .wia-btn-clear-guidance:hover {\n    opacity: 1;\n}\n\n.wia-guidance-block .wia-guidance-textarea {\n    width: 100%;\n    resize: vertical;\n    min-height: 60px;\n    font-size: 0.9em;\n}\n\n/* Per-entry token limit row */\n.wia-controls .wia-tokens-row {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.85em;\n    opacity: 0.85;\n    margin-left: auto;\n}\n\n.wia-controls .wia-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.wia-controls .wia-tokens-input {\n    width: 72px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n/* ── ACC modal: context preamble controls ── */\n\n.acc-context-section {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: wrap;\n    margin-bottom: 12px;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.acc-context-section .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.9em;\n    cursor: pointer;\n}\n\n.acc-lorebook-picker {\n    position: relative;\n    font-size: 0.9em;\n}\n\n.acc-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.acc-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.acc-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.acc-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 10002;\n    min-width: 240px;\n    max-height: 260px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\n}\n\n.acc-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.acc-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   NARRATIVE GUIDANCE SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_subsection_header {\n    margin: 12px 0 4px 0;\n    opacity: 0.85;\n}\n\n#saints_silly_settings .ng_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings .ng_prompt_section textarea {\n    width: 100%;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .ng_inline_row {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin: 6px 0;\n}\n\n#saints_silly_settings .ng_number_input {\n    width: 5em;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng_select_input {\n    width: auto;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng-lorebook-picker {\n    margin: 8px 0;\n}\n\n#saints_silly_settings .ng-lorebook-list {\n    margin-top: 4px;\n    padding: 6px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n}\n\n#saints_silly_settings .ng-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n#saints_silly_settings .ng-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n#saints_silly_settings [id$=\"_regenerate_now\"].disabled,\n#saints_silly_settings [id$=\"_continue_now\"].disabled,\n#saints_silly_settings [id$=\"_retry_now\"].disabled {\n    opacity: 0.6;\n    pointer-events: none;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PROMPT TEMPLATE CONTROLS (shared, one row per prompt)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_template_controls {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin-top: 6px;\n}\n\n#saints_silly_settings .saints_template_select {\n    width: 100%;\n}\n\n#saints_silly_settings .saints_template_buttons {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button {\n    flex: 1 1 0;\n    min-width: 100px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button.disabled {\n    opacity: 0.5;\n    pointer-events: none;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   TOOL PRESET BLOCK & PROMPT PREVIEW\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_preset_block {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin: 8px 0;\n    padding: 8px;\n    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));\n    border-radius: 6px;\n}\n\n#saints_silly_settings .saints_preview_btn {\n    align-self: flex-start;\n    white-space: nowrap;\n}\n\n.sse-prompt-preview {\n    text-align: left;\n}\n\n.sse-prompt-preview h3 {\n    margin: 0 0 10px 0;\n}\n\n.sse-preview-section {\n    margin-bottom: 12px;\n}\n\n.sse-preview-label {\n    font-weight: bold;\n    opacity: 0.8;\n    margin-bottom: 4px;\n}\n\n.sse-preview-text {\n    white-space: pre-wrap;\n    word-break: break-word;\n    text-align: left;\n    font-size: calc(var(--mainFontSize, 14px) * 0.85);\n    background-color: rgba(0, 0, 0, 0.2);\n    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));\n    border-radius: 6px;\n    padding: 8px;\n    margin: 0;\n    max-height: 40vh;\n    overflow-y: auto;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   REFORMATTING\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Engine-specific option blocks; toggled by the Engine dropdown. */\n#saints_silly_settings .reformatting_section {\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    margin-top: 6px;\n}\n\n#saints_silly_settings .reformatting-hidden {\n    display: none;\n}\n\n/* Mutually-exclusive asterisk-handling choice. */\n#saints_silly_settings .reformatting_radio_group {\n    display: flex;\n    flex-direction: column;\n    gap: 2px;\n    margin: 2px 0 4px 12px;\n}\n\n/* Per-message reformat button — inherits ST's .mes_button sizing; this just\n   gives it a subtle hover tint consistent with the other quick buttons. */\n.sse-reformat-button {\n    cursor: pointer;\n}\n\n.sse-reformat-button:hover {\n    color: var(--SmartThemeQuoteColor, #6bf);\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PHRASE BAN\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .phrase_ban_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings .phrase_ban_section textarea {\n    width: 100%;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n/* Live pattern-list validation readout under the patterns textarea. */\n#saints_silly_settings #phrase_ban_pattern_status {\n    display: block;\n    margin-top: 4px;\n    opacity: 0.8;\n}\n\n#saints_silly_settings #phrase_ban_pattern_status.phrase-ban-status-error {\n    color: var(--warning, #e8a23a);\n    opacity: 1;\n}\n\n"],"sourceRoot":""}]);
+`, "",{"version":3,"sources":["webpack://./src/style.css"],"names":[],"mappings":"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","sourcesContent":["/* Saint's Silly Extensions — Combined Styles */\n\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   POSSESSION STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Group Chat: Radio Button Toggle ── */\n\n.possession_radio_wrapper {\n    display: inline-flex;\n    align-items: center;\n    margin-left: 4px;\n    cursor: pointer;\n}\n\n.possession_radio {\n    width: 16px;\n    height: 16px;\n    border-radius: 50%;\n    border: 2px solid var(--SmartThemeBorderColor, #555);\n    background: transparent;\n    cursor: pointer;\n    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;\n    position: relative;\n    flex-shrink: 0;\n}\n\n.possession_radio:hover {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.possession_radio.possession_active {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n    background: var(--SmartThemeQuoteColor, #e8a23a);\n    box-shadow: inset 0 0 0 3px var(--SmartThemeBlurTintColor, #1a1a2e);\n}\n\n/* ── Solo Chat: Possess Toggle Button ── */\n\n#possession_solo_btn {\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    cursor: pointer;\n    position: relative;\n}\n\n#possession_solo_btn:hover {\n    opacity: 1;\n}\n\n#possession_solo_btn.possession_active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n#possession_solo_btn.possession_active::after {\n    content: '';\n    position: absolute;\n    bottom: -2px;\n    left: 50%;\n    transform: translateX(-50%);\n    width: 6px;\n    height: 6px;\n    border-radius: 50%;\n    background-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Group member highlight when possessed ── */\n\n.group_member.possession_possessed {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n/* ── Possession Impersonate Button (Character Avatar) ── */\n\n#possession_impersonate_btn {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease;\n    padding: 2px;\n}\n\n#possession_impersonate_btn:hover {\n    opacity: 1;\n}\n\n.possession_impersonate_avatar {\n    width: 26px;\n    height: 26px;\n    border-radius: 50%;\n    object-fit: cover;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    transition: border-color 0.15s ease;\n}\n\n#possession_impersonate_btn:hover .possession_impersonate_avatar {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hide controls when extension is disabled ── */\n\n.possession_hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PHRASING STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Input Area Button (next to Send) ── */\n\n#phrasing_send_button {\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    padding: 3px;\n    font-size: 1.2em;\n}\n\n#phrasing_send_button:hover {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hamburger Menu Item ── */\n\n#phrasing_menu_button {\n    cursor: pointer;\n}\n\n#phrasing_menu_button .fa-solid {\n    margin-right: 5px;\n    width: 1em;\n    text-align: center;\n}\n\n/* ── Hide buttons during generation ── */\n\n.phrasing-hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SETTINGS PANEL STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .inline-drawer-content {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n    padding: 8px 0;\n}\n\n/* Nested drawers (template fields inside each tool's panel) — slightly\n   indented and with a smaller, dimmer header so they read as a sub-section\n   rather than a peer of the top-level tool drawer. */\n#saints_silly_settings .saints_nested_drawer {\n    margin: 4px 0 4px 4px;\n    border-left: 2px solid var(--SmartThemeBorderColor, #555);\n    padding-left: 8px;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-toggle {\n    font-size: 0.95em;\n    opacity: 0.85;\n    padding: 2px 0;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-toggle:hover {\n    opacity: 1;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-content {\n    padding: 4px 0 4px 0;\n}\n\n#saints_silly_settings .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_section_header {\n    margin: 4px 0 2px 0;\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_divider {\n    border: none;\n    border-top: 1px solid var(--SmartThemeBorderColor, #555);\n    margin: 8px 0;\n}\n\n#saints_silly_settings .phrasing_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #phrasing_prompt_textarea {\n    width: 100%;\n    min-height: 120px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .acc_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #acc_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC MODAL STYLES (rendered inside ST's Popup; chrome is provided by Popup)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n.acc-modal-body {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n    text-align: left;\n}\n\n.acc-brief-section {\n    margin-bottom: 12px;\n}\n\n.acc-brief-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.acc-action-row {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    margin-bottom: 8px;\n}\n\n.acc-tokens-row {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 6px;\n    margin-bottom: 12px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.acc-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.acc-tokens-input {\n    width: 80px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n.acc-action-btn {\n    flex: 1 1 0;\n    min-width: 110px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n.acc-action-btn.acc-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.acc-generate-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.acc-status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    background: var(--SmartThemeBodyColor, #222);\n    border-radius: 4px;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 0.9em;\n}\n\n.acc-description-section {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.acc-description-section label {\n    margin-bottom: 4px;\n}\n\n.acc-description-output {\n    width: 100%;\n    flex: 1 1 0%;\n    min-height: 200px;\n    resize: vertical;\n}\n\n.acc-description-output[disabled] {\n    opacity: 0.5;\n    cursor: not-allowed;\n}\n\n.acc-hidden {\n    display: none !important;\n}\n\n/* ACC Launch button in character creator */\n#acc_launch_btn {\n    display: flex;\n    align-items: center;\n    gap: 4px;\n}\n\n/* Field header row: label on the left, Clear button on the right. */\n.acc-modal-body .acc-field-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin-bottom: 4px;\n}\n\n.acc-modal-body .acc-clear-btn {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.acc-modal-body .acc-clear-btn:hover {\n    opacity: 1;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   WORLD INFO ASSIST STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Settings panel */\n#saints_silly_settings .wia_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #wia_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* Per-entry assist controls injected into each WI entry form */\n.wia-controls {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    flex-wrap: wrap;\n    margin: 6px 0 6px 0;\n}\n\n.wia-controls .wia-btn {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    cursor: pointer;\n    font-size: 0.85em;\n    padding: 4px 8px;\n}\n\n.wia-controls .wia-btn-assist {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.wia-controls .wia-btn-label {\n    font-weight: 500;\n}\n\n.wia-controls .wia-spinner {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 1em;\n    display: inline-flex;\n    align-items: center;\n    padding: 4px 6px;\n}\n\n.wia-controls .wia-hidden {\n    display: none !important;\n}\n\n/* Use Chat Context checkbox */\n.wia-controls .wia-context-toggle {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    font-size: 0.85em;\n    cursor: pointer;\n    opacity: 0.85;\n    user-select: none;\n}\n\n.wia-controls .wia-context-toggle:hover {\n    opacity: 1;\n}\n\n/* Lore book multi-select picker (per-entry) */\n.wia-controls .wia-lorebook-picker {\n    position: relative;\n    font-size: 0.85em;\n}\n\n.wia-controls .wia-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.wia-controls .wia-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.wia-controls .wia-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.wia-controls .wia-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 50;\n    min-width: 220px;\n    max-height: 240px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);\n}\n\n.wia-controls .wia-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.wia-controls .wia-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Inline Clear-content button on the WIA controls row */\n/* Content-clear row — sits directly above the entry's content textarea so\n   it's unambiguous which field the button clears. */\n.wia-content-clear-row {\n    display: flex;\n    justify-content: flex-end;\n    margin: 2px 0 4px 0;\n}\n\n.wia-content-clear-row .wia-btn-clear-content {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.wia-content-clear-row .wia-btn-clear-content:hover {\n    opacity: 1;\n}\n\n/* Per-entry guidance section — sits between the controls and the entry's\n   content textarea so it's clearly the user's *input* to the assist. */\n.wia-guidance-block {\n    margin: 0 0 8px 0;\n}\n\n.wia-guidance-block .wia-guidance-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin: 0 0 4px 0;\n}\n\n.wia-guidance-block .wia-guidance-label {\n    font-size: 0.9em;\n    font-weight: 500;\n    opacity: 0.9;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n}\n\n.wia-guidance-block .wia-btn-clear-guidance {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.wia-guidance-block .wia-btn-clear-guidance:hover {\n    opacity: 1;\n}\n\n.wia-guidance-block .wia-guidance-textarea {\n    width: 100%;\n    resize: vertical;\n    min-height: 60px;\n    font-size: 0.9em;\n}\n\n/* Per-entry token limit row */\n.wia-controls .wia-tokens-row {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.85em;\n    opacity: 0.85;\n    margin-left: auto;\n}\n\n.wia-controls .wia-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.wia-controls .wia-tokens-input {\n    width: 72px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n/* ── ACC modal: context preamble controls ── */\n\n.acc-context-section {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: wrap;\n    margin-bottom: 12px;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.acc-context-section .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.9em;\n    cursor: pointer;\n}\n\n.acc-lorebook-picker {\n    position: relative;\n    font-size: 0.9em;\n}\n\n.acc-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.acc-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.acc-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.acc-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 10002;\n    min-width: 240px;\n    max-height: 260px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\n}\n\n.acc-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.acc-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   COMPACTION MODAL STYLES (rendered inside ST's Popup; mirror the ACC flex chain)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n.cc-modal-body {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n    text-align: left;\n}\n\n.cc-usage-banner {\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    font-size: 0.9em;\n    opacity: 0.9;\n}\n\n.cc-usage-banner.cc-usage-high {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n    opacity: 1;\n}\n\n.cc-context-section {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: wrap;\n    margin-bottom: 12px;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.cc-context-hint {\n    opacity: 0.7;\n}\n\n.cc-guidance-section {\n    margin-bottom: 12px;\n}\n\n.cc-guidance-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.cc-action-row {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    margin-bottom: 8px;\n}\n\n.cc-action-btn {\n    flex: 1 1 0;\n    min-width: 130px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n.cc-action-btn.cc-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.cc-generate-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.cc-tokens-row {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 6px;\n    margin-bottom: 12px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.cc-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.cc-tokens-input {\n    width: 90px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n.cc-status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    background: var(--SmartThemeBodyColor, #222);\n    border-radius: 4px;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 0.9em;\n}\n\n.cc-summary-section {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.cc-summary-section label {\n    margin-bottom: 4px;\n}\n\n.cc-summary-output {\n    width: 100%;\n    flex: 1 1 0%;\n    min-height: 200px;\n    resize: vertical;\n}\n\n.cc-hidden {\n    display: none !important;\n}\n\n.cc-modal-body .cc-field-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin-bottom: 4px;\n}\n\n.cc-modal-body .cc-clear-btn {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.cc-modal-body .cc-clear-btn:hover {\n    opacity: 1;\n}\n\n.cc-confirm .cc-dont-ask {\n    margin-top: 10px;\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n/* Compaction lore-book picker (shares the ACC picker shape) */\n.cc-lorebook-picker {\n    position: relative;\n    font-size: 0.9em;\n}\n\n.cc-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.cc-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.cc-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.cc-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 10002;\n    min-width: 240px;\n    max-height: 260px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\n}\n\n.cc-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.cc-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Compaction launch item in the hamburger menu */\n#compaction_menu_button {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n/* The seeded \"Story so far\" recap message. The class is applied to the .mes\n   node by tagCompactionSummaries() (extra.sse_summary alone has no DOM hook). */\n#chat .mes.cc-summary-message {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n#chat .mes.cc-summary-message .ch_name .name_text {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-style: italic;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   NARRATIVE GUIDANCE SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_subsection_header {\n    margin: 12px 0 4px 0;\n    opacity: 0.85;\n}\n\n#saints_silly_settings .ng_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings .ng_prompt_section textarea {\n    width: 100%;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .ng_inline_row {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin: 6px 0;\n}\n\n#saints_silly_settings .ng_number_input {\n    width: 5em;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng_select_input {\n    width: auto;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng-lorebook-picker {\n    margin: 8px 0;\n}\n\n#saints_silly_settings .ng-lorebook-list {\n    margin-top: 4px;\n    padding: 6px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n}\n\n#saints_silly_settings .ng-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n#saints_silly_settings .ng-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n#saints_silly_settings [id$=\"_regenerate_now\"].disabled,\n#saints_silly_settings [id$=\"_continue_now\"].disabled,\n#saints_silly_settings [id$=\"_retry_now\"].disabled {\n    opacity: 0.6;\n    pointer-events: none;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PROMPT TEMPLATE CONTROLS (shared, one row per prompt)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_template_controls {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin-top: 6px;\n}\n\n#saints_silly_settings .saints_template_select {\n    width: 100%;\n}\n\n#saints_silly_settings .saints_template_buttons {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button {\n    flex: 1 1 0;\n    min-width: 100px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button.disabled {\n    opacity: 0.5;\n    pointer-events: none;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   TOOL PRESET BLOCK & PROMPT PREVIEW\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_preset_block {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin: 8px 0;\n    padding: 8px;\n    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));\n    border-radius: 6px;\n}\n\n#saints_silly_settings .saints_preview_btn {\n    align-self: flex-start;\n    white-space: nowrap;\n}\n\n.sse-prompt-preview {\n    text-align: left;\n}\n\n.sse-prompt-preview h3 {\n    margin: 0 0 10px 0;\n}\n\n.sse-preview-section {\n    margin-bottom: 12px;\n}\n\n.sse-preview-label {\n    font-weight: bold;\n    opacity: 0.8;\n    margin-bottom: 4px;\n}\n\n.sse-preview-text {\n    white-space: pre-wrap;\n    word-break: break-word;\n    text-align: left;\n    font-size: calc(var(--mainFontSize, 14px) * 0.85);\n    background-color: rgba(0, 0, 0, 0.2);\n    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));\n    border-radius: 6px;\n    padding: 8px;\n    margin: 0;\n    max-height: 40vh;\n    overflow-y: auto;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   REFORMATTING\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Engine-specific option blocks; toggled by the Engine dropdown. */\n#saints_silly_settings .reformatting_section {\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    margin-top: 6px;\n}\n\n#saints_silly_settings .reformatting-hidden {\n    display: none;\n}\n\n/* Mutually-exclusive asterisk-handling choice. */\n#saints_silly_settings .reformatting_radio_group {\n    display: flex;\n    flex-direction: column;\n    gap: 2px;\n    margin: 2px 0 4px 12px;\n}\n\n/* Per-message reformat button — inherits ST's .mes_button sizing; this just\n   gives it a subtle hover tint consistent with the other quick buttons. */\n.sse-reformat-button {\n    cursor: pointer;\n}\n\n.sse-reformat-button:hover {\n    color: var(--SmartThemeQuoteColor, #6bf);\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PHRASE BAN\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .phrase_ban_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings .phrase_ban_section textarea {\n    width: 100%;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n/* Live pattern-list validation readout under the patterns textarea. */\n#saints_silly_settings #phrase_ban_pattern_status {\n    display: block;\n    margin-top: 4px;\n    opacity: 0.8;\n}\n\n#saints_silly_settings #phrase_ban_pattern_status.phrase-ban-status-error {\n    color: var(--warning, #e8a23a);\n    opacity: 1;\n}\n\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -1444,7 +1677,7 @@ var update = injectStylesIntoStyleTag_default()(style/* default */.A, options);
 
 ;// ./src/settings.html
 // Module
-var code = `<div id="saints_silly_settings" class="extension_settings"> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-ghost"></span> SSE Possession</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="possession_enabled" type="checkbox"/> <span>Enable Possession</span> </label> <label class="checkbox_label"> <input id="possession_show_toast" type="checkbox"/> <span>Show Toast on Possess/Unpossess</span> </label> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-pen-fancy"></span> SSE Phrasing!</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="phrasing_enabled" type="checkbox" checked="checked"/> <span>Enable Phrasing!</span> </label> <label class="checkbox_label" title="When enabled, rephrasing a message includes every existing swipe in the prompt and asks the model to produce something wildly different."> <input id="phrasing_inverse_guidance" type="checkbox"/> <span>Inverse Guidance</span> </label> <div class="saints_preset_block"> <label title="Save and switch named bundles of every Phrasing prompt field below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="phrasing_presets"></div> <div class="menu_button saints_preview_btn" id="phrasing_preview_btn" title="Show exactly what Phrasing! will inject into the chat prompt, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrasing_prompt_section"> <textarea id="phrasing_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Phrasing! prompt template..."></textarea> <small>Injected into the chat prompt as a system message for the rephrase generation. Placeholder: <code>{{phrasingSeed}}</code> — the speaker-prefixed message being rephrased.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Inverse Guidance Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrasing_prompt_section"> <textarea id="phrasing_inverse_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Inverse Guidance prompt template..."></textarea> <small>Used instead of the standard prompt when Inverse Guidance is on. Placeholders: <code>{{phrasingSeed}}</code>, <code>{{phrasingSwipes}}</code> — the existing swipes to avoid resembling.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-ban"></span> SSE Phrase Ban</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <small>Scans each AI reply against a regex ban list and, on a match, has the model rewrite the reply without the offending phrasing (through the Phrasing! engine). The original is always kept as a swipe. Set Max Rewrite Attempts to 0 to only be notified. Every detected phrase is also collected into a per-chat <b>Learned Phrases</b> list, which (while Phrase Ban is enabled) is appended to your backend's native banned strings on Text Completion. Turn on <b>Proactive Injection</b> to also instruct the model to avoid that list before every reply (useful on Chat Completion APIs, which have no native ban).</small> <label class="checkbox_label"> <input id="phrase_ban_enabled" type="checkbox"/> <span>Enable Phrase Ban</span> </label> <label class="checkbox_label" title="When on, every AI character message is scanned as it arrives. When off, only /phraseban scans."> <input id="phrase_ban_auto" type="checkbox"/> <span>Auto-Scan AI Messages</span> </label> <div class="ng_inline_row"> <label for="phrase_ban_max_retries"><b><span class="fa-solid fa-rotate-right"></span> Max Rewrite Attempts:</b></label> <input id="phrase_ban_max_retries" type="number" min="0" max="5" step="1" class="text_pole ng_number_input" title="How many times to rewrite a reply that still matches the ban list before giving up. 0 = detect and notify only, never rewrite."/> <small>0 = notify only</small> </div> <div class="ng_inline_row"> <small id="phrase_ban_learned_status"></small> <div class="menu_button" id="phrase_ban_clear_learned" title="Forget every phrase learned in the current chat (also removes the proactive injection)."> <span class="fa-solid fa-eraser"></span> Clear Learned Phrases </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Learned Phrases (this chat)</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrase_ban_section"> <textarea id="phrase_ban_learned_textarea" class="text_pole" rows="6" placeholder="Phrases detected in this chat are collected here, one per line.&#10;Edit freely — add your own, or delete ones you don't want used."></textarea> <small>One phrase per line. Detected phrases are collected here automatically as Phrase Ban scans; edit freely to add or remove entries. While Phrase Ban is enabled, this list is also appended to your backend's native banned strings on Text Completion backends (a sampler-level ban; no effect on Chat Completion APIs). Stored with the chat, not globally.</small> </div> </div> </div> <label class="checkbox_label" title="Injects the Learned Phrases list before every AI turn as a 'don't reuse these phrases' instruction, so future replies avoid them up front. Independent of the native sampler-level ban (which is always applied on Text Completion backends while Phrase Ban is enabled); use this for Chat Completion APIs, or as extra reinforcement."> <input id="phrase_ban_proactive" type="checkbox"/> <span>Proactive Injection (avoid learned phrases)</span> </label> <div class="ng_inline_row"> <label for="phrase_ban_injection_depth"><b>Depth:</b></label> <input id="phrase_ban_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the proactive instruction after (0 = bottom)."/> <label for="phrase_ban_injection_role"><b>Role:</b></label> <select id="phrase_ban_injection_role" class="text_pole ng_select_input" title="Role used when injecting the proactive instruction into the prompt."> <option value="system">System</option> <option value="user">User</option> <option value="assistant">Assistant</option> </select> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the pattern list + rewrite prompt below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="phrase_ban_presets"></div> <div class="menu_button saints_preview_btn" id="phrase_ban_preview_btn" title="Show exactly what Phrase Ban will inject into the chat prompt for a rewrite, with sample matches."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Banned Phrase Patterns</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrase_ban_section"> <textarea id="phrase_ban_patterns_textarea" class="text_pole" rows="8" placeholder="One JavaScript regex per line, e.g.&#10;voice was (thick|heavy) with&#10;something (he|she|they) (didn't|couldn't) want to name&#10;/Anger\\? Rage\\?/&#10;# lines starting with # are comments"></textarea> <small>One JavaScript regular expression per line, matched against the raw message text. Case-insensitive by default; wrap a line in <code>/…/flags</code> to set your own flags. Lines starting with <code>#</code> are comments. Invalid patterns are skipped.</small> <small id="phrase_ban_pattern_status"></small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Rewrite Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrase_ban_section"> <textarea id="phrase_ban_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Phrase Ban rewrite prompt template..."></textarea> <small>Injected into the chat prompt as a system message for the rewrite generation. Placeholders: <code>{{phrasingSeed}}</code> — the speaker-prefixed message being rewritten; <code>{{bannedPhrases}}</code> — the list of matched phrases to avoid.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Proactive Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrase_ban_section"> <textarea id="phrase_ban_proactive_prompt_textarea" class="text_pole" rows="6" placeholder="Enter your Phrase Ban proactive injection template..."></textarea> <small>Used only when <b>Proactive Injection</b> is on. Persistently injected before every AI turn while the chat has learned phrases. Placeholder: <code>{{bannedPhrases}}</code> — the running list of phrases learned in this chat.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-wand-magic-sparkles"></span> SSE Assisted Character Creation</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="acc_enabled" type="checkbox"/> <span>Enable Assisted Character Creation</span> </label> <div class="ng_inline_row"> <label for="acc_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="acc_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for ACC generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the ACC prompt + prefill below. The prompt describes the prefill's opening, so they are saved together."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="acc_presets"></div> <div class="menu_button saints_preview_btn" id="acc_preview_btn" title="Show the exact system prompt, assembled user prompt, and prefill ACC will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="acc_prompt_section"> <textarea id="acc_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your ACC prompt template..."></textarea> <small>Sent as the user prompt for each generation. Placeholders: <code>{{context}}</code> (chat/lore preamble, when enabled in the modal), <code>{{brief}}</code> (your Character Brief). If a placeholder is missing, the context is prepended and the brief appended automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="acc_prompt_section"> <textarea id="acc_prefill_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix the model continues. Also prepended to the description on success."></textarea> <small>Sent as an assistant prefix the model continues from, and kept at the top of the final description. If the backend ignores prefills and the model repeats it, the echo is stripped automatically. Keep it in sync with the format the Prompt Template describes.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-book-atlas"></span> SSE World Info Assist</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="wia_enabled" type="checkbox"/> <span>Enable World Info Assist</span> </label> <div class="ng_inline_row"> <label for="wia_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="wia_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for World Info Assist generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="wia_response_length"><b><span class="fa-solid fa-coins"></span> Response Token Limit:</b></label> <input id="wia_response_length" type="number" min="50" max="8192" step="50" class="text_pole ng_number_input" title="Maximum tokens the model may use for each World Info Assist generation."/> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the WIA prompt + both prefills below. The prompt describes the prefill's opening, so they are saved together."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="wia_presets"></div> <div class="menu_button saints_preview_btn" id="wia_preview_btn" title="Show the exact system prompt, assembled user prompt, and prefills WIA will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="wia_prompt_section"> <textarea id="wia_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your World Info Assist prompt template..."></textarea> <small>Sent as the user prompt for each Assist/Continue. Placeholders: <code>{{context}}</code> (chat/lore preamble, when enabled on the entry's Assist row), <code>{{guidance}}</code> (the entry's Assist Guidance text), <code>{{title}}</code> (the entry's title). If context or guidance placeholders are missing, those blocks are added automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template — Titled Entry</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="wia_prompt_section"> <textarea id="wia_prefill_titled_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix used when the entry has a title."></textarea> <small>Sent as an assistant prefix when the entry has a title, and kept at the start of the entry on success. Placeholder: <code>{{title}}</code>. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template — Untitled Entry</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="wia_prompt_section"> <textarea id="wia_prefill_untitled_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix used when the entry has no title yet."></textarea> <small>Sent as an assistant prefix when the entry has no title, and kept at the start of the entry on success. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-compass"></span> SSE Narrative Guidance</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <small>Two independent tiers of story direction. <b>Long-term</b> sets the overarching arc on a slow refresh horizon; <b>Short-term</b> sets the immediate beats on a fast one and is seeded with the active long-term arc so the two stay aligned. Each tier has its own toggle, cadence, prompts, lore books and guidance text.</small> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-mountain-sun"></span> Long-term (the overarching arc)</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="ng_long_enabled" type="checkbox"/> <span>Enable Long-term Guidance</span> </label> <label class="checkbox_label" title="When on, regenerates the long-term arc automatically when its turn counter hits zero. When off, only the Regenerate Now button updates it."> <input id="ng_long_auto_regen" type="checkbox"/> <span>Auto-Regenerate at Zero</span> </label> <div class="ng_inline_row"> <label for="ng_long_default_turn_count"><b>Turns Between Regenerations:</b></label> <input id="ng_long_default_turn_count" type="number" min="1" step="1" class="text_pole ng_number_input"/> </div> <div class="ng_inline_row"> <label for="ng_long_response_length"><b>Response Token Limit:</b></label> <input id="ng_long_response_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="Maximum number of tokens the model may use for each generated guidance paragraph."/> </div> <div class="ng_inline_row"> <label for="ng_long_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="ng_long_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for long-term generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="ng_long_injection_depth"><b>Depth:</b></label> <input id="ng_long_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the guidance after (0 = bottom)."/> <label for="ng_long_injection_role"><b>Role:</b></label> <select id="ng_long_injection_role" class="text_pole ng_select_input" title="Role used when injecting the guidance into the prompt."> <option value="system">System</option> <option value="user">User</option> <option value="assistant">Assistant</option> </select> </div> <div id="ng_long_lorebooks_host"></div> <div class="ng_inline_row"> <span><b>Turns Remaining:</b> <span id="ng_long_remaining_display">0</span></span> <div class="menu_button" id="ng_long_decrement_button" title="Decrement remaining by 1"> <span class="fa-solid fa-minus"></span> </div> <div class="menu_button" id="ng_long_reset_button" title="Reset remaining to default turn count"> <span class="fa-solid fa-rotate-right"></span> Reset </div> <div class="menu_button disabled" id="ng_long_continue_now" title="Continue the current guidance paragraph"> <span class="fa-solid fa-arrow-right"></span> Continue </div> <div class="menu_button disabled" id="ng_long_retry_now" title="Restore previous guidance and regenerate"> <span class="fa-solid fa-rotate-right"></span> Retry </div> <div class="menu_button" id="ng_long_regenerate_now" title="Regenerate guidance now"> <span class="ng-regen-icon fa-solid fa-wand-sparkles"></span> Regenerate Now </div> </div> <div class="ng_prompt_section"> <label for="ng_long_themes_textarea"><b>Themes / Story Arcs:</b></label> <textarea id="ng_long_themes_textarea" class="text_pole" rows="4" placeholder="Optional themes, ideas, or arcs for the AI to consider..."></textarea> </div> <div class="ng_prompt_section"> <label for="ng_long_active_guidance_textarea"><b>Active Guidance:</b></label> <textarea id="ng_long_active_guidance_textarea" class="text_pole" rows="6" placeholder="The currently active long-term arc. Edit freely; changes apply on the next AI turn."></textarea> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the three long-term prompt fields below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="ng_long_presets"></div> <div class="menu_button saints_preview_btn" id="ng_long_preview_btn" title="Show the exact system prompt, assembled user prompt, prefill, and injection long-term guidance will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Generation Instructions Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_long_user_prompt_textarea" class="text_pole" rows="5" placeholder="Instructions sent as the user prompt for each generation..."></textarea> <small>Sent as the user prompt for each generation. Placeholders: <code>{{context}}</code> (chat/lore preamble), <code>{{themes}}</code> (your Themes / Story Arcs block). If a placeholder is missing, the blocks are prepended automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_long_generation_prompt_textarea" class="text_pole" rows="4" placeholder="Enter the prefill that the LLM will continue..."></textarea> <small>Sent as an assistant prefix the model continues from; the prefill plus the reply becomes the active guidance. If it opens with "[", the brackets are stripped when the guidance is injected into the chat prompt. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Injection Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_long_injection_prompt_textarea" class="text_pole" rows="3" placeholder="Template injected before each AI turn..."></textarea> <small>Added to the chat prompt before each AI turn while guidance is active. Placeholder: <code>{{guidance}}</code> — the active guidance text (outer brackets stripped).</small> </div> </div> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-bolt"></span> Short-term (the immediate beats)</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="ng_short_enabled" type="checkbox"/> <span>Enable Short-term Guidance</span> </label> <label class="checkbox_label" title="When on, regenerates the short-term beats automatically when its turn counter hits zero (and whenever the long-term arc refreshes). When off, only the Regenerate Now button updates it."> <input id="ng_short_auto_regen" type="checkbox"/> <span>Auto-Regenerate at Zero</span> </label> <div class="ng_inline_row"> <label for="ng_short_default_turn_count"><b>Turns Between Regenerations:</b></label> <input id="ng_short_default_turn_count" type="number" min="1" step="1" class="text_pole ng_number_input"/> </div> <div class="ng_inline_row"> <label for="ng_short_response_length"><b>Response Token Limit:</b></label> <input id="ng_short_response_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="Maximum number of tokens the model may use for each generated guidance paragraph."/> </div> <div class="ng_inline_row"> <label for="ng_short_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="ng_short_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for short-term generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="ng_short_injection_depth"><b>Depth:</b></label> <input id="ng_short_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the guidance after (0 = bottom)."/> <label for="ng_short_injection_role"><b>Role:</b></label> <select id="ng_short_injection_role" class="text_pole ng_select_input" title="Role used when injecting the guidance into the prompt."> <option value="system">System</option> <option value="user">User</option> <option value="assistant">Assistant</option> </select> </div> <div id="ng_short_lorebooks_host"></div> <div class="ng_inline_row"> <span><b>Turns Remaining:</b> <span id="ng_short_remaining_display">0</span></span> <div class="menu_button" id="ng_short_decrement_button" title="Decrement remaining by 1"> <span class="fa-solid fa-minus"></span> </div> <div class="menu_button" id="ng_short_reset_button" title="Reset remaining to default turn count"> <span class="fa-solid fa-rotate-right"></span> Reset </div> <div class="menu_button disabled" id="ng_short_continue_now" title="Continue the current guidance paragraph"> <span class="fa-solid fa-arrow-right"></span> Continue </div> <div class="menu_button disabled" id="ng_short_retry_now" title="Restore previous guidance and regenerate"> <span class="fa-solid fa-rotate-right"></span> Retry </div> <div class="menu_button" id="ng_short_regenerate_now" title="Regenerate guidance now"> <span class="ng-regen-icon fa-solid fa-wand-sparkles"></span> Regenerate Now </div> </div> <div class="ng_prompt_section"> <label for="ng_short_themes_textarea"><b>Themes / Story Arcs:</b></label> <textarea id="ng_short_themes_textarea" class="text_pole" rows="4" placeholder="Optional themes, ideas, or arcs for the AI to consider..."></textarea> </div> <div class="ng_prompt_section"> <label for="ng_short_active_guidance_textarea"><b>Active Guidance:</b></label> <textarea id="ng_short_active_guidance_textarea" class="text_pole" rows="6" placeholder="The currently active short-term beats. Edit freely; changes apply on the next AI turn."></textarea> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the three short-term prompt fields below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="ng_short_presets"></div> <div class="menu_button saints_preview_btn" id="ng_short_preview_btn" title="Show the exact system prompt, assembled user prompt, prefill, and injection short-term guidance will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Generation Instructions Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_short_user_prompt_textarea" class="text_pole" rows="5" placeholder="Instructions sent as the user prompt for each generation..."></textarea> <small>Sent as the user prompt for each generation. Placeholders: <code>{{context}}</code> (chat/lore preamble), <code>{{longGuidance}}</code> (the active long-term arc), <code>{{themes}}</code> (your Themes / Story Arcs block). If a placeholder is missing, the blocks are prepended automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_short_generation_prompt_textarea" class="text_pole" rows="4" placeholder="Enter the prefill that the LLM will continue..."></textarea> <small>Sent as an assistant prefix the model continues from; the prefill plus the reply becomes the active guidance. If it opens with "[", the brackets are stripped when the guidance is injected into the chat prompt. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Injection Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_short_injection_prompt_textarea" class="text_pole" rows="3" placeholder="Template injected before each AI turn..."></textarea> <small>Added to the chat prompt before each AI turn while guidance is active. Placeholder: <code>{{guidance}}</code> — the active guidance text (outer brackets stripped).</small> </div> </div> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-text-slash"></span> SSE Reformatting</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <small>Normalizes the formatting of AI character messages after they're generated. Runs automatically on each reply, or manually via the <span class="fa-solid fa-text-slash"></span> button on each message. The original text is always kept as a swipe, so a reformat is reversible.</small> <label class="checkbox_label"> <input id="reformatting_enabled" type="checkbox"/> <span>Enable Reformatting</span> </label> <label class="checkbox_label" title="When on, every AI character message is reformatted as it arrives. When off, only the per-message button (or /reformat) reformats."> <input id="reformatting_auto" type="checkbox"/> <span>Auto-Reformat AI Messages</span> </label> <div class="ng_inline_row"> <label for="reformatting_engine"><b>Engine:</b></label> <select id="reformatting_engine" class="text_pole ng_select_input" title="Rules — fast, free, deterministic transforms. LLM — send the message to the model with the prompt below."> <option value="rules">Rules (deterministic)</option> <option value="llm">LLM (prompt-based)</option> </select> </div> <div id="reformatting_rules_section" class="reformatting_section"> <label><b>Asterisks:</b></label> <div class="reformatting_radio_group"> <label class="checkbox_label" title="Leave asterisks exactly as the model wrote them."> <input type="radio" name="reformatting_asterisk_mode" value="none"/> <span>Leave as-is</span> </label> <label class="checkbox_label" title="Remove every asterisk (markdown italic / bold emphasis marker). Turns *He danced.* into He danced."> <input type="radio" name="reformatting_asterisk_mode" value="strip"/> <span>Strip asterisks</span> </label> <label class="checkbox_label" title="Wrap narration (everything outside quoted dialogue) in asterisks. Strips existing asterisks first, so the result is consistent. Turns He danced. &quot;Hi.&quot; into *He danced.* &quot;Hi.&quot;"> <input type="radio" name="reformatting_asterisk_mode" value="wrap"/> <span>Wrap narration in asterisks</span> </label> </div> <label class="checkbox_label" title="Collapse runs of 3+ blank lines to one and trim trailing spaces. Applies on top of the asterisk choice above."> <input id="reformatting_collapse_whitespace" type="checkbox"/> <span>Collapse Extra Whitespace</span> </label> </div> <div id="reformatting_llm_section" class="reformatting_section"> <div class="ng_inline_row"> <label for="reformatting_response_length"><b><span class="fa-solid fa-coins"></span> Response Token Limit:</b></label> <input id="reformatting_response_length" type="number" min="50" max="8192" step="50" class="text_pole ng_number_input" title="Maximum tokens the model may use to reformat a message."/> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the Reformatting prompt + prefill below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="reformatting_presets"></div> <div class="menu_button saints_preview_btn" id="reformatting_preview_btn" title="Show the exact system prompt, assembled user prompt, and prefill the LLM engine will send, with a sample message."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>System Prompt</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="reformatting_prompt_section"> <textarea id="reformatting_system_prompt_textarea" class="text_pole" rows="4" placeholder="Enter the system prompt for the LLM reformatter..."></textarea> <small>Sent as the system prompt for each LLM reformat. Sets the model's role and overall instructions.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="reformatting_prompt_section"> <textarea id="reformatting_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your Reformatting prompt template..."></textarea> <small>Sent as the user prompt for each LLM reformat. Placeholder: <code>{{message}}</code> — the message being reformatted. If it's missing, the message is appended automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="reformatting_prompt_section"> <textarea id="reformatting_prefill_textarea" class="text_pole" rows="3" placeholder="Optional assistant prefix the model continues from (leave empty for none)."></textarea> <small>Optional. Sent as an assistant prefix the model continues from, and kept at the start of the result. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-bolt"></span> SSE Silent Generation</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label" title="Stream ACC, World Info Assist, Narrative Guidance, and LLM Reformatting output into their fields token by token, instead of waiting for the full response."> <input id="silent_generation_streaming" type="checkbox"/> <span>Stream output into fields</span> </label> <small>Live-streams silent generations (ACC, WIA, Narrative Guidance, LLM Reformatting) into their output fields. A fresh generation clears the field as it starts; stopping mid-stream keeps whatever has arrived so you can edit it or continue from it. Supported for Chat Completion, Text Completion, KoboldAI Classic (streaming-capable KoboldCpp), and NovelAI (with its streaming toggle on); other backends — or a stream that fails before the first token — fall back to a single write when the response completes.</small> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-bug"></span> SSE Diagnostics</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label" title="Log detailed Possession events to the browser console."> <input id="possession_debug_mode" type="checkbox"/> <span>Possession Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Phrasing events to the browser console."> <input id="phrasing_debug_mode" type="checkbox"/> <span>Phrasing Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Phrase Ban events (pattern compilation, matches, rewrite attempts) to the browser console."> <input id="phrase_ban_debug_mode" type="checkbox"/> <span>Phrase Ban Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Assisted Character Creation events, prompts, and generations to the browser console."> <input id="acc_debug_mode" type="checkbox"/> <span>ACC Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed World Info Assist events, prompts, and generations to the browser console."> <input id="wia_debug_mode" type="checkbox"/> <span>WI Assist Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Narrative Guidance events to the browser console."> <input id="ng_debug_mode" type="checkbox"/> <span>Narrative Guidance Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Reformatting events (engine, per-message decisions, LLM prompts) to the browser console."> <input id="reformatting_debug_mode" type="checkbox"/> <span>Reformatting Debug Mode</span> </label> <label class="checkbox_label" title="Log silent-generation lifecycle (job start/abort/completion, stop-listener events, stream token counts) to the browser console. Useful when diagnosing stop-button behavior across backends."> <input id="silent_generation_debug_mode" type="checkbox"/> <span>Silent Generation Debug Mode</span> </label> </div> </div> </div> `;
+var code = `<div id="saints_silly_settings" class="extension_settings"> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-ghost"></span> SSE Possession</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="possession_enabled" type="checkbox"/> <span>Enable Possession</span> </label> <label class="checkbox_label"> <input id="possession_show_toast" type="checkbox"/> <span>Show Toast on Possess/Unpossess</span> </label> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-pen-fancy"></span> SSE Phrasing!</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="phrasing_enabled" type="checkbox" checked="checked"/> <span>Enable Phrasing!</span> </label> <label class="checkbox_label" title="When enabled, rephrasing a message includes every existing swipe in the prompt and asks the model to produce something wildly different."> <input id="phrasing_inverse_guidance" type="checkbox"/> <span>Inverse Guidance</span> </label> <div class="saints_preset_block"> <label title="Save and switch named bundles of every Phrasing prompt field below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="phrasing_presets"></div> <div class="menu_button saints_preview_btn" id="phrasing_preview_btn" title="Show exactly what Phrasing! will inject into the chat prompt, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrasing_prompt_section"> <textarea id="phrasing_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Phrasing! prompt template..."></textarea> <small>Injected into the chat prompt as a system message for the rephrase generation. Placeholder: <code>{{phrasingSeed}}</code> — the speaker-prefixed message being rephrased.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Inverse Guidance Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrasing_prompt_section"> <textarea id="phrasing_inverse_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Inverse Guidance prompt template..."></textarea> <small>Used instead of the standard prompt when Inverse Guidance is on. Placeholders: <code>{{phrasingSeed}}</code>, <code>{{phrasingSwipes}}</code> — the existing swipes to avoid resembling.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-ban"></span> SSE Phrase Ban</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <small>Scans each AI reply against a regex ban list and, on a match, has the model rewrite the reply without the offending phrasing (through the Phrasing! engine). The original is always kept as a swipe. Set Max Rewrite Attempts to 0 to only be notified. Every detected phrase is also collected into a per-chat <b>Learned Phrases</b> list, which (while Phrase Ban is enabled) is appended to your backend's native banned strings on Text Completion. Turn on <b>Proactive Injection</b> to also instruct the model to avoid that list before every reply (useful on Chat Completion APIs, which have no native ban).</small> <label class="checkbox_label"> <input id="phrase_ban_enabled" type="checkbox"/> <span>Enable Phrase Ban</span> </label> <label class="checkbox_label" title="When on, every AI character message is scanned as it arrives. When off, only /phraseban scans."> <input id="phrase_ban_auto" type="checkbox"/> <span>Auto-Scan AI Messages</span> </label> <div class="ng_inline_row"> <label for="phrase_ban_max_retries"><b><span class="fa-solid fa-rotate-right"></span> Max Rewrite Attempts:</b></label> <input id="phrase_ban_max_retries" type="number" min="0" max="5" step="1" class="text_pole ng_number_input" title="How many times to rewrite a reply that still matches the ban list before giving up. 0 = detect and notify only, never rewrite."/> <small>0 = notify only</small> </div> <div class="ng_inline_row"> <small id="phrase_ban_learned_status"></small> <div class="menu_button" id="phrase_ban_clear_learned" title="Forget every phrase learned in the current chat (also removes the proactive injection)."> <span class="fa-solid fa-eraser"></span> Clear Learned Phrases </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Learned Phrases (this chat)</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrase_ban_section"> <textarea id="phrase_ban_learned_textarea" class="text_pole" rows="6" placeholder="Phrases detected in this chat are collected here, one per line.&#10;Edit freely — add your own, or delete ones you don't want used."></textarea> <small>One phrase per line. Detected phrases are collected here automatically as Phrase Ban scans; edit freely to add or remove entries. While Phrase Ban is enabled, this list is also appended to your backend's native banned strings on Text Completion backends (a sampler-level ban; no effect on Chat Completion APIs). Stored with the chat, not globally.</small> </div> </div> </div> <label class="checkbox_label" title="Injects the Learned Phrases list before every AI turn as a 'don't reuse these phrases' instruction, so future replies avoid them up front. Independent of the native sampler-level ban (which is always applied on Text Completion backends while Phrase Ban is enabled); use this for Chat Completion APIs, or as extra reinforcement."> <input id="phrase_ban_proactive" type="checkbox"/> <span>Proactive Injection (avoid learned phrases)</span> </label> <div class="ng_inline_row"> <label for="phrase_ban_injection_depth"><b>Depth:</b></label> <input id="phrase_ban_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the proactive instruction after (0 = bottom)."/> <label for="phrase_ban_injection_role"><b>Role:</b></label> <select id="phrase_ban_injection_role" class="text_pole ng_select_input" title="Role used when injecting the proactive instruction into the prompt."> <option value="system">System</option> <option value="user">User</option> <option value="assistant">Assistant</option> </select> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the pattern list + rewrite prompt below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="phrase_ban_presets"></div> <div class="menu_button saints_preview_btn" id="phrase_ban_preview_btn" title="Show exactly what Phrase Ban will inject into the chat prompt for a rewrite, with sample matches."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Banned Phrase Patterns</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrase_ban_section"> <textarea id="phrase_ban_patterns_textarea" class="text_pole" rows="8" placeholder="One JavaScript regex per line, e.g.&#10;voice was (thick|heavy) with&#10;something (he|she|they) (didn't|couldn't) want to name&#10;/Anger\\? Rage\\?/&#10;# lines starting with # are comments"></textarea> <small>One JavaScript regular expression per line, matched against the raw message text. Case-insensitive by default; wrap a line in <code>/…/flags</code> to set your own flags. Lines starting with <code>#</code> are comments. Invalid patterns are skipped.</small> <small id="phrase_ban_pattern_status"></small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Rewrite Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrase_ban_section"> <textarea id="phrase_ban_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Phrase Ban rewrite prompt template..."></textarea> <small>Injected into the chat prompt as a system message for the rewrite generation. Placeholders: <code>{{phrasingSeed}}</code> — the speaker-prefixed message being rewritten; <code>{{bannedPhrases}}</code> — the list of matched phrases to avoid.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Proactive Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrase_ban_section"> <textarea id="phrase_ban_proactive_prompt_textarea" class="text_pole" rows="6" placeholder="Enter your Phrase Ban proactive injection template..."></textarea> <small>Used only when <b>Proactive Injection</b> is on. Persistently injected before every AI turn while the chat has learned phrases. Placeholder: <code>{{bannedPhrases}}</code> — the running list of phrases learned in this chat.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-wand-magic-sparkles"></span> SSE Assisted Character Creation</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="acc_enabled" type="checkbox"/> <span>Enable Assisted Character Creation</span> </label> <div class="ng_inline_row"> <label for="acc_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="acc_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for ACC generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the ACC prompt + prefill below. The prompt describes the prefill's opening, so they are saved together."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="acc_presets"></div> <div class="menu_button saints_preview_btn" id="acc_preview_btn" title="Show the exact system prompt, assembled user prompt, and prefill ACC will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="acc_prompt_section"> <textarea id="acc_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your ACC prompt template..."></textarea> <small>Sent as the user prompt for each generation. Placeholders: <code>{{context}}</code> (chat/lore preamble, when enabled in the modal), <code>{{brief}}</code> (your Character Brief). If a placeholder is missing, the context is prepended and the brief appended automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="acc_prompt_section"> <textarea id="acc_prefill_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix the model continues. Also prepended to the description on success."></textarea> <small>Sent as an assistant prefix the model continues from, and kept at the top of the final description. If the backend ignores prefills and the model repeats it, the echo is stripped automatically. Keep it in sync with the format the Prompt Template describes.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-book-atlas"></span> SSE World Info Assist</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="wia_enabled" type="checkbox"/> <span>Enable World Info Assist</span> </label> <div class="ng_inline_row"> <label for="wia_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="wia_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for World Info Assist generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="wia_response_length"><b><span class="fa-solid fa-coins"></span> Response Token Limit:</b></label> <input id="wia_response_length" type="number" min="50" max="8192" step="50" class="text_pole ng_number_input" title="Maximum tokens the model may use for each World Info Assist generation."/> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the WIA prompt + both prefills below. The prompt describes the prefill's opening, so they are saved together."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="wia_presets"></div> <div class="menu_button saints_preview_btn" id="wia_preview_btn" title="Show the exact system prompt, assembled user prompt, and prefills WIA will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="wia_prompt_section"> <textarea id="wia_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your World Info Assist prompt template..."></textarea> <small>Sent as the user prompt for each Assist/Continue. Placeholders: <code>{{context}}</code> (chat/lore preamble, when enabled on the entry's Assist row), <code>{{guidance}}</code> (the entry's Assist Guidance text), <code>{{title}}</code> (the entry's title). If context or guidance placeholders are missing, those blocks are added automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template — Titled Entry</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="wia_prompt_section"> <textarea id="wia_prefill_titled_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix used when the entry has a title."></textarea> <small>Sent as an assistant prefix when the entry has a title, and kept at the start of the entry on success. Placeholder: <code>{{title}}</code>. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template — Untitled Entry</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="wia_prompt_section"> <textarea id="wia_prefill_untitled_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix used when the entry has no title yet."></textarea> <small>Sent as an assistant prefix when the entry has no title, and kept at the start of the entry on success. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-compass"></span> SSE Narrative Guidance</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <small>Two independent tiers of story direction. <b>Long-term</b> sets the overarching arc on a slow refresh horizon; <b>Short-term</b> sets the immediate beats on a fast one and is seeded with the active long-term arc so the two stay aligned. Each tier has its own toggle, cadence, prompts, lore books and guidance text.</small> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-mountain-sun"></span> Long-term (the overarching arc)</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="ng_long_enabled" type="checkbox"/> <span>Enable Long-term Guidance</span> </label> <label class="checkbox_label" title="When on, regenerates the long-term arc automatically when its turn counter hits zero. When off, only the Regenerate Now button updates it."> <input id="ng_long_auto_regen" type="checkbox"/> <span>Auto-Regenerate at Zero</span> </label> <div class="ng_inline_row"> <label for="ng_long_default_turn_count"><b>Turns Between Regenerations:</b></label> <input id="ng_long_default_turn_count" type="number" min="1" step="1" class="text_pole ng_number_input"/> </div> <div class="ng_inline_row"> <label for="ng_long_response_length"><b>Response Token Limit:</b></label> <input id="ng_long_response_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="Maximum number of tokens the model may use for each generated guidance paragraph."/> </div> <div class="ng_inline_row"> <label for="ng_long_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="ng_long_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for long-term generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="ng_long_injection_depth"><b>Depth:</b></label> <input id="ng_long_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the guidance after (0 = bottom)."/> <label for="ng_long_injection_role"><b>Role:</b></label> <select id="ng_long_injection_role" class="text_pole ng_select_input" title="Role used when injecting the guidance into the prompt."> <option value="system">System</option> <option value="user">User</option> <option value="assistant">Assistant</option> </select> </div> <div id="ng_long_lorebooks_host"></div> <div class="ng_inline_row"> <span><b>Turns Remaining:</b> <span id="ng_long_remaining_display">0</span></span> <div class="menu_button" id="ng_long_decrement_button" title="Decrement remaining by 1"> <span class="fa-solid fa-minus"></span> </div> <div class="menu_button" id="ng_long_reset_button" title="Reset remaining to default turn count"> <span class="fa-solid fa-rotate-right"></span> Reset </div> <div class="menu_button disabled" id="ng_long_continue_now" title="Continue the current guidance paragraph"> <span class="fa-solid fa-arrow-right"></span> Continue </div> <div class="menu_button disabled" id="ng_long_retry_now" title="Restore previous guidance and regenerate"> <span class="fa-solid fa-rotate-right"></span> Retry </div> <div class="menu_button" id="ng_long_regenerate_now" title="Regenerate guidance now"> <span class="ng-regen-icon fa-solid fa-wand-sparkles"></span> Regenerate Now </div> </div> <div class="ng_prompt_section"> <label for="ng_long_themes_textarea"><b>Themes / Story Arcs:</b></label> <textarea id="ng_long_themes_textarea" class="text_pole" rows="4" placeholder="Optional themes, ideas, or arcs for the AI to consider..."></textarea> </div> <div class="ng_prompt_section"> <label for="ng_long_active_guidance_textarea"><b>Active Guidance:</b></label> <textarea id="ng_long_active_guidance_textarea" class="text_pole" rows="6" placeholder="The currently active long-term arc. Edit freely; changes apply on the next AI turn."></textarea> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the three long-term prompt fields below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="ng_long_presets"></div> <div class="menu_button saints_preview_btn" id="ng_long_preview_btn" title="Show the exact system prompt, assembled user prompt, prefill, and injection long-term guidance will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Generation Instructions Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_long_user_prompt_textarea" class="text_pole" rows="5" placeholder="Instructions sent as the user prompt for each generation..."></textarea> <small>Sent as the user prompt for each generation. Placeholders: <code>{{context}}</code> (chat/lore preamble), <code>{{themes}}</code> (your Themes / Story Arcs block). If a placeholder is missing, the blocks are prepended automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_long_generation_prompt_textarea" class="text_pole" rows="4" placeholder="Enter the prefill that the LLM will continue..."></textarea> <small>Sent as an assistant prefix the model continues from; the prefill plus the reply becomes the active guidance. If it opens with "[", the brackets are stripped when the guidance is injected into the chat prompt. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Injection Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_long_injection_prompt_textarea" class="text_pole" rows="3" placeholder="Template injected before each AI turn..."></textarea> <small>Added to the chat prompt before each AI turn while guidance is active. Placeholder: <code>{{guidance}}</code> — the active guidance text (outer brackets stripped).</small> </div> </div> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-bolt"></span> Short-term (the immediate beats)</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="ng_short_enabled" type="checkbox"/> <span>Enable Short-term Guidance</span> </label> <label class="checkbox_label" title="When on, regenerates the short-term beats automatically when its turn counter hits zero (and whenever the long-term arc refreshes). When off, only the Regenerate Now button updates it."> <input id="ng_short_auto_regen" type="checkbox"/> <span>Auto-Regenerate at Zero</span> </label> <div class="ng_inline_row"> <label for="ng_short_default_turn_count"><b>Turns Between Regenerations:</b></label> <input id="ng_short_default_turn_count" type="number" min="1" step="1" class="text_pole ng_number_input"/> </div> <div class="ng_inline_row"> <label for="ng_short_response_length"><b>Response Token Limit:</b></label> <input id="ng_short_response_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="Maximum number of tokens the model may use for each generated guidance paragraph."/> </div> <div class="ng_inline_row"> <label for="ng_short_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="ng_short_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for short-term generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="ng_short_injection_depth"><b>Depth:</b></label> <input id="ng_short_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the guidance after (0 = bottom)."/> <label for="ng_short_injection_role"><b>Role:</b></label> <select id="ng_short_injection_role" class="text_pole ng_select_input" title="Role used when injecting the guidance into the prompt."> <option value="system">System</option> <option value="user">User</option> <option value="assistant">Assistant</option> </select> </div> <div id="ng_short_lorebooks_host"></div> <div class="ng_inline_row"> <span><b>Turns Remaining:</b> <span id="ng_short_remaining_display">0</span></span> <div class="menu_button" id="ng_short_decrement_button" title="Decrement remaining by 1"> <span class="fa-solid fa-minus"></span> </div> <div class="menu_button" id="ng_short_reset_button" title="Reset remaining to default turn count"> <span class="fa-solid fa-rotate-right"></span> Reset </div> <div class="menu_button disabled" id="ng_short_continue_now" title="Continue the current guidance paragraph"> <span class="fa-solid fa-arrow-right"></span> Continue </div> <div class="menu_button disabled" id="ng_short_retry_now" title="Restore previous guidance and regenerate"> <span class="fa-solid fa-rotate-right"></span> Retry </div> <div class="menu_button" id="ng_short_regenerate_now" title="Regenerate guidance now"> <span class="ng-regen-icon fa-solid fa-wand-sparkles"></span> Regenerate Now </div> </div> <div class="ng_prompt_section"> <label for="ng_short_themes_textarea"><b>Themes / Story Arcs:</b></label> <textarea id="ng_short_themes_textarea" class="text_pole" rows="4" placeholder="Optional themes, ideas, or arcs for the AI to consider..."></textarea> </div> <div class="ng_prompt_section"> <label for="ng_short_active_guidance_textarea"><b>Active Guidance:</b></label> <textarea id="ng_short_active_guidance_textarea" class="text_pole" rows="6" placeholder="The currently active short-term beats. Edit freely; changes apply on the next AI turn."></textarea> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the three short-term prompt fields below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="ng_short_presets"></div> <div class="menu_button saints_preview_btn" id="ng_short_preview_btn" title="Show the exact system prompt, assembled user prompt, prefill, and injection short-term guidance will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Generation Instructions Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_short_user_prompt_textarea" class="text_pole" rows="5" placeholder="Instructions sent as the user prompt for each generation..."></textarea> <small>Sent as the user prompt for each generation. Placeholders: <code>{{context}}</code> (chat/lore preamble), <code>{{longGuidance}}</code> (the active long-term arc), <code>{{themes}}</code> (your Themes / Story Arcs block). If a placeholder is missing, the blocks are prepended automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_short_generation_prompt_textarea" class="text_pole" rows="4" placeholder="Enter the prefill that the LLM will continue..."></textarea> <small>Sent as an assistant prefix the model continues from; the prefill plus the reply becomes the active guidance. If it opens with "[", the brackets are stripped when the guidance is injected into the chat prompt. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Injection Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_short_injection_prompt_textarea" class="text_pole" rows="3" placeholder="Template injected before each AI turn..."></textarea> <small>Added to the chat prompt before each AI turn while guidance is active. Placeholder: <code>{{guidance}}</code> — the active guidance text (outer brackets stripped).</small> </div> </div> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-text-slash"></span> SSE Reformatting</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <small>Normalizes the formatting of AI character messages after they're generated. Runs automatically on each reply, or manually via the <span class="fa-solid fa-text-slash"></span> button on each message. The original text is always kept as a swipe, so a reformat is reversible.</small> <label class="checkbox_label"> <input id="reformatting_enabled" type="checkbox"/> <span>Enable Reformatting</span> </label> <label class="checkbox_label" title="When on, every AI character message is reformatted as it arrives. When off, only the per-message button (or /reformat) reformats."> <input id="reformatting_auto" type="checkbox"/> <span>Auto-Reformat AI Messages</span> </label> <div class="ng_inline_row"> <label for="reformatting_engine"><b>Engine:</b></label> <select id="reformatting_engine" class="text_pole ng_select_input" title="Rules — fast, free, deterministic transforms. LLM — send the message to the model with the prompt below."> <option value="rules">Rules (deterministic)</option> <option value="llm">LLM (prompt-based)</option> </select> </div> <div id="reformatting_rules_section" class="reformatting_section"> <label><b>Asterisks:</b></label> <div class="reformatting_radio_group"> <label class="checkbox_label" title="Leave asterisks exactly as the model wrote them."> <input type="radio" name="reformatting_asterisk_mode" value="none"/> <span>Leave as-is</span> </label> <label class="checkbox_label" title="Remove every asterisk (markdown italic / bold emphasis marker). Turns *He danced.* into He danced."> <input type="radio" name="reformatting_asterisk_mode" value="strip"/> <span>Strip asterisks</span> </label> <label class="checkbox_label" title="Wrap narration (everything outside quoted dialogue) in asterisks. Strips existing asterisks first, so the result is consistent. Turns He danced. &quot;Hi.&quot; into *He danced.* &quot;Hi.&quot;"> <input type="radio" name="reformatting_asterisk_mode" value="wrap"/> <span>Wrap narration in asterisks</span> </label> </div> <label class="checkbox_label" title="Collapse runs of 3+ blank lines to one and trim trailing spaces. Applies on top of the asterisk choice above."> <input id="reformatting_collapse_whitespace" type="checkbox"/> <span>Collapse Extra Whitespace</span> </label> </div> <div id="reformatting_llm_section" class="reformatting_section"> <div class="ng_inline_row"> <label for="reformatting_response_length"><b><span class="fa-solid fa-coins"></span> Response Token Limit:</b></label> <input id="reformatting_response_length" type="number" min="50" max="8192" step="50" class="text_pole ng_number_input" title="Maximum tokens the model may use to reformat a message."/> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the Reformatting prompt + prefill below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="reformatting_presets"></div> <div class="menu_button saints_preview_btn" id="reformatting_preview_btn" title="Show the exact system prompt, assembled user prompt, and prefill the LLM engine will send, with a sample message."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>System Prompt</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="reformatting_prompt_section"> <textarea id="reformatting_system_prompt_textarea" class="text_pole" rows="4" placeholder="Enter the system prompt for the LLM reformatter..."></textarea> <small>Sent as the system prompt for each LLM reformat. Sets the model's role and overall instructions.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="reformatting_prompt_section"> <textarea id="reformatting_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your Reformatting prompt template..."></textarea> <small>Sent as the user prompt for each LLM reformat. Placeholder: <code>{{message}}</code> — the message being reformatted. If it's missing, the message is appended automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="reformatting_prompt_section"> <textarea id="reformatting_prefill_textarea" class="text_pole" rows="3" placeholder="Optional assistant prefix the model continues from (leave empty for none)."></textarea> <small>Optional. Sent as an assistant prefix the model continues from, and kept at the start of the result. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-compress"></span> SSE Compaction</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <small>When a chat fills the context window, generation slows to a crawl. Compaction summarizes the chat, starts a fresh chat seeded with that summary plus the recent tail, migrates per-chat extension state, and resumes — resetting the context window. Trigger it from the <span class="fa-solid fa-compress"></span> <b>Compact Chat</b> item in the hamburger menu or with <code>/compact</code>. Every compaction opens a modal where you review and edit the summary first.</small> <label class="checkbox_label" title="Enable Compaction (the launch button, /compact, and the auto-trigger)."> <input id="compaction_enabled" type="checkbox"/> <span>Enable Compaction</span> </label> <label class="checkbox_label" title="When the measured prompt crosses the threshold below, automatically open the Compaction modal after a turn finishes. The modal still requires you to act — nothing is rewritten headlessly."> <input id="compaction_auto_enabled" type="checkbox"/> <span>Auto-open at threshold</span> </label> <label class="checkbox_label" title="Show a confirmation dialog (with a 'Don't ask again' option) before auto-opening the modal."> <input id="compaction_confirm_auto" type="checkbox"/> <span>Confirm before auto-opening</span> </label> <label class="checkbox_label" title="Carry over per-chat extension state (Possession, Narrative Guidance, Phrase Ban) into the compacted chat. World Info Assist guidance travels on the lorebook automatically."> <input id="compaction_migrate_state" type="checkbox"/> <span>Migrate per-chat extension state</span> </label> <div class="ng_inline_row"> <label for="compaction_threshold_percent"><b><span class="fa-solid fa-gauge-high"></span> Auto Threshold (%):</b></label> <input id="compaction_threshold_percent" type="number" min="1" max="100" step="1" class="text_pole ng_number_input" title="Percent of the model's context window (measured outgoing prompt) that triggers the auto-open."/> <small>% of context window</small> </div> <div class="ng_inline_row"> <label for="compaction_tail_length"><b><span class="fa-solid fa-list-ol"></span> Tail Length:</b></label> <input id="compaction_tail_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="How many of the most recent messages are copied into the new chat verbatim (swipes preserved). Older messages are replaced by the summary."/> <small>messages kept verbatim</small> </div> <div class="ng_inline_row"> <label for="compaction_response_length"><b><span class="fa-solid fa-coins"></span> Summary Token Limit:</b></label> <input id="compaction_response_length" type="number" min="50" max="16384" step="50" class="text_pole ng_number_input" title="Maximum tokens for the summary generation."/> </div> <div class="ng_inline_row"> <label for="compaction_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="compaction_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of chat history the summary generation pulls in. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the Compaction summary prompt + prefill below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="compaction_presets"></div> <div class="menu_button saints_preview_btn" id="compaction_preview_btn" title="Show the exact system prompt, assembled user prompt, and prefill the summary generation will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Summary Prompt</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="compaction_prompt_section"> <textarea id="compaction_summary_prompt_textarea" class="text_pole" rows="12" placeholder="Enter your Compaction summary prompt template..."></textarea> <small>Sent as the user prompt for the summary. Placeholders: <code>{{context}}</code> (packed chat history minus the verbatim tail, plus selected lore books), <code>{{guidance}}</code> (your Summary Guidance from the modal). If a placeholder is missing, the context is prepended and the guidance appended last, wrapped emphatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Summary Prefill</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="compaction_prompt_section"> <textarea id="compaction_summary_prefill_textarea" class="text_pole" rows="3" placeholder="Optional assistant prefix the model continues from (leave empty for none)."></textarea> <small>Optional. Sent as an assistant prefix the model continues from, and kept at the start of the summary. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-bolt"></span> SSE Silent Generation</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label" title="Stream ACC, World Info Assist, Narrative Guidance, and LLM Reformatting output into their fields token by token, instead of waiting for the full response."> <input id="silent_generation_streaming" type="checkbox"/> <span>Stream output into fields</span> </label> <small>Live-streams silent generations (ACC, WIA, Narrative Guidance, LLM Reformatting) into their output fields. A fresh generation clears the field as it starts; stopping mid-stream keeps whatever has arrived so you can edit it or continue from it. Supported for Chat Completion, Text Completion, KoboldAI Classic (streaming-capable KoboldCpp), and NovelAI (with its streaming toggle on); other backends — or a stream that fails before the first token — fall back to a single write when the response completes.</small> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-bug"></span> SSE Diagnostics</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label" title="Log detailed Possession events to the browser console."> <input id="possession_debug_mode" type="checkbox"/> <span>Possession Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Phrasing events to the browser console."> <input id="phrasing_debug_mode" type="checkbox"/> <span>Phrasing Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Phrase Ban events (pattern compilation, matches, rewrite attempts) to the browser console."> <input id="phrase_ban_debug_mode" type="checkbox"/> <span>Phrase Ban Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Assisted Character Creation events, prompts, and generations to the browser console."> <input id="acc_debug_mode" type="checkbox"/> <span>ACC Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed World Info Assist events, prompts, and generations to the browser console."> <input id="wia_debug_mode" type="checkbox"/> <span>WI Assist Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Narrative Guidance events to the browser console."> <input id="ng_debug_mode" type="checkbox"/> <span>Narrative Guidance Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Reformatting events (engine, per-message decisions, LLM prompts) to the browser console."> <input id="reformatting_debug_mode" type="checkbox"/> <span>Reformatting Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Compaction events (prompt measurement, auto-trigger checks, summary generation, commit pipeline) to the browser console."> <input id="compaction_debug_mode" type="checkbox"/> <span>Compaction Debug Mode</span> </label> <label class="checkbox_label" title="Log silent-generation lifecycle (job start/abort/completion, stop-listener events, stream token counts) to the browser console. Useful when diagnosing stop-button behavior across backends."> <input id="silent_generation_debug_mode" type="checkbox"/> <span>Silent Generation Debug Mode</span> </label> </div> </div> </div> `;
 // Exports
 /* harmony default export */ const settings = (code);
 ;// external "../../../../world-info.js"
@@ -2691,6 +2924,25 @@ function formatChatLine(m, ctx) {
 }
 
 /**
+ * Estimate the token cost of the current chat's visible (non-system) lines.
+ *
+ * Used as the cold-start fallback for context-usage readouts before a live
+ * generation has reported the true outgoing prompt size. Counts the whole
+ * chat in a single tokenizer call (cheap enough for a one-shot estimate);
+ * returns 0 when there's nothing to count.
+ *
+ * @returns {Promise<number>} Approximate token count of the visible chat.
+ */
+async function estimateChatTokens() {
+    const ctx = getContext();
+    const chat = Array.isArray(ctx.chat) ? ctx.chat : [];
+    if (!chat.length) return 0;
+    const lines = chat.map(m => formatChatLine(m, ctx)).filter(Boolean);
+    if (!lines.length) return 0;
+    return await __WEBPACK_EXTERNAL_MODULE__tokenizers_js_d5863f55_getTokenCountAsync__(lines.join('\n'));
+}
+
+/**
  * Pack as many recent chat lines as the token budget allows, newest first,
  * but return them in chronological order. Returns '' if nothing fits.
  */
@@ -2726,6 +2978,7 @@ async function packRecentChatLines(chat, ctx, chatBudget) {
  * @param {string[]} [opts.loreBookNames=[]] - Names of lore books whose enabled entries to include.
  * @param {number}  [opts.responseLength=0] - Tokens reserved for the model's response; subtracted from the budget.
  * @param {number}  [opts.maxContextOverride=0] - If > 0, use this as the max-context size instead of `getMaxPromptTokens()`. Lets callers cap how much chat history they pull in independently of the model's real window.
+ * @param {number}  [opts.excludeRecentCount=0] - Drop this many of the most recent messages before packing the chat. Compaction uses it so `{{context}}` is the chat *minus* the verbatim tail it carries over.
  * @returns {Promise<string>} The composed preamble, or '' if nothing was included.
  */
 async function buildContextPreamble({
@@ -2733,6 +2986,7 @@ async function buildContextPreamble({
     loreBookNames = [],
     responseLength = 0,
     maxContextOverride = 0,
+    excludeRecentCount = 0,
 } = {}) {
     const sections = [];
     const ctx = getContext();
@@ -2781,7 +3035,12 @@ async function buildContextPreamble({
 
     // Pack recent chat into whatever budget remains.
     if (includeChat) {
-        const chat = Array.isArray(ctx.chat) ? ctx.chat : [];
+        const fullChat = Array.isArray(ctx.chat) ? ctx.chat : [];
+        // Optionally drop the most-recent N messages (the verbatim tail a
+        // caller is carrying over elsewhere) so they aren't double-counted.
+        const chat = (Number.isFinite(excludeRecentCount) && excludeRecentCount > 0)
+            ? fullChat.slice(0, Math.max(0, fullChat.length - excludeRecentCount))
+            : fullChat;
         if (chat.length) {
             let recentBlock = '';
             try {
@@ -8028,6 +8287,1112 @@ function registerReformattingSlashCommand() {
     reformatting_debug('Registered /reformat slash command');
 }
 
+;// ./src/compaction.js
+/**
+ * Compaction
+ *
+ * Long roleplays eventually fill the model's context window; once full, ST
+ * evicts the oldest history every turn, which invalidates the backend's KV
+ * cache and slows generation to a crawl. Compaction fixes this the only way
+ * that actually works: it summarizes the chat, starts a *fresh* chat seeded
+ * with that summary plus the recent tail, migrates all per-chat extension
+ * state, and resumes — resetting the context window and restoring fast
+ * generation.
+ *
+ * Triggers: a manual button + `/compact`, and an optional auto-trigger when
+ * the *measured* outgoing prompt crosses a user-set % of the context window.
+ * The auto-trigger only ever *opens the modal* — every compaction still
+ * requires a deliberate user action (Generate a summary, then click Compact).
+ * Nothing is ever rewritten headlessly.
+ *
+ * The guided summary modal mirrors the Assisted Character Creation modal:
+ * per-chat guidance demanding specific details, a lore-book picker, and
+ * Generate / Continue / Checkpoint / Retry actions that stream into an
+ * editable "Story so far" preview before commit.
+ */
+
+// Namespace import: `doNewChat` is the New Chat button handler in the running
+// ST but isn't listed in this repo's API docs, so we call it defensively
+// (`hostScript.doNewChat?.(...)`) and fall back to confirmed primitives if a
+// build ever lacks the export. The webpack externals rule passes the `../`
+// request through unchanged, so the namespace resolves at runtime.
+
+
+
+
+
+
+
+
+
+
+// ─── Defaults ───
+
+const DEFAULT_COMPACTION_SUMMARY_PROMPT = `{{context}}[
+You are a summarization engine for a long-running roleplay. Produce a "Story so far" recap dense enough that the roleplay can continue seamlessly after the older chat history is dropped from the model's context.
+
+Rules:
+- Write organized prose under clear headings: Setting, Characters & Relationships, What Happened (chronological), Established Facts / Canon, Open Threads & Goals, Where Things Stand Now. Third person, past tense.
+- Maximize information density. Keep everything plot-critical; drop verbatim dialogue, repetition, and minor filler.
+- Never invent events that did not occur, and never continue the story — only summarize what has already happened.
+- Output only the recap. No preamble, no commentary, no meta-text.
+]`;
+
+// Prefill is optional for Compaction (the summary is free-form prose), so the
+// default is empty. When set it is dual-use: sent as the assistant prefix and
+// prepended to the stored summary, with the echo stripped at the prepend site.
+const DEFAULT_COMPACTION_SUMMARY_PREFILL = '';
+
+const DEFAULT_COMPACTION_RESPONSE_LENGTH = 1200;
+const DEFAULT_COMPACTION_THRESHOLD_PERCENT = 90;
+const DEFAULT_COMPACTION_TAIL_LENGTH = 20;
+
+const COMPACTION_SUMMARY_SYSTEM_PROMPT =
+    'You are a summarization assistant for long-form roleplay. Produce a faithful, '
+    + 'information-dense recap in the requested format. No preamble, no commentary.';
+
+const COMPACTION_CONTINUE_SYSTEM_PROMPT =
+    'You are a summarization assistant. Continue the existing recap seamlessly in the '
+    + 'same format. Output only the continuation — no headers, no meta-commentary, '
+    + 'no repetition of prior text.';
+
+// Speaker name for the seeded recap message. It's a normal (non-system)
+// message so the model actually receives it — see the plan's "Why not
+// is_system" — tagged via extra.sse_summary for styling and recognition.
+const SUMMARY_MESSAGE_NAME = 'Story so far';
+
+// Per-chat metadata key. Holds `{ guidance }` — the user's demanded-details
+// text, persisted like Narrative Guidance so it survives across opens and
+// across compactions of the same storyline.
+const COMPACTION_METADATA_KEY = 'compaction';
+
+// SSE per-chat metadata keys carried into the fresh chat on compaction.
+const MIGRATED_METADATA_KEYS = ['possession', 'narrativeGuidance', 'phraseBan'];
+
+// ─── Module State ───
+
+let compaction_moduleSettings = null;
+let compaction_saveSettingsFn = null;
+let resyncChatStateFn = null;
+let compaction_debug = () => {};
+
+// The true outgoing prompt size, learned from the prompt-measurement events.
+// 0 means "not measured yet" → getContextUsage() falls back to the cold-start
+// chat estimate until the first live generation reports the real number.
+let lastPromptTokens = 0;
+
+// Set for the whole commit (snapshot → new chat → restore → seed) so our
+// measurement listeners, auto-trigger, and modal don't re-enter on the
+// freshly-created/seeded chat.
+let compacting = false;
+
+// Modal summary-generation runtime (mirrors ACC).
+let compaction_isGenerating = false;
+let compaction_abortRequested = false;
+let compaction_activeAction = null;   // which button initiated the current generation
+let compaction_lastAction = null;     // 'generate' | 'continue' — what Retry should redo
+let compaction_restorePoint = null;   // preview snapshot used by Retry
+
+let compaction_activePopup = null;
+let compaction_activeBody = null;
+
+let guidanceSaveTimer = null;
+
+// ─── Init ───
+
+/**
+ * Initialize the Compaction module. Called once from index.js.
+ * @param {object} opts
+ * @param {object} opts.settings - Shared mutable settings reference.
+ * @param {function} opts.saveSettings - Persists settings.
+ * @param {function} opts.resyncChatState - Re-runs the per-chat state reload
+ *   wiring (possession/NG/phrase-ban/reformatting) so migrated metadata is
+ *   re-applied after the fresh chat is created and seeded.
+ */
+function initCompaction({ settings, saveSettings, resyncChatState }) {
+    compaction_moduleSettings = settings;
+    compaction_saveSettingsFn = saveSettings;
+    resyncChatStateFn = typeof resyncChatState === 'function' ? resyncChatState : null;
+    compaction_debug = createDebugLogger('COMPACTION', () => compaction_moduleSettings.compactionDebugMode);
+    compaction_debug('Module initialized');
+}
+
+// ─── Settings Helpers ───
+
+function getSummaryTemplate() {
+    const stored = compaction_moduleSettings?.compactionSummaryPrompt;
+    return (typeof stored === 'string' && stored.trim()) ? stored : DEFAULT_COMPACTION_SUMMARY_PROMPT;
+}
+
+function compaction_getPrefill() {
+    const stored = compaction_moduleSettings?.compactionSummaryPrefill;
+    return (typeof stored === 'string') ? stored : DEFAULT_COMPACTION_SUMMARY_PREFILL;
+}
+
+function getTailLength() {
+    const n = compaction_moduleSettings?.compactionTailLength;
+    return (Number.isFinite(n) && n > 0) ? Math.floor(n) : DEFAULT_COMPACTION_TAIL_LENGTH;
+}
+
+function getThresholdRatio() {
+    const n = compaction_moduleSettings?.compactionThresholdPercent;
+    const pct = (Number.isFinite(n) && n > 0) ? n : DEFAULT_COMPACTION_THRESHOLD_PERCENT;
+    return Math.min(Math.max(pct, 1), 100) / 100;
+}
+
+function compaction_getResponseLength() {
+    const input = document.getElementById('cc_response_length');
+    if (input) {
+        const parsed = parseInt(input.value, 10);
+        if (!isNaN(parsed) && parsed > 0) return parsed;
+    }
+    const setting = compaction_moduleSettings?.compactionSummaryResponseLength;
+    if (typeof setting === 'number' && setting > 0) return setting;
+    return DEFAULT_COMPACTION_RESPONSE_LENGTH;
+}
+
+// ─── Per-chat Guidance Persistence ───
+
+function compaction_readGuidance() {
+    const ctx = getContext();
+    const raw = ctx.chatMetadata?.[COMPACTION_METADATA_KEY];
+    return (raw && typeof raw.guidance === 'string') ? raw.guidance : '';
+}
+
+function writeGuidance(text) {
+    const ctx = getContext();
+    const existing = ctx.chatMetadata?.[COMPACTION_METADATA_KEY];
+    const container = (existing && typeof existing === 'object') ? existing : {};
+    container.guidance = text || '';
+    ctx.chatMetadata[COMPACTION_METADATA_KEY] = container;
+}
+
+function scheduleGuidanceSave(text) {
+    // Write through immediately so a chat switch never persists stale text;
+    // debounce only the saveMetadata call.
+    writeGuidance(text);
+    if (guidanceSaveTimer) clearTimeout(guidanceSaveTimer);
+    guidanceSaveTimer = setTimeout(() => {
+        guidanceSaveTimer = null;
+        getContext().saveMetadata();
+    }, 300);
+}
+
+// ─── Token Measurement ───
+
+function contentToText(content) {
+    if (typeof content === 'string') return content;
+    if (Array.isArray(content)) {
+        return content.map(p => (typeof p === 'string' ? p : (p?.text || ''))).join(' ');
+    }
+    return '';
+}
+
+/**
+ * CHAT_COMPLETION_PROMPT_READY → `{ chat, dryRun }`. The `chat` array is the
+ * fully-assembled list of `{ role, content }` message objects actually sent,
+ * so tokenizing it captures character cards, persona, activated world info,
+ * system prompt, author's notes, and every injection.
+ */
+async function onCompactionChatCompletionPromptReady(data) {
+    // Skip dry-runs, the commit pipeline, and our own summary generation
+    // (which fires this too — measuring it would clobber the real reading).
+    if (!data || data.dryRun || compacting || compaction_activePopup) return;
+    try {
+        const chat = Array.isArray(data.chat) ? data.chat : [];
+        const text = chat.map(m => contentToText(m?.content)).filter(Boolean).join('\n');
+        lastPromptTokens = text ? await __WEBPACK_EXTERNAL_MODULE__tokenizers_js_d5863f55_getTokenCountAsync__(text) : 0;
+        compaction_debug('Measured chat-completion prompt tokens:', lastPromptTokens);
+    } catch (err) {
+        compaction_debug('Chat-completion measurement failed:', err);
+    }
+}
+
+/**
+ * GENERATE_AFTER_COMBINE_PROMPTS → `{ prompt, dryRun }`. `prompt` is the final
+ * combined text-completion string.
+ */
+async function onCompactionGenerateAfterCombinePrompts(data) {
+    if (!data || data.dryRun || compacting || compaction_activePopup) return;
+    try {
+        const prompt = typeof data.prompt === 'string' ? data.prompt : '';
+        if (prompt) {
+            lastPromptTokens = await __WEBPACK_EXTERNAL_MODULE__tokenizers_js_d5863f55_getTokenCountAsync__(prompt);
+            compaction_debug('Measured text-completion prompt tokens:', lastPromptTokens);
+        }
+    } catch (err) {
+        compaction_debug('Text-completion measurement failed:', err);
+    }
+}
+
+/**
+ * Current context usage. `tokens` is the measured outgoing prompt size when a
+ * live generation has reported it, otherwise a cold-start estimate from the
+ * chat. `ratio` is `tokens / getMaxPromptTokens()` (0 when the max is
+ * unavailable, so callers never divide by zero / auto-trigger spuriously).
+ *
+ * @returns {Promise<{ tokens: number, max: number, ratio: number, measured: boolean }>}
+ */
+async function getContextUsage() {
+    let max = 0;
+    try {
+        const raw = __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_getMaxPromptTokens__?.();
+        if (Number.isFinite(raw) && raw > 0) max = raw;
+    } catch (err) {
+        compaction_debug('getMaxPromptTokens failed:', err);
+    }
+
+    let tokens = lastPromptTokens;
+    let measured = tokens > 0;
+    if (!measured) {
+        try {
+            tokens = await estimateChatTokens();
+        } catch (err) {
+            compaction_debug('Cold-start chat estimate failed:', err);
+            tokens = 0;
+        }
+    }
+
+    const ratio = max > 0 ? tokens / max : 0;
+    return { tokens, max, ratio, measured };
+}
+
+// ─── Event Handlers (wired in index.js) ───
+
+/** Reset measured tokens to cold-start for the new chat, then re-tag any
+ *  seeded summary messages (DOM classes don't survive a chat reload). */
+function onCompactionChatChanged() {
+    lastPromptTokens = 0;
+    tagCompactionSummaries();
+    compaction_debug('Chat changed — measured tokens reset to cold-start');
+}
+
+/**
+ * Add the styling class to every "Story so far" message in the current chat.
+ * The `extra.sse_summary` flag has no DOM hook, so we apply the class to the
+ * matching `.mes` nodes ourselves. Safe to call repeatedly.
+ */
+function tagCompactionSummaries() {
+    const ctx = getContext();
+    const chat = Array.isArray(ctx.chat) ? ctx.chat : [];
+    for (let i = 0; i < chat.length; i++) {
+        if (!chat[i]?.extra?.sse_summary) continue;
+        const el = document.querySelector(`#chat .mes[mesid="${i}"]`);
+        if (el) el.classList.add('cc-summary-message');
+    }
+}
+
+/** Idle auto-trigger check, detached from ST's generation pipeline. */
+function onCompactionGenerationEnded() {
+    if (!compaction_moduleSettings?.compactionEnabled || !compaction_moduleSettings?.compactionAutoEnabled) return;
+    if (compacting || compaction_activePopup) return;
+    setTimeout(() => {
+        maybeAutoTrigger().catch(err => console.error('Compaction auto-trigger failed:', err));
+    }, 1200);
+}
+
+async function maybeAutoTrigger() {
+    if (!compaction_moduleSettings?.compactionEnabled || !compaction_moduleSettings?.compactionAutoEnabled) return;
+    if (compacting || compaction_activePopup) return;
+    const ctx = getContext();
+    if (ctx.isGenerating) return;
+    if (!hasActiveCharacterOrGroup(ctx)) return;
+
+    const usage = await getContextUsage();
+    if (usage.max <= 0) return;
+    if (usage.ratio < getThresholdRatio()) return;
+
+    compaction_debug('Auto-trigger threshold reached:', Math.round(usage.ratio * 100), '%');
+
+    if (compaction_moduleSettings.compactionConfirmAuto) {
+        const ok = await confirmAutoCompaction(usage);
+        if (!ok) return;
+    }
+    // Re-check guards: the confirm dialog is async and the user may have
+    // started a generation, or a compaction may have begun, meanwhile.
+    if (compacting || compaction_activePopup) return;
+    if (getContext().isGenerating) return;
+    openCompactionModal({ auto: true });
+}
+
+async function confirmAutoCompaction(usage) {
+    const pct = usage.max > 0 ? Math.round(usage.ratio * 100) : 0;
+    const root = document.createElement('div');
+    root.className = 'cc-confirm';
+    const tokenNote = usage.max > 0 ? ` (≈${usage.tokens} / ${usage.max} tokens)` : '';
+    root.innerHTML = `
+        <p>The prompt is about <b>${pct}%</b> of the context window${tokenNote}.</p>
+        <p>Compact this chat now? You'll review and edit the summary before anything changes.</p>
+        <label class="checkbox_label cc-dont-ask">
+            <input id="cc_dont_ask_again" type="checkbox" />
+            <span>Don't ask again — auto-open the summary modal at the threshold</span>
+        </label>
+    `;
+    const popup = new __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_Popup__(root, __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_POPUP_TYPE__.CONFIRM, '', {
+        okButton: 'Compact',
+        cancelButton: 'Not now',
+    });
+    const result = await popup.show();
+    if (result === __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_POPUP_RESULT__.AFFIRMATIVE) {
+        if (root.querySelector('#cc_dont_ask_again')?.checked) {
+            compaction_moduleSettings.compactionConfirmAuto = false;
+            compaction_saveSettingsFn?.();
+            compaction_debug('Auto-confirm disabled via "Don\'t ask again"');
+        }
+        return true;
+    }
+    return false;
+}
+
+function hasActiveCharacterOrGroup(ctx) {
+    if (ctx.groupId) return true;
+    return ctx.characterId !== undefined && ctx.characterId !== null
+        && Array.isArray(ctx.characters) && !!ctx.characters[ctx.characterId];
+}
+
+// ─── Slash Command + Launch Button ───
+
+function registerCompactionSlashCommand() {
+    if (typeof __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandParser_js_42c8b851_SlashCommandParser__?.addCommandObject !== 'function') return;
+    __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandParser_js_42c8b851_SlashCommandParser__.addCommandObject(__WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommand_js_1b0d5616_SlashCommand__.fromProps({
+        name: 'compact',
+        callback: () => {
+            openCompactionModal({ auto: false });
+            return '';
+        },
+        helpString: 'Open the Compaction modal: summarize the chat and start a fresh, compacted chat seeded with the summary plus the recent tail.',
+    }));
+    compaction_debug('Registered /compact slash command');
+}
+
+function createCompactionMenuItem() {
+    if (document.getElementById('compaction_menu_button')) return;
+    const ref = document.getElementById('option_continue');
+    if (!ref) return;
+
+    const btn = document.createElement('div');
+    btn.id = 'compaction_menu_button';
+    btn.classList.add('compaction-trigger', 'list-group-item', 'interactable');
+    btn.title = 'Summarize this chat and start a fresh, compacted chat';
+    btn.innerHTML = '<span class="fa-solid fa-compress"></span> Compact Chat';
+    btn.addEventListener('click', () => openCompactionModal({ auto: false }));
+
+    ref.parentNode.insertBefore(btn, ref.nextSibling);
+    compaction_debug('Launch menu item injected');
+}
+
+// ─── Settings Bindings ───
+
+function bindCompactionSettings(saveSettings) {
+    bindCheckbox('compaction_enabled', 'compactionEnabled', saveSettings);
+    bindCheckbox('compaction_auto_enabled', 'compactionAutoEnabled', saveSettings);
+    bindCheckbox('compaction_confirm_auto', 'compactionConfirmAuto', saveSettings);
+    bindCheckbox('compaction_migrate_state', 'compactionMigrateState', saveSettings);
+    bindCheckbox('compaction_debug_mode', 'compactionDebugMode', saveSettings);
+
+    bindNumber('compaction_threshold_percent', 'compactionThresholdPercent', saveSettings, { min: 1, max: 100 });
+    bindNumber('compaction_tail_length', 'compactionTailLength', saveSettings, { min: 1 });
+    bindNumber('compaction_response_length', 'compactionSummaryResponseLength', saveSettings, { min: 50 });
+    bindNumber('compaction_max_context_override', 'compactionMaxContextOverride', saveSettings, { min: 0, allowZero: true });
+
+    const promptArea = document.getElementById('compaction_summary_prompt_textarea');
+    if (promptArea) {
+        promptArea.value = compaction_moduleSettings.compactionSummaryPrompt || DEFAULT_COMPACTION_SUMMARY_PROMPT;
+        promptArea.addEventListener('input', () => {
+            compaction_moduleSettings.compactionSummaryPrompt = promptArea.value;
+            saveSettings();
+        });
+    }
+
+    const prefillArea = document.getElementById('compaction_summary_prefill_textarea');
+    if (prefillArea) {
+        prefillArea.value = (typeof compaction_moduleSettings.compactionSummaryPrefill === 'string')
+            ? compaction_moduleSettings.compactionSummaryPrefill
+            : DEFAULT_COMPACTION_SUMMARY_PREFILL;
+        prefillArea.addEventListener('input', () => {
+            compaction_moduleSettings.compactionSummaryPrefill = prefillArea.value;
+            saveSettings();
+        });
+    }
+
+    document.getElementById('compaction_preview_btn')
+        ?.addEventListener('click', showCompactionPromptPreview);
+}
+
+function bindCheckbox(id, key, saveSettings) {
+    const cb = document.getElementById(id);
+    if (!cb) return;
+    cb.checked = !!compaction_moduleSettings[key];
+    cb.addEventListener('change', () => {
+        compaction_moduleSettings[key] = cb.checked;
+        saveSettings();
+    });
+}
+
+function bindNumber(id, key, saveSettings, { min = 0, max = Infinity, allowZero = false } = {}) {
+    const input = document.getElementById(id);
+    if (!input) return;
+    input.value = Number.isFinite(compaction_moduleSettings[key]) ? compaction_moduleSettings[key] : 0;
+    input.addEventListener('input', () => {
+        const n = parseInt(input.value, 10);
+        if (!Number.isFinite(n)) return;
+        if (allowZero && n === 0) {
+            compaction_moduleSettings[key] = 0;
+            saveSettings();
+            return;
+        }
+        if (n >= min && n <= max) {
+            compaction_moduleSettings[key] = n;
+            saveSettings();
+        }
+    });
+}
+
+// ─── Prompt Composition ───
+
+/**
+ * Assemble the summary user prompt. `{{context}}` (the packed chat-minus-tail)
+ * and `{{guidance}}` are substituted in place; when a placeholder is absent
+ * the block is added the legacy way — context prepended, guidance appended
+ * last and wrapped emphatically (it's the user's demanded detail, placed where
+ * it carries the most weight). Shared by the real generation and Preview so
+ * the preview never lies.
+ */
+function composeSummaryPrompt(preambleBlock, guidance) {
+    const guidanceText = (guidance || '').trim();
+    const { text, used } = applyTemplateMacros(getSummaryTemplate(), {
+        context: preambleBlock || '',
+        guidance: guidanceText,
+    });
+    let prompt = text;
+    if (!used.has('context') && preambleBlock) prompt = preambleBlock + prompt;
+    if (!used.has('guidance') && guidanceText) {
+        prompt = `${prompt}\n\nCRITICAL — the summary MUST explicitly preserve the following details:\n${guidanceText}`;
+    }
+    return prompt;
+}
+
+function compaction_composeContinuePrompt(preambleBlock, guidance, existing) {
+    const base = composeSummaryPrompt(preambleBlock, guidance);
+    return `${base}\n\nRecap so far:\n${existing}\n\nContinue exactly where the recap leaves off. Do not repeat any text already present. Maintain the same format. Output only the continuation.`;
+}
+
+function showCompactionPromptPreview() {
+    const sampleContext =
+        'Chat history to summarize (the most recent messages are carried over verbatim and excluded here):\n'
+        + '(character cards, persona, selected lore books, and packed chat history)\n\n';
+    const prompt = composeSummaryPrompt(sampleContext, '(your Summary Guidance — demanded details to preserve)');
+    showPromptPreview('Compaction — Summary Prompt Preview (Generate)', [
+        { label: 'System Prompt (fixed)', text: COMPACTION_SUMMARY_SYSTEM_PROMPT },
+        { label: 'User Prompt (template with sample values)', text: prompt },
+        { label: 'Prefill (assistant prefix; kept at the start of the summary)', text: compaction_getPrefill() || '(none)' },
+        {
+            label: 'Note',
+            text: 'Continue reuses the same template plus a "Recap so far: …" block and '
+                + `continuation instructions, with this system prompt:\n\n${COMPACTION_CONTINUE_SYSTEM_PROMPT}`,
+        },
+    ]);
+}
+
+// ─── Preamble ───
+
+async function buildSummaryPreamble(loreBookNames) {
+    const tail = getTailLength();
+    const preamble = await buildContextPreamble({
+        includeChat: true,
+        loreBookNames: Array.isArray(loreBookNames) ? loreBookNames : [],
+        responseLength: compaction_getResponseLength(),
+        maxContextOverride: compaction_moduleSettings?.compactionMaxContextOverride || 0,
+        excludeRecentCount: tail,
+    });
+    if (!preamble) return '';
+    compaction_debug('Summary preamble length:', preamble.length);
+    return `Chat history to summarize (the most recent ${tail} messages are carried over verbatim and are NOT included here):\n${preamble}\n\n`;
+}
+
+// ─── Modal ───
+
+async function openCompactionModal({ auto = false } = {}) {
+    if (compaction_activePopup) return;
+    if (!compaction_moduleSettings?.compactionEnabled) {
+        if (!auto) toast('Compaction is disabled. Enable it in the extension settings first.', 'warning');
+        return;
+    }
+    const ctx = getContext();
+    if (ctx.isGenerating) {
+        if (!auto) toast('Wait for the current generation to finish before compacting.', 'warning');
+        return;
+    }
+    if (compacting) return;
+    if (!hasActiveCharacterOrGroup(ctx)) {
+        if (!auto) toast('Select a character or group chat before compacting.', 'warning');
+        return;
+    }
+
+    compaction_isGenerating = false;
+    compaction_abortRequested = false;
+    compaction_activeAction = null;
+    compaction_lastAction = null;
+    compaction_restorePoint = null;
+
+    const body = compaction_buildModalBody();
+
+    const popup = new __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_Popup__(body, __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_POPUP_TYPE__.TEXT, '', {
+        okButton: 'Compact',
+        cancelButton: 'Cancel',
+        wide: true,
+        large: true,
+        allowVerticalScrolling: true,
+        onOpen: () => {
+            compaction_bindModalHandlers();
+            compaction_refreshActionButtonStates();
+            updateUsageBanner();
+            compaction_debug('Modal opened', auto ? '(auto)' : '(manual)');
+        },
+        onClosing: (p) => {
+            if (p.result === __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_POPUP_RESULT__.AFFIRMATIVE) {
+                if (compaction_isGenerating) {
+                    toast('Wait for the summary generation to finish before clicking Compact.', 'warning');
+                    return false;
+                }
+                const summary = body.querySelector('#cc_summary_output')?.value?.trim() || '';
+                if (!summary) {
+                    toast('Generate or write a summary before compacting.', 'warning');
+                    return false;
+                }
+                return true;
+            }
+            // Cancel / Esc / X — abort any in-flight summary gen, commit nothing.
+            if (compaction_isGenerating) {
+                compaction_abortRequested = true;
+                compaction_stopGeneration();
+            }
+            return true;
+        },
+    });
+    compaction_activePopup = popup;
+    compaction_activeBody = body;
+
+    let committed = false;
+    try {
+        const result = await popup.show();
+        if (result === __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_POPUP_RESULT__.AFFIRMATIVE) {
+            const summary = body.querySelector('#cc_summary_output')?.value?.trim() || '';
+            // Persist the final guidance text before tearing the modal down.
+            scheduleGuidanceSave(body.querySelector('#cc_guidance')?.value || '');
+            if (summary) {
+                committed = true;
+                await runCompaction({ summary });
+            }
+        }
+    } finally {
+        compaction_activePopup = null;
+        compaction_activeBody = null;
+        compaction_isGenerating = false;
+        compaction_activeAction = null;
+        compaction_lastAction = null;
+        compaction_restorePoint = null;
+        compaction_debug('Modal closed', committed ? '(compacted)' : '(no commit)');
+    }
+}
+
+function compaction_buildModalBody() {
+    const root = document.createElement('div');
+    root.className = 'cc-modal-body';
+    root.innerHTML = `
+        <div class="cc-usage-banner" id="cc_usage_banner">Measuring context usage…</div>
+        <div class="cc-context-section">
+            <div class="cc-lorebook-host"></div>
+            <small class="cc-context-hint">Selected lore books are folded into the summary so canon isn't lost.</small>
+        </div>
+        <div class="cc-guidance-section">
+            <div class="cc-field-header">
+                <label for="cc_guidance"><b>Summary Guidance:</b></label>
+                <div id="cc_clear_guidance_btn" class="menu_button interactable cc-clear-btn" title="Clear the guidance">
+                    <span class="fa-solid fa-eraser"></span> Clear
+                </div>
+            </div>
+            <textarea id="cc_guidance" class="text_pole" rows="3" placeholder="Demand specific details the summary must preserve (names, items, promises, plot threads, ongoing states…). Persisted per-chat."></textarea>
+        </div>
+        <div class="cc-action-row">
+            <div id="cc_generate_btn" class="menu_button interactable cc-action-btn cc-generate-btn" title="Generate a fresh summary from the chat (replaces the preview)">
+                <span class="fa-solid fa-wand-magic-sparkles"></span> Generate Summary
+            </div>
+            <div id="cc_continue_btn" class="menu_button interactable cc-action-btn" title="Continue from where the summary leaves off">
+                <span class="fa-solid fa-arrow-right"></span> Continue
+            </div>
+            <div id="cc_checkpoint_btn" class="menu_button interactable cc-action-btn" title="Save the current summary as the Retry restore point">
+                <span class="fa-solid fa-flag"></span> Checkpoint
+            </div>
+            <div id="cc_retry_btn" class="menu_button interactable cc-action-btn" title="Restore to the last snapshot and re-run the last action">
+                <span class="fa-solid fa-rotate-right"></span> Retry
+            </div>
+        </div>
+        <div class="cc-tokens-row">
+            <label class="cc-tokens-label" for="cc_response_length" title="Maximum tokens for the summary generation">
+                <span class="fa-solid fa-coins"></span> Max Tokens:
+            </label>
+            <input id="cc_response_length" type="number" class="text_pole cc-tokens-input" min="50" max="16384" step="50" />
+        </div>
+        <div class="cc-status-bar cc-hidden" id="cc_status_bar">
+            <span class="fa-solid fa-spinner fa-spin"></span>
+            <span id="cc_status_text"></span>
+        </div>
+        <div class="cc-summary-section">
+            <div class="cc-field-header">
+                <label for="cc_summary_output"><b>Story so far (summary preview):</b></label>
+                <div id="cc_clear_output_btn" class="menu_button interactable cc-clear-btn" title="Clear the summary preview">
+                    <span class="fa-solid fa-eraser"></span> Clear
+                </div>
+            </div>
+            <textarea id="cc_summary_output" class="text_pole cc-summary-output" rows="16" placeholder="The generated summary will appear here. Edit it freely — this exact text becomes the &quot;Story so far&quot; message. Then click Compact."></textarea>
+        </div>
+    `;
+
+    const guidanceEl = root.querySelector('#cc_guidance');
+    if (guidanceEl) guidanceEl.value = compaction_readGuidance();
+
+    const tokenInput = root.querySelector('#cc_response_length');
+    if (tokenInput) tokenInput.value = String(compaction_getResponseLength());
+
+    const picker = createLoreBookPicker({
+        classPrefix: 'cc-lorebook',
+        title: 'Lore Books',
+    });
+    root.querySelector('.cc-lorebook-host').replaceWith(picker.element);
+    root._ccLorebookPicker = picker;
+
+    return root;
+}
+
+function compaction_bindModalHandlers() {
+    document.getElementById('cc_generate_btn')?.addEventListener('click', compaction_handleGenerate);
+    document.getElementById('cc_continue_btn')?.addEventListener('click', compaction_handleContinue);
+    document.getElementById('cc_checkpoint_btn')?.addEventListener('click', compaction_handleCheckpoint);
+    document.getElementById('cc_retry_btn')?.addEventListener('click', compaction_handleRetry);
+
+    const output = document.getElementById('cc_summary_output');
+    output?.addEventListener('input', compaction_refreshActionButtonStates);
+
+    const guidance = document.getElementById('cc_guidance');
+    guidance?.addEventListener('input', () => scheduleGuidanceSave(guidance.value));
+
+    const tokenInput = document.getElementById('cc_response_length');
+    tokenInput?.addEventListener('change', () => {
+        const parsed = parseInt(tokenInput.value, 10);
+        if (!isNaN(parsed) && parsed > 0) {
+            compaction_moduleSettings.compactionSummaryResponseLength = parsed;
+            compaction_saveSettingsFn?.();
+        }
+    });
+
+    document.getElementById('cc_clear_guidance_btn')?.addEventListener('click', () => {
+        if (compaction_isGenerating) return;
+        const g = document.getElementById('cc_guidance');
+        if (!g) return;
+        g.value = '';
+        scheduleGuidanceSave('');
+        g.focus();
+    });
+
+    document.getElementById('cc_clear_output_btn')?.addEventListener('click', () => {
+        if (compaction_isGenerating) return;
+        const out = document.getElementById('cc_summary_output');
+        if (!out) return;
+        out.value = '';
+        compaction_restorePoint = null;
+        compaction_lastAction = null;
+        out.focus();
+        compaction_refreshActionButtonStates();
+    });
+}
+
+async function updateUsageBanner() {
+    const banner = document.getElementById('cc_usage_banner');
+    if (!banner) return;
+    try {
+        const usage = await getContextUsage();
+        if (usage.max <= 0) {
+            banner.textContent = 'Context size unknown — compaction available, but the auto-threshold can\'t be measured.';
+            banner.classList.toggle('cc-usage-high', false);
+            return;
+        }
+        const pct = Math.round(usage.ratio * 100);
+        const qualifier = usage.measured ? '' : ' (estimated)';
+        banner.textContent = `Context ~${pct}% full${qualifier} (≈${usage.tokens} / ${usage.max} tokens).`;
+        banner.classList.toggle('cc-usage-high', usage.ratio >= getThresholdRatio());
+    } catch (err) {
+        compaction_debug('Usage banner update failed:', err);
+        banner.textContent = 'Context usage unavailable.';
+    }
+}
+
+// ─── Modal Actions (mirror ACC) ───
+
+function readModalLoreBooks() {
+    const picker = compaction_activeBody?._ccLorebookPicker;
+    return picker ? picker.getSelected() : [];
+}
+
+async function compaction_handleGenerate() {
+    if (compaction_isGenerating) {
+        if (compaction_activeAction === 'generate') {
+            compaction_abortRequested = true;
+            compaction_stopGeneration();
+        }
+        return;
+    }
+    const ctx = getContext();
+    if ((ctx.chat?.length || 0) <= getTailLength()) {
+        toast(`The chat has ${ctx.chat?.length || 0} messages — at or below the tail length (${getTailLength()}). There's nothing to summarize away.`, 'warning');
+        return;
+    }
+    const output = document.getElementById('cc_summary_output');
+    compaction_restorePoint = output?.value || '';
+    await runSummaryGeneration('generate');
+}
+
+async function compaction_handleContinue() {
+    if (compaction_isGenerating) {
+        if (compaction_activeAction === 'continue') {
+            compaction_abortRequested = true;
+            compaction_stopGeneration();
+        }
+        return;
+    }
+    const output = document.getElementById('cc_summary_output');
+    const existing = output?.value || '';
+    if (!existing.trim()) {
+        toast('Nothing to continue from. Generate a summary first or type some text.', 'warning');
+        return;
+    }
+    compaction_restorePoint = existing;
+    await runSummaryGeneration('continue');
+}
+
+function compaction_handleCheckpoint() {
+    if (compaction_isGenerating) return;
+    const output = document.getElementById('cc_summary_output');
+    const current = output?.value || '';
+    if (!current.trim()) {
+        toast('Nothing to checkpoint — the summary is empty.', 'warning');
+        return;
+    }
+    compaction_restorePoint = current;
+    compaction_lastAction = 'continue';
+    toast('Checkpoint saved. Retry will restore to this point.', 'success');
+    compaction_refreshActionButtonStates();
+}
+
+async function compaction_handleRetry() {
+    if (compaction_isGenerating) return;
+    if (!compaction_lastAction || compaction_restorePoint === null) {
+        toast('Nothing to retry yet.', 'warning');
+        return;
+    }
+    if (compaction_lastAction === 'continue' && !compaction_restorePoint.trim()) {
+        toast('Cannot continue from an empty restore point.', 'warning');
+        return;
+    }
+    const output = document.getElementById('cc_summary_output');
+    if (output) output.value = compaction_restorePoint;
+    await runSummaryGeneration(compaction_lastAction);
+}
+
+async function runSummaryGeneration(action) {
+    compaction_isGenerating = true;
+    compaction_abortRequested = false;
+    compaction_activeAction = action;
+
+    const isContinue = action === 'continue';
+    compaction_setGeneratingUI(true, action);
+    compaction_setStatusBar(isContinue ? 'Continuing summary…' : 'Generating summary…');
+
+    try {
+        const loreBookNames = readModalLoreBooks();
+        const guidance = document.getElementById('cc_guidance')?.value || '';
+        const output = document.getElementById('cc_summary_output');
+        const existing = output?.value || '';
+
+        const result = isContinue
+            ? await compaction_generateContinuation(loreBookNames, guidance, existing)
+            : await generateSummary(loreBookNames, guidance);
+
+        if (compaction_abortRequested) {
+            compaction_debug(`${action} aborted, discarding result`);
+            return;
+        }
+        if (!output) return;
+        if (isContinue) {
+            const sep = compaction_needsSeparator(existing) ? ' ' : '';
+            output.value = existing + sep + result;
+        } else {
+            output.value = result;
+        }
+        compaction_lastAction = action;
+        compaction_debug(`${action} complete, length:`, result.length);
+    } catch (err) {
+        if (isSilentGenerationAbort(err)) {
+            compaction_debug(`${action} aborted via cancellation`);
+        } else if (!compaction_abortRequested) {
+            console.error('Compaction summary error:', err);
+            toast(`Summary generation failed: ${err.message}`, 'error');
+        }
+    } finally {
+        compaction_isGenerating = false;
+        compaction_abortRequested = false;
+        compaction_activeAction = null;
+        compaction_setGeneratingUI(false, action);
+        compaction_setStatusBar(null);
+        compaction_refreshActionButtonStates();
+    }
+}
+
+function compaction_needsSeparator(text) {
+    if (!text) return false;
+    const last = text[text.length - 1];
+    return last !== ' ' && last !== '\n' && last !== '\t';
+}
+
+async function generateSummary(loreBookNames, guidance) {
+    const preambleBlock = await buildSummaryPreamble(loreBookNames);
+    const prompt = composeSummaryPrompt(preambleBlock, guidance);
+    const systemPrompt = COMPACTION_SUMMARY_SYSTEM_PROMPT;
+    const responseLength = compaction_getResponseLength();
+    const prefill = compaction_getPrefill();
+
+    compaction_debug('Generating summary, tokens', responseLength, 'prefill?', !!prefill);
+
+    const outputEl = document.getElementById('cc_summary_output');
+    const result = await withSingleLineDisabled(() => streamingGenerate(
+        { prompt, systemPrompt, responseLength, ...(prefill ? { prefill } : {}) },
+        outputEl,
+        { append: false },
+    ));
+    const cleaned = stripPrefillEcho(__WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(result).trim(), prefill);
+    return (prefill || '') + cleaned;
+}
+
+async function compaction_generateContinuation(loreBookNames, guidance, existing) {
+    const preambleBlock = await buildSummaryPreamble(loreBookNames);
+    const prompt = compaction_composeContinuePrompt(preambleBlock, guidance, existing);
+    const systemPrompt = COMPACTION_CONTINUE_SYSTEM_PROMPT;
+    const responseLength = compaction_getResponseLength();
+
+    compaction_debug('Continuing summary, existing length', existing.length);
+
+    const outputEl = document.getElementById('cc_summary_output');
+    const result = await withSingleLineDisabled(() => streamingGenerate(
+        { prompt, systemPrompt, responseLength },
+        outputEl,
+        { append: true },
+    ));
+    return __WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(result).trim();
+}
+
+function compaction_stopGeneration() {
+    // Route through abortAllGenerations() so ST's GENERATION_STOPPED fires and
+    // the backend actually halts (not just our local controllers).
+    abortAllGenerations('compaction-cancel');
+    compaction_debug('Stop generation triggered');
+}
+
+// ─── Modal UI Helpers ───
+
+const compaction_ACTION_BUTTON_IDS = ['cc_generate_btn', 'cc_continue_btn', 'cc_checkpoint_btn', 'cc_retry_btn'];
+
+const compaction_ACTION_LABELS = {
+    cc_generate_btn: '<span class="fa-solid fa-wand-magic-sparkles"></span> Generate Summary',
+    cc_continue_btn: '<span class="fa-solid fa-arrow-right"></span> Continue',
+    cc_checkpoint_btn: '<span class="fa-solid fa-flag"></span> Checkpoint',
+    cc_retry_btn: '<span class="fa-solid fa-rotate-right"></span> Retry',
+};
+
+function compaction_setGeneratingUI(generating, action) {
+    const guidanceInput = document.getElementById('cc_guidance');
+    const activeBtnId = action === 'continue' ? 'cc_continue_btn' : 'cc_generate_btn';
+
+    for (const id of compaction_ACTION_BUTTON_IDS) {
+        const btn = document.getElementById(id);
+        if (!btn) continue;
+        if (generating) {
+            if (id === activeBtnId) {
+                btn.innerHTML = '<span class="fa-solid fa-stop"></span> Stop';
+                btn.classList.remove('cc-disabled');
+            } else {
+                btn.innerHTML = compaction_ACTION_LABELS[id];
+                btn.classList.add('cc-disabled');
+            }
+        } else {
+            btn.innerHTML = compaction_ACTION_LABELS[id];
+            btn.classList.remove('cc-disabled');
+        }
+    }
+
+    const okBtn = compaction_activePopup?.okButton;
+    if (okBtn) okBtn.classList.toggle('disabled', !!generating);
+
+    if (generating) {
+        guidanceInput?.setAttribute('disabled', 'true');
+    } else {
+        guidanceInput?.removeAttribute('disabled');
+        compaction_refreshActionButtonStates();
+    }
+}
+
+function compaction_refreshActionButtonStates() {
+    if (compaction_isGenerating) return;
+    const output = document.getElementById('cc_summary_output');
+    const hasText = !!output?.value?.trim();
+    compaction_setButtonDisabled('cc_continue_btn', !hasText);
+    compaction_setButtonDisabled('cc_checkpoint_btn', !hasText);
+    compaction_setButtonDisabled('cc_retry_btn', !compaction_lastAction || compaction_restorePoint === null);
+}
+
+function compaction_setButtonDisabled(id, disabled) {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.classList.toggle('cc-disabled', disabled);
+}
+
+function compaction_setStatusBar(message) {
+    const bar = document.getElementById('cc_status_bar');
+    const text = document.getElementById('cc_status_text');
+    if (!bar || !text) return;
+    if (message) {
+        text.textContent = message;
+        bar.classList.remove('cc-hidden');
+    } else {
+        bar.classList.add('cc-hidden');
+    }
+}
+
+// ─── Commit Pipeline ───
+
+function deepClone(obj) {
+    try {
+        return structuredClone(obj);
+    } catch (_) {
+        return JSON.parse(JSON.stringify(obj));
+    }
+}
+
+/**
+ * Commit a compaction: snapshot per-chat state and the verbatim tail, create a
+ * fresh chat, restore the migrated metadata, then seed the "Story so far"
+ * message and the carried tail. Runs entirely under the `compacting` guard so
+ * our own measurement/auto-trigger logic doesn't re-enter on the new chat.
+ */
+async function runCompaction({ summary }) {
+    if (compacting) return;
+
+    const ctx = getContext();
+    const chat = Array.isArray(ctx.chat) ? ctx.chat : [];
+    const tailLength = getTailLength();
+    const messagesSummarized = chat.length - tailLength;
+    if (messagesSummarized <= 0) {
+        toast(`The chat has ${chat.length} messages — at or below the tail length (${tailLength}). Nothing to compact.`, 'warning');
+        return;
+    }
+
+    compacting = true;
+    compaction_debug('Commit starting — summarized:', messagesSummarized, 'tail:', tailLength);
+
+    try {
+        // 1. Snapshot the tail (deep copy — swipes/extra preserved) and the
+        //    per-chat SSE metadata, before the new chat wipes everything.
+        const tail = chat.slice(-tailLength).map(deepClone);
+        const guidanceCarry = compaction_readGuidance();
+        const metaSnapshot = {};
+        if (compaction_moduleSettings.compactionMigrateState) {
+            for (const key of MIGRATED_METADATA_KEYS) {
+                const value = ctx.chatMetadata?.[key];
+                if (value !== undefined) metaSnapshot[key] = deepClone(value);
+            }
+        }
+
+        // 2. Create the fresh chat (solo or group). Clears chat + metadata and
+        //    fires CHAT_CHANGED.
+        const created = await createFreshChat();
+        if (!created) {
+            toast('Could not create a new chat — compaction aborted. The original chat is unchanged.', 'error');
+            return;
+        }
+        // Drop any auto-added greeting so the new chat starts clean.
+        if (typeof __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_clearChat__ === 'function') {
+            await __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_clearChat__({ clearData: true });
+        }
+
+        // 3. Restore metadata BEFORE seeding (fresh context — the new chat's
+        //    chatMetadata is a different object).
+        const ctx2 = getContext();
+        for (const [key, value] of Object.entries(metaSnapshot)) {
+            ctx2.chatMetadata[key] = value;
+        }
+        ctx2.chatMetadata[COMPACTION_METADATA_KEY] = { guidance: guidanceCarry };
+        ctx2.saveMetadata();
+
+        // 4. Seed the "Story so far" message, then the carried tail.
+        const summaryMsg = {
+            name: SUMMARY_MESSAGE_NAME,
+            is_user: false,
+            is_system: false,
+            send_date: Date.now(),
+            mes: summary,
+            extra: { sse_summary: true },
+        };
+        ctx2.chat.push(summaryMsg);
+        ctx2.addOneMessage(summaryMsg);
+        for (const msg of tail) {
+            ctx2.chat.push(msg);
+            ctx2.addOneMessage(msg);
+        }
+        await ctx2.saveChat();
+        tagCompactionSummaries();
+
+        // 5. Re-sync per-chat module state with the restored metadata (the
+        //    CHAT_CHANGED from step 2 saw the empty new chat).
+        resyncChatStateFn?.();
+
+        // 6. Reset measured tokens to cold-start for the compacted chat.
+        lastPromptTokens = 0;
+
+        toast(`Compacted: summarized ${messagesSummarized} message${messagesSummarized === 1 ? '' : 's'}, kept the last ${tailLength}.`, 'success');
+        compaction_debug('Commit complete');
+    } catch (err) {
+        console.error('Compaction commit failed:', err);
+        toast(`Compaction failed: ${err.message}`, 'error');
+    } finally {
+        compacting = false;
+    }
+}
+
+/**
+ * Create a fresh chat for the current character or group, preferring ST's
+ * `doNewChat` (handles both solo and group internally) and falling back to
+ * confirmed primitives if a build lacks the export.
+ *
+ * @returns {Promise<boolean>} Whether a new chat was created.
+ */
+async function createFreshChat() {
+    const ctx = getContext();
+    if (typeof __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_doNewChat__ === 'function') {
+        await __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_doNewChat__({ deleteCurrentChat: false });
+        return true;
+    }
+    compaction_debug('doNewChat unavailable — using fallback chat creation');
+    if (ctx.groupId && typeof __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_createNewGroupChat__ === 'function') {
+        await __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_createNewGroupChat__(ctx.groupId);
+        return true;
+    }
+    if (typeof __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_clearChat__ === 'function') {
+        await __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_clearChat__({ clearData: true });
+        if (typeof ctx.saveChat === 'function') await ctx.saveChat();
+        return true;
+    }
+    return false;
+}
+
 ;// ./src/prompt-templates.js
 /**
  * Tool Presets — named, reusable bundles of every editable prompt/prefill a
@@ -8358,6 +9723,7 @@ function setupToolPresets({ toolKey, label, containerId, fields, settings, saveS
 
 
 
+
 // ─── Constants ───
 
 const EXTENSION_NAME = 'Saints-Silly-Extensions';
@@ -8430,6 +9796,17 @@ const defaultSettings = {
     reformattingPrompt: DEFAULT_REFORMATTING_PROMPT,
     reformattingPrefill: DEFAULT_REFORMATTING_PREFILL,
     reformattingResponseLength: DEFAULT_REFORMATTING_RESPONSE_LENGTH,
+    compactionEnabled: false,
+    compactionAutoEnabled: false,
+    compactionThresholdPercent: DEFAULT_COMPACTION_THRESHOLD_PERCENT,
+    compactionTailLength: DEFAULT_COMPACTION_TAIL_LENGTH,
+    compactionConfirmAuto: true,
+    compactionSummaryPrompt: DEFAULT_COMPACTION_SUMMARY_PROMPT,
+    compactionSummaryPrefill: DEFAULT_COMPACTION_SUMMARY_PREFILL,
+    compactionSummaryResponseLength: DEFAULT_COMPACTION_RESPONSE_LENGTH,
+    compactionMaxContextOverride: 0,
+    compactionMigrateState: true,
+    compactionDebugMode: false,
     silentGenerationDebugMode: false,
     silentGenerationStreaming: true,
     // toolPresets / activeToolPreset are intentionally absent here:
@@ -8520,6 +9897,15 @@ const TOOL_PRESET_CONFIG = [
             { key: 'reformattingPrefill', label: 'Prefill', textareaId: 'reformatting_prefill_textarea', defaultText: DEFAULT_REFORMATTING_PREFILL },
         ],
     },
+    {
+        toolKey: 'compaction',
+        label: 'Compaction',
+        containerId: 'compaction_presets',
+        fields: [
+            { key: 'compactionSummaryPrompt', label: 'Summary Prompt', textareaId: 'compaction_summary_prompt_textarea', defaultText: DEFAULT_COMPACTION_SUMMARY_PROMPT },
+            { key: 'compactionSummaryPrefill', label: 'Summary Prefill', textareaId: 'compaction_summary_prefill_textarea', defaultText: DEFAULT_COMPACTION_SUMMARY_PREFILL },
+        ],
+    },
 ];
 
 // ─── State ───
@@ -8567,6 +9953,7 @@ function injectSettingsPanel() {
     bindWIASettings(saveSettings);
     bindNarrativeGuidanceSettings(saveSettings);
     bindReformattingSettings(saveSettings);
+    bindCompactionSettings(saveSettings);
     bindSilentGenerationSettings(saveSettings);
 
     // Preset widgets go last: the module bindings above must attach their
@@ -8593,6 +9980,7 @@ function src_onGenerationEnded() {
     onGenerationEnded();
     phrasing_onGenerationEnded();
     showPossessionImpersonateButton();
+    onCompactionGenerationEnded();
     SSEDebug('Generation ended');
 }
 
@@ -8610,6 +9998,7 @@ function onChatChanged() {
     onNarrativeGuidanceChatChanged();
     onPhraseBanChatChanged();
     rescanReformatButtons();
+    onCompactionChatChanged();
     SSEDebug('Chat changed, state reloaded');
 }
 
@@ -8649,6 +10038,9 @@ jQuery(async () => {
     initWIA({ settings: src_settings });
     initNarrativeGuidance({ settings: src_settings });
     initReformatting({ settings: src_settings });
+    // resyncChatState re-runs the per-chat state reload after a compaction
+    // creates and seeds the fresh chat, so migrated metadata is re-applied.
+    initCompaction({ settings: src_settings, saveSettings, resyncChatState: onChatChanged });
 
     loadPossessionState();
     injectSettingsPanel();
@@ -8665,6 +10057,9 @@ jQuery(async () => {
     // Phrasing UI
     createInputAreaButton();
     createHamburgerMenuItem();
+
+    // Compaction UI — launch item in the hamburger (options) menu.
+    createCompactionMenuItem();
 
     // Wire up the global "stop button → abort silent generations" hook
     // before subscribing any per-module handlers, so a stop event always
@@ -8696,12 +10091,21 @@ jQuery(async () => {
     if (eventTypes.TEXT_COMPLETION_SETTINGS_READY) {
         eventSource.on(eventTypes.TEXT_COMPLETION_SETTINGS_READY, onPhraseBanTextCompletionSettings);
     }
+    // Compaction prompt-measurement: passively tokenize the true outgoing
+    // prompt so the trigger threshold reflects the real context usage.
+    if (eventTypes.CHAT_COMPLETION_PROMPT_READY) {
+        eventSource.on(eventTypes.CHAT_COMPLETION_PROMPT_READY, onCompactionChatCompletionPromptReady);
+    }
+    if (eventTypes.GENERATE_AFTER_COMBINE_PROMPTS) {
+        eventSource.on(eventTypes.GENERATE_AFTER_COMBINE_PROMPTS, onCompactionGenerateAfterCombinePrompts);
+    }
 
     // Slash commands
     registerPossessionSlashCommands();
     registerPhrasingSlashCommand();
     registerPhraseBanSlashCommand();
     registerReformattingSlashCommand();
+    registerCompactionSlashCommand();
 
     // Initial state
     syncAllPossessionUI();

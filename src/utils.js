@@ -697,6 +697,25 @@ function formatChatLine(m, ctx) {
 }
 
 /**
+ * Estimate the token cost of the current chat's visible (non-system) lines.
+ *
+ * Used as the cold-start fallback for context-usage readouts before a live
+ * generation has reported the true outgoing prompt size. Counts the whole
+ * chat in a single tokenizer call (cheap enough for a one-shot estimate);
+ * returns 0 when there's nothing to count.
+ *
+ * @returns {Promise<number>} Approximate token count of the visible chat.
+ */
+export async function estimateChatTokens() {
+    const ctx = getContext();
+    const chat = Array.isArray(ctx.chat) ? ctx.chat : [];
+    if (!chat.length) return 0;
+    const lines = chat.map(m => formatChatLine(m, ctx)).filter(Boolean);
+    if (!lines.length) return 0;
+    return await getTokenCountAsync(lines.join('\n'));
+}
+
+/**
  * Pack as many recent chat lines as the token budget allows, newest first,
  * but return them in chronological order. Returns '' if nothing fits.
  */
@@ -732,6 +751,7 @@ async function packRecentChatLines(chat, ctx, chatBudget) {
  * @param {string[]} [opts.loreBookNames=[]] - Names of lore books whose enabled entries to include.
  * @param {number}  [opts.responseLength=0] - Tokens reserved for the model's response; subtracted from the budget.
  * @param {number}  [opts.maxContextOverride=0] - If > 0, use this as the max-context size instead of `getMaxPromptTokens()`. Lets callers cap how much chat history they pull in independently of the model's real window.
+ * @param {number}  [opts.excludeRecentCount=0] - Drop this many of the most recent messages before packing the chat. Compaction uses it so `{{context}}` is the chat *minus* the verbatim tail it carries over.
  * @returns {Promise<string>} The composed preamble, or '' if nothing was included.
  */
 export async function buildContextPreamble({
@@ -739,6 +759,7 @@ export async function buildContextPreamble({
     loreBookNames = [],
     responseLength = 0,
     maxContextOverride = 0,
+    excludeRecentCount = 0,
 } = {}) {
     const sections = [];
     const ctx = getContext();
@@ -787,7 +808,12 @@ export async function buildContextPreamble({
 
     // Pack recent chat into whatever budget remains.
     if (includeChat) {
-        const chat = Array.isArray(ctx.chat) ? ctx.chat : [];
+        const fullChat = Array.isArray(ctx.chat) ? ctx.chat : [];
+        // Optionally drop the most-recent N messages (the verbatim tail a
+        // caller is carrying over elsewhere) so they aren't double-counted.
+        const chat = (Number.isFinite(excludeRecentCount) && excludeRecentCount > 0)
+            ? fullChat.slice(0, Math.max(0, fullChat.length - excludeRecentCount))
+            : fullChat;
         if (chat.length) {
             let recentBlock = '';
             try {

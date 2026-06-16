@@ -1,6 +1,6 @@
 # Saint's Silly Extensions
 
-A [SillyTavern](https://github.com/SillyTavern/SillyTavern) third-party extension that adds six integrated roleplay tools: **Possession**, **Phrasing**, **Assisted Character Creation**, **World Info Assist**, **Narrative Guidance**, and **Reformatting**
+A [SillyTavern](https://github.com/SillyTavern/SillyTavern) third-party extension that adds seven integrated roleplay tools: **Possession**, **Phrasing**, **Assisted Character Creation**, **World Info Assist**, **Narrative Guidance**, **Reformatting**, and **Compaction**
 
 ## Features
 
@@ -104,6 +104,17 @@ Normalizes the formatting of AI character messages *after* they're generated, so
 - **AI messages only** — User and system messages are never touched.
 - **Non-destructive** — The original text is always preserved as a swipe, so you can swipe back to it at any time. Reformatting never re-processes a swipe it already produced.
 
+### Compaction
+
+Long chats (1000+ messages) eventually fill the model's context window. Once full, SillyTavern evicts the oldest history every turn, which invalidates the backend's KV cache from the eviction point on — so each post-fill turn triggers a near-full reprocess and generation slows to a crawl. The only real fix is to make the prompt short again.
+
+Compaction **summarizes the chat, starts a fresh chat seeded with that summary plus the recent tail, migrates per-chat extension state, and resumes** — resetting the context window and restoring fast generation. It's periodic context compaction, analogous to what agent harnesses do when they compact a long conversation.
+
+- **Guided summary modal** (mirrors Assisted Character Creation) — Add **Summary Guidance** demanding specific details be captured, pick which **lore books** to fold in, then **Generate / Continue / Checkpoint / Retry** a summary preview you can freely edit. The summary streams in live and the Stop button cancels it. Clicking **Compact** commits.
+- **The handoff** — The summary lands in the new chat as a visible, editable **"Story so far"** message, followed by the last *N* messages (default 20) copied over **verbatim with swipes preserved**. The old chat is left intact and selectable from history.
+- **Manual or automatic trigger** — Trigger it from the <span title="compress icon">🗜</span> **Compact Chat** item in the hamburger menu or with `/compact`. With **Auto-open at threshold** on, the modal opens on its own once the *measured* outgoing prompt crosses your % of the context window (with an optional confirmation dialog). The trigger is the **only** automatic part — every compaction still requires you to act in the modal. Nothing is ever rewritten headlessly.
+- **State migration** — Possession, Narrative Guidance, and Phrase Ban per-chat state carry over to the new chat (World Info Assist guidance travels on the lorebook automatically). Your Summary Guidance is remembered per-chat across compactions of the same storyline.
+
 ### How to Use Possession
 
 Possession allows you to "possess" an active character in your solo or group chat (more useful for group chats). When possessing, your messages will be sent as that character rather than your active persona.
@@ -183,6 +194,14 @@ Notes: detection happens after the reply arrives (regex can't run inside the mod
 4. To reformat a single message at any time, click the <span title="text-slash icon">✂</span> button in that message's button row, or run `/reformat` to reformat the last message.
 5. The reformatted text becomes the active version of the message; the original is kept as a swipe, so you can always swipe back to it.
 
+### How to Use Compaction
+
+1. Open **Extensions** > **Saint's Silly Extensions** and find the **Compaction** section. Tick **Enable Compaction**.
+2. Optionally set the **Tail Length** (how many recent messages are kept verbatim), the **Summary Token Limit**, and — if you want automatic prompts — **Auto-open at threshold** plus the **Auto Threshold (%)**.
+3. When a chat grows long, open the modal: click **Compact Chat** in the hamburger (options) menu, or run `/compact`. (With auto-open on, it appears on its own once the prompt crosses your threshold — after an optional confirmation.)
+4. In the modal: optionally add **Summary Guidance** (specific details the summary must preserve) and pick any **lore books** to fold in. Click **Generate Summary**, then refine with **Continue / Retry** or by editing the preview directly. **Checkpoint** saves a restore point for Retry.
+5. When the **Story so far** preview reads well, click **Compact**. A fresh chat is created, seeded with the summary plus the last *N* messages (swipes intact), with your per-chat extension state carried over. The original chat stays in your chat history.
+6. Continue roleplaying — you take the next turn. Generation is fast again because the context window has been reset.
 
 ## Installation
 
@@ -306,6 +325,24 @@ The drawer holds two self-contained tiers — **Long-term** (the overarching arc
 | Prefill Template (LLM) | Optional assistant prefix the model continues from, kept at the start of the result. Prefill echoes from backends that ignore prefills are stripped automatically |
 | Reformatting Debug Mode | Log detailed Reformatting events to the browser console (in the Diagnostics drawer) |
 
+### Compaction Settings
+
+| Setting | Description |
+|---------|-------------|
+| Enable Compaction | Toggle the Compaction feature, its **Compact Chat** menu item, `/compact`, and the auto-trigger |
+| Auto-open at threshold | When on, automatically open the Compaction modal after a turn finishes once the measured prompt crosses the threshold. The modal still requires you to act — nothing is rewritten headlessly |
+| Confirm before auto-opening | Show a confirmation dialog (with a **Don't ask again** option) before auto-opening the modal |
+| Migrate per-chat extension state | Carry Possession, Narrative Guidance, and Phrase Ban per-chat state into the compacted chat (World Info Assist guidance travels on the lorebook automatically) |
+| Auto Threshold (%) | Percent of the model's context window (measured outgoing prompt) that triggers the auto-open (default 90) |
+| Tail Length | How many of the most recent messages are copied into the new chat verbatim, swipes preserved (default 20). Older messages are replaced by the summary |
+| Summary Token Limit | Maximum tokens for the summary generation (default 1200) |
+| Max Context Override | If > 0, caps how many tokens of chat history the summary generation pulls in. 0 = use the model's full context size |
+| Preset / Preview Assembled Prompt | Save named bundles of the summary prompt + prefill and preview exactly what gets sent (see Tool Presets & Prompt Preview below) |
+| Summary Prompt | The user prompt for the summary. Supports `{{context}}` (packed chat history minus the verbatim tail, plus selected lore books) and `{{guidance}}` (your Summary Guidance) placeholders; if missing, the context is prepended and the guidance appended last, wrapped emphatically |
+| Summary Prefill | Optional assistant prefix the model continues from, kept at the start of the summary. Prefill echoes from backends that ignore prefills are stripped automatically |
+| Summary Guidance (per-chat, in the modal) | Specific details the summary must preserve. Stored with the chat and remembered across compactions of the same storyline |
+| Compaction Debug Mode | Log detailed Compaction events (prompt measurement, auto-trigger, summary generation, commit pipeline) to the browser console (in the Diagnostics drawer) |
+
 ### Silent Generation
 
 | Setting | Description |
@@ -356,6 +393,7 @@ Generation templates support tool-specific placeholders, substituted in place. I
 | `/phrasing` | Enrich the text in the input box or the last message |
 | `/phraseban` | Scan the last message against the Phrase Ban regex list and rewrite it (as a new swipe) if banned phrasing is found |
 | `/reformat` | Reformat the last message using the configured engine (keeps the original as a swipe) |
+| `/compact` | Open the Compaction modal to summarize the chat and start a fresh, compacted chat seeded with the summary plus the recent tail |
 
 ## License
 
