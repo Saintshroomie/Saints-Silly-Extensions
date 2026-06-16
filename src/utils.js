@@ -696,40 +696,23 @@ function formatChatLine(m, ctx) {
     return text ? `${who}: ${text}` : '';
 }
 
-// Upper bound on the text fed to the cold-start token estimate. A full
-// context window is at most a few hundred KB of text, so tokenizing more than
-// this tells us nothing new — and building/hashing a multi-megabyte string
-// from a 1000+ message chat can spike memory and freeze the tab. We only need
-// a rough "how full is the context" number here; the real measured size takes
-// over after the first live generation.
-const ESTIMATE_CHAR_BUDGET = 600000;
-
 /**
  * Estimate the token cost of the current chat's visible (non-system) lines.
  *
  * Used as the cold-start fallback for context-usage readouts before a live
- * generation has reported the true outgoing prompt size. Packs the most recent
- * lines up to a fixed character budget (newest first) so it stays cheap even
- * on very long chats; returns 0 when there's nothing to count.
+ * generation has reported the true outgoing prompt size. Counts the whole
+ * chat in a single tokenizer call (cheap enough for a one-shot estimate);
+ * returns 0 when there's nothing to count.
  *
- * @returns {Promise<number>} Approximate token count of the recent chat.
+ * @returns {Promise<number>} Approximate token count of the visible chat.
  */
 export async function estimateChatTokens() {
     const ctx = getContext();
     const chat = Array.isArray(ctx.chat) ? ctx.chat : [];
     if (!chat.length) return 0;
-    const picked = [];
-    let chars = 0;
-    for (let i = chat.length - 1; i >= 0; i--) {
-        const line = formatChatLine(chat[i], ctx);
-        if (!line) continue;
-        picked.push(line);
-        chars += line.length + 1;
-        if (chars >= ESTIMATE_CHAR_BUDGET) break;
-    }
-    if (!picked.length) return 0;
-    picked.reverse();
-    return await getTokenCountAsync(picked.join('\n'));
+    const lines = chat.map(m => formatChatLine(m, ctx)).filter(Boolean);
+    if (!lines.length) return 0;
+    return await getTokenCountAsync(lines.join('\n'));
 }
 
 /**
