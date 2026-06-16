@@ -651,8 +651,24 @@ export function createLoreBookPicker({
         updateSummary();
     };
 
+    // Close the dropdown when the user clicks or moves focus outside it, so it
+    // behaves like a normal dropdown instead of requiring a second click on the
+    // summary to dismiss. Capture-phase so we still see the event if inner
+    // handlers stop propagation; only attached while open.
+    const closeIfOutside = (event) => {
+        if (!details.open || details.contains(event.target)) return;
+        details.open = false;
+    };
+
     details.addEventListener('toggle', () => {
-        if (details.open) render();
+        if (details.open) {
+            render();
+            document.addEventListener('pointerdown', closeIfOutside, true);
+            document.addEventListener('focusin', closeIfOutside, true);
+        } else {
+            document.removeEventListener('pointerdown', closeIfOutside, true);
+            document.removeEventListener('focusin', closeIfOutside, true);
+        }
     });
     render();
 
