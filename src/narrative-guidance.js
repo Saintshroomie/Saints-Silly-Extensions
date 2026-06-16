@@ -15,8 +15,10 @@
  * a long-term refresh re-aligns short-term.
  *
  * Per-chat state lives under `context.chatMetadata.narrativeGuidance` as
- * `{ long: { guidance, turnsRemaining, themes }, short: { … } }`. Legacy
- * single-track state is mapped onto the short-term track on read.
+ * `{ long: { guidance, turnsRemaining, themes, loreBookNames }, short: { … } }`.
+ * Legacy single-track state is mapped onto the short-term track on read. The
+ * lore-book selection is per-chat (so a new chat starts with none selected)
+ * and is pruned of any books ST no longer knows about on read.
  */
 
 import {
@@ -33,6 +35,7 @@ import {
     stickyToast,
     buildContextPreamble,
     createLoreBookPicker,
+    getAvailableLoreBookNames,
     streamingGenerate,
     withSingleLineDisabled,
     applyTemplateMacros,
@@ -145,7 +148,6 @@ function trackEl(track, suffix) {
 // ─── Module State ───
 
 let moduleSettings = null;
-let saveSettingsCb = null;
 let debug = () => {};
 let saveTimer = null;
 
@@ -171,12 +173,14 @@ function readContainer() {
         return raw;
     }
     // Empty or legacy single-track shape → map any legacy guidance to short.
+    // Lore-book selection is new and per-chat, so legacy state has none.
     return {
-        long: { guidance: '', turnsRemaining: 0, themes: '' },
+        long: { guidance: '', turnsRemaining: 0, themes: '', loreBookNames: [] },
         short: {
             guidance: typeof raw?.guidance === 'string' ? raw.guidance : '',
             turnsRemaining: Number.isFinite(raw?.turnsRemaining) ? raw.turnsRemaining : 0,
             themes: typeof raw?.themes === 'string' ? raw.themes : '',
+            loreBookNames: [],
         },
     };
 }
@@ -187,6 +191,7 @@ function loadChatState(track) {
         guidance: typeof raw.guidance === 'string' ? raw.guidance : '',
         turnsRemaining: Number.isFinite(raw.turnsRemaining) ? raw.turnsRemaining : 0,
         themes: typeof raw.themes === 'string' ? raw.themes : '',
+        loreBookNames: Array.isArray(raw.loreBookNames) ? raw.loreBookNames.slice() : [],
     };
 }
 
@@ -197,6 +202,7 @@ function writeChatState(track, state) {
         guidance: state.guidance || '',
         turnsRemaining: Number.isFinite(state.turnsRemaining) ? state.turnsRemaining : 0,
         themes: state.themes || '',
+        loreBookNames: Array.isArray(state.loreBookNames) ? state.loreBookNames : [],
     };
     context.chatMetadata[NG_METADATA_KEY] = container;
 }
@@ -228,6 +234,42 @@ function resolveTurnCount(track) {
 function resolveResponseLength(track) {
     const n = getSetting(track, 'ResponseLength');
     return Number.isFinite(n) && n > 0 ? n : DEFAULT_NG_RESPONSE_LENGTH;
+}
+
+/**
+ * Resolve a track's per-chat lore-book selection, dropping any books ST no
+ * longer knows about. When `prune` is set and the stored list references
+ * missing books, the cleaned list is persisted back to chat metadata and the
+ * user is notified once (subsequent reads then find nothing to prune).
+ *
+ * The available list is queried fresh; when it comes back empty (e.g. World
+ * Info hasn't finished loading) the stored selection is returned untouched —
+ * pruning against an empty list would wipe legitimate picks.
+ *
+ * @param {object} track - NG track config.
+ * @param {{ prune?: boolean }} [opts]
+ * @returns {string[]} The selection, missing books removed.
+ */
+function resolveChatLoreBookNames(track, { prune = false } = {}) {
+    const stored = loadChatState(track).loreBookNames;
+    if (!stored.length) return [];
+    const available = getAvailableLoreBookNames();
+    if (!available.length) return stored.slice();
+    const availableSet = new Set(available);
+    const existing = stored.filter(name => availableSet.has(name));
+    if (existing.length === stored.length) return existing;
+    if (prune) {
+        const removed = stored.filter(name => !availableSet.has(name));
+        const state = loadChatState(track);
+        state.loreBookNames = existing;
+        saveChatState(track, state);
+        toast(
+            `${track.label}: dropped ${removed.length} missing lore book${removed.length === 1 ? '' : 's'} from the selection.`,
+            'info',
+        );
+        debug(`[${track.id}] Pruned missing lore books:`, removed);
+    }
+    return existing;
 }
 
 // ─── Injection ───
@@ -379,9 +421,7 @@ async function regenGuidance(track, reason) {
         const state = loadChatState(track);
         const preamble = await buildContextPreamble({
             includeChat: true,
-            loreBookNames: Array.isArray(getSetting(track, 'LoreBookNames'))
-                ? getSetting(track, 'LoreBookNames')
-                : [],
+            loreBookNames: resolveChatLoreBookNames(track, { prune: true }),
             responseLength,
             maxContextOverride: getSetting(track, 'MaxContextOverride') || 0,
         });
@@ -543,6 +583,9 @@ async function continueGuidance(track) {
 
 export function onNarrativeGuidanceChatChanged() {
     for (const track of NG_TRACK_LIST) {
+        // Rebuild the picker so it reflects this chat's per-chat selection
+        // (a new chat starts empty) rather than the previous chat's.
+        populateLoreBookPicker(track);
         refreshPanelFromState(track);
         reapplyInjection(track);
     }
@@ -745,17 +788,18 @@ function populateLoreBookPicker(track) {
     const host = trackEl(track, 'lorebooks_host');
     if (!host) return;
 
-    const initial = Array.isArray(getSetting(track, 'LoreBookNames'))
-        ? getSetting(track, 'LoreBookNames')
-        : [];
+    // Lore-book selection is per-chat (stored in chatMetadata), so a new chat
+    // starts with none selected; prune any books that no longer exist.
+    const initial = resolveChatLoreBookNames(track, { prune: true });
 
     const { element } = createLoreBookPicker({
         initialSelection: initial,
         // Shared styling class across both tracks; the element id differs.
         classPrefix: 'ng-lorebook',
         onChange: (names) => {
-            moduleSettings[settingKey(track, 'LoreBookNames')] = names;
-            saveSettingsCb?.();
+            const state = loadChatState(track);
+            state.loreBookNames = names;
+            scheduleChatStateSave(track, state);
         },
     });
     element.id = domId(track, 'lorebooks_details');
@@ -960,8 +1004,6 @@ function bindTrackControls(track, saveSettings) {
 }
 
 export function bindNarrativeGuidanceSettings(saveSettings) {
-    saveSettingsCb = saveSettings;
-
     for (const track of NG_TRACK_LIST) {
         bindTrackControls(track, saveSettings);
     }

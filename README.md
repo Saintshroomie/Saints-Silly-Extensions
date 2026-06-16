@@ -82,13 +82,13 @@ Guidance comes in **two independent tiers** that operate the same way but on dif
 
 Enable either tier on its own or both together. Each tier is fully self-contained — its own enable/auto-regen toggles, refresh horizon, prompts, lore-book picks, themes box, counter, and live guidance paragraph.
 
-- **Per-chat state** — Each tier's active guidance, remaining turn count, and themes/ideas are persisted per chat (via `chatMetadata`) and reload automatically when switching chats. (Pre-split chats keep their guidance — it lands on the short-term tier.)
+- **Per-chat state** — Each tier's active guidance, remaining turn count, themes/ideas, and lore-book selection are persisted per chat (via `chatMetadata`) and reload automatically when switching chats. A brand-new chat starts with nothing selected, so an old chat's lore-book picks never leak into a new one. (Pre-split chats keep their guidance — it lands on the short-term tier.)
 - **Auto-regenerate at zero** — When a tier's turn counter hits zero on the AI's reply that decrements it, a new guidance paragraph is generated in the background so it's ready before your next send. A full-screen overlay masks the UI for the duration of the regeneration so you can't accidentally send a message mid-regen. Optional per tier — turn it off to keep the counter purely as a manual prompt. A progress toast stays up while a generation runs.
 - **Manual regenerate** — A **Regenerate Now** button in each tier forces a fresh generation at any time. The `-1` and `Reset` buttons next to the remaining-turn display let you nudge or reset that tier's counter without regenerating.
 - **Editable everything** — Per tier: the generation instructions (the user prompt, with `{{context}}` / `{{themes}}` placeholders, plus `{{longGuidance}}` for short-term), the prefill the model continues from, the injection template (with `{{guidance}}` placeholder), and the live guidance paragraph itself are all directly editable. Edits to the active guidance apply on the next AI turn.
 - **Themes / arcs input** — Each tier has a per-chat textarea where you can offer themes, ideas, or general arcs for the model to weave into the next round of guidance.
 - **Injection controls** — Per tier: Depth and Role inputs (mirroring SillyTavern's Author's Note) control where in the prompt the guidance is inserted and which role it speaks as.
-- **Lore book picker** — Per tier: pick which lore books to feed into the guidance generation's context preamble.
+- **Lore book picker** — Per tier: pick which lore books to feed into the guidance generation's context preamble. The selection is **per-chat** — it resets to empty on a new chat and reloads when you switch chats. If a selected lore book is later deleted or renamed, it's silently dropped from the selection (with a one-time notice) the next time that chat's picker is opened or guidance is generated.
 - **Configurable token limits** — Per tier: set the response token limit for the generation, and optionally cap how much chat history feeds into the context preamble.
 
 ### Reformatting
@@ -285,7 +285,7 @@ The drawer holds two self-contained tiers — **Long-term** (the overarching arc
 | Injection Prompt Template | Template injected before each AI turn. Supports the `{{guidance}}` placeholder. |
 | Depth | Number of recent chat messages to insert the guidance after (0 = at the bottom) |
 | Role | Role used when injecting the guidance (System / User / Assistant) |
-| Lore Books | Optional picker for lore books to feed into that tier's generation context |
+| Lore Books (per-chat) | Optional picker for lore books to feed into that tier's generation context. Stored per chat (resets on a new chat); missing books are dropped automatically |
 | Themes / Story Arcs (per-chat) | Themes, ideas, or arcs for the model to weave into the tier's next round of guidance |
 | Active Guidance (per-chat) | The tier's currently active guidance paragraph. Edit directly to hand-tune steering; edits apply on the next AI turn. |
 | Turns Remaining / -1 / Reset / Regenerate Now | Manual controls over that tier's per-chat counter and on-demand regeneration |
