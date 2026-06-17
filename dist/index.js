@@ -2122,16 +2122,34 @@ async function streamRawGenerate(params, targetEl, append, signal, jobName, prog
     const streamFn = await openRawStream(params, signal);
     debug(`${jobName} — stream opened, awaiting tokens (api: ${params.api || __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_main_api__})`);
 
+    // Throttle the live field writes. Writing (and scrolling) the textarea on
+    // every token forces a reflow per token; on a large page (e.g. a long
+    // chat behind the modal) that starves the main thread enough that the SSE
+    // reader falls behind and the stream appears to hang — most visibly on
+    // memory/CPU-limited mobile devices. Coalesce writes to ~10/sec; the final
+    // cleaned write after the loop always reflects the full text.
+    const FLUSH_INTERVAL_MS = 100;
+    let lastFlush = 0;
+    const flushField = () => {
+        if (!targetEl) return;
+        targetEl.value = baseText + progress.text;
+        targetEl.scrollTop = targetEl.scrollHeight;
+    };
+
     for await (const chunk of streamFn()) {
         if (signal.aborted) break;
         if (typeof chunk?.text === 'string') progress.text = chunk.text;
         if (progress.receivedChunks === 0) debug(`${jobName} — first chunk received`);
         progress.receivedChunks++;
-        if (targetEl) {
-            targetEl.value = baseText + progress.text;
-            targetEl.scrollTop = targetEl.scrollHeight;
+        const now = Date.now();
+        if (now - lastFlush >= FLUSH_INTERVAL_MS) {
+            flushField();
+            lastFlush = now;
         }
     }
+    // Make sure the field reflects everything streamed (the last tokens may
+    // have been throttled out, and abort handlers expect the partial visible).
+    flushField();
     debug(`${jobName} — stream LOOP ENDED after ${progress.receivedChunks} chunk(s), raw length: ${progress.text.length} (if this line is missing in the log, the backend never closed the stream)`);
     signal.throwIfAborted();
 
@@ -2935,23 +2953,40 @@ function formatChatLine(m, ctx) {
     return text ? `${who}: ${text}` : '';
 }
 
+// Upper bound on the text fed to the cold-start token estimate. A full
+// context window is at most a few hundred KB of text, so tokenizing more than
+// this adds nothing — but building/hashing one string from a 1000+ message
+// chat can spike memory on a constrained mobile tab. We only need a rough
+// "how full is the context" number; the real measured size takes over after
+// the first live generation.
+const ESTIMATE_CHAR_BUDGET = 600000;
+
 /**
  * Estimate the token cost of the current chat's visible (non-system) lines.
  *
  * Used as the cold-start fallback for context-usage readouts before a live
- * generation has reported the true outgoing prompt size. Counts the whole
- * chat in a single tokenizer call (cheap enough for a one-shot estimate);
- * returns 0 when there's nothing to count.
+ * generation has reported the true outgoing prompt size. Packs the most recent
+ * lines up to a fixed character budget (newest first) so it stays cheap even
+ * on very long chats; returns 0 when there's nothing to count.
  *
- * @returns {Promise<number>} Approximate token count of the visible chat.
+ * @returns {Promise<number>} Approximate token count of the recent chat.
  */
 async function estimateChatTokens() {
     const ctx = getContext();
     const chat = Array.isArray(ctx.chat) ? ctx.chat : [];
     if (!chat.length) return 0;
-    const lines = chat.map(m => formatChatLine(m, ctx)).filter(Boolean);
-    if (!lines.length) return 0;
-    return await __WEBPACK_EXTERNAL_MODULE__tokenizers_js_d5863f55_getTokenCountAsync__(lines.join('\n'));
+    const picked = [];
+    let chars = 0;
+    for (let i = chat.length - 1; i >= 0; i--) {
+        const line = formatChatLine(chat[i], ctx);
+        if (!line) continue;
+        picked.push(line);
+        chars += line.length + 1;
+        if (chars >= ESTIMATE_CHAR_BUDGET) break;
+    }
+    if (!picked.length) return 0;
+    picked.reverse();
+    return await __WEBPACK_EXTERNAL_MODULE__tokenizers_js_d5863f55_getTokenCountAsync__(picked.join('\n'));
 }
 
 /**
