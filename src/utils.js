@@ -636,6 +636,14 @@ export function createLoreBookPicker({
             updateSummary();
             return;
         }
+        const emitChange = (cb) => {
+            debug('picker change — book:', cb.value, 'checked:', cb.checked);
+            updateSummary();
+            const selected = getSelected();
+            debug('picker change — selection now:', selected);
+            onChange?.(selected);
+            debug('picker change — onChange handled');
+        };
         for (const name of names) {
             const label = document.createElement('label');
             label.className = `${classPrefix}-item checkbox_label`;
@@ -643,13 +651,19 @@ export function createLoreBookPicker({
             cb.type = 'checkbox';
             cb.value = name;
             if (previouslyChecked.has(name)) cb.checked = true;
-            cb.addEventListener('change', () => {
-                debug('picker change — book:', cb.value, 'checked:', cb.checked);
-                updateSummary();
-                const selected = getSelected();
-                debug('picker change — selection now:', selected);
-                onChange?.(selected);
-                debug('picker change — onChange handled');
+            // Direct checkbox clicks + keyboard (space) toggle natively.
+            cb.addEventListener('change', () => emitChange(cb));
+            // Clicking the row's text label must toggle too. Native <label> →
+            // checkbox forwarding is unreliable inside a <details> dropdown in
+            // Firefox (the box never toggles and focus escapes to <body>,
+            // collapsing the dropdown), so toggle ourselves for non-checkbox
+            // targets and preventDefault to stop native forwarding from
+            // double-toggling where it does work.
+            label.addEventListener('click', (event) => {
+                if (event.target === cb) return;
+                event.preventDefault();
+                cb.checked = !cb.checked;
+                emitChange(cb);
             });
             const span = document.createElement('span');
             span.textContent = name;
@@ -665,7 +679,12 @@ export function createLoreBookPicker({
     // summary to dismiss. Capture-phase so we still see the event if inner
     // handlers stop propagation; only attached while open.
     const closeIfOutside = (event) => {
-        if (!details.open || details.contains(event.target)) return;
+        if (!details.open) return;
+        // Focus landing on <body> happens when clicking non-focusable text
+        // inside the dropdown (e.g. a lore book name); that must not collapse
+        // the picker. Genuine outside clicks are still caught via pointerdown.
+        if (event.type === 'focusin' && event.target === document.body) return;
+        if (details.contains(event.target)) return;
         details.open = false;
     };
 

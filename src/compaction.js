@@ -541,33 +541,6 @@ async function buildSummaryPreamble(loreBookNames) {
 
 // ─── Modal ───
 
-// While the modal is open the chat sits fully behind it, but a long chat's
-// render tree / composited layers keep consuming renderer memory — enough to
-// push a memory-limited mobile tab over the edge into an "Aw, Snap" OOM crash
-// on the next allocation (e.g. ticking a lore book). Drop #chat out of the
-// render pipeline for the duration of the modal and restore it on close. The
-// DOM nodes are kept, so nothing is lost; only layout/paint/layer memory is
-// reclaimed, which gives headroom for the modal interactions.
-let chatHiddenForModal = false;
-let chatPrevInlineDisplay = '';
-
-function hideChatForModal() {
-    const el = document.getElementById('chat');
-    if (!el || chatHiddenForModal) return;
-    chatPrevInlineDisplay = el.style.display;
-    el.style.display = 'none';
-    chatHiddenForModal = true;
-    debug('Hid #chat to relieve renderer memory while the modal is open');
-}
-
-function restoreChatAfterModal() {
-    if (!chatHiddenForModal) return;
-    const el = document.getElementById('chat');
-    if (el) el.style.display = chatPrevInlineDisplay;
-    chatHiddenForModal = false;
-    debug('Restored #chat after modal close');
-}
-
 async function openCompactionModal({ auto = false } = {}) {
     debug('openCompactionModal — auto:', auto, 'activePopup:', !!activePopup, 'compacting:', compacting);
     if (activePopup) return;
@@ -605,7 +578,6 @@ async function openCompactionModal({ auto = false } = {}) {
         large: true,
         allowVerticalScrolling: true,
         onOpen: () => {
-            hideChatForModal();
             bindModalHandlers();
             refreshActionButtonStates();
             updateUsageBanner();
@@ -648,7 +620,6 @@ async function openCompactionModal({ auto = false } = {}) {
             }
         }
     } finally {
-        restoreChatAfterModal();
         activePopup = null;
         activeBody = null;
         isGenerating = false;
