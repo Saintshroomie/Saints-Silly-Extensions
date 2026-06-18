@@ -597,7 +597,11 @@ async function runGeneration(action, brief) {
             : await generateDescription(brief, ctxOptions);
 
         if (abortRequested) {
-            debug(`${action} aborted, discarding result`);
+            debug(`${action} aborted, discarding result; keeping the streamed partial`);
+            // Leave the streamed partial in the field so the user can edit it
+            // and Continue from there; treat the stop like a short result so
+            // Retry can redo it (Continue/Checkpoint enable on field content).
+            if (output?.value?.trim()) lastAction = action;
             return;
         }
 
@@ -612,7 +616,9 @@ async function runGeneration(action, brief) {
         debug(`${action} complete, length:`, result.length);
     } catch (err) {
         if (isSilentGenerationAbort(err)) {
-            debug(`${action} aborted via cancellation`);
+            debug(`${action} aborted via cancellation; keeping the streamed partial`);
+            const out = document.getElementById('acc_description_output');
+            if (out?.value?.trim()) lastAction = action;
         } else if (!abortRequested) {
             console.error('ACC generation error:', err);
             toast(`Generation failed: ${err.message}`, 'error');

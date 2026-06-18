@@ -592,6 +592,10 @@ async function onAssist(formEl, id, isContinue) {
     } catch (err) {
         if (isSilentGenerationAbort(err)) {
             debug('Generation cancelled for', id);
+            // The streamed partial is left in the content field; if anything
+            // was produced, treat the entry as generated so Continue/Retry stay
+            // available and the user can edit the partial and pick up from it.
+            if ((contentEl.value || '').trim()) state.hasGenerated = true;
         } else {
             console.error('WIA generation error:', err);
             toast(`World Info assist failed: ${err.message}`, 'error');

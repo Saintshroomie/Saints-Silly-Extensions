@@ -5778,7 +5778,11 @@ async function runGeneration(action, brief) {
             : await generateDescription(brief, ctxOptions);
 
         if (abortRequested) {
-            assisted_character_creation_debug(`${action} aborted, discarding result`);
+            assisted_character_creation_debug(`${action} aborted, discarding result; keeping the streamed partial`);
+            // Leave the streamed partial in the field so the user can edit it
+            // and Continue from there; treat the stop like a short result so
+            // Retry can redo it (Continue/Checkpoint enable on field content).
+            if (output?.value?.trim()) lastAction = action;
             return;
         }
 
@@ -5793,7 +5797,9 @@ async function runGeneration(action, brief) {
         assisted_character_creation_debug(`${action} complete, length:`, result.length);
     } catch (err) {
         if (isSilentGenerationAbort(err)) {
-            assisted_character_creation_debug(`${action} aborted via cancellation`);
+            assisted_character_creation_debug(`${action} aborted via cancellation; keeping the streamed partial`);
+            const out = document.getElementById('acc_description_output');
+            if (out?.value?.trim()) lastAction = action;
         } else if (!abortRequested) {
             console.error('ACC generation error:', err);
             toast(`Generation failed: ${err.message}`, 'error');
@@ -6590,6 +6596,10 @@ async function onAssist(formEl, id, isContinue) {
     } catch (err) {
         if (isSilentGenerationAbort(err)) {
             world_info_assist_debug('Generation cancelled for', id);
+            // The streamed partial is left in the content field; if anything
+            // was produced, treat the entry as generated so Continue/Retry stay
+            // available and the user can edit the partial and pick up from it.
+            if ((contentEl.value || '').trim()) state.hasGenerated = true;
         } else {
             console.error('WIA generation error:', err);
             toast(`World Info assist failed: ${err.message}`, 'error');
@@ -9240,7 +9250,12 @@ async function runSummaryGeneration(action) {
             : await generateSummary(loreBookNames, guidance);
 
         if (compaction_abortRequested) {
-            compaction_debug(`${action} aborted, discarding result`);
+            compaction_debug(`${action} aborted, discarding result; keeping the streamed partial`);
+            // The streamed partial is left in the field on purpose so the user
+            // can edit it and Continue from there. Treat the stop like a short
+            // result so Retry can redo it (Continue/Checkpoint enable on field
+            // content via refreshActionButtonStates in finally).
+            if (output?.value?.trim()) compaction_lastAction = action;
             return;
         }
         if (!output) return;
@@ -9254,7 +9269,9 @@ async function runSummaryGeneration(action) {
         compaction_debug(`${action} complete, length:`, result.length);
     } catch (err) {
         if (isSilentGenerationAbort(err)) {
-            compaction_debug(`${action} aborted via cancellation`);
+            compaction_debug(`${action} aborted via cancellation; keeping the streamed partial`);
+            const out = document.getElementById('cc_summary_output');
+            if (out?.value?.trim()) compaction_lastAction = action;
         } else if (!compaction_abortRequested) {
             console.error('Compaction summary error:', err);
             toast(`Summary generation failed: ${err.message}`, 'error');

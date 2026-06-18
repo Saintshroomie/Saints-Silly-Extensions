@@ -865,7 +865,12 @@ async function runSummaryGeneration(action) {
             : await generateSummary(loreBookNames, guidance);
 
         if (abortRequested) {
-            debug(`${action} aborted, discarding result`);
+            debug(`${action} aborted, discarding result; keeping the streamed partial`);
+            // The streamed partial is left in the field on purpose so the user
+            // can edit it and Continue from there. Treat the stop like a short
+            // result so Retry can redo it (Continue/Checkpoint enable on field
+            // content via refreshActionButtonStates in finally).
+            if (output?.value?.trim()) lastAction = action;
             return;
         }
         if (!output) return;
@@ -879,7 +884,9 @@ async function runSummaryGeneration(action) {
         debug(`${action} complete, length:`, result.length);
     } catch (err) {
         if (isSilentGenerationAbort(err)) {
-            debug(`${action} aborted via cancellation`);
+            debug(`${action} aborted via cancellation; keeping the streamed partial`);
+            const out = document.getElementById('cc_summary_output');
+            if (out?.value?.trim()) lastAction = action;
         } else if (!abortRequested) {
             console.error('Compaction summary error:', err);
             toast(`Summary generation failed: ${err.message}`, 'error');
