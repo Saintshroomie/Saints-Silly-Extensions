@@ -523,10 +523,14 @@ async function continueGuidance(track) {
     try {
         const responseLength = resolveResponseLength(track);
 
+        // True positional continuation (like ST's native Continue): the
+        // paragraph so far is sent as the assistant prefill, so the model
+        // extends from its exact end. It is therefore not embedded in the
+        // prompt (that would duplicate it).
         const continuePrompt =
-            `The following narrative guidance paragraph is in progress:\n\n${state.guidance}\n\n` +
-            'Continue this paragraph seamlessly from where it left off. ' +
-            'Add 1–2 sentences extending the story direction, mood, or complications. ' +
+            'A narrative guidance paragraph is in progress; your reply has been prefilled ' +
+            'with the paragraph so far. Continue it seamlessly from exactly where it stops — ' +
+            'add 1–2 sentences extending the story direction, mood, or complications. ' +
             'Do not repeat existing text. Output only the continuation — no brackets, no preamble.';
 
         const systemPrompt =
@@ -537,12 +541,12 @@ async function continueGuidance(track) {
 
         const guidanceArea = trackEl(track, 'active_guidance_textarea');
         const raw = await withSingleLineDisabled(() => streamingGenerate(
-            { prompt: continuePrompt, systemPrompt, responseLength },
+            { prompt: continuePrompt, systemPrompt, responseLength, ...(state.guidance ? { prefill: state.guidance } : {}) },
             guidanceArea,
             { append: true },
         ));
 
-        const continuation = removeReasoningFromString(raw).trim();
+        const continuation = stripPrefillEcho(removeReasoningFromString(raw).trim(), state.guidance);
         if (!continuation) throw new Error('Model returned empty continuation.');
 
         rt.lastSnapshot = state.guidance;
@@ -704,9 +708,11 @@ function recoverRegenPartial(track, err) {
  */
 function recoverContinuePartial(track, err) {
     if (typeof err?.streamedPartial === 'string') {
-        const continuation = err.streamedPartial.trim();
-        if (!continuation) return '';
         const prev = loadChatState(track).guidance || '';
+        // The partial may carry a prefill echo (the guidance-so-far) on
+        // backends that re-emit it; strip it so we don't double the text.
+        const continuation = stripPrefillEcho(err.streamedPartial.trim(), prev);
+        if (!continuation) return '';
         const sep = !prev || prev.endsWith(' ') || prev.endsWith('\n') ? '' : ' ';
         return prev + sep + continuation;
     }

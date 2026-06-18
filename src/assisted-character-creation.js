@@ -261,8 +261,10 @@ function showACCPromptPreview() {
         { label: 'Prefill (assistant prefix; kept at the top of the final description)', text: getPrefill() },
         {
             label: 'Note',
-            text: 'Continue uses the same template plus a fixed "Description so far: …" block and '
-                + `continuation instructions, with this system prompt:\n\n${ACC_CONTINUE_SYSTEM_PROMPT}`,
+            text: 'Continue uses the same template, but the character sheet so far is sent as '
+                + 'the assistant prefill so the model picks up from its exact end (a true '
+                + 'continuation, like ST\'s native Continue) rather than starting a fresh '
+                + `section. System prompt:\n\n${ACC_CONTINUE_SYSTEM_PROMPT}`,
         },
     ]);
 }
@@ -649,10 +651,12 @@ function composeGeneratePrompt(preambleBlock, brief) {
 }
 
 /**
- * Assemble the Continue-mode user prompt: same template + macros, then the
- * description-so-far and continuation instructions.
+ * Assemble the Continue-mode user prompt: same template + macros, then a
+ * prefill-aware continuation note. The character-sheet-so-far is sent as the
+ * assistant prefill (true positional continuation, like ST's native Continue),
+ * so it is deliberately NOT embedded here — that would duplicate it.
  */
-function composeContinuePrompt(preambleBlock, brief, existing) {
+function composeContinuePrompt(preambleBlock, brief) {
     const briefValue = brief || '(none provided)';
     const { text, used } = applyTemplateMacros(getPromptTemplate(), {
         context: preambleBlock || '',
@@ -661,7 +665,7 @@ function composeContinuePrompt(preambleBlock, brief, existing) {
     let prompt = text;
     if (!used.has('context') && preambleBlock) prompt = preambleBlock + prompt;
     if (!used.has('brief') && brief) prompt = `${prompt}\n\nCharacter Brief:\n${brief}`;
-    return `${prompt}\n\nDescription so far:\n${existing}\n\nContinue exactly where the text leaves off. Do not repeat any text already present. Maintain the same format and style. Output only the continuation.`;
+    return `${prompt}\n\nYour reply has been prefilled with the character sheet so far. Continue seamlessly from exactly where it stops — do not repeat any existing text. Maintain the same format and style. Output only the continuation.`;
 }
 
 async function generateDescription(brief, ctxOptions) {
@@ -690,7 +694,7 @@ async function generateDescription(brief, ctxOptions) {
 
 async function generateContinuation(brief, existing, ctxOptions) {
     const preambleBlock = await buildPreambleBlock(ctxOptions);
-    const prompt = composeContinuePrompt(preambleBlock, brief, existing);
+    const prompt = composeContinuePrompt(preambleBlock, brief);
     const systemPrompt = ACC_CONTINUE_SYSTEM_PROMPT;
     const responseLength = getResponseLength();
 
@@ -699,12 +703,14 @@ async function generateContinuation(brief, existing, ctxOptions) {
     debug('Prompt:', prompt);
 
     const outputEl = document.getElementById('acc_description_output');
+    // The sheet-so-far is the assistant prefill, so the model continues from
+    // its exact end; strip any prefill echo to keep only the new tail.
     const result = await withSingleLineDisabled(() => streamingGenerate(
-        { prompt, systemPrompt, responseLength },
+        { prompt, systemPrompt, responseLength, ...(existing ? { prefill: existing } : {}) },
         outputEl,
         { append: true },
     ));
-    return removeReasoningFromString(result).trim();
+    return stripPrefillEcho(removeReasoningFromString(result).trim(), existing);
 }
 
 function getPromptTemplate() {

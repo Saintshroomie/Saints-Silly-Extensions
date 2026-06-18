@@ -461,7 +461,7 @@ function getWIAPromptTemplate() {
  * tail (prefill pointer or entry-so-far + continuation instructions) is
  * always appended.
  */
-function composeWIAPrompt({ preambleBlock, seed, title, isContinue, currentText }) {
+function composeWIAPrompt({ preambleBlock, seed, title, isContinue }) {
     const guidanceValue = seed
         || (isContinue ? '(none provided)' : '(no specific guidance — invent a fitting entry)');
     const { text, used } = applyTemplateMacros(getWIAPromptTemplate(), {
@@ -474,8 +474,10 @@ function composeWIAPrompt({ preambleBlock, seed, title, isContinue, currentText 
     if (!used.has('guidance')) prompt = `${prompt}\n\nGuidance from the user:\n${guidanceValue}`;
 
     if (isContinue) {
-        return `${prompt}\n\nThe entry so far:\n${currentText}\n\n` +
-            'Continue exactly where the entry left off. Do not repeat any text. ' +
+        // The entry-so-far is sent as the assistant prefill (true positional
+        // continuation, like ST's native Continue), so it is not embedded here.
+        return `${prompt}\n\nYour reply has been prefilled with the entry so far. ` +
+            'Continue seamlessly from exactly where it stops — do not repeat any existing text. ' +
             'Maintain the bracketed format and close the bracket when the entry is complete.';
     }
     return `${prompt}\n\n` + (title
@@ -535,9 +537,11 @@ async function onAssist(formEl, id, isContinue) {
             : '';
 
         const userPrompt = composeWIAPrompt({
-            preambleBlock, seed, title, isContinue, currentText,
+            preambleBlock, seed, title, isContinue,
         });
-        const prefill = isContinue ? '' : resolveWIAPrefill(title);
+        // Continue: the entry-so-far is the prefill, so the model picks up from
+        // its exact end. Assist: the prefill is the bracket/tone/subject opener.
+        const prefill = isContinue ? currentText : resolveWIAPrefill(title);
         const systemPrompt = WIA_SYSTEM_PROMPT;
 
         debug('System prompt:', systemPrompt);
@@ -557,8 +561,8 @@ async function onAssist(formEl, id, isContinue) {
 
         let cleaned = removeReasoningFromString(raw).trim();
         // Backends that ignore the assistant prefix may re-emit the prefill;
-        // strip the echo so prepending it doesn't double the opening.
-        if (!isContinue) cleaned = stripPrefillEcho(cleaned, prefill);
+        // strip the echo so prepending/appending it doesn't double the text.
+        cleaned = stripPrefillEcho(cleaned, prefill);
 
         if (isContinue) {
             const sep =
@@ -709,7 +713,6 @@ function showWIAPromptPreview() {
         seed: '(your Assist Guidance text)',
         title: sampleTitle,
         isContinue: false,
-        currentText: '',
     });
     showPromptPreview('World Info Assist — Prompt Preview (Assist, titled entry)', [
         { label: 'System Prompt (fixed)', text: WIA_SYSTEM_PROMPT },
@@ -719,8 +722,9 @@ function showWIAPromptPreview() {
         {
             label: 'Note',
             text: 'The prefill is sent as an assistant prefix and kept at the start of the entry on '
-                + 'success. Continue uses the same template plus a fixed "The entry so far: …" block '
-                + 'and continuation instructions, with no prefill.',
+                + 'success. Continue uses the same template, but the entry so far is sent as the '
+                + 'prefill so the model picks up from its exact end (a true continuation, like ST\'s '
+                + 'native Continue) rather than starting a fresh section.',
         },
     ]);
 }

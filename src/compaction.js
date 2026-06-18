@@ -501,9 +501,14 @@ export function composeSummaryPrompt(preambleBlock, guidance) {
     return prompt;
 }
 
-function composeContinuePrompt(preambleBlock, guidance, existing) {
+// Continue is a true positional continuation (mirrors ST's native Continue):
+// the recap-so-far is sent as the assistant *prefill*, so createRawPrompt seeds
+// it as the assistant prefix / trailing text and the model extends from the
+// exact end. The user prompt therefore omits the recap text (it would otherwise
+// be duplicated) and just notes the prefill.
+function composeContinuePrompt(preambleBlock, guidance) {
     const base = composeSummaryPrompt(preambleBlock, guidance);
-    return `${base}\n\nRecap so far:\n${existing}\n\nContinue exactly where the recap leaves off. Do not repeat any text already present. Maintain the same format. Output only the continuation.`;
+    return `${base}\n\nYour reply has been prefilled with the recap so far. Continue seamlessly from exactly where it stops — do not repeat any existing text. Maintain the same format. Output only the continuation.`;
 }
 
 export function showCompactionPromptPreview() {
@@ -517,8 +522,10 @@ export function showCompactionPromptPreview() {
         { label: 'Prefill (assistant prefix; kept at the start of the summary)', text: getPrefill() || '(none)' },
         {
             label: 'Note',
-            text: 'Continue reuses the same template plus a "Recap so far: …" block and '
-                + `continuation instructions, with this system prompt:\n\n${COMPACTION_CONTINUE_SYSTEM_PROMPT}`,
+            text: 'Continue reuses the same template, but the recap so far is sent as the '
+                + 'assistant prefill so the model picks up from its exact end (a true '
+                + 'continuation, like ST\'s native Continue) rather than starting a fresh '
+                + `section. System prompt:\n\n${COMPACTION_CONTINUE_SYSTEM_PROMPT}`,
         },
     ]);
 }
@@ -917,7 +924,7 @@ async function generateSummary(loreBookNames, guidance) {
 
 async function generateContinuation(loreBookNames, guidance, existing) {
     const preambleBlock = await buildSummaryPreamble(loreBookNames);
-    const prompt = composeContinuePrompt(preambleBlock, guidance, existing);
+    const prompt = composeContinuePrompt(preambleBlock, guidance);
     const systemPrompt = COMPACTION_CONTINUE_SYSTEM_PROMPT;
     const responseLength = getResponseLength();
 
@@ -925,13 +932,15 @@ async function generateContinuation(loreBookNames, guidance, existing) {
 
     const outputEl = document.getElementById('cc_summary_output');
     debug('generateContinuation — streamingGenerate START');
+    // The recap-so-far is the assistant prefill — the model continues from its
+    // exact end. Strip any prefill echo so we keep only the new tail.
     const result = await withSingleLineDisabled(() => streamingGenerate(
-        { prompt, systemPrompt, responseLength },
+        { prompt, systemPrompt, responseLength, ...(existing ? { prefill: existing } : {}) },
         outputEl,
         { append: true, name: 'compaction-continue' },
     ));
     debug('generateContinuation — streamingGenerate RESOLVED, raw length:', (result || '').length);
-    return removeReasoningFromString(result).trim();
+    return stripPrefillEcho(removeReasoningFromString(result).trim(), existing);
 }
 
 function stopGeneration() {

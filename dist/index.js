@@ -5442,8 +5442,10 @@ function showACCPromptPreview() {
         { label: 'Prefill (assistant prefix; kept at the top of the final description)', text: getPrefill() },
         {
             label: 'Note',
-            text: 'Continue uses the same template plus a fixed "Description so far: …" block and '
-                + `continuation instructions, with this system prompt:\n\n${ACC_CONTINUE_SYSTEM_PROMPT}`,
+            text: 'Continue uses the same template, but the character sheet so far is sent as '
+                + 'the assistant prefill so the model picks up from its exact end (a true '
+                + 'continuation, like ST\'s native Continue) rather than starting a fresh '
+                + `section. System prompt:\n\n${ACC_CONTINUE_SYSTEM_PROMPT}`,
         },
     ]);
 }
@@ -5830,10 +5832,12 @@ function composeGeneratePrompt(preambleBlock, brief) {
 }
 
 /**
- * Assemble the Continue-mode user prompt: same template + macros, then the
- * description-so-far and continuation instructions.
+ * Assemble the Continue-mode user prompt: same template + macros, then a
+ * prefill-aware continuation note. The character-sheet-so-far is sent as the
+ * assistant prefill (true positional continuation, like ST's native Continue),
+ * so it is deliberately NOT embedded here — that would duplicate it.
  */
-function composeContinuePrompt(preambleBlock, brief, existing) {
+function composeContinuePrompt(preambleBlock, brief) {
     const briefValue = brief || '(none provided)';
     const { text, used } = applyTemplateMacros(assisted_character_creation_getPromptTemplate(), {
         context: preambleBlock || '',
@@ -5842,7 +5846,7 @@ function composeContinuePrompt(preambleBlock, brief, existing) {
     let prompt = text;
     if (!used.has('context') && preambleBlock) prompt = preambleBlock + prompt;
     if (!used.has('brief') && brief) prompt = `${prompt}\n\nCharacter Brief:\n${brief}`;
-    return `${prompt}\n\nDescription so far:\n${existing}\n\nContinue exactly where the text leaves off. Do not repeat any text already present. Maintain the same format and style. Output only the continuation.`;
+    return `${prompt}\n\nYour reply has been prefilled with the character sheet so far. Continue seamlessly from exactly where it stops — do not repeat any existing text. Maintain the same format and style. Output only the continuation.`;
 }
 
 async function generateDescription(brief, ctxOptions) {
@@ -5871,7 +5875,7 @@ async function generateDescription(brief, ctxOptions) {
 
 async function generateContinuation(brief, existing, ctxOptions) {
     const preambleBlock = await buildPreambleBlock(ctxOptions);
-    const prompt = composeContinuePrompt(preambleBlock, brief, existing);
+    const prompt = composeContinuePrompt(preambleBlock, brief);
     const systemPrompt = ACC_CONTINUE_SYSTEM_PROMPT;
     const responseLength = getResponseLength();
 
@@ -5880,12 +5884,14 @@ async function generateContinuation(brief, existing, ctxOptions) {
     assisted_character_creation_debug('Prompt:', prompt);
 
     const outputEl = document.getElementById('acc_description_output');
+    // The sheet-so-far is the assistant prefill, so the model continues from
+    // its exact end; strip any prefill echo to keep only the new tail.
     const result = await withSingleLineDisabled(() => streamingGenerate(
-        { prompt, systemPrompt, responseLength },
+        { prompt, systemPrompt, responseLength, ...(existing ? { prefill: existing } : {}) },
         outputEl,
         { append: true },
     ));
-    return __WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(result).trim();
+    return stripPrefillEcho(__WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(result).trim(), existing);
 }
 
 function assisted_character_creation_getPromptTemplate() {
@@ -6453,7 +6459,7 @@ function getWIAPromptTemplate() {
  * tail (prefill pointer or entry-so-far + continuation instructions) is
  * always appended.
  */
-function composeWIAPrompt({ preambleBlock, seed, title, isContinue, currentText }) {
+function composeWIAPrompt({ preambleBlock, seed, title, isContinue }) {
     const guidanceValue = seed
         || (isContinue ? '(none provided)' : '(no specific guidance — invent a fitting entry)');
     const { text, used } = applyTemplateMacros(getWIAPromptTemplate(), {
@@ -6466,8 +6472,10 @@ function composeWIAPrompt({ preambleBlock, seed, title, isContinue, currentText 
     if (!used.has('guidance')) prompt = `${prompt}\n\nGuidance from the user:\n${guidanceValue}`;
 
     if (isContinue) {
-        return `${prompt}\n\nThe entry so far:\n${currentText}\n\n` +
-            'Continue exactly where the entry left off. Do not repeat any text. ' +
+        // The entry-so-far is sent as the assistant prefill (true positional
+        // continuation, like ST's native Continue), so it is not embedded here.
+        return `${prompt}\n\nYour reply has been prefilled with the entry so far. ` +
+            'Continue seamlessly from exactly where it stops — do not repeat any existing text. ' +
             'Maintain the bracketed format and close the bracket when the entry is complete.';
     }
     return `${prompt}\n\n` + (title
@@ -6527,9 +6535,11 @@ async function onAssist(formEl, id, isContinue) {
             : '';
 
         const userPrompt = composeWIAPrompt({
-            preambleBlock, seed, title, isContinue, currentText,
+            preambleBlock, seed, title, isContinue,
         });
-        const prefill = isContinue ? '' : resolveWIAPrefill(title);
+        // Continue: the entry-so-far is the prefill, so the model picks up from
+        // its exact end. Assist: the prefill is the bracket/tone/subject opener.
+        const prefill = isContinue ? currentText : resolveWIAPrefill(title);
         const systemPrompt = WIA_SYSTEM_PROMPT;
 
         world_info_assist_debug('System prompt:', systemPrompt);
@@ -6549,8 +6559,8 @@ async function onAssist(formEl, id, isContinue) {
 
         let cleaned = __WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(raw).trim();
         // Backends that ignore the assistant prefix may re-emit the prefill;
-        // strip the echo so prepending it doesn't double the opening.
-        if (!isContinue) cleaned = stripPrefillEcho(cleaned, prefill);
+        // strip the echo so prepending/appending it doesn't double the text.
+        cleaned = stripPrefillEcho(cleaned, prefill);
 
         if (isContinue) {
             const sep =
@@ -6701,7 +6711,6 @@ function showWIAPromptPreview() {
         seed: '(your Assist Guidance text)',
         title: sampleTitle,
         isContinue: false,
-        currentText: '',
     });
     showPromptPreview('World Info Assist — Prompt Preview (Assist, titled entry)', [
         { label: 'System Prompt (fixed)', text: WIA_SYSTEM_PROMPT },
@@ -6711,8 +6720,9 @@ function showWIAPromptPreview() {
         {
             label: 'Note',
             text: 'The prefill is sent as an assistant prefix and kept at the start of the entry on '
-                + 'success. Continue uses the same template plus a fixed "The entry so far: …" block '
-                + 'and continuation instructions, with no prefill.',
+                + 'success. Continue uses the same template, but the entry so far is sent as the '
+                + 'prefill so the model picks up from its exact end (a true continuation, like ST\'s '
+                + 'native Continue) rather than starting a fresh section.',
         },
     ]);
 }
@@ -7222,10 +7232,14 @@ async function continueGuidance(track) {
     try {
         const responseLength = resolveResponseLength(track);
 
+        // True positional continuation (like ST's native Continue): the
+        // paragraph so far is sent as the assistant prefill, so the model
+        // extends from its exact end. It is therefore not embedded in the
+        // prompt (that would duplicate it).
         const continuePrompt =
-            `The following narrative guidance paragraph is in progress:\n\n${state.guidance}\n\n` +
-            'Continue this paragraph seamlessly from where it left off. ' +
-            'Add 1–2 sentences extending the story direction, mood, or complications. ' +
+            'A narrative guidance paragraph is in progress; your reply has been prefilled ' +
+            'with the paragraph so far. Continue it seamlessly from exactly where it stops — ' +
+            'add 1–2 sentences extending the story direction, mood, or complications. ' +
             'Do not repeat existing text. Output only the continuation — no brackets, no preamble.';
 
         const systemPrompt =
@@ -7236,12 +7250,12 @@ async function continueGuidance(track) {
 
         const guidanceArea = trackEl(track, 'active_guidance_textarea');
         const raw = await withSingleLineDisabled(() => streamingGenerate(
-            { prompt: continuePrompt, systemPrompt, responseLength },
+            { prompt: continuePrompt, systemPrompt, responseLength, ...(state.guidance ? { prefill: state.guidance } : {}) },
             guidanceArea,
             { append: true },
         ));
 
-        const continuation = __WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(raw).trim();
+        const continuation = stripPrefillEcho(__WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(raw).trim(), state.guidance);
         if (!continuation) throw new Error('Model returned empty continuation.');
 
         rt.lastSnapshot = state.guidance;
@@ -7403,9 +7417,11 @@ function recoverRegenPartial(track, err) {
  */
 function recoverContinuePartial(track, err) {
     if (typeof err?.streamedPartial === 'string') {
-        const continuation = err.streamedPartial.trim();
-        if (!continuation) return '';
         const prev = loadChatState(track).guidance || '';
+        // The partial may carry a prefill echo (the guidance-so-far) on
+        // backends that re-emit it; strip it so we don't double the text.
+        const continuation = stripPrefillEcho(err.streamedPartial.trim(), prev);
+        if (!continuation) return '';
         const sep = !prev || prev.endsWith(' ') || prev.endsWith('\n') ? '' : ' ';
         return prev + sep + continuation;
     }
@@ -8860,9 +8876,14 @@ function composeSummaryPrompt(preambleBlock, guidance) {
     return prompt;
 }
 
-function compaction_composeContinuePrompt(preambleBlock, guidance, existing) {
+// Continue is a true positional continuation (mirrors ST's native Continue):
+// the recap-so-far is sent as the assistant *prefill*, so createRawPrompt seeds
+// it as the assistant prefix / trailing text and the model extends from the
+// exact end. The user prompt therefore omits the recap text (it would otherwise
+// be duplicated) and just notes the prefill.
+function compaction_composeContinuePrompt(preambleBlock, guidance) {
     const base = composeSummaryPrompt(preambleBlock, guidance);
-    return `${base}\n\nRecap so far:\n${existing}\n\nContinue exactly where the recap leaves off. Do not repeat any text already present. Maintain the same format. Output only the continuation.`;
+    return `${base}\n\nYour reply has been prefilled with the recap so far. Continue seamlessly from exactly where it stops — do not repeat any existing text. Maintain the same format. Output only the continuation.`;
 }
 
 function showCompactionPromptPreview() {
@@ -8876,8 +8897,10 @@ function showCompactionPromptPreview() {
         { label: 'Prefill (assistant prefix; kept at the start of the summary)', text: compaction_getPrefill() || '(none)' },
         {
             label: 'Note',
-            text: 'Continue reuses the same template plus a "Recap so far: …" block and '
-                + `continuation instructions, with this system prompt:\n\n${COMPACTION_CONTINUE_SYSTEM_PROMPT}`,
+            text: 'Continue reuses the same template, but the recap so far is sent as the '
+                + 'assistant prefill so the model picks up from its exact end (a true '
+                + 'continuation, like ST\'s native Continue) rather than starting a fresh '
+                + `section. System prompt:\n\n${COMPACTION_CONTINUE_SYSTEM_PROMPT}`,
         },
     ]);
 }
@@ -9276,7 +9299,7 @@ async function generateSummary(loreBookNames, guidance) {
 
 async function compaction_generateContinuation(loreBookNames, guidance, existing) {
     const preambleBlock = await buildSummaryPreamble(loreBookNames);
-    const prompt = compaction_composeContinuePrompt(preambleBlock, guidance, existing);
+    const prompt = compaction_composeContinuePrompt(preambleBlock, guidance);
     const systemPrompt = COMPACTION_CONTINUE_SYSTEM_PROMPT;
     const responseLength = compaction_getResponseLength();
 
@@ -9284,13 +9307,15 @@ async function compaction_generateContinuation(loreBookNames, guidance, existing
 
     const outputEl = document.getElementById('cc_summary_output');
     compaction_debug('generateContinuation — streamingGenerate START');
+    // The recap-so-far is the assistant prefill — the model continues from its
+    // exact end. Strip any prefill echo so we keep only the new tail.
     const result = await withSingleLineDisabled(() => streamingGenerate(
-        { prompt, systemPrompt, responseLength },
+        { prompt, systemPrompt, responseLength, ...(existing ? { prefill: existing } : {}) },
         outputEl,
         { append: true, name: 'compaction-continue' },
     ));
     compaction_debug('generateContinuation — streamingGenerate RESOLVED, raw length:', (result || '').length);
-    return __WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(result).trim();
+    return stripPrefillEcho(__WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(result).trim(), existing);
 }
 
 function compaction_stopGeneration() {
