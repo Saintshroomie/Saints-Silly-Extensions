@@ -594,7 +594,7 @@ export function createLoreBookPicker({
     debug = () => {},
 } = {}) {
     const details = document.createElement('details');
-    details.className = `${classPrefix}-picker`;
+    details.className = `${classPrefix}-picker sse-lorebook-picker`;
     details.title = 'Prepend active entries from the selected lore books';
 
     const summary = document.createElement('summary');

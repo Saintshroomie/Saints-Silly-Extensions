@@ -2,6 +2,25 @@
 
 
 /* ═══════════════════════════════════════════════════════════════════════════════
+   SHARED: LORE BOOK PICKER
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Applied to every lore book picker (ACC / WIA / NG / Compaction) via the shared
+   factory. The picker text is pure UI and must not be selectable: tapping a
+   selectable lore book name engages Android Chrome's text-selection/magnifier
+   subsystem, which can crash the renderer ("Aw, Snap"). Disabling selection +
+   the touch callout/highlight keeps taps lightweight. user-select inherits, so
+   one rule on the root covers the summary and every list item. */
+.sse-lorebook-picker,
+.sse-lorebook-picker * {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════════
    POSSESSION STYLES
    ═══════════════════════════════════════════════════════════════════════════════ */
 
