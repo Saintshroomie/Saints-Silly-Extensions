@@ -645,31 +645,34 @@ export function createLoreBookPicker({
             debug('picker change — onChange handled');
         };
         for (const name of names) {
-            const label = document.createElement('label');
-            label.className = `${classPrefix}-item checkbox_label`;
+            // Deliberately a <div>, not a <label>: native <label> → checkbox
+            // click forwarding is unreliable across browsers inside a <details>
+            // dropdown — it does nothing in Firefox (focus escapes to <body>
+            // and collapses the dropdown) and double-fires on Android Chrome
+            // (forward + our manual toggle cancel out). With a plain div there
+            // is no native forwarding to fight, so one explicit toggle is
+            // deterministic everywhere. aria-label preserves the checkbox's
+            // accessible name that the <label> used to provide.
+            const row = document.createElement('div');
+            row.className = `${classPrefix}-item checkbox_label`;
             const cb = document.createElement('input');
             cb.type = 'checkbox';
             cb.value = name;
+            cb.setAttribute('aria-label', name);
             if (previouslyChecked.has(name)) cb.checked = true;
             // Direct checkbox clicks + keyboard (space) toggle natively.
             cb.addEventListener('change', () => emitChange(cb));
-            // Clicking the row's text label must toggle too. Native <label> →
-            // checkbox forwarding is unreliable inside a <details> dropdown in
-            // Firefox (the box never toggles and focus escapes to <body>,
-            // collapsing the dropdown), so toggle ourselves for non-checkbox
-            // targets and preventDefault to stop native forwarding from
-            // double-toggling where it does work.
-            label.addEventListener('click', (event) => {
+            // Tapping anywhere else on the row (the name) toggles manually.
+            row.addEventListener('click', (event) => {
                 if (event.target === cb) return;
-                event.preventDefault();
                 cb.checked = !cb.checked;
                 emitChange(cb);
             });
             const span = document.createElement('span');
             span.textContent = name;
-            label.appendChild(cb);
-            label.appendChild(span);
-            list.appendChild(label);
+            row.appendChild(cb);
+            row.appendChild(span);
+            list.appendChild(row);
         }
         updateSummary();
     };
