@@ -39,6 +39,10 @@ let retryState = {
 // This prevents continue/generation from silently updating the checkpoint.
 let snapshotLocked = false;
 
+// Per-swipe marker stamped on every swipe Retry creates, so retry attempts are
+// identifiable in the chat data (and distinct from a tool's own swipes).
+const RETRY_FLAG = 'sseRetryAttempt';
+
 // ─── Init ───
 
 /**
@@ -270,27 +274,29 @@ async function handleTypedMessageRetry(inputText) {
 
 // ─── Swipe Creation & Continue ───
 
-async function createSnapshotSwipeAndContinue(lastMsg, lastMsgIndex) {
-    debug('createSnapshotSwipeAndContinue: msgIndex =', lastMsgIndex);
-    const context = getContext();
-
-    // Ensure the message has a swipes array
+/**
+ * Push the frozen snapshot text onto the message as a new (tagged) active
+ * swipe. Shared by the interactive Retry flow and the programmatic
+ * retryFromCheckpoint path so both stamp the swipe identically.
+ */
+function pushSnapshotSwipe(lastMsg) {
     if (!lastMsg.swipes) {
-        debug('createSnapshotSwipeAndContinue: initializing swipes array');
         lastMsg.swipes = [lastMsg.mes];
         lastMsg.swipe_id = 0;
         lastMsg.swipe_info = [{}];
     }
-
-    // Add a new swipe with the snapshot text
     lastMsg.swipes.push(retryState.snapshotText);
-    lastMsg.swipe_info.push({});
-
-    // Switch to the new swipe
-    const newSwipeIndex = lastMsg.swipes.length - 1;
-    lastMsg.swipe_id = newSwipeIndex;
+    lastMsg.swipe_info.push({ [RETRY_FLAG]: true });
+    lastMsg.swipe_id = lastMsg.swipes.length - 1;
     lastMsg.mes = retryState.snapshotText;
-    debug('createSnapshotSwipeAndContinue: created swipe', newSwipeIndex, '| total swipes =', lastMsg.swipes.length);
+}
+
+async function createSnapshotSwipeAndContinue(lastMsg, lastMsgIndex) {
+    debug('createSnapshotSwipeAndContinue: msgIndex =', lastMsgIndex);
+    const context = getContext();
+
+    pushSnapshotSwipe(lastMsg);
+    debug('createSnapshotSwipeAndContinue: created swipe', lastMsg.swipe_id, '| total swipes =', lastMsg.swipes.length);
 
     // Re-render the message to reflect the new swipe
     reRenderMessage(lastMsgIndex);
@@ -312,6 +318,67 @@ async function createSnapshotSwipeAndContinue(lastMsg, lastMsgIndex) {
         debug('createSnapshotSwipeAndContinue: autoContinue disabled, skipping continue');
         rcToast('New swipe created from checkpoint.');
     }
+}
+
+/**
+ * True when an active checkpoint is anchored to the message at `index`. Used by
+ * Phrase Ban to decide whether a banned-phrase hit should drive a retry instead
+ * of a rewrite.
+ */
+export function isRetryCheckpointActiveFor(index) {
+    return !!(retryState.active && retryState.messageId === index);
+}
+
+/**
+ * Programmatic retry from the existing checkpoint: push the frozen prefix as a
+ * new swipe and continue from it, always generating (regardless of the
+ * Auto-Continue preference) and resolving only once generation has finished.
+ * Returns false if there's no usable checkpoint on the last message.
+ *
+ * This is the path Phrase Ban drives on a banned-phrase hit while a checkpoint
+ * is active — each call is one more browsable attempt, with the freshly-learned
+ * phrase already in the ban list before the continue builds its payload.
+ */
+export async function retryFromCheckpoint() {
+    const context = getContext();
+    if (!retryState.active) return false;
+    const lastIndex = context.chat.length - 1;
+    if (retryState.messageId !== lastIndex) {
+        debug('retryFromCheckpoint: checkpoint not on the last message, skipping');
+        return false;
+    }
+    const lastMsg = context.chat[lastIndex];
+    if (!lastMsg) return false;
+
+    pushSnapshotSwipe(lastMsg);
+    reRenderMessage(lastIndex);
+    await context.saveChat();
+
+    retryState.retryCount++;
+    saveRetryState();
+    updateButtonVisuals();
+    updateMessageIndicator();
+
+    snapshotLocked = true;
+    debug('retryFromCheckpoint: snapshotLocked = true, triggering continue (attempt', retryState.retryCount, ')');
+    await triggerContinue();
+    await waitForGenerationToFinish();
+    return true;
+}
+
+/** Resolve once no chat generation is in flight (bounded by a long timeout). */
+function waitForGenerationToFinish(timeoutMs = 5 * 60 * 1000) {
+    return new Promise((resolve) => {
+        const start = Date.now();
+        const tick = () => {
+            if (!getContext().isGenerating || Date.now() - start > timeoutMs) {
+                resolve();
+                return;
+            }
+            setTimeout(tick, 250);
+        };
+        tick();
+    });
 }
 
 /**
@@ -710,6 +777,10 @@ export function onRetryContinueMessageEdited(messageId) {
         return;
     }
     if (retryState.active && parseInt(messageId) === retryState.messageId) {
+        // Tool-driven mutations (our own continue, a phrase-ban-driven retry)
+        // all run under snapshotLocked / isGenerating, which the guards above
+        // already filter — so anything reaching here is a genuine user edit and
+        // is safe to adopt as the new frozen prefix.
         const msg = ctx.chat[retryState.messageId];
         if (msg) {
             debug('event: MESSAGE_EDITED — updating snapshot to edited text, length =', msg.mes.length);

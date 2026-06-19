@@ -626,20 +626,15 @@
         </div>
         <div class="inline-drawer-content" style="display: none;">
 
-            <small>Normalizes the formatting of AI character messages after they're
-                generated. Runs automatically on each reply, or manually via the
-                <span class="fa-solid fa-text-slash"></span> button on each message.
-                The original text is always kept as a swipe, so a reformat is
+            <small>Normalizes the formatting of AI character messages. Reformat a
+                message manually with the <span class="fa-solid fa-text-slash"></span>
+                button on each message, or with <code>/reformat</code> for the last
+                message. The original text is always kept as a swipe, so a reformat is
                 reversible.</small>
 
             <label class="checkbox_label">
                 <input id="reformatting_enabled" type="checkbox" />
                 <span>Enable Reformatting</span>
-            </label>
-
-            <label class="checkbox_label" title="When on, every AI character message is reformatted as it arrives. When off, only the per-message button (or /reformat) reformats.">
-                <input id="reformatting_auto" type="checkbox" />
-                <span>Auto-Reformat AI Messages</span>
             </label>
 
             <div class="ng_inline_row">

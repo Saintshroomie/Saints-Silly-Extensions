@@ -98,7 +98,6 @@ import {
 import {
     initReformatting,
     bindReformattingSettings,
-    onReformattingMessageReceived,
     startReformattingObserver,
     rescanReformatButtons,
     registerReformattingSlashCommand,
@@ -129,6 +128,8 @@ import {
     hookRetryAutoContinue,
     registerRetryContinueSlashCommands,
     loadRetryState,
+    isRetryCheckpointActiveFor,
+    retryFromCheckpoint,
     onRetryContinueChatChanged,
     onRetryContinueUserMessageRendered,
     onRetryContinueCharacterMessageRendered,
@@ -205,7 +206,6 @@ const defaultSettings = {
     narrativeGuidanceShortInjectionRole: DEFAULT_NG_INJECTION_ROLE,
     // (Lore-book selection is stored per-chat in chatMetadata, not here.)
     reformattingEnabled: false,
-    reformattingAuto: true,
     reformattingEngine: 'rules',
     reformattingDebugMode: false,
     reformattingAsteriskMode: 'strip',
@@ -461,6 +461,7 @@ jQuery(async () => {
     initPhraseBan({
         settings,
         phrasingApi: { rewriteMessageWithTemplate },
+        retryApi: { isRetryCheckpointActiveFor, retryFromCheckpoint },
     });
     initACC({ settings, saveSettings });
     initWIA({ settings });
@@ -516,9 +517,9 @@ jQuery(async () => {
     eventSource.on(eventTypes.MESSAGE_RECEIVED, async (idx) => {
         onNarrativeGuidanceMessageReceived(idx);
         onRetryContinueMessageReceived(idx);
-        await onReformattingMessageReceived(idx);
-        // After Reformatting so the scan sees the final text. Detached
-        // internally — it must never block this emit chain.
+        // Detached internally (setTimeout) — it must never block this emit
+        // chain. On a banned-phrase hit it drives a rewrite, or, while a Retry
+        // checkpoint is active, a retry-continue from that checkpoint.
         onPhraseBanMessageReceived(idx);
     });
     if (eventTypes.USER_MESSAGE_RENDERED) {

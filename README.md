@@ -36,8 +36,9 @@ Tired of the model reusing the same tics — "his voice was thick with something
 
 - **Regex ban list** — One JavaScript regular expression per line, matched against the raw text of every incoming AI reply. Case-insensitive by default, `/pattern/flags` for custom flags, `#` for comments. Invalid patterns are skipped, with a live validity readout under the textarea.
 - **Detect → rewrite loop** — On a match, the message is rewritten through the Phrasing! engine: the actual matched phrases are listed in a rewrite prompt and the message is regenerated as a new swipe. If the rewrite *still* matches, it retries up to **Max Rewrite Attempts** (default 2), then gives up with a warning toast.
-- **Notify-only mode** — Set Max Rewrite Attempts to 0 to be warned about matches without ever auto-rewriting.
-- **Non-destructive** — Every rewrite is a swipe; the original (and each intermediate attempt) stays one swipe away.
+- **Plays nicely with Retry Continue** — If a **Retry checkpoint** is active on the matched message, Phrase Ban skips the in-place rewrite and instead drives a **retry-continue from that checkpoint** (the freshly-detected phrase is added to the ban list first, so the new attempt is steered away from it). Each attempt is a browsable swipe and your frozen checkpoint prefix is never disturbed. Same **Max Rewrite Attempts** cap applies. (Most effective on Text Completion, where the ban is enforced at the sampler level; on Chat Completion turn on Proactive Injection — otherwise an attempt may just reproduce the phrase and exhaust the cap.)
+- **Notify-only mode** — Set Max Rewrite Attempts to 0 to be warned about matches without ever auto-rewriting (or auto-retrying).
+- **Non-destructive** — Every rewrite (or retry attempt) is a swipe; the original (and each intermediate attempt) stays one swipe away.
 - **Automatic or manual** — With **Auto-Scan** on, every AI reply is scanned as it arrives (a reply is never re-scanned once checked). Run `/phraseban` to scan and fix the last message on demand.
 - **Learned phrase list (per chat)** — Every phrase Phrase Ban detects is collected into a per-chat **Learned Phrases** list automatically, as bookkeeping — whether or not you ever inject it. The list is fully **editable** in a per-chat textarea (add your own phrases or delete ones you don't want used), travels with the chat, and has a **Clear Learned Phrases** button to wipe it.
 - **Native sampler-level ban (automatic)** — While Phrase Ban is enabled, the learned list is appended to the request's `banned_strings` on **Text Completion** backends (llama.cpp, KoboldCpp, TabbyAPI/ExLlama, etc.), so the backend *refuses to emit* those sequences at the sampler level instead of merely being asked to. It's applied non-destructively per-request — your saved sampler settings are never touched — and needs no toggle. Chat Completion APIs (OpenAI, Claude, …) have no sampler-level ban, so this is a no-op there (use Proactive Injection instead).
@@ -102,7 +103,7 @@ Normalizes the formatting of AI character messages *after* they're generated, so
     - **Asterisks** — a single choice of **Leave as-is**, **Strip asterisks** (removes every italic / bold marker), or **Wrap narration in asterisks** (the inverse: splits quoted dialogue from narration and wraps the narration, e.g. `He danced. "Hi."` → `*He danced.* "Hi."`, stripping existing asterisks first so the result is always consistent).
     - **Collapse Extra Whitespace** — an independent option that collapses runs of blank lines and trims trailing spaces, on top of the asterisk choice.
   - **LLM** — sends the message to the model with an editable prompt (and optional prefill) and lets it rewrite the formatting. More flexible, but slower and token-using; routed through the shared silent-generation manager so SillyTavern's Stop button cancels it. Joins the Tool Presets system.
-- **Automatic or manual** — With **Auto-Reformat** on, every AI reply is reformatted as it arrives. With it off (or any time), reformat a single message with the <span title="text-slash icon">✂</span> button injected into that message's button row, or with `/reformat` for the last message.
+- **Manual** — Reformat a single message with the <span title="text-slash icon">✂</span> button injected into that message's button row, or with `/reformat` for the last message. (Reformatting only acts when you ask it to — there's no automatic on-arrival pass, so it never collides with retries or other tools.)
 - **AI messages only** — User and system messages are never touched.
 - **Non-destructive** — The original text is always preserved as a swipe, so you can swipe back to it at any time. Reformatting never re-processes a swipe it already produced.
 
@@ -124,8 +125,9 @@ Automates the "edit the message to keep the good part, delete the bad part, hit 
 - **Checkpoint + retry** — Retry snapshots the last message (or, if you edited it down to a good prefix first, your edited text) as a checkpoint, saves that snapshot as a new swipe, and continues from it. Press Retry again and again — each attempt becomes a new swipe you can browse with SillyTavern's native swipe arrows.
 - **Two buttons** — A <span title="rotate-right icon">↻</span> **Retry** item in the hamburger menu (next to Continue) and a matching quick-action button in the send bar. The button highlights while a checkpoint is active and shows the retry count.
 - **Typed-message retry** — With text in the input box, Retry checkpoints that text and posts-and-continues it natively.
-- **Smart checkpoint lifecycle** — The checkpoint clears automatically when a new message is added, you switch chats, or you clear it manually; editing the checkpointed message updates the snapshot. State persists per-chat across refreshes.
+- **Smart checkpoint lifecycle** — The checkpoint clears automatically when a new message is added, you switch chats, or you clear it manually; editing the checkpointed message updates the snapshot. The prefix is frozen against tool-driven edits — only *your* edits change it. State persists per-chat across refreshes.
 - **Configurable indicator** — Mark the checkpointed message with a border, an icon, or nothing.
+- **Phrase Ban integration** — While a checkpoint is active, a banned-phrase hit drives a fresh retry from your checkpoint (with the offending phrase added to the ban list) instead of an in-place rewrite, so detection and retries share one swipe stack.
 
 ### How to Use Possession
 
@@ -202,9 +204,8 @@ Notes: detection happens after the reply arrives (regex can't run inside the mod
 2. Choose an **Engine**:
    - **Rules** — pick how asterisks are handled (**Strip asterisks** handles the common "remove the italics" case; **Wrap narration in asterisks** does the inverse), and optionally enable **Collapse Extra Whitespace**.
    - **LLM** — set a Response Token Limit and edit the system prompt, the user prompt (with the `{{message}}` placeholder), and the optional prefill. Use **Preview Assembled Prompt** to see exactly what gets sent, and save variants as presets.
-3. Leave **Auto-Reformat AI Messages** on to reformat every reply as it arrives, or turn it off to keep it manual-only.
-4. To reformat a single message at any time, click the <span title="text-slash icon">✂</span> button in that message's button row, or run `/reformat` to reformat the last message.
-5. The reformatted text becomes the active version of the message; the original is kept as a swipe, so you can always swipe back to it.
+3. To reformat a message, click the <span title="text-slash icon">✂</span> button in that message's button row, or run `/reformat` to reformat the last message. (Reformatting is manual — it only ever acts when you ask it to.)
+4. The reformatted text becomes the active version of the message; the original is kept as a swipe, so you can always swipe back to it.
 
 ### How to Use Compaction
 
@@ -273,7 +274,7 @@ Open **Extensions** > **Saint's Silly Extensions** in SillyTavern's settings pan
 |---------|-------------|
 | Enable Phrase Ban | Toggle the Phrase Ban feature and `/phraseban` on/off |
 | Auto-Scan AI Messages | When on, every AI character message is scanned against the ban list as it arrives. When off, only `/phraseban` scans |
-| Max Rewrite Attempts | How many times to rewrite a reply that still matches the ban list before giving up (default 2). **0** = detect and notify only, never rewrite |
+| Max Rewrite Attempts | How many times to regenerate a reply that still matches the ban list before giving up (default 2). Caps both the in-place rewrite loop and, when a Retry checkpoint is active, the retry-continue loop. **0** = detect and notify only, never rewrite or retry |
 | Native sampler-level ban | Automatic (no toggle): while Phrase Ban is enabled, the Learned Phrases list is appended to each Text Completion request's `banned_strings`, non-destructively per-request. No-op on Chat Completion APIs |
 | Proactive Injection (avoid learned phrases) | When on, injects a "don't reuse these phrases" instruction built from the Learned Phrases list before every AI turn. Independent of the native ban; this only controls the soft injection. When off, the list is still built and natively banned (default off) |
 | Depth / Role | Where (how many messages from the bottom) and with which role the proactive instruction is injected |
@@ -334,8 +335,7 @@ The drawer holds two self-contained tiers — **Long-term** (the overarching arc
 
 | Setting | Description |
 |---------|-------------|
-| Enable Reformatting | Toggle the Reformatting feature, its per-message buttons, and `/reformat` on/off |
-| Auto-Reformat AI Messages | When on, every AI character message is reformatted as it arrives. When off, only the per-message button or `/reformat` reformats |
+| Enable Reformatting | Toggle the Reformatting feature, its per-message buttons, and `/reformat` on/off. Reformatting is manual only — there is no automatic on-arrival pass |
 | Engine | Which engine to use: **Rules** (deterministic transforms) or **LLM** (prompt-based rewrite) |
 | Asterisks (Rules) | Mutually-exclusive choice: **Leave as-is**, **Strip asterisks** (remove every italic / bold marker), or **Wrap narration in asterisks** (wrap everything outside quoted dialogue; strips existing asterisks first so the result is consistent) |
 | Collapse Extra Whitespace (Rules) | Independent option: collapse runs of 3+ blank lines to one and trim trailing spaces |
