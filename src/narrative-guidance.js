@@ -946,6 +946,10 @@ function bindTrackControls(track, saveSettings) {
             state.guidance = guidanceArea.value;
             scheduleChatStateSave(track, state);
             reapplyInjection(track);
+            // Continue is available whenever there's active guidance text —
+            // including text the user typed or edited by hand — so refresh the
+            // button's enabled state live as they type.
+            refreshNGActionButtonStates(track);
         });
     }
 

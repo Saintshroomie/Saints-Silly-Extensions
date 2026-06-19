@@ -333,6 +333,13 @@ function injectControls(formEl) {
         setUIState(formEl, 'idle');
         contentTextarea.focus();
     });
+    // Keep Continue's visibility in sync with the entry text so a hand-typed
+    // entry exposes Continue without needing a throwaway Assist first.
+    contentTextarea.addEventListener('input', () => {
+        const st = entryStates.get(id);
+        if (st?.generating) return;
+        setUIState(formEl, st?.hasGenerated ? 'generated' : 'idle');
+    });
 
     if (tokensInput) {
         tokensInput.value = getWIAResponseLength();
@@ -352,6 +359,11 @@ function injectControls(formEl) {
     const picker = createLoreBookPicker({ classPrefix: 'wia-lorebook' });
     controls.querySelector('.wia-lorebook-host').replaceWith(picker.element);
     controls._wiaLorebookPicker = picker;
+
+    // Seed initial button visibility from the current content — an entry may
+    // load with text already, which should expose Continue immediately.
+    const existingState = entryStates.get(id);
+    setUIState(formEl, existingState?.hasGenerated ? 'generated' : 'idle');
 
     debug('Injected controls for entry', id);
 }
@@ -414,7 +426,10 @@ function setUIState(formEl, state, activeAction = null) {
         restoreBtn(assistBtn, 'wia-btn-assist');
         restoreBtn(continueBtn, 'wia-btn-continue');
         show(assistBtn, true);
-        show(continueBtn, false);
+        // Continue is available whenever the entry has text to pick up from —
+        // including text typed or pasted by hand, with no prior generation.
+        // (Retry re-runs Assist, so it stays gated on an actual generation.)
+        show(continueBtn, !!getContentTextarea(formEl)?.value?.trim());
         show(retryBtn, false);
         show(spinner, false);
     } else if (state === 'generating') {
