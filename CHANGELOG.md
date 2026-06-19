@@ -12,6 +12,16 @@ _Changes that have landed on the development branch but are not yet part of a
 released version. When cutting a release, move these notes into a new
 `## [X.Y.Z]` section and run `npm version`._
 
+### Added
+- **Retry Continue** — folds the standalone Retry Continue extension into the
+  suite. Adds a <span title="rotate-right icon">↻</span> Retry button to the
+  hamburger menu and the quick-action bar that snapshots the last message (or
+  your edited prefix of it) as a checkpoint, saves it as a swipe, and continues
+  from it — so each attempt becomes a swipe you can browse with the native
+  arrows. Per-chat checkpoint persistence, a configurable checkpoint indicator
+  (border / icon / none), optional auto-set-on-Continue, and the `/retry` and
+  `/retryclear` slash commands.
+
 ## [1.1.0] - 2026-06-19
 
 ### Added

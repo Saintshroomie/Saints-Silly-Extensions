@@ -117,6 +117,16 @@ Compaction **summarizes the chat, starts a fresh chat seeded with that summary p
 - **Manual or automatic trigger** — Trigger it from the <span title="compress icon">🗜</span> **Compact Chat** item in the hamburger menu or with `/compact`. With **Auto-open at threshold** on, the modal opens on its own once the *measured* outgoing prompt crosses your % of the context window (with an optional confirmation dialog). The trigger is the **only** automatic part — every compaction still requires you to act in the modal. Nothing is ever rewritten headlessly.
 - **State migration** — Possession, Narrative Guidance, and Phrase Ban per-chat state carry over to the new chat (World Info Assist guidance travels on the lorebook automatically). Your Summary Guidance is remembered per-chat across compactions of the same storyline.
 
+### Retry Continue
+
+Automates the "edit the message to keep the good part, delete the bad part, hit Continue" workflow — and keeps every attempt as a swipe so you can compare and pick the best.
+
+- **Checkpoint + retry** — Retry snapshots the last message (or, if you edited it down to a good prefix first, your edited text) as a checkpoint, saves that snapshot as a new swipe, and continues from it. Press Retry again and again — each attempt becomes a new swipe you can browse with SillyTavern's native swipe arrows.
+- **Two buttons** — A <span title="rotate-right icon">↻</span> **Retry** item in the hamburger menu (next to Continue) and a matching quick-action button in the send bar. The button highlights while a checkpoint is active and shows the retry count.
+- **Typed-message retry** — With text in the input box, Retry checkpoints that text and posts-and-continues it natively.
+- **Smart checkpoint lifecycle** — The checkpoint clears automatically when a new message is added, you switch chats, or you clear it manually; editing the checkpointed message updates the snapshot. State persists per-chat across refreshes.
+- **Configurable indicator** — Mark the checkpointed message with a border, an icon, or nothing.
+
 ### How to Use Possession
 
 Possession allows you to "possess" an active character in your solo or group chat (more useful for group chats). When possessing, your messages will be sent as that character rather than your active persona.
@@ -204,6 +214,15 @@ Notes: detection happens after the reply arrives (regex can't run inside the mod
 4. In the modal: optionally add **Summary Guidance** (specific details the summary must preserve) and pick any **lore books** to fold in. Click **Generate Summary**, then refine with **Continue / Retry** or by editing the preview directly. **Checkpoint** saves a restore point for Retry.
 5. When the **Story so far** preview reads well, click **Compact**. A fresh chat is created, seeded with the summary plus the last *N* messages (swipes intact), with your per-chat extension state carried over. The original chat stays in your chat history.
 6. Continue roleplaying — you take the next turn. Generation is fast again because the context window has been reset.
+
+### How to Use Retry Continue
+
+1. The AI generates a message. You like the first half but not the second.
+2. **Edit the message** — delete the unwanted tail, keeping only the good prefix — and confirm the edit. (Optional: skip this to retry the message as-is.)
+3. Click **Retry** (the <span title="rotate-right icon">↻</span> button in the action bar or hamburger menu), or run `/retry`.
+4. The extension saves your text as a checkpoint, creates a new swipe, and continues from it.
+5. Not satisfied? Click **Retry** again — each attempt becomes a new swipe.
+6. Use the native **swipe arrows** to browse all retry results and pick the best one. `/retryclear` (or the **Clear Retry Checkpoint** button) drops the checkpoint.
 
 ## Installation
 
@@ -345,6 +364,17 @@ The drawer holds two self-contained tiers — **Long-term** (the overarching arc
 | Summary Guidance (per-chat, in the modal) | Specific details the summary must preserve. Stored with the chat and remembered across compactions of the same storyline |
 | Compaction Debug Mode | Log detailed Compaction events (prompt measurement, auto-trigger, summary generation, commit pipeline) to the browser console (in the Diagnostics drawer) |
 
+### Retry Continue Settings
+
+| Setting | Description |
+|---------|-------------|
+| Auto-Continue | After creating the retry swipe, automatically trigger Continue to generate from it. When off, Retry just creates the swipe and waits (default on) |
+| Auto-set checkpoint on Continue | When you use SillyTavern's normal Continue button, automatically set a retry checkpoint from the current message first (default off) |
+| Show toast notifications | Toggle Retry Continue's toast messages on/off (default on) |
+| Checkpoint indicator | How the checkpointed message is marked: **Border**, **Icon**, or **None** (default Border) |
+| Clear Retry Checkpoint | Button that drops the active checkpoint (same as `/retryclear`) |
+| Retry Continue Debug Mode | Log detailed Retry Continue events (checkpoint set/clear, snapshot lock transitions, swipe creation) to the browser console (in the Diagnostics drawer) |
+
 ### Silent Generation
 
 | Setting | Description |
@@ -396,6 +426,8 @@ Generation templates support tool-specific placeholders, substituted in place. I
 | `/phraseban` | Scan the last message against the Phrase Ban regex list and rewrite it (as a new swipe) if banned phrasing is found |
 | `/reformat` | Reformat the last message using the configured engine (keeps the original as a swipe) |
 | `/compact` | Open the Compaction modal to summarize the chat and start a fresh, compacted chat seeded with the summary plus the recent tail |
+| `/retry` | Retry the continuation from the saved checkpoint, creating a new swipe. If no checkpoint exists, sets one from the current message and continues |
+| `/retryclear` | Clear the active retry checkpoint |
 
 ## License
 
