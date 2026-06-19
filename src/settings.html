@@ -736,6 +736,104 @@
         </div>
     </div>
 
+    <!-- ─── SSE Compaction ─── -->
+    <div class="inline-drawer">
+        <div class="inline-drawer-toggle inline-drawer-header">
+            <b><span class="fa-solid fa-compress"></span> SSE Compaction</b>
+            <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+        </div>
+        <div class="inline-drawer-content" style="display: none;">
+
+            <small>When a chat fills the context window, generation slows to a crawl.
+                Compaction summarizes the chat, starts a fresh chat seeded with that
+                summary plus the recent tail, migrates per-chat extension state, and
+                resumes — resetting the context window. Trigger it from the
+                <span class="fa-solid fa-compress"></span> <b>Compact Chat</b> item in the
+                hamburger menu or with <code>/compact</code>. Every compaction opens a
+                modal where you review and edit the summary first.</small>
+
+            <label class="checkbox_label" title="Enable Compaction (the launch button, /compact, and the auto-trigger).">
+                <input id="compaction_enabled" type="checkbox" />
+                <span>Enable Compaction</span>
+            </label>
+
+            <label class="checkbox_label" title="When the measured prompt crosses the threshold below, automatically open the Compaction modal after a turn finishes. The modal still requires you to act — nothing is rewritten headlessly.">
+                <input id="compaction_auto_enabled" type="checkbox" />
+                <span>Auto-open at threshold</span>
+            </label>
+
+            <label class="checkbox_label" title="Show a confirmation dialog (with a 'Don't ask again' option) before auto-opening the modal.">
+                <input id="compaction_confirm_auto" type="checkbox" />
+                <span>Confirm before auto-opening</span>
+            </label>
+
+            <label class="checkbox_label" title="Carry over per-chat extension state (Possession, Narrative Guidance, Phrase Ban) into the compacted chat. World Info Assist guidance travels on the lorebook automatically.">
+                <input id="compaction_migrate_state" type="checkbox" />
+                <span>Migrate per-chat extension state</span>
+            </label>
+
+            <div class="ng_inline_row">
+                <label for="compaction_threshold_percent"><b><span class="fa-solid fa-gauge-high"></span> Auto Threshold (%):</b></label>
+                <input id="compaction_threshold_percent" type="number" min="1" max="100" step="1" class="text_pole ng_number_input" title="Percent of the model's context window (measured outgoing prompt) that triggers the auto-open." />
+                <small>% of context window</small>
+            </div>
+
+            <div class="ng_inline_row">
+                <label for="compaction_tail_length"><b><span class="fa-solid fa-list-ol"></span> Tail Length:</b></label>
+                <input id="compaction_tail_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="How many of the most recent messages are copied into the new chat verbatim (swipes preserved). Older messages are replaced by the summary." />
+                <small>messages kept verbatim</small>
+            </div>
+
+            <div class="ng_inline_row">
+                <label for="compaction_response_length"><b><span class="fa-solid fa-coins"></span> Summary Token Limit:</b></label>
+                <input id="compaction_response_length" type="number" min="50" max="16384" step="50" class="text_pole ng_number_input" title="Maximum tokens for the summary generation." />
+            </div>
+
+            <div class="ng_inline_row">
+                <label for="compaction_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label>
+                <input id="compaction_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of chat history the summary generation pulls in. 0 = use the model's full context size." />
+                <small>0 = use model default</small>
+            </div>
+
+            <div class="saints_preset_block">
+                <label title="Save and switch named bundles of the Compaction summary prompt + prefill below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label>
+                <div class="saints_template_controls" id="compaction_presets"></div>
+                <div class="menu_button saints_preview_btn" id="compaction_preview_btn" title="Show the exact system prompt, assembled user prompt, and prefill the summary generation will send, with sample values.">
+                    <span class="fa-solid fa-eye"></span> Preview Assembled Prompt
+                </div>
+            </div>
+
+            <div class="inline-drawer saints_nested_drawer">
+                <div class="inline-drawer-toggle inline-drawer-header">
+                    <b>Summary Prompt</b>
+                    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                </div>
+                <div class="inline-drawer-content" style="display: none;">
+                    <div class="compaction_prompt_section">
+                        <textarea id="compaction_summary_prompt_textarea" class="text_pole" rows="12"
+                            placeholder="Enter your Compaction summary prompt template..."></textarea>
+                        <small>Sent as the user prompt for the summary. Placeholders: <code>{{context}}</code> (packed chat history minus the verbatim tail, plus selected lore books), <code>{{guidance}}</code> (your Summary Guidance from the modal). If a placeholder is missing, the context is prepended and the guidance appended last, wrapped emphatically.</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="inline-drawer saints_nested_drawer">
+                <div class="inline-drawer-toggle inline-drawer-header">
+                    <b>Summary Prefill</b>
+                    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                </div>
+                <div class="inline-drawer-content" style="display: none;">
+                    <div class="compaction_prompt_section">
+                        <textarea id="compaction_summary_prefill_textarea" class="text_pole" rows="3"
+                            placeholder="Optional assistant prefix the model continues from (leave empty for none)."></textarea>
+                        <small>Optional. Sent as an assistant prefix the model continues from, and kept at the start of the summary. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
     <!-- ─── SSE Silent Generation ─── -->
     <div class="inline-drawer">
         <div class="inline-drawer-toggle inline-drawer-header">
@@ -794,6 +892,11 @@
             <label class="checkbox_label" title="Log detailed Reformatting events (engine, per-message decisions, LLM prompts) to the browser console.">
                 <input id="reformatting_debug_mode" type="checkbox" />
                 <span>Reformatting Debug Mode</span>
+            </label>
+
+            <label class="checkbox_label" title="Log detailed Compaction events (prompt measurement, auto-trigger checks, summary generation, commit pipeline) to the browser console.">
+                <input id="compaction_debug_mode" type="checkbox" />
+                <span>Compaction Debug Mode</span>
             </label>
 
             <label class="checkbox_label" title="Log silent-generation lifecycle (job start/abort/completion, stop-listener events, stream token counts) to the browser console. Useful when diagnosing stop-button behavior across backends.">

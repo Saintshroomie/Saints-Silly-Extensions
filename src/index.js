@@ -108,6 +108,21 @@ import {
     DEFAULT_REFORMATTING_RESPONSE_LENGTH,
 } from './reformatting.js';
 import {
+    initCompaction,
+    bindCompactionSettings,
+    registerCompactionSlashCommand,
+    createCompactionMenuItem,
+    onCompactionChatChanged,
+    onCompactionGenerationEnded,
+    onCompactionChatCompletionPromptReady,
+    onCompactionGenerateAfterCombinePrompts,
+    DEFAULT_COMPACTION_SUMMARY_PROMPT,
+    DEFAULT_COMPACTION_SUMMARY_PREFILL,
+    DEFAULT_COMPACTION_RESPONSE_LENGTH,
+    DEFAULT_COMPACTION_THRESHOLD_PERCENT,
+    DEFAULT_COMPACTION_TAIL_LENGTH,
+} from './compaction.js';
+import {
     setupToolPresets,
     migrateLegacyToolPresets,
 } from './prompt-templates.js';
@@ -184,6 +199,17 @@ const defaultSettings = {
     reformattingPrompt: DEFAULT_REFORMATTING_PROMPT,
     reformattingPrefill: DEFAULT_REFORMATTING_PREFILL,
     reformattingResponseLength: DEFAULT_REFORMATTING_RESPONSE_LENGTH,
+    compactionEnabled: false,
+    compactionAutoEnabled: false,
+    compactionThresholdPercent: DEFAULT_COMPACTION_THRESHOLD_PERCENT,
+    compactionTailLength: DEFAULT_COMPACTION_TAIL_LENGTH,
+    compactionConfirmAuto: true,
+    compactionSummaryPrompt: DEFAULT_COMPACTION_SUMMARY_PROMPT,
+    compactionSummaryPrefill: DEFAULT_COMPACTION_SUMMARY_PREFILL,
+    compactionSummaryResponseLength: DEFAULT_COMPACTION_RESPONSE_LENGTH,
+    compactionMaxContextOverride: 0,
+    compactionMigrateState: true,
+    compactionDebugMode: false,
     silentGenerationDebugMode: false,
     silentGenerationStreaming: true,
     // toolPresets / activeToolPreset are intentionally absent here:
@@ -274,6 +300,15 @@ const TOOL_PRESET_CONFIG = [
             { key: 'reformattingPrefill', label: 'Prefill', textareaId: 'reformatting_prefill_textarea', defaultText: DEFAULT_REFORMATTING_PREFILL },
         ],
     },
+    {
+        toolKey: 'compaction',
+        label: 'Compaction',
+        containerId: 'compaction_presets',
+        fields: [
+            { key: 'compactionSummaryPrompt', label: 'Summary Prompt', textareaId: 'compaction_summary_prompt_textarea', defaultText: DEFAULT_COMPACTION_SUMMARY_PROMPT },
+            { key: 'compactionSummaryPrefill', label: 'Summary Prefill', textareaId: 'compaction_summary_prefill_textarea', defaultText: DEFAULT_COMPACTION_SUMMARY_PREFILL },
+        ],
+    },
 ];
 
 // ─── State ───
@@ -321,6 +356,7 @@ function injectSettingsPanel() {
     bindWIASettings(saveSettings);
     bindNarrativeGuidanceSettings(saveSettings);
     bindReformattingSettings(saveSettings);
+    bindCompactionSettings(saveSettings);
     bindSilentGenerationSettings(saveSettings);
 
     // Preset widgets go last: the module bindings above must attach their
@@ -347,6 +383,7 @@ function onGenerationEnded() {
     possessionGenEnded();
     phrasingGenEnded();
     showPossessionImpersonateButton();
+    onCompactionGenerationEnded();
     SSEDebug('Generation ended');
 }
 
@@ -364,6 +401,7 @@ function onChatChanged() {
     onNarrativeGuidanceChatChanged();
     onPhraseBanChatChanged();
     rescanReformatButtons();
+    onCompactionChatChanged();
     SSEDebug('Chat changed, state reloaded');
 }
 
@@ -403,6 +441,9 @@ jQuery(async () => {
     initWIA({ settings });
     initNarrativeGuidance({ settings });
     initReformatting({ settings });
+    // resyncChatState re-runs the per-chat state reload after a compaction
+    // creates and seeds the fresh chat, so migrated metadata is re-applied.
+    initCompaction({ settings, saveSettings, resyncChatState: onChatChanged });
 
     loadPossessionState();
     injectSettingsPanel();
@@ -419,6 +460,9 @@ jQuery(async () => {
     // Phrasing UI
     createInputAreaButton();
     createHamburgerMenuItem();
+
+    // Compaction UI — launch item in the hamburger (options) menu.
+    createCompactionMenuItem();
 
     // Wire up the global "stop button → abort silent generations" hook
     // before subscribing any per-module handlers, so a stop event always
@@ -450,12 +494,21 @@ jQuery(async () => {
     if (eventTypes.TEXT_COMPLETION_SETTINGS_READY) {
         eventSource.on(eventTypes.TEXT_COMPLETION_SETTINGS_READY, onPhraseBanTextCompletionSettings);
     }
+    // Compaction prompt-measurement: passively tokenize the true outgoing
+    // prompt so the trigger threshold reflects the real context usage.
+    if (eventTypes.CHAT_COMPLETION_PROMPT_READY) {
+        eventSource.on(eventTypes.CHAT_COMPLETION_PROMPT_READY, onCompactionChatCompletionPromptReady);
+    }
+    if (eventTypes.GENERATE_AFTER_COMBINE_PROMPTS) {
+        eventSource.on(eventTypes.GENERATE_AFTER_COMBINE_PROMPTS, onCompactionGenerateAfterCombinePrompts);
+    }
 
     // Slash commands
     registerPossessionSlashCommands();
     registerPhrasingSlashCommand();
     registerPhraseBanSlashCommand();
     registerReformattingSlashCommand();
+    registerCompactionSlashCommand();
 
     // Initial state
     syncAllPossessionUI();
