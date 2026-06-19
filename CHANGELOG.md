@@ -12,6 +12,37 @@ _Changes that have landed on the development branch but are not yet part of a
 released version. When cutting a release, move these notes into a new
 `## [X.Y.Z]` section and run `npm version`._
 
+## [1.2.0] - 2026-06-19
+
+### Added
+- **Retry Continue** — folds the standalone Retry Continue extension into the
+  suite. Adds a <span title="rotate-right icon">↻</span> Retry button to the
+  hamburger menu and the quick-action bar that snapshots the last message (or
+  your edited prefix of it) as a checkpoint, saves it as a swipe, and continues
+  from it — so each attempt becomes a swipe you can browse with the native
+  arrows. Per-chat checkpoint persistence, a configurable checkpoint indicator
+  (border / icon / none), optional auto-set-on-Continue, and the `/retry` and
+  `/retryclear` slash commands.
+- **Phrase Ban × Retry Continue** — when a Retry checkpoint is active on the
+  matched message, Phrase Ban now drives a retry-continue from that checkpoint
+  (after learning the offending phrase) instead of an in-place rewrite, so
+  detection and retries share one swipe stack and the checkpoint prefix is never
+  disturbed. Bounded by the existing Max Rewrite Attempts cap. Applies to both
+  the auto path and the manual scan (`/phraseban`).
+
+### Changed
+- **Retry Continue checkpoint prefix is now frozen** against tool-generated
+  edits — only a genuine user edit updates it. This stops an automatic
+  reformat / phrase-ban rewrite from silently re-pointing what a retry continues
+  from.
+
+### Removed
+- **Reformatting auto-scan** — Reformatting is now manual only (the per-message
+  <span title="text-slash icon">✂</span> button and `/reformat`). The
+  "Auto-Reformat AI Messages" setting and the on-arrival pass are gone; this
+  removes the last automatic writer that could collide with a Retry checkpoint
+  or other post-generation tools.
+
 ## [1.1.0] - 2026-06-19
 
 ### Added
@@ -69,5 +100,6 @@ Initial release. Bundles seven roleplay tools for SillyTavern:
 Plus shared infrastructure: cancellable **Silent Generation** (with live
 streaming) and per-tool **Prompt Presets**.
 
-[Unreleased]: https://github.com/Saintshroomie/Saints-Silly-Extensions/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/Saintshroomie/Saints-Silly-Extensions/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/Saintshroomie/Saints-Silly-Extensions/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/Saintshroomie/Saints-Silly-Extensions/releases/tag/v1.1.0

@@ -10,10 +10,10 @@
  *              it rewrite the formatting. Routed through the shared
  *              silent-generation manager so the Stop button cancels it.
  *
- * Works in two modes (independently): automatic (reformat each AI reply as it
- * arrives) and manual (a per-message button injected into `.mes_buttons`).
- * Either way the original text is preserved as a swipe, so a reformat is
- * always non-destructive and reversible.
+ * Manual only: reformat a message with the per-message button injected into
+ * `.mes_buttons` (kept present by a `#chat` MutationObserver) or with the
+ * `/reformat` slash command. The original text is preserved as a swipe, so a
+ * reformat is always non-destructive and reversible.
  */
 
 import { SlashCommandParser } from '../../../../slash-commands/SlashCommandParser.js';
@@ -330,19 +330,6 @@ export async function reformatMessage(index, { manual = false } = {}) {
     }
 }
 
-// ─── Auto Path ───
-
-/**
- * Reformat a freshly received AI message when automatic mode is on. Fired from
- * the combined MESSAGE_RECEIVED handler in index.js.
- */
-export async function onReformattingMessageReceived(messageIndex) {
-    if (!moduleSettings.reformattingEnabled || !moduleSettings.reformattingAuto) return;
-    const context = getContext();
-    const idx = typeof messageIndex === 'number' ? messageIndex : context.chat.length - 1;
-    await reformatMessage(idx, { manual: false });
-}
-
 // ─── Per-message Button ───
 
 function makeReformatButton() {
@@ -442,15 +429,6 @@ export function bindReformattingSettings(saveSettings) {
             } else {
                 removeAllReformatButtons();
             }
-        });
-    }
-
-    const autoCb = document.getElementById('reformatting_auto');
-    if (autoCb) {
-        autoCb.checked = !!moduleSettings.reformattingAuto;
-        autoCb.addEventListener('change', () => {
-            moduleSettings.reformattingAuto = autoCb.checked;
-            saveSettings();
         });
     }
 

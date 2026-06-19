@@ -98,7 +98,6 @@ import {
 import {
     initReformatting,
     bindReformattingSettings,
-    onReformattingMessageReceived,
     startReformattingObserver,
     rescanReformatButtons,
     registerReformattingSlashCommand,
@@ -122,6 +121,23 @@ import {
     DEFAULT_COMPACTION_THRESHOLD_PERCENT,
     DEFAULT_COMPACTION_TAIL_LENGTH,
 } from './compaction.js';
+import {
+    initRetryContinue,
+    bindRetryContinueSettings,
+    createRetryContinueButtons,
+    hookRetryAutoContinue,
+    registerRetryContinueSlashCommands,
+    loadRetryState,
+    isRetryCheckpointActiveFor,
+    retryFromCheckpoint,
+    onRetryContinueChatChanged,
+    onRetryContinueUserMessageRendered,
+    onRetryContinueCharacterMessageRendered,
+    onRetryContinueMessageEdited,
+    onRetryContinueMessageReceived,
+    onRetryContinueGenerationStarted,
+    onRetryContinueGenerationEnded,
+} from './retry-continue.js';
 import {
     setupToolPresets,
     migrateLegacyToolPresets,
@@ -190,7 +206,6 @@ const defaultSettings = {
     narrativeGuidanceShortInjectionRole: DEFAULT_NG_INJECTION_ROLE,
     // (Lore-book selection is stored per-chat in chatMetadata, not here.)
     reformattingEnabled: false,
-    reformattingAuto: true,
     reformattingEngine: 'rules',
     reformattingDebugMode: false,
     reformattingAsteriskMode: 'strip',
@@ -210,6 +225,11 @@ const defaultSettings = {
     compactionMaxContextOverride: 0,
     compactionMigrateState: true,
     compactionDebugMode: false,
+    retryAutoContinue: true,
+    retryAutoSetOnContinue: false,
+    retryShowToasts: true,
+    retryIndicatorStyle: 'border',
+    retryDebugMode: false,
     silentGenerationDebugMode: false,
     silentGenerationStreaming: true,
     // toolPresets / activeToolPreset are intentionally absent here:
@@ -357,6 +377,7 @@ function injectSettingsPanel() {
     bindNarrativeGuidanceSettings(saveSettings);
     bindReformattingSettings(saveSettings);
     bindCompactionSettings(saveSettings);
+    bindRetryContinueSettings(saveSettings);
     bindSilentGenerationSettings(saveSettings);
 
     // Preset widgets go last: the module bindings above must attach their
@@ -376,6 +397,7 @@ function onGenerationStarted(_type, _options, dryRun) {
     if (dryRun) return;
     possessionGenStarted();
     phrasingGenStarted();
+    onRetryContinueGenerationStarted();
     SSEDebug('Generation started');
 }
 
@@ -384,6 +406,7 @@ function onGenerationEnded() {
     phrasingGenEnded();
     showPossessionImpersonateButton();
     onCompactionGenerationEnded();
+    onRetryContinueGenerationEnded();
     SSEDebug('Generation ended');
 }
 
@@ -392,6 +415,7 @@ function onGenerationStopped() {
     possessionGenEnded();
     phrasingGenEnded();
     showPossessionImpersonateButton();
+    onRetryContinueGenerationEnded();
     SSEDebug('Generation stopped');
 }
 
@@ -402,6 +426,7 @@ function onChatChanged() {
     onPhraseBanChatChanged();
     rescanReformatButtons();
     onCompactionChatChanged();
+    onRetryContinueChatChanged();
     SSEDebug('Chat changed, state reloaded');
 }
 
@@ -436,6 +461,7 @@ jQuery(async () => {
     initPhraseBan({
         settings,
         phrasingApi: { rewriteMessageWithTemplate },
+        retryApi: { isRetryCheckpointActiveFor, retryFromCheckpoint },
     });
     initACC({ settings, saveSettings });
     initWIA({ settings });
@@ -444,6 +470,7 @@ jQuery(async () => {
     // resyncChatState re-runs the per-chat state reload after a compaction
     // creates and seeds the fresh chat, so migrated metadata is re-applied.
     initCompaction({ settings, saveSettings, resyncChatState: onChatChanged });
+    initRetryContinue({ settings });
 
     loadPossessionState();
     injectSettingsPanel();
@@ -463,6 +490,11 @@ jQuery(async () => {
 
     // Compaction UI — launch item in the hamburger (options) menu.
     createCompactionMenuItem();
+
+    // Retry Continue UI — Retry buttons in the hamburger + quick-action bars,
+    // plus the optional auto-set-on-Continue hook on ST's native Continue.
+    createRetryContinueButtons();
+    hookRetryAutoContinue();
 
     // Wire up the global "stop button → abort silent generations" hook
     // before subscribing any per-module handlers, so a stop event always
@@ -484,11 +516,21 @@ jQuery(async () => {
     });
     eventSource.on(eventTypes.MESSAGE_RECEIVED, async (idx) => {
         onNarrativeGuidanceMessageReceived(idx);
-        await onReformattingMessageReceived(idx);
-        // After Reformatting so the scan sees the final text. Detached
-        // internally — it must never block this emit chain.
+        onRetryContinueMessageReceived(idx);
+        // Detached internally (setTimeout) — it must never block this emit
+        // chain. On a banned-phrase hit it drives a rewrite, or, while a Retry
+        // checkpoint is active, a retry-continue from that checkpoint.
         onPhraseBanMessageReceived(idx);
     });
+    if (eventTypes.USER_MESSAGE_RENDERED) {
+        eventSource.on(eventTypes.USER_MESSAGE_RENDERED, onRetryContinueUserMessageRendered);
+    }
+    if (eventTypes.CHARACTER_MESSAGE_RENDERED) {
+        eventSource.on(eventTypes.CHARACTER_MESSAGE_RENDERED, onRetryContinueCharacterMessageRendered);
+    }
+    if (eventTypes.MESSAGE_EDITED) {
+        eventSource.on(eventTypes.MESSAGE_EDITED, onRetryContinueMessageEdited);
+    }
     // Text Completion only: append Phrase Ban's learned list to the request's
     // sampler-level banned_strings whenever Phrase Ban is enabled.
     if (eventTypes.TEXT_COMPLETION_SETTINGS_READY) {
@@ -509,10 +551,12 @@ jQuery(async () => {
     registerPhraseBanSlashCommand();
     registerReformattingSlashCommand();
     registerCompactionSlashCommand();
+    registerRetryContinueSlashCommands();
 
     // Initial state
     syncAllPossessionUI();
     applyPhrasingEnabledState();
+    loadRetryState();
 
     SSEDebug('Extension initialized');
 });

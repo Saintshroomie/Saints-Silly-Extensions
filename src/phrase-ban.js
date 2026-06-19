@@ -93,6 +93,8 @@ const SETTLE_TIMEOUT_MS = 5 * 60 * 1000;
 let moduleSettings = null;
 /** @type {{ rewriteMessageWithTemplate: function }} */
 let phrasingApi = null;
+/** @type {{ isRetryCheckpointActiveFor: function, retryFromCheckpoint: function }} */
+let retryApi = null;
 let debug = () => {};
 // One scan-and-rewrite cycle at a time; the rewrite's own MESSAGE_RECEIVED
 // re-enters the auto path and must not start a second cycle.
@@ -104,10 +106,12 @@ let busy = false;
  * @param {object} options
  * @param {object} options.settings     - Shared mutable settings reference.
  * @param {object} options.phrasingApi  - { rewriteMessageWithTemplate(index, template, extraMacros) }
+ * @param {object} options.retryApi     - { isRetryCheckpointActiveFor(index), retryFromCheckpoint() }
  */
-export function initPhraseBan({ settings, phrasingApi: pApi }) {
+export function initPhraseBan({ settings, phrasingApi: pApi, retryApi: rApi }) {
     moduleSettings = settings;
     phrasingApi = pApi;
+    retryApi = rApi;
     debug = createDebugLogger('PHRASE-BAN', () => moduleSettings.phraseBanDebugMode);
     debug('Module initialized');
 }
@@ -416,9 +420,17 @@ async function waitUntilGenerationSettles(timeoutMs = SETTLE_TIMEOUT_MS) {
 // ─── Scan & Rewrite ───
 
 /**
- * Scan one message against the ban list and, while it matches, rewrite it via
- * the Phrasing engine — up to Max Rewrite Attempts times. Each pass re-scans
- * the live message text, so edits/reformatting between passes are respected.
+ * Scan one message against the ban list and, while it matches, regenerate it —
+ * up to Max Rewrite Attempts times. Each pass re-scans the live message text,
+ * so edits between passes are respected.
+ *
+ * The regeneration takes one of two forms, decided per pass:
+ *   - If a Retry checkpoint is active on this message, drive a retry-continue
+ *     from the checkpoint (the freshly-learned phrase is already in the ban
+ *     list, so the new attempt is steered away from it). Each attempt is a
+ *     browsable swipe and the checkpoint's frozen prefix is never disturbed.
+ *   - Otherwise, rewrite the message in place via the Phrasing engine (the
+ *     classic path).
  *
  * @param {number} index
  * @param {{ manual?: boolean }} [opts] - `manual` calls surface "clean" /
@@ -472,34 +484,51 @@ export async function scanAndRewriteMessage(index, { manual = false } = {}) {
             debug('scan — index', index, 'attempt', attempt, '| matches:', matches);
             const summary = matches.slice(0, 3).map(m => `"${truncateMatch(m)}"`).join(', ');
 
+            // While a Retry checkpoint is anchored to this message, regenerate by
+            // retrying from the checkpoint rather than rewriting in place.
+            const useRetry = !!retryApi?.isRetryCheckpointActiveFor?.(index);
+            const action = useRetry ? 'retry' : 'rewrite';
+
             if (attempt >= maxRetries) {
                 if (maxRetries === 0) {
-                    toast(`Banned phrasing detected: ${summary}. Auto-rewrite is off (Max Rewrite Attempts is 0).`, 'warning', 'Phrase Ban');
+                    const off = useRetry ? 'Retry-on-ban is off' : 'Auto-rewrite is off';
+                    toast(`Banned phrasing detected: ${summary}. ${off} (Max Rewrite Attempts is 0).`, 'warning', 'Phrase Ban');
                 } else {
-                    toast(`Still contains banned phrasing after ${maxRetries} rewrite${maxRetries === 1 ? '' : 's'}: ${summary}. Left as-is — earlier versions are kept as swipes.`, 'warning', 'Phrase Ban');
+                    const noun = useRetry
+                        ? `${maxRetries} retr${maxRetries === 1 ? 'y' : 'ies'}`
+                        : `${maxRetries} rewrite${maxRetries === 1 ? '' : 's'}`;
+                    toast(`Still contains banned phrasing after ${noun}: ${summary}. Left as-is — earlier versions are kept as swipes.`, 'warning', 'Phrase Ban');
                 }
                 return;
             }
 
             // ST only regenerates swipes on the last message in the chat.
             if (index !== context.chat.length - 1) {
-                debug('scan — message is no longer the last in the chat; cannot rewrite');
-                if (manual) toast('Only the last message in the chat can be rewritten.', 'warning', 'Phrase Ban');
+                debug('scan — message is no longer the last in the chat; cannot regenerate');
+                if (manual) toast('Only the last message in the chat can be regenerated.', 'warning', 'Phrase Ban');
                 return;
             }
 
             dismissToast();
-            dismissToast = stickyToast(`Banned phrasing detected (${summary}) — rewriting…`, 'info', 'Phrase Ban');
-
-            const result = await phrasingApi.rewriteMessageWithTemplate(
-                index,
-                getPromptTemplate(),
-                { bannedPhrases: formatMatchList(matches) },
+            dismissToast = stickyToast(
+                `Banned phrasing detected (${summary}) — ${useRetry ? 'retrying from checkpoint' : 'rewriting'}…`,
+                'info', 'Phrase Ban',
             );
+
+            let ok;
+            if (useRetry) {
+                ok = await retryApi.retryFromCheckpoint();
+            } else {
+                ok = await phrasingApi.rewriteMessageWithTemplate(
+                    index,
+                    getPromptTemplate(),
+                    { bannedPhrases: formatMatchList(matches) },
+                );
+            }
             dismissToast();
 
-            if (!result) {
-                debug('scan — rewrite did not run or returned empty; stopping');
+            if (!ok) {
+                debug(`scan — ${action} did not run or returned empty; stopping`);
                 return;
             }
             await delay(SETTLE_DELAY_MS);

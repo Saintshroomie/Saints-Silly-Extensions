@@ -626,20 +626,15 @@
         </div>
         <div class="inline-drawer-content" style="display: none;">
 
-            <small>Normalizes the formatting of AI character messages after they're
-                generated. Runs automatically on each reply, or manually via the
-                <span class="fa-solid fa-text-slash"></span> button on each message.
-                The original text is always kept as a swipe, so a reformat is
+            <small>Normalizes the formatting of AI character messages. Reformat a
+                message manually with the <span class="fa-solid fa-text-slash"></span>
+                button on each message, or with <code>/reformat</code> for the last
+                message. The original text is always kept as a swipe, so a reformat is
                 reversible.</small>
 
             <label class="checkbox_label">
                 <input id="reformatting_enabled" type="checkbox" />
                 <span>Enable Reformatting</span>
-            </label>
-
-            <label class="checkbox_label" title="When on, every AI character message is reformatted as it arrives. When off, only the per-message button (or /reformat) reformats.">
-                <input id="reformatting_auto" type="checkbox" />
-                <span>Auto-Reformat AI Messages</span>
             </label>
 
             <div class="ng_inline_row">
@@ -834,6 +829,52 @@
         </div>
     </div>
 
+    <!-- ─── SSE Retry Continue ─── -->
+    <div class="inline-drawer">
+        <div class="inline-drawer-toggle inline-drawer-header">
+            <b><span class="fa-solid fa-arrow-rotate-right"></span> SSE Retry Continue</b>
+            <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+        </div>
+        <div class="inline-drawer-content" style="display: none;">
+
+            <small>Adds a <span class="fa-solid fa-arrow-rotate-right"></span> <b>Retry</b>
+                button to the hamburger menu and the quick-action bar. Retry snapshots
+                the last message (or your edited prefix of it) as a checkpoint, saves it
+                as a new swipe, and continues from it — so each attempt becomes a swipe
+                you can browse with the native arrows. Also available as <code>/retry</code>
+                and <code>/retryclear</code>.</small>
+
+            <label class="checkbox_label" title="After creating the retry swipe, automatically trigger Continue to generate from it. When off, Retry just creates the swipe and waits.">
+                <input id="retry_continue_autocontinue" type="checkbox" />
+                <span>Auto-Continue (generate after creating retry swipe)</span>
+            </label>
+
+            <label class="checkbox_label" title="When you use ST's normal Continue button, automatically set a retry checkpoint from the current message first.">
+                <input id="retry_continue_autoset" type="checkbox" />
+                <span>Auto-set checkpoint on Continue</span>
+            </label>
+
+            <label class="checkbox_label" title="Show toast notifications for Retry Continue actions.">
+                <input id="retry_continue_show_toasts" type="checkbox" />
+                <span>Show toast notifications</span>
+            </label>
+
+            <div class="ng_inline_row">
+                <label for="retry_continue_indicator_style"><b>Checkpoint indicator:</b></label>
+                <select id="retry_continue_indicator_style" class="text_pole ng_select_input" title="How the checkpointed message is visually marked.">
+                    <option value="border">Border</option>
+                    <option value="icon">Icon</option>
+                    <option value="none">None</option>
+                </select>
+            </div>
+
+            <div class="menu_button" id="retry_continue_clear" title="Clear the active retry checkpoint.">
+                Clear Retry Checkpoint
+            </div>
+
+        </div>
+    </div>
+
     <!-- ─── SSE Silent Generation ─── -->
     <div class="inline-drawer">
         <div class="inline-drawer-toggle inline-drawer-header">
@@ -897,6 +938,11 @@
             <label class="checkbox_label" title="Log detailed Compaction events (prompt measurement, auto-trigger checks, summary generation, commit pipeline) to the browser console.">
                 <input id="compaction_debug_mode" type="checkbox" />
                 <span>Compaction Debug Mode</span>
+            </label>
+
+            <label class="checkbox_label" title="Log detailed Retry Continue events (checkpoint set/clear, snapshot lock transitions, swipe creation) to the browser console.">
+                <input id="retry_continue_debug_mode" type="checkbox" />
+                <span>Retry Continue Debug Mode</span>
             </label>
 
             <label class="checkbox_label" title="Log silent-generation lifecycle (job start/abort/completion, stop-listener events, stream token counts) to the browser console. Useful when diagnosing stop-button behavior across backends.">
