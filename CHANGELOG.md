@@ -12,6 +12,8 @@ _Changes that have landed on the development branch but are not yet part of a
 released version. When cutting a release, move these notes into a new
 `## [X.Y.Z]` section and run `npm version`._
 
+## [1.2.0] - 2026-06-19
+
 ### Added
 - **Retry Continue** — folds the standalone Retry Continue extension into the
   suite. Adds a <span title="rotate-right icon">↻</span> Retry button to the
@@ -98,5 +100,6 @@ Initial release. Bundles seven roleplay tools for SillyTavern:
 Plus shared infrastructure: cancellable **Silent Generation** (with live
 streaming) and per-tool **Prompt Presets**.
 
-[Unreleased]: https://github.com/Saintshroomie/Saints-Silly-Extensions/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/Saintshroomie/Saints-Silly-Extensions/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/Saintshroomie/Saints-Silly-Extensions/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/Saintshroomie/Saints-Silly-Extensions/releases/tag/v1.1.0
