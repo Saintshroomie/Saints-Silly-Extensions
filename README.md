@@ -1,10 +1,41 @@
 # Saint's Silly Extensions
 
-A [SillyTavern](https://github.com/SillyTavern/SillyTavern) third-party extension that adds seven integrated roleplay tools: **Possession**, **Phrasing**, **Assisted Character Creation**, **World Info Assist**, **Narrative Guidance**, **Reformatting**, and **Compaction**
+A [SillyTavern](https://github.com/SillyTavern/SillyTavern) third-party extension that adds nine integrated roleplay tools: **Possession**, **Phrasing**, **Phrase Ban**, **Assisted Character Creation**, **World Info Assist**, **Narrative Guidance**, **Reformatting**, **Compaction**, and **Retry Continue**.
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes and version history.
 
-## Features
+## Table of Contents
+
+- [Tools](#tools)
+  - [Possession](#possession)
+  - [Phrasing](#phrasing)
+  - [Using Possession and Phrasing Together](#using-possession-and-phrasing-together)
+  - [Phrase Ban](#phrase-ban)
+  - [Assisted Character Creation](#assisted-character-creation)
+  - [World Info Assist](#world-info-assist)
+  - [Narrative Guidance](#narrative-guidance)
+  - [Reformatting](#reformatting)
+  - [Compaction](#compaction)
+  - [Retry Continue](#retry-continue)
+- [Installation](#installation)
+  - [Manual Installation](#manual-installation)
+- [Configuration](#configuration)
+  - [Possession Settings](#possession-settings)
+  - [Phrasing! Settings](#phrasing-settings)
+  - [Phrase Ban Settings](#phrase-ban-settings)
+  - [Assisted Character Creation Settings](#assisted-character-creation-settings)
+  - [World Info Assist Settings](#world-info-assist-settings)
+  - [Narrative Guidance Settings](#narrative-guidance-settings)
+  - [Reformatting Settings](#reformatting-settings)
+  - [Compaction Settings](#compaction-settings)
+  - [Retry Continue Settings](#retry-continue-settings)
+  - [Silent Generation](#silent-generation)
+  - [Diagnostics](#diagnostics)
+  - [Tool Presets & Prompt Preview](#tool-presets--prompt-preview)
+- [Slash Commands](#slash-commands)
+- [License](#license)
+
+## Tools
 
 ### Possession
 
@@ -16,6 +47,13 @@ Possession allows you to easily take control of any active character and post me
 - **Impersonate replacement** — While possessing, the standard Impersonate buttons are hidden and replaced with a character avatar button that triggers a generation as the possessed character (uses the character's speak action in groups, or trigger in solo)
 - **State persistence** — Possession state (including character avatar) is saved per-chat and restored automatically when switching chats
 - **Slash commands** — `/possess [name]` (supports partial name matching) and `/unpossess`
+
+**How to use**
+
+Possession allows you to "possess" an active character in your solo or group chat (more useful for group chats). When possessing, your messages will be sent as that character rather than your active persona.
+
+1. Select a character to possess by clicking their radio button in the active member panel (group chat) or the ghost icon in the character card panel (solo chat).
+2. Click the Character Avatar Button to perform an ST-like Impersonate for that character (It's just generating a response as that character)
 
 ### Phrasing
 
@@ -29,6 +67,26 @@ Enrich your messages with LLM-generated narration, actions, and detail that stay
 - **Custom prompts** — Customize the phrasing prompt and save any number of named preset variants (see Tool Presets & Prompt Preview below)
 - **Inverse Guidance** — Optional mode that feeds every existing swipe of the target message into the prompt and asks the model to produce a swipe that is wildly different in tone, pacing, and approach. Comes with its own editable prompt template (with `{{phrasingSwipes}}` and `{{phrasingSeed}}` placeholders).
 - **Possession-aware** — When possessing a character, phrasing generates in that character's voice; otherwise it uses the standard ST impersonate feature
+
+**How to use**
+
+Love the gist, but not the phrasing of a generation? Wish you could easily guide the next generation to write something similar? Phrasing allows you to seed a generation with either your own message, or an existing one. If your not a great writer or just feeling lazy, you can type out a paraphrase about what you want your character to say or do, press the quill button, and let the LLM do the hard work of actually writing the message.
+
+**Paraphrasing for {{user}}:**
+1. Enter your paraphrase, and press the quill button to trigger a standard SillyTavern Impersonation that is guided by your written text.
+
+**Paraphrasing for {{char}}:**
+1. Press the quill button on the most recent message (must be a character message) and Phrasing will guide a swipe generation with that message.
+2. Didn't like the phrasing? Just activate the swipe you want for the seed (or edit it to paraphrase something else) and click the quill for another guided swipe.
+3. Wish the guided message was longer? Click the continue button and Phrasing will make sure the seed continues to guide the Continue generation.
+
+### Using Possession and Phrasing Together
+
+When Possession and Phrasing are used together, you can quickly take over characters, and guide their generation by paraphrasing.
+
+1. Select a character to possess.
+2. Type a paraphrase of what you want your possessed character to do or say or feel, and press the quill button to let the LLM do the hard work.
+3. Pressing the quill button again will perform a swipe using the active message as the guiding seed.
 
 ### Phrase Ban
 
@@ -44,6 +102,21 @@ Tired of the model reusing the same tics — "his voice was thick with something
 - **Native sampler-level ban (automatic)** — While Phrase Ban is enabled, the learned list is appended to the request's `banned_strings` on **Text Completion** backends (llama.cpp, KoboldCpp, TabbyAPI/ExLlama, etc.), so the backend *refuses to emit* those sequences at the sampler level instead of merely being asked to. It's applied non-destructively per-request — your saved sampler settings are never touched — and needs no toggle. Chat Completion APIs (OpenAI, Claude, …) have no sampler-level ban, so this is a no-op there (use Proactive Injection instead).
 - **Proactive injection (avoid learned phrases)** — Optionally, Phrase Ban also persistently injects a *"don't reuse these phrases"* instruction built from the learned list before every AI turn — so future replies avoid the tics up front. Independent of the native ban (it's the way to enforce the list on Chat Completion APIs, or extra reinforcement on Text Completion). The injection's depth and role are configurable. Pair it (or the native ban) with **Max Rewrite Attempts = 0** for pure prevention — collect + ban, never rewrite.
 - **Custom rewrite + proactive prompts + presets** — Both the rewrite prompt (placeholders `{{phrasingSeed}}` and `{{bannedPhrases}}`) and the proactive injection template (placeholder `{{bannedPhrases}}`) are editable, and the pattern list + both prompts save together as named presets, so you can keep per-model or per-genre ban lists.
+
+**How to use**
+
+1. Open **Extensions** > **Saint's Silly Extensions** and find the **Phrase Ban** section. Tick **Enable Phrase Ban**.
+2. Open **Banned Phrase Patterns** and add one regex per line for the phrasing you never want to see again, e.g.:
+   - `voice was (thick|heavy) with` — catches every pronoun/verb variation of the cliché
+   - `something (he|she|they) (didn't|couldn't) want to name`
+   - `despite the \w+ (around|between) them`
+3. Leave **Auto-Scan AI Messages** on. From now on, any AI reply matching a pattern is automatically rewritten (the matched phrases are quoted to the model so it knows exactly what to avoid), and the original stays available as a swipe.
+4. Tune **Max Rewrite Attempts** to taste: raise it for stubborn models, or set it to **0** to only get a warning toast instead of a rewrite.
+5. Run `/phraseban` at any time to scan and fix the last message manually — useful after editing the pattern list.
+6. Every detected phrase is collected into the per-chat **Learned Phrases** list automatically (no toggle needed) — open **Learned Phrases (this chat)** to review and hand-edit it, adding phrases of your own or deleting ones you don't want. While Phrase Ban is enabled, this list is automatically fed into your backend's sampler-level `banned_strings` on **Text Completion** backends, so the model is *unable* to emit those phrases. (On Chat Completion APIs there's no sampler ban — see the next step.)
+7. *(Optional)* Tick **Proactive Injection (avoid learned phrases)** to also have the model *instructed* to avoid the list before every reply. This is the way to enforce the list on **Chat Completion** APIs (which have no native ban), and works as extra reinforcement on Text Completion too. Adjust the injection **Depth**/**Role**, edit the **Proactive Prompt Template** (must keep `{{bannedPhrases}}`), and use **Clear Learned Phrases** to reset the chat's list. For a "prevent, don't rewrite" workflow, combine the bans with **Max Rewrite Attempts = 0**.
+
+Notes: detection happens after the reply arrives (regex can't run inside the model's sampler), so you'll briefly see the original before the rewrite lands. In group chats only the round's final message can be auto-rewritten, since SillyTavern can only swipe the last message in the chat. The learned list grows from the same detection pass, so a reply must match (and be scanned) once before its phrasing is added — the native/soft ban then prevents *future* reuse.
 
 ### Assisted Character Creation
 
@@ -62,6 +135,16 @@ A modal-based character creator that adds an **Assist** button to SillyTavern's 
 - **Apply on Done** — Clicking Done copies the textarea contents into SillyTavern's description field. Cancel discards.
 - **Modal contents persist** — The brief, generated description, Use Chat Context toggle, selected lore books, and token count are all remembered the next time you open the modal — even after clicking Done or Cancel. Use the per-field **Clear** buttons to wipe the brief or description when you want to start fresh.
 
+**How to use**
+
+1. Open SillyTavern's **Create Character** page and click the **Assist** button (wand icon) in the character creation button row.
+2. Fill in the **Character Brief** — a few sentences describing your concept, setting, and any anchor details.
+3. (Optional) Tick **Use Chat Context** and/or pick lore books to ground the generation in your current chat or world.
+4. Click **Generate**. The full description appears in the textarea below.
+5. Use **Continue** to extend the description, **Retry** to undo the last action and re-roll, or **Checkpoint** to lock in the current state as the restore point for the next Retry.
+6. Edit the textarea freely between actions.
+7. Click **Done** to copy the description into SillyTavern's description field, or **Cancel** to discard.
+
 ### World Info Assist
 
 Adds an **Assist** button to every World Info / lore book entry, letting you draft entries with LLM help directly from the entry form.
@@ -73,6 +156,14 @@ Adds an **Assist** button to every World Info / lore book entry, letting you dra
 - **Clear buttons** — Each field has its own labeled button directly above it: **Clear Guidance** in the Assist Guidance header, and **Clear Content** just above the entry's content textarea.
 - **Editable prompt template** — The default prompt instructs the model to emit a `[ Subject: Description ]` world lore artifact with no commentary. You can edit it freely in the settings panel (with `{{context}}` / `{{guidance}}` / `{{title}}` placeholders); save the prompt + prefills together as named presets and preview the assembled prompt (see Tool Presets & Prompt Preview below).
 - **No schema** — Unlike Assisted Character Creation, World Info Assist has no schema. The prompt itself defines the desired output format.
+
+**How to use**
+
+1. Open any World Info / lore book entry. An **Assist** button row and an **Assist Guidance** textarea will appear above the entry's content textarea.
+2. (Optional) Type a title in the comment field at the top of the entry — it will be used to prime the generation with `[Title: `.
+3. (Optional) Type guidance into the **Assist Guidance** field — keywords, a rough idea, tone, canon notes, anything you want the model to consider. The guidance is saved on the entry and persists across page reloads.
+4. Click **Assist** to generate the entry. The result is written into the content textarea and saved automatically.
+5. Click **Continue** to extend the entry, or **Retry** to re-run Assist with your saved guidance (replacing the current content). Use the **Clear** buttons to wipe the guidance or content fields when starting over.
 
 ### Narrative Guidance
 
@@ -94,6 +185,16 @@ Enable either tier on its own or both together. Each tier is fully self-containe
 - **Lore book picker** — Per tier: pick which lore books to feed into the guidance generation's context preamble. The selection is **per-chat** — it resets to empty on a new chat and reloads when you switch chats. If a selected lore book is later deleted or renamed, it's silently dropped from the selection (with a one-time notice) the next time that chat's picker is opened or guidance is generated.
 - **Configurable token limits** — Per tier: set the response token limit for the generation, and optionally cap how much chat history feeds into the context preamble.
 
+**How to use**
+
+1. Open **Extensions** > **Saint's Silly Extensions** and find the **Narrative Guidance** section. It holds two tiers — **Long-term** (the overarching arc) and **Short-term** (the immediate beats). Open either sub-drawer and tick its **Enable** box. You can run one tier or both.
+2. (Optional) Adjust that tier's **Turns Between Regenerations** — how many AI replies elapse between automatic regenerations (defaults: long-term 40, short-term 8).
+3. (Optional) Edit the tier's **Themes / Story Arcs** textarea with anything you want its next round of guidance to weave in — ideas, arcs, "introduce a mysterious stranger", etc.
+4. (Optional) Tick lore books in the tier's picker to fold their entries into that tier's guidance generation context.
+5. Send a message in your chat. With **Auto-Regenerate at Zero** on, the first generation for each enabled tier kicks off automatically (the UI is masked while it runs, and a progress toast stays up) and the resulting paragraph fills that tier's **Active Guidance** textarea. If both tiers are enabled, long-term generates first and short-term is seeded from it.
+6. From there, every subsequent AI turn is steered by the active guidance until a tier's counter hits zero, at which point that tier regenerates from the now-updated chat context (and your latest themes). When long-term refreshes, short-term re-aligns to the new arc.
+7. Click a tier's **Regenerate Now** at any time to force an immediate regeneration. Use **-1** and **Reset** to nudge that tier's counter without regenerating. Edit the **Active Guidance** textarea directly to hand-tune the steering.
+
 ### Reformatting
 
 Normalizes the formatting of AI character messages *after* they're generated, so they always match the prose style you want — for example, stripping the italic asterisks out of `*He danced around the room.*` to leave `He danced around the room.`
@@ -107,6 +208,15 @@ Normalizes the formatting of AI character messages *after* they're generated, so
 - **AI messages only** — User and system messages are never touched.
 - **Non-destructive** — The original text is always preserved as a swipe, so you can swipe back to it at any time. Reformatting never re-processes a swipe it already produced.
 
+**How to use**
+
+1. Open **Extensions** > **Saint's Silly Extensions** and find the **Reformatting** section. Tick **Enable Reformatting**.
+2. Choose an **Engine**:
+   - **Rules** — pick how asterisks are handled (**Strip asterisks** handles the common "remove the italics" case; **Wrap narration in asterisks** does the inverse), and optionally enable **Collapse Extra Whitespace**.
+   - **LLM** — set a Response Token Limit and edit the system prompt, the user prompt (with the `{{message}}` placeholder), and the optional prefill. Use **Preview Assembled Prompt** to see exactly what gets sent, and save variants as presets.
+3. To reformat a message, click the <span title="text-slash icon">✂</span> button in that message's button row, or run `/reformat` to reformat the last message. (Reformatting is manual — it only ever acts when you ask it to.)
+4. The reformatted text becomes the active version of the message; the original is kept as a swipe, so you can always swipe back to it.
+
 ### Compaction
 
 Long chats (1000+ messages) eventually fill the model's context window. Once full, SillyTavern evicts the oldest history every turn, which invalidates the backend's KV cache from the eviction point on — so each post-fill turn triggers a near-full reprocess and generation slows to a crawl. The only real fix is to make the prompt short again.
@@ -117,6 +227,15 @@ Compaction **summarizes the chat, starts a fresh chat seeded with that summary p
 - **The handoff** — The summary lands in the new chat as a visible, editable **"Story so far"** message, followed by the last *N* messages (default 20) copied over **verbatim with swipes preserved**. The old chat is left intact and selectable from history.
 - **Manual or automatic trigger** — Trigger it from the <span title="compress icon">🗜</span> **Compact Chat** item in the hamburger menu or with `/compact`. With **Auto-open at threshold** on, the modal opens on its own once the *measured* outgoing prompt crosses your % of the context window (with an optional confirmation dialog). The trigger is the **only** automatic part — every compaction still requires you to act in the modal. Nothing is ever rewritten headlessly.
 - **State migration** — Possession, Narrative Guidance, and Phrase Ban per-chat state carry over to the new chat (World Info Assist guidance travels on the lorebook automatically). Your Summary Guidance is remembered per-chat across compactions of the same storyline.
+
+**How to use**
+
+1. Open **Extensions** > **Saint's Silly Extensions** and find the **Compaction** section. Tick **Enable Compaction**.
+2. Optionally set the **Tail Length** (how many recent messages are kept verbatim), the **Summary Token Limit**, and — if you want automatic prompts — **Auto-open at threshold** plus the **Auto Threshold (%)**.
+3. When a chat grows long, open the modal: click **Compact Chat** in the hamburger (options) menu, or run `/compact`. (With auto-open on, it appears on its own once the prompt crosses your threshold — after an optional confirmation.)
+4. In the modal: optionally add **Summary Guidance** (specific details the summary must preserve) and pick any **lore books** to fold in. Click **Generate Summary**, then refine with **Continue / Retry** or by editing the preview directly. **Checkpoint** saves a restore point for Retry.
+5. When the **Story so far** preview reads well, click **Compact**. A fresh chat is created, seeded with the summary plus the last *N* messages (swipes intact), with your per-chat extension state carried over. The original chat stays in your chat history.
+6. Continue roleplaying — you take the next turn. Generation is fast again because the context window has been reset.
 
 ### Retry Continue
 
@@ -129,94 +248,7 @@ Automates the "edit the message to keep the good part, delete the bad part, hit 
 - **Configurable indicator** — Mark the checkpointed message with a border, an icon, or nothing.
 - **Phrase Ban integration** — While a checkpoint is active, a banned-phrase hit drives a fresh retry from your checkpoint (with the offending phrase added to the ban list) instead of an in-place rewrite, so detection and retries share one swipe stack.
 
-### How to Use Possession
-
-Possession allows you to "possess" an active character in your solo or group chat (more useful for group chats). When possessing, your messages will be sent as that character rather than your active persona.
-
-1. Select a character to possess by clicking their radio button in the active member panel (group chat) or the ghost icon in the character card panel (solo chat).
-2. Click the Character Avatar Button to perform an ST-like Impersonate for that character (It's just generating a response as that character)
-
-### How to Use Phrasing
-Love the gist, but not the phrasing of a generation? Wish you could easily guide the next generation to write something similar? Phrasing allows you to seed a generation with either your own message, or an existing one. If your not a great writer or just feeling lazy, you can type out a paraphrase about what you want your character to say or do, press the quill button, and let the LLM do the hard work of actually writing the message.
-
-**Paraphrasing for {{user}}:**
-1. Enter your paraphrase, and press the quill button to trigger a standard SillyTavern Impersonation that is guided by your written text.
-
-**Paraphrasing for {{char}}:**
-1. Press the quill button on the most recent message (must be a character message) and Phrasing will guide a swipe generation with that message.
-2. Didn't like the phrasing? Just activate the swipe you want for the seed (or edit it to paraphrase something else) and click the quill for another guided swipe.
-3. Wish the guided message was longer? Click the continue button and Phrasing will make sure the seed continues to guide the Continue generation.
-
-### How to Use Possession and Phrasing Together
-
-When Possession and Phrasing are used together, you can quickly take over characters, and guide their generation by paraphrasing. 
-
-1. Select a character to possess.
-2. Type a paraphrase of what you want your possessed character to do or say or feel, and press the quill button to let the LLM do the hard work.
-3. Pressing the quill button again will perform a swipe using the active message as the guiding seed.
-
-### How to Use Phrase Ban
-
-1. Open **Extensions** > **Saint's Silly Extensions** and find the **Phrase Ban** section. Tick **Enable Phrase Ban**.
-2. Open **Banned Phrase Patterns** and add one regex per line for the phrasing you never want to see again, e.g.:
-   - `voice was (thick|heavy) with` — catches every pronoun/verb variation of the cliché
-   - `something (he|she|they) (didn't|couldn't) want to name`
-   - `despite the \w+ (around|between) them`
-3. Leave **Auto-Scan AI Messages** on. From now on, any AI reply matching a pattern is automatically rewritten (the matched phrases are quoted to the model so it knows exactly what to avoid), and the original stays available as a swipe.
-4. Tune **Max Rewrite Attempts** to taste: raise it for stubborn models, or set it to **0** to only get a warning toast instead of a rewrite.
-5. Run `/phraseban` at any time to scan and fix the last message manually — useful after editing the pattern list.
-6. Every detected phrase is collected into the per-chat **Learned Phrases** list automatically (no toggle needed) — open **Learned Phrases (this chat)** to review and hand-edit it, adding phrases of your own or deleting ones you don't want. While Phrase Ban is enabled, this list is automatically fed into your backend's sampler-level `banned_strings` on **Text Completion** backends, so the model is *unable* to emit those phrases. (On Chat Completion APIs there's no sampler ban — see the next step.)
-7. *(Optional)* Tick **Proactive Injection (avoid learned phrases)** to also have the model *instructed* to avoid the list before every reply. This is the way to enforce the list on **Chat Completion** APIs (which have no native ban), and works as extra reinforcement on Text Completion too. Adjust the injection **Depth**/**Role**, edit the **Proactive Prompt Template** (must keep `{{bannedPhrases}}`), and use **Clear Learned Phrases** to reset the chat's list. For a "prevent, don't rewrite" workflow, combine the bans with **Max Rewrite Attempts = 0**.
-
-Notes: detection happens after the reply arrives (regex can't run inside the model's sampler), so you'll briefly see the original before the rewrite lands. In group chats only the round's final message can be auto-rewritten, since SillyTavern can only swipe the last message in the chat. The learned list grows from the same detection pass, so a reply must match (and be scanned) once before its phrasing is added — the native/soft ban then prevents *future* reuse.
-
-### How to Use Assisted Character Creation
-
-1. Open SillyTavern's **Create Character** page and click the **Assist** button (wand icon) in the character creation button row.
-2. Fill in the **Character Brief** — a few sentences describing your concept, setting, and any anchor details.
-3. (Optional) Tick **Use Chat Context** and/or pick lore books to ground the generation in your current chat or world.
-4. Click **Generate**. The full description appears in the textarea below.
-5. Use **Continue** to extend the description, **Retry** to undo the last action and re-roll, or **Checkpoint** to lock in the current state as the restore point for the next Retry.
-6. Edit the textarea freely between actions.
-7. Click **Done** to copy the description into SillyTavern's description field, or **Cancel** to discard.
-
-### How to Use World Info Assist
-
-1. Open any World Info / lore book entry. An **Assist** button row and an **Assist Guidance** textarea will appear above the entry's content textarea.
-2. (Optional) Type a title in the comment field at the top of the entry — it will be used to prime the generation with `[Title: `.
-3. (Optional) Type guidance into the **Assist Guidance** field — keywords, a rough idea, tone, canon notes, anything you want the model to consider. The guidance is saved on the entry and persists across page reloads.
-4. Click **Assist** to generate the entry. The result is written into the content textarea and saved automatically.
-5. Click **Continue** to extend the entry, or **Retry** to re-run Assist with your saved guidance (replacing the current content). Use the **Clear** buttons to wipe the guidance or content fields when starting over.
-
-### How to Use Narrative Guidance
-
-1. Open **Extensions** > **Saint's Silly Extensions** and find the **Narrative Guidance** section. It holds two tiers — **Long-term** (the overarching arc) and **Short-term** (the immediate beats). Open either sub-drawer and tick its **Enable** box. You can run one tier or both.
-2. (Optional) Adjust that tier's **Turns Between Regenerations** — how many AI replies elapse between automatic regenerations (defaults: long-term 40, short-term 8).
-3. (Optional) Edit the tier's **Themes / Story Arcs** textarea with anything you want its next round of guidance to weave in — ideas, arcs, "introduce a mysterious stranger", etc.
-4. (Optional) Tick lore books in the tier's picker to fold their entries into that tier's guidance generation context.
-5. Send a message in your chat. With **Auto-Regenerate at Zero** on, the first generation for each enabled tier kicks off automatically (the UI is masked while it runs, and a progress toast stays up) and the resulting paragraph fills that tier's **Active Guidance** textarea. If both tiers are enabled, long-term generates first and short-term is seeded from it.
-6. From there, every subsequent AI turn is steered by the active guidance until a tier's counter hits zero, at which point that tier regenerates from the now-updated chat context (and your latest themes). When long-term refreshes, short-term re-aligns to the new arc.
-7. Click a tier's **Regenerate Now** at any time to force an immediate regeneration. Use **-1** and **Reset** to nudge that tier's counter without regenerating. Edit the **Active Guidance** textarea directly to hand-tune the steering.
-
-### How to Use Reformatting
-
-1. Open **Extensions** > **Saint's Silly Extensions** and find the **Reformatting** section. Tick **Enable Reformatting**.
-2. Choose an **Engine**:
-   - **Rules** — pick how asterisks are handled (**Strip asterisks** handles the common "remove the italics" case; **Wrap narration in asterisks** does the inverse), and optionally enable **Collapse Extra Whitespace**.
-   - **LLM** — set a Response Token Limit and edit the system prompt, the user prompt (with the `{{message}}` placeholder), and the optional prefill. Use **Preview Assembled Prompt** to see exactly what gets sent, and save variants as presets.
-3. To reformat a message, click the <span title="text-slash icon">✂</span> button in that message's button row, or run `/reformat` to reformat the last message. (Reformatting is manual — it only ever acts when you ask it to.)
-4. The reformatted text becomes the active version of the message; the original is kept as a swipe, so you can always swipe back to it.
-
-### How to Use Compaction
-
-1. Open **Extensions** > **Saint's Silly Extensions** and find the **Compaction** section. Tick **Enable Compaction**.
-2. Optionally set the **Tail Length** (how many recent messages are kept verbatim), the **Summary Token Limit**, and — if you want automatic prompts — **Auto-open at threshold** plus the **Auto Threshold (%)**.
-3. When a chat grows long, open the modal: click **Compact Chat** in the hamburger (options) menu, or run `/compact`. (With auto-open on, it appears on its own once the prompt crosses your threshold — after an optional confirmation.)
-4. In the modal: optionally add **Summary Guidance** (specific details the summary must preserve) and pick any **lore books** to fold in. Click **Generate Summary**, then refine with **Continue / Retry** or by editing the preview directly. **Checkpoint** saves a restore point for Retry.
-5. When the **Story so far** preview reads well, click **Compact**. A fresh chat is created, seeded with the summary plus the last *N* messages (swipes intact), with your per-chat extension state carried over. The original chat stays in your chat history.
-6. Continue roleplaying — you take the next turn. Generation is fast again because the context window has been reset.
-
-### How to Use Retry Continue
+**How to use**
 
 1. The AI generates a message. You like the first half but not the second.
 2. **Edit the message** — delete the unwanted tail, keeping only the good prefix — and confirm the edit. (Optional: skip this to retry the message as-is.)
