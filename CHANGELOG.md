@@ -68,3 +68,6 @@ Initial release. Bundles seven roleplay tools for SillyTavern:
 
 Plus shared infrastructure: cancellable **Silent Generation** (with live
 streaming) and per-tool **Prompt Presets**.
+
+[Unreleased]: https://github.com/Saintshroomie/Saints-Silly-Extensions/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/Saintshroomie/Saints-Silly-Extensions/releases/tag/v1.1.0

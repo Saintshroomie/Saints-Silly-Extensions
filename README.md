@@ -2,6 +2,8 @@
 
 A [SillyTavern](https://github.com/SillyTavern/SillyTavern) third-party extension that adds seven integrated roleplay tools: **Possession**, **Phrasing**, **Assisted Character Creation**, **World Info Assist**, **Narrative Guidance**, **Reformatting**, and **Compaction**
 
+See [CHANGELOG.md](CHANGELOG.md) for release notes and version history.
+
 ## Features
 
 ### Possession
