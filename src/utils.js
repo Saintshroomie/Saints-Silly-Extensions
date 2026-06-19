@@ -581,6 +581,9 @@ export async function flushWIAEntryGuidanceSave(worldName, uid) {
  *        module-specific styles (wia-…, acc-…, ng-…) all share the same shape,
  *        so callers can pass their own prefix to keep their styling intact.
  * @param {string} [opts.title='Lore Books'] - Summary label when nothing is selected.
+ * @param {function} [opts.debug] - Optional logger; called with picker lifecycle
+ *        details (render/toggle/change) so a caller's debug mode can trace
+ *        selection behavior. No-op by default.
  * @returns {{ element: HTMLDetailsElement, getSelected: () => string[] }}
  */
 export function createLoreBookPicker({
@@ -588,9 +591,10 @@ export function createLoreBookPicker({
     onChange = null,
     classPrefix = 'sse-lorebook',
     title = 'Lore Books',
+    debug = () => {},
 } = {}) {
     const details = document.createElement('details');
-    details.className = `${classPrefix}-picker`;
+    details.className = `${classPrefix}-picker sse-lorebook-picker`;
     details.title = 'Prepend active entries from the selected lore books';
 
     const summary = document.createElement('summary');
@@ -622,6 +626,7 @@ export function createLoreBookPicker({
         const previouslyChecked = new Set(
             list.children.length === 0 ? initialSelection : getSelected(),
         );
+        debug('picker render — available:', names.length, 'previously checked:', [...previouslyChecked]);
         list.replaceChildren();
         if (!names.length) {
             const empty = document.createElement('div');
@@ -631,22 +636,43 @@ export function createLoreBookPicker({
             updateSummary();
             return;
         }
+        const emitChange = (cb) => {
+            debug('picker change — book:', cb.value, 'checked:', cb.checked);
+            updateSummary();
+            const selected = getSelected();
+            debug('picker change — selection now:', selected);
+            onChange?.(selected);
+            debug('picker change — onChange handled');
+        };
         for (const name of names) {
-            const label = document.createElement('label');
-            label.className = `${classPrefix}-item checkbox_label`;
+            // Deliberately a <div>, not a <label>: native <label> → checkbox
+            // click forwarding is unreliable across browsers inside a <details>
+            // dropdown — it does nothing in Firefox (focus escapes to <body>
+            // and collapses the dropdown) and double-fires on Android Chrome
+            // (forward + our manual toggle cancel out). With a plain div there
+            // is no native forwarding to fight, so one explicit toggle is
+            // deterministic everywhere. aria-label preserves the checkbox's
+            // accessible name that the <label> used to provide.
+            const row = document.createElement('div');
+            row.className = `${classPrefix}-item checkbox_label`;
             const cb = document.createElement('input');
             cb.type = 'checkbox';
             cb.value = name;
+            cb.setAttribute('aria-label', name);
             if (previouslyChecked.has(name)) cb.checked = true;
-            cb.addEventListener('change', () => {
-                updateSummary();
-                onChange?.(getSelected());
+            // Direct checkbox clicks + keyboard (space) toggle natively.
+            cb.addEventListener('change', () => emitChange(cb));
+            // Tapping anywhere else on the row (the name) toggles manually.
+            row.addEventListener('click', (event) => {
+                if (event.target === cb) return;
+                cb.checked = !cb.checked;
+                emitChange(cb);
             });
             const span = document.createElement('span');
             span.textContent = name;
-            label.appendChild(cb);
-            label.appendChild(span);
-            list.appendChild(label);
+            row.appendChild(cb);
+            row.appendChild(span);
+            list.appendChild(row);
         }
         updateSummary();
     };
@@ -656,11 +682,17 @@ export function createLoreBookPicker({
     // summary to dismiss. Capture-phase so we still see the event if inner
     // handlers stop propagation; only attached while open.
     const closeIfOutside = (event) => {
-        if (!details.open || details.contains(event.target)) return;
+        if (!details.open) return;
+        // Focus landing on <body> happens when clicking non-focusable text
+        // inside the dropdown (e.g. a lore book name); that must not collapse
+        // the picker. Genuine outside clicks are still caught via pointerdown.
+        if (event.type === 'focusin' && event.target === document.body) return;
+        if (details.contains(event.target)) return;
         details.open = false;
     };
 
     details.addEventListener('toggle', () => {
+        debug('picker toggle — open:', details.open);
         if (details.open) {
             render();
             document.addEventListener('pointerdown', closeIfOutside, true);
@@ -694,6 +726,42 @@ function formatChatLine(m, ctx) {
     const who = m.name || (m.is_user ? (ctx.name1 || 'User') : (ctx.name2 || 'Character'));
     const text = (m.mes || '').trim();
     return text ? `${who}: ${text}` : '';
+}
+
+// Upper bound on the text fed to the cold-start token estimate. A full
+// context window is at most a few hundred KB of text, so tokenizing more than
+// this adds nothing — but building/hashing one string from a 1000+ message
+// chat can spike memory on a constrained mobile tab. We only need a rough
+// "how full is the context" number; the real measured size takes over after
+// the first live generation.
+const ESTIMATE_CHAR_BUDGET = 600000;
+
+/**
+ * Estimate the token cost of the current chat's visible (non-system) lines.
+ *
+ * Used as the cold-start fallback for context-usage readouts before a live
+ * generation has reported the true outgoing prompt size. Packs the most recent
+ * lines up to a fixed character budget (newest first) so it stays cheap even
+ * on very long chats; returns 0 when there's nothing to count.
+ *
+ * @returns {Promise<number>} Approximate token count of the recent chat.
+ */
+export async function estimateChatTokens() {
+    const ctx = getContext();
+    const chat = Array.isArray(ctx.chat) ? ctx.chat : [];
+    if (!chat.length) return 0;
+    const picked = [];
+    let chars = 0;
+    for (let i = chat.length - 1; i >= 0; i--) {
+        const line = formatChatLine(chat[i], ctx);
+        if (!line) continue;
+        picked.push(line);
+        chars += line.length + 1;
+        if (chars >= ESTIMATE_CHAR_BUDGET) break;
+    }
+    if (!picked.length) return 0;
+    picked.reverse();
+    return await getTokenCountAsync(picked.join('\n'));
 }
 
 /**
@@ -732,6 +800,7 @@ async function packRecentChatLines(chat, ctx, chatBudget) {
  * @param {string[]} [opts.loreBookNames=[]] - Names of lore books whose enabled entries to include.
  * @param {number}  [opts.responseLength=0] - Tokens reserved for the model's response; subtracted from the budget.
  * @param {number}  [opts.maxContextOverride=0] - If > 0, use this as the max-context size instead of `getMaxPromptTokens()`. Lets callers cap how much chat history they pull in independently of the model's real window.
+ * @param {number}  [opts.excludeRecentCount=0] - Drop this many of the most recent messages before packing the chat. Compaction uses it so `{{context}}` is the chat *minus* the verbatim tail it carries over.
  * @returns {Promise<string>} The composed preamble, or '' if nothing was included.
  */
 export async function buildContextPreamble({
@@ -739,6 +808,7 @@ export async function buildContextPreamble({
     loreBookNames = [],
     responseLength = 0,
     maxContextOverride = 0,
+    excludeRecentCount = 0,
 } = {}) {
     const sections = [];
     const ctx = getContext();
@@ -787,7 +857,12 @@ export async function buildContextPreamble({
 
     // Pack recent chat into whatever budget remains.
     if (includeChat) {
-        const chat = Array.isArray(ctx.chat) ? ctx.chat : [];
+        const fullChat = Array.isArray(ctx.chat) ? ctx.chat : [];
+        // Optionally drop the most-recent N messages (the verbatim tail a
+        // caller is carrying over elsewhere) so they aren't double-counted.
+        const chat = (Number.isFinite(excludeRecentCount) && excludeRecentCount > 0)
+            ? fullChat.slice(0, Math.max(0, fullChat.length - excludeRecentCount))
+            : fullChat;
         if (chat.length) {
             let recentBlock = '';
             try {

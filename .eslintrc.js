@@ -26,7 +26,7 @@ module.exports = {
             },
         },
         {
-            files: ['webpack.config.js', '.eslintrc.js'],
+            files: ['webpack.config.js', '.eslintrc.js', 'scripts/**/*.js'],
             parserOptions: {
             },
             env: {

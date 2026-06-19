@@ -431,17 +431,37 @@ async function streamRawGenerate(params, targetEl, append, signal, jobName, prog
         targetEl.value = baseText;
     }
     const streamFn = await openRawStream(params, signal);
+    debug(`${jobName} — stream opened, awaiting tokens (api: ${params.api || main_api})`);
+
+    // Throttle the live field writes. Writing (and scrolling) the textarea on
+    // every token forces a reflow per token; on a large page (e.g. a long
+    // chat behind the modal) that starves the main thread enough that the SSE
+    // reader falls behind and the stream appears to hang — most visibly on
+    // memory/CPU-limited mobile devices. Coalesce writes to ~10/sec; the final
+    // cleaned write after the loop always reflects the full text.
+    const FLUSH_INTERVAL_MS = 100;
+    let lastFlush = 0;
+    const flushField = () => {
+        if (!targetEl) return;
+        targetEl.value = baseText + progress.text;
+        targetEl.scrollTop = targetEl.scrollHeight;
+    };
 
     for await (const chunk of streamFn()) {
         if (signal.aborted) break;
         if (typeof chunk?.text === 'string') progress.text = chunk.text;
+        if (progress.receivedChunks === 0) debug(`${jobName} — first chunk received`);
         progress.receivedChunks++;
-        if (targetEl) {
-            targetEl.value = baseText + progress.text;
-            targetEl.scrollTop = targetEl.scrollHeight;
+        const now = Date.now();
+        if (now - lastFlush >= FLUSH_INTERVAL_MS) {
+            flushField();
+            lastFlush = now;
         }
     }
-    debug(`${jobName} — stream closed after ${progress.receivedChunks} chunk(s), raw length: ${progress.text.length}`);
+    // Make sure the field reflects everything streamed (the last tokens may
+    // have been throttled out, and abort handlers expect the partial visible).
+    flushField();
+    debug(`${jobName} — stream LOOP ENDED after ${progress.receivedChunks} chunk(s), raw length: ${progress.text.length} (if this line is missing in the log, the backend never closed the stream)`);
     signal.throwIfAborted();
 
     const trimNames = params.trimNames !== false;

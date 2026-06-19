@@ -121,7 +121,19 @@ import { SlashCommandParser } from '../../../../slash-commands/SlashCommandParse
 - Default branch: `main`. The pre-commit hook runs lint + build on every commit; do not skip it with `--no-verify`.
 - Feature work happens on dedicated branches; `dist/` rebuilds are part of the commit, not a follow-up.
 
+## Versioning & Releases
+
+- Versioning is **SemVer** (`MAJOR.MINOR.PATCH`). The number lives in `package.json` and is mirrored into `manifest.json` — which SillyTavern reads and which drives `auto_update`, so a bump is what makes installed copies pull the new build.
+- **Never hand-edit the version in `manifest.json`.** Bump with npm so both files stay in lockstep:
+  - `npm version patch` — bug fixes only.
+  - `npm version minor` — new backward-compatible features.
+  - `npm version major` — breaking changes.
+- `npm version` runs the `version` lifecycle script (`scripts/sync-version.js`), which writes the new number into `manifest.json` and `git add`s it; npm then makes the version commit and a `vX.Y.Z` git tag. The pre-commit hook still lints + rebuilds `dist/` as part of that commit. Push with `git push --follow-tags`.
+- `npm version` requires a clean working tree — commit code changes first, then bump. If you ever hand-edit `package.json`'s version, run `npm run sync-version` to re-mirror it into `manifest.json`.
+- **Update `CHANGELOG.md` before bumping.** Move the relevant notes from the `## [Unreleased]` section into a new `## [X.Y.Z] - <date>` section (Keep a Changelog format: Added / Changed / Fixed / Removed). Add an entry per user-facing release.
+
 ## Useful References
 
 - `README.md` — user-facing feature docs, install instructions, settings tables, slash commands.
+- `CHANGELOG.md` — released versions and their notable changes (Keep a Changelog format).
 - `LICENSE` — GPL v3.0.
