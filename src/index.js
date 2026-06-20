@@ -158,7 +158,7 @@ import {
     bindDirectorSettings,
     registerDirectorSlashCommands,
     onDirectorChatChanged,
-    onDirectorMessageSent,
+    onDirectorGroupWrapperFinished,
     DEFAULT_DIRECTOR_PROMPT,
     DEFAULT_DIRECTOR_RESPONSE_LENGTH,
 } from './director.js';
@@ -507,8 +507,9 @@ function onCharacterPageLoadedHandler() {
     accOnCharacterPageLoaded();
 }
 
-function onGroupWrapperFinishedHandler() {
+function onGroupWrapperFinishedHandler(data) {
     onGroupWrapperFinished();
+    onDirectorGroupWrapperFinished(data);
 }
 
 // ─── Initialization ───
@@ -596,7 +597,6 @@ jQuery(async () => {
     eventSource.on(eventTypes.MESSAGE_SENT, async (idx) => {
         onMessageSent(idx);
         await onNarrativeGuidanceMessageSent(idx);
-        onDirectorMessageSent(idx);
     });
     eventSource.on(eventTypes.MESSAGE_RECEIVED, async (idx) => {
         onNarrativeGuidanceMessageReceived(idx);
