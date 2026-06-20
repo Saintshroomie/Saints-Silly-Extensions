@@ -29,6 +29,11 @@ released version. When cutting a release, move these notes into a new
   director is choosing, a click-to-cancel progress toast is shown (the silent
   roll has no native Stop button). Pressing **Send** with an empty input box
   advances the scene — the director picks the next speaker (same as `/next`).
+  Also detects ad-hoc **walk-on characters** the story introduces inline as
+  `[Name]:` speaker lines (in your sends, possessed posts, AI replies, or edits),
+  ignoring real members and your persona, and keeps a per-chat editable list of
+  them (with a "Scan Chat for Walk-ons" backfill button). Groundwork for letting
+  the director voice walk-ons later.
 
 ## [1.2.0] - 2026-06-19
 

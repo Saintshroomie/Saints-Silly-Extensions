@@ -945,6 +945,35 @@
                 </div>
             </div>
 
+            <div class="inline-drawer saints_nested_drawer">
+                <div class="inline-drawer-toggle inline-drawer-header">
+                    <b><span class="fa-solid fa-user-plus"></span> Walk-on Characters</b>
+                    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                </div>
+                <div class="inline-drawer-content" style="display: none;">
+
+                    <small>Tracks ad-hoc "walk-on" characters the story introduces inline as <code>[Name]:</code> speaker lines (in messages you send, possessed posts, AI replies, or edits). Real group members and your persona are ignored. The list is saved per-chat and editable below.</small>
+
+                    <label class="checkbox_label" title="Scan new messages and edits for [Name]: speaker lines and collect the names here.">
+                        <input id="director_walkons_enabled" type="checkbox" />
+                        <span>Detect walk-on characters (<code>[Name]:</code> lines)</span>
+                    </label>
+
+                    <div class="ng_inline_row">
+                        <span><b>Walk-ons this chat:</b> <span id="director_walkons_count">0</span></span>
+                        <div class="menu_button" id="director_walkons_scan" title="Scan every message in the current chat for [Name]: walk-on lines.">
+                            <span class="fa-solid fa-magnifying-glass"></span> Scan Chat for Walk-ons
+                        </div>
+                    </div>
+
+                    <div class="ng_prompt_section">
+                        <textarea id="director_walkons_textarea" class="text_pole" rows="6"
+                            placeholder="Walk-on characters detected in this chat are collected here, one per line.&#10;Edit freely — add your own, or delete ones you don't want."></textarea>
+                    </div>
+
+                </div>
+            </div>
+
         </div>
     </div>
 
