@@ -27,7 +27,8 @@ released version. When cutting a release, move these notes into a new
   instructions (with `{{context}}` / `{{roster}}` macros), preset support, a
   prompt preview, and per-tool response-length / max-context controls. While the
   director is choosing, a click-to-cancel progress toast is shown (the silent
-  roll has no native Stop button).
+  roll has no native Stop button). Pressing **Send** with an empty input box
+  advances the scene — the director picks the next speaker (same as `/next`).
 
 ## [1.2.0] - 2026-06-19
 

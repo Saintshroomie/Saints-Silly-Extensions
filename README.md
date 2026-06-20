@@ -268,6 +268,7 @@ Lets an LLM decide **who speaks next** in a group chat instead of SillyTavern's 
 - **Reliable by design** — The director is given a numbered roster and asked for just a name, so there's nothing fragile to parse out of an in-character reply.
 - **Respects mutes & Possession** — **Muted** group members are never selectable. If the director picks the character you're currently **possessing**, it yields silently and leaves the turn to you — exactly like native ST.
 - **`/next`** — Roll again for a back-to-back speaker without typing (useful for letting two characters exchange lines).
+- **Empty Send advances the scene** — press Send with the input box empty and the director picks the next speaker (same as `/next`), instead of SillyTavern's default random pick.
 - Editable director instructions (`{{context}}` / `{{roster}}` macros), preset support, and a prompt preview.
 
 **How to use**

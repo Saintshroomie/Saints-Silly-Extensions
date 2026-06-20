@@ -539,6 +539,37 @@ export function onDirectorGroupWrapperFinished(data) {
     }, 0);
 }
 
+// ─── Send-button Interceptor ───
+
+/**
+ * Capture-phase handler: when the user presses Send with an **empty** input box
+ * in a group, run the director instead of ST's default (which, in our Manual
+ * reply order, would pick a random member). A normal send with text is left
+ * alone — the `MESSAGE_SENT` → `userTurnPending` path rolls after it.
+ */
+function onSendButtonClickCapture(event) {
+    if (!event.target.closest?.('#send_but')) return;
+    if (!moduleSettings?.directorEnabled) return;
+    if (!getContext().groupId) return;
+    const textarea = document.getElementById('send_textarea');
+    if (textarea?.value?.trim()) return; // has input — let ST send it normally
+    if (is_group_generating) return; // a turn is already running
+
+    event.stopImmediatePropagation();
+    event.preventDefault();
+    if (textarea) {
+        textarea.value = '';
+        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    debug('Empty send intercepted — running director');
+    runDirector({ manual: true }).catch(err => console.error('Group Director empty-send failed:', err));
+}
+
+export function attachDirectorSendInterceptor() {
+    document.addEventListener('click', onSendButtonClickCapture, { capture: true });
+    debug('Attached send interceptor');
+}
+
 // ─── Slash Commands ───
 
 export function registerDirectorSlashCommands() {

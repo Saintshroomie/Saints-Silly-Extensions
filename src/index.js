@@ -146,6 +146,7 @@ import {
     onDirectorChatChanged,
     onDirectorMessageSent,
     onDirectorGroupWrapperFinished,
+    attachDirectorSendInterceptor,
     DEFAULT_DIRECTOR_PROMPT,
     DEFAULT_DIRECTOR_RESPONSE_LENGTH,
 } from './director.js';
@@ -515,6 +516,9 @@ jQuery(async () => {
 
     // Possession UI
     attachContinueInterceptor();
+
+    // Group Director: empty Send (no input) → director picks the next speaker.
+    attachDirectorSendInterceptor();
 
     // Phrasing UI
     createInputAreaButton();
