@@ -583,7 +583,15 @@ jQuery(async () => {
         eventSource.on(eventTypes.MESSAGE_EDITED, (id) => {
             onRetryContinueMessageEdited(id);
             onDirectorScanForWalkOns(parseInt(id, 10));
+            // An edit changes content in place (no new .mes node), so the
+            // observer won't re-evaluate it — refresh the split buttons here so
+            // one appears/disappears as `[Name]:` lines are added/removed.
+            rescanSplitButtons();
         });
+    }
+    // Swiping also updates a message's content in place — refresh split buttons.
+    if (eventTypes.MESSAGE_SWIPED) {
+        eventSource.on(eventTypes.MESSAGE_SWIPED, () => rescanSplitButtons());
     }
     // Text Completion only: append Phrase Ban's learned list to the request's
     // sampler-level banned_strings whenever Phrase Ban is enabled.
