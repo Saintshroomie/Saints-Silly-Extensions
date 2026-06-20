@@ -161,7 +161,10 @@ import {
     onDirectorMessageSent,
     onDirectorGroupWrapperFinished,
     onDirectorScanForWalkOns,
+    onDirectorMaybeSplit,
     attachDirectorSendInterceptor,
+    startDirectorObserver,
+    rescanSplitButtons,
     DEFAULT_DIRECTOR_PROMPT,
     DEFAULT_DIRECTOR_RESPONSE_LENGTH,
 } from './director.js';
@@ -269,6 +272,7 @@ const defaultSettings = {
     directorEnabled: false,
     directorConfirm: true,
     directorWalkOnsEnabled: true,
+    directorWalkOnSplitAuto: true,
     directorPrompt: DEFAULT_DIRECTOR_PROMPT,
     directorResponseLength: DEFAULT_DIRECTOR_RESPONSE_LENGTH,
     directorMaxContextOverride: 0,
@@ -498,6 +502,7 @@ function onChatChanged() {
     onCompactionChatChanged();
     onRetryContinueChatChanged();
     onDirectorChatChanged();
+    rescanSplitButtons();
     SSEDebug('Chat changed, state reloaded');
 }
 
@@ -562,6 +567,10 @@ jQuery(async () => {
     // buttons (each anchors the modal's context at that message).
     startImagePromptObserver();
 
+    // Watch the chat to keep the Group Director's per-message walk-on split
+    // button present on messages that contain `[Name]:` lines.
+    startDirectorObserver();
+
     // Possession UI
     attachContinueInterceptor();
 
@@ -615,6 +624,7 @@ jQuery(async () => {
         // checkpoint is active, a retry-continue from that checkpoint.
         onPhraseBanMessageReceived(idx);
         onDirectorScanForWalkOns(idx);
+        onDirectorMaybeSplit(idx);
     });
     if (eventTypes.USER_MESSAGE_RENDERED) {
         eventSource.on(eventTypes.USER_MESSAGE_RENDERED, onRetryContinueUserMessageRendered);

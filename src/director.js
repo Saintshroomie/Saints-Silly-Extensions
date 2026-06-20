@@ -368,6 +368,233 @@ function scanWholeChatForWalkOns() {
         : 'No new walk-on characters found.', added.length ? 'success' : 'info');
 }
 
+// ─── Walk-on Message Splitting ───
+//
+// Promote `[Name]:` speaker lines embedded in a message into their own messages,
+// posted under each name (with the matching character's avatar when the name is
+// a real character, otherwise a nameplate-only walk-on) — as if ST had posted
+// them. Deterministic (no LLM). The chat array is spliced and re-rendered via
+// `printMessages`, so it works at any position.
+
+let splitBusy = false;
+
+function delayMs(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/** Wait until the group turn has fully settled before mutating the chat. */
+async function waitForGroupSettle(timeoutMs = 8000) {
+    const start = Date.now();
+    while (is_group_generating) {
+        if (Date.now() - start > timeoutMs) return false;
+        await delayMs(100);
+    }
+    await delayMs(50);
+    return true;
+}
+
+/**
+ * Split a message body at its `[Name]:` speaker boundaries (ignoring meta-tags).
+ * Returns `{ head, segments: [{ name, text }] }`, where `head` is the text
+ * before the first speaker line and each segment's text is the speaker's
+ * content with the `[Name]:` prefix stripped.
+ */
+function parseWalkOnSegments(text) {
+    const str = String(text || '');
+    const boundaries = [];
+    WALKON_SPEAKER_RE.lastIndex = 0;
+    for (const m of str.matchAll(WALKON_SPEAKER_RE)) {
+        const name = (m[1] || '').trim();
+        if (!name || IGNORED_WALKON_TAGS.has(name.toLowerCase())) continue;
+        boundaries.push({ name, start: m.index, contentStart: m.index + m[0].length });
+    }
+    if (!boundaries.length) return { head: str, segments: [] };
+    const segments = boundaries.map((b, i) => {
+        const end = i + 1 < boundaries.length ? boundaries[i + 1].start : str.length;
+        return { name: b.name, text: str.slice(b.contentStart, end).trim() };
+    });
+    return { head: str.slice(0, boundaries[0].start), segments };
+}
+
+/** Build a chat message posted under `name` (real character's avatar if known). */
+function makeSpeakerMessage(ctx, name, text, original) {
+    const char = (ctx.characters || []).find(c => (c.name || '').toLowerCase() === name.toLowerCase());
+    const msg = {
+        name: char ? char.name : name,
+        is_user: false,
+        is_system: false,
+        send_date: original?.send_date ?? Date.now(),
+        mes: text,
+        extra: { sseWalkOnSplit: true },
+    };
+    if (char?.avatar) {
+        msg.force_avatar = `/characters/${char.avatar}`;
+        if (ctx.groupId) msg.original_avatar = char.avatar;
+    }
+    if (ctx.groupId) msg.is_name = true;
+    return msg;
+}
+
+/** Construct the ordered replacement messages for a split. */
+function buildSplitMessages(ctx, original, parsed) {
+    const replacements = [];
+    const headText = parsed.head.trim();
+    if (headText) {
+        // Keep the original message's identity, trimmed to the leading text.
+        // Drop stale swipes (content changed). No split tag — a later edit that
+        // re-introduces a speaker line should still be splittable.
+        const kept = { ...original, mes: headText };
+        delete kept.swipes;
+        delete kept.swipe_id;
+        delete kept.swipe_info;
+        replacements.push(kept);
+    }
+    for (const seg of parsed.segments) {
+        if (!seg.text) continue;
+        replacements.push(makeSpeakerMessage(ctx, seg.name, seg.text, original));
+    }
+    return replacements;
+}
+
+/**
+ * Split the message at `index` into separate named messages. Returns the number
+ * of new messages created (0 = nothing to split).
+ */
+async function splitWalkOnsInMessage(index) {
+    if (splitBusy) return 0;
+    const ctx = getContext();
+    const msg = ctx.chat?.[index];
+    if (!msg || typeof msg.mes !== 'string') return 0;
+    if (msg.extra?.sseWalkOnSplit) return 0;
+
+    const parsed = parseWalkOnSegments(msg.mes);
+    if (!parsed.segments.length) return 0;
+
+    const replacements = buildSplitMessages(ctx, msg, parsed);
+    if (!replacements.length) return 0;
+    const newCount = replacements.length - (parsed.head.trim() ? 1 : 0);
+
+    splitBusy = true;
+    try {
+        ctx.chat.splice(index, 1, ...replacements);
+        await ctx.saveChat();
+        await ctx.printMessages();
+        debug('Split walk-on message at', index, '→', replacements.length, 'message(s)');
+        return newCount;
+    } finally {
+        splitBusy = false;
+    }
+}
+
+/**
+ * Auto-split path (AI replies only): after the group turn settles, split the
+ * referenced message if it carries embedded walk-on lines. Tracks the message
+ * by object reference so a shifted index (e.g. the director appended a reply)
+ * still resolves.
+ */
+async function maybeAutoSplit(messageIndex) {
+    if (!moduleSettings?.directorWalkOnSplitAuto) return;
+    const ctx = getContext();
+    if (!ctx.groupId) return;
+    const idx = Number.isInteger(messageIndex) ? messageIndex : ctx.chat.length - 1;
+    const msg = ctx.chat?.[idx];
+    if (!msg || msg.extra?.sseWalkOnSplit) return;
+    if (!parseWalkOnSegments(String(msg.mes || '')).segments.length) return;
+
+    await waitForGroupSettle();
+    const liveIdx = getContext().chat.indexOf(msg);
+    if (liveIdx === -1) return; // message was swiped/deleted while we waited
+    await splitWalkOnsInMessage(liveIdx);
+}
+
+/**
+ * Auto-split a freshly-received AI message (wired to `MESSAGE_RECEIVED` only —
+ * user/edited messages use the per-message button, which avoids reordering
+ * against the director's own triggered reply).
+ */
+export function onDirectorMaybeSplit(messageIndex) {
+    if (!moduleSettings?.directorWalkOnSplitAuto) return;
+    const idx = Number.isInteger(messageIndex) ? messageIndex : undefined;
+    maybeAutoSplit(idx).catch(err => console.error('Group Director auto-split failed:', err));
+}
+
+// ─── Walk-on Split Button ───
+
+function makeSplitButton() {
+    const btn = document.createElement('div');
+    btn.className = 'mes_button sse-walkon-split-button fa-solid fa-scissors interactable';
+    btn.title = 'Split [Name]: walk-on lines in this message into separate messages';
+    btn.tabIndex = 0;
+    btn.addEventListener('click', onSplitButtonClick);
+    return btn;
+}
+
+function onSplitButtonClick(event) {
+    const mesEl = event.currentTarget.closest('.mes');
+    if (!mesEl) return;
+    const index = parseInt(mesEl.getAttribute('mesid'), 10);
+    if (Number.isNaN(index)) return;
+    if (is_group_generating) {
+        toast('Wait for the current generation to finish.', 'warning');
+        return;
+    }
+    splitWalkOnsInMessage(index)
+        .then(n => { if (!n) toast('No walk-on lines to split in this message.', 'info'); })
+        .catch(err => console.error('Group Director split failed:', err));
+}
+
+/** Inject (or remove) the split button on a `.mes` based on its content. */
+function injectSplitButtonInto(mesEl) {
+    if (!(mesEl instanceof HTMLElement) || !mesEl.matches?.('.mes')) return;
+    if (mesEl.getAttribute('is_system') === 'true') return;
+    const buttons = mesEl.querySelector('.mes_buttons');
+    if (!buttons) return;
+    const existing = buttons.querySelector('.sse-walkon-split-button');
+
+    const ctx = getContext();
+    const index = parseInt(mesEl.getAttribute('mesid'), 10);
+    const msg = !Number.isNaN(index) ? ctx.chat?.[index] : null;
+    const splittable = !!ctx.groupId && !!msg && !msg.extra?.sseWalkOnSplit
+        && parseWalkOnSegments(String(msg.mes || '')).segments.length > 0;
+
+    if (!splittable) {
+        existing?.remove();
+        return;
+    }
+    if (existing) return;
+    const extra = buttons.querySelector('.extraMesButtons');
+    const btn = makeSplitButton();
+    if (extra) buttons.insertBefore(btn, extra);
+    else buttons.appendChild(btn);
+}
+
+/** (Re)scan every message and inject/refresh split buttons. */
+export function rescanSplitButtons() {
+    document.querySelectorAll('#chat .mes').forEach(injectSplitButtonInto);
+}
+
+let splitObserverInstalled = false;
+
+/** Keep the per-message split button present as ST re-renders message nodes. */
+export function startDirectorObserver() {
+    if (splitObserverInstalled) return;
+    splitObserverInstalled = true;
+    const chat = document.getElementById('chat');
+    if (!chat) return;
+    const observer = new MutationObserver((mutations) => {
+        for (const m of mutations) {
+            for (const node of m.addedNodes) {
+                if (!(node instanceof HTMLElement)) continue;
+                if (node.matches?.('.mes')) injectSplitButtonInto(node);
+                node.querySelectorAll?.('.mes').forEach(injectSplitButtonInto);
+            }
+        }
+    });
+    observer.observe(chat, { childList: true, subtree: true });
+    rescanSplitButtons();
+    debug('Split-button observer installed');
+}
+
 // ─── Prompt Assembly ───
 
 function resolveResponseLength() {
@@ -855,6 +1082,15 @@ export function bindDirectorSettings(saveSettings) {
         walkOnsCb.checked = !!moduleSettings.directorWalkOnsEnabled;
         walkOnsCb.addEventListener('change', () => {
             moduleSettings.directorWalkOnsEnabled = walkOnsCb.checked;
+            saveSettings();
+        });
+    }
+
+    const splitAutoCb = document.getElementById('director_walkon_split_auto');
+    if (splitAutoCb) {
+        splitAutoCb.checked = !!moduleSettings.directorWalkOnSplitAuto;
+        splitAutoCb.addEventListener('change', () => {
+            moduleSettings.directorWalkOnSplitAuto = splitAutoCb.checked;
             saveSettings();
         });
     }
