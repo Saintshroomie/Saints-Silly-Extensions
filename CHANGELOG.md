@@ -25,7 +25,9 @@ released version. When cutting a release, move these notes into a new
   director picks the character you're currently **possessing**, it yields
   silently so you can reply as them — just like native ST. Editable director
   instructions (with `{{context}}` / `{{roster}}` macros), preset support, a
-  prompt preview, and per-tool response-length / max-context controls.
+  prompt preview, and per-tool response-length / max-context controls. While the
+  director is choosing, a click-to-cancel progress toast is shown (the silent
+  roll has no native Stop button).
 
 ## [1.2.0] - 2026-06-19
 
