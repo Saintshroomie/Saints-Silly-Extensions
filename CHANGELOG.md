@@ -31,9 +31,10 @@ released version. When cutting a release, move these notes into a new
   advances the scene — the director picks the next speaker (same as `/next`).
   Also detects ad-hoc **walk-on characters** the story introduces inline as
   `[Name]:` speaker lines (in your sends, possessed posts, AI replies, or edits),
-  ignoring real members and your persona, and keeps a per-chat editable list of
-  them (with a "Scan Chat for Walk-ons" backfill button). Groundwork for letting
-  the director voice walk-ons later.
+  including several in one message, with a toast on each new detection. Real
+  members, your persona, and common meta-tags (`[OOC]:`, `[System]:`, …) are
+  ignored, and a per-chat editable list is kept (with a "Scan Chat for Walk-ons"
+  backfill button). Groundwork for letting the director voice walk-ons later.
 
 ## [1.2.0] - 2026-06-19
 

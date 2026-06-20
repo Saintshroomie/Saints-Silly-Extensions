@@ -10551,11 +10551,18 @@ const DIRECTOR_SYSTEM_PROMPT =
 const DEFAULT_DIRECTOR_RESPONSE_LENGTH = 32;
 
 // Walk-on detection: a speaker line is a bracket-delimited name followed by a
-// colon at the start of a line, e.g. `[Tony Stark]: "Hello."`. The brackets
-// delimit a (possibly multi-word) name unambiguously.
-const WALKON_SPEAKER_RE = /^[ \t]*\[([^\]\n]{1,60})\][ \t]*:/gm;
+// colon, e.g. `[Tony Stark]: "Hello."`. The brackets delimit a (possibly
+// multi-word) name unambiguously. Not line-anchored, so multiple walk-ons in
+// one message — even on the same line — are all detected.
+const WALKON_SPEAKER_RE = /\[([^\]\n]{1,60})\][ \t]*:/g;
 const MAX_WALKON_NAME_LENGTH = 60;
 const MAX_WALKONS = 50;
+
+// Common bracketed meta-tags that look like `[Name]:` but aren't characters.
+const IGNORED_WALKON_TAGS = new Set([
+    'ooc', 'system', 'note', 'notes', 'narrator', 'setting', 'scene', 'continue',
+    'author', 'author\'s note', 'translation', 'time', 'status', 'a/n', 'an',
+]);
 
 // ─── Module State ───
 
@@ -10723,6 +10730,7 @@ function extractWalkOnNames(text) {
         const name = (m[1] || '').trim();
         if (!name) continue;
         const key = name.toLowerCase();
+        if (IGNORED_WALKON_TAGS.has(key)) continue;
         if (seen.has(key)) continue;
         seen.add(key);
         names.push(name);
@@ -10754,22 +10762,31 @@ function sameList(a, b) {
 
 /**
  * Merge newly-detected names into the per-chat list, dropping anything that is a
- * real cast member or the persona. Returns true if the stored list changed.
+ * real cast member or the persona, or already known. Returns the list of names
+ * that were actually newly added (empty if nothing changed).
  */
 function addWalkOns(names) {
     const ctx = getContext();
     const excluded = buildExcludedNameSet(ctx);
-    const candidates = names.filter(n => !excluded.has(n.trim().toLowerCase()));
-    if (!candidates.length) return false;
-
     const state = readState();
-    const combined = normalizeWalkOns([...state.walkOns, ...candidates]);
-    if (sameList(combined, state.walkOns)) return false;
+    const known = new Set(state.walkOns.map(n => n.toLowerCase()));
+    const fresh = [];
+    for (const raw of names) {
+        const name = (raw || '').trim();
+        const key = name.toLowerCase();
+        if (!name || excluded.has(key) || known.has(key)) continue;
+        known.add(key);
+        fresh.push(name);
+    }
+    if (!fresh.length) return [];
+
+    const combined = normalizeWalkOns([...state.walkOns, ...fresh]);
+    if (sameList(combined, state.walkOns)) return [];
 
     state.walkOns = combined;
     saveState(state);
     refreshWalkOnPanel();
-    return true;
+    return fresh;
 }
 
 /** Scan one message's text for walk-on speaker lines and learn any new names. */
@@ -10782,7 +10799,14 @@ function scanMessageForWalkOns(index) {
     if (!msg || msg.is_system || typeof msg.mes !== 'string' || !msg.mes.trim()) return;
     const names = extractWalkOnNames(msg.mes);
     if (!names.length) return;
-    if (addWalkOns(names)) director_debug('Learned walk-on(s):', names);
+    const added = addWalkOns(names);
+    if (added.length) {
+        director_debug('Learned walk-on(s):', added);
+        toast(
+            `Walk-on ${added.length === 1 ? 'character' : 'characters'} detected: ${added.join(', ')}`,
+            'success',
+        );
+    }
 }
 
 /**
@@ -10810,24 +10834,21 @@ function scanWholeChatForWalkOns() {
         toast('Walk-on detection only runs in group chats.', 'warning');
         return;
     }
-    const excluded = buildExcludedNameSet(ctx);
     const found = [];
     const seen = new Set();
     for (const msg of ctx.chat || []) {
         if (!msg || msg.is_system || typeof msg.mes !== 'string') continue;
         for (const name of extractWalkOnNames(msg.mes)) {
             const key = name.toLowerCase();
-            if (excluded.has(key) || seen.has(key)) continue;
+            if (seen.has(key)) continue;
             seen.add(key);
             found.push(name);
         }
     }
-    const before = loadWalkOns().length;
-    addWalkOns(found);
-    const added = loadWalkOns().length - before;
-    toast(added > 0
-        ? `Found ${added} new walk-on${added === 1 ? '' : 's'}.`
-        : 'No new walk-on characters found.', added > 0 ? 'success' : 'info');
+    const added = addWalkOns(found);
+    toast(added.length
+        ? `Found ${added.length} new walk-on${added.length === 1 ? '' : 's'}: ${added.join(', ')}`
+        : 'No new walk-on characters found.', added.length ? 'success' : 'info');
 }
 
 // ─── Prompt Assembly ───
