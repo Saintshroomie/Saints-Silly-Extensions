@@ -68,21 +68,6 @@ const DIRECTOR_SYSTEM_PROMPT =
 
 export const DEFAULT_DIRECTOR_RESPONSE_LENGTH = 32;
 
-// When the director picks a walk-on (a character with no card), it generates the
-// reply itself from this template and posts it under that name. {{name}} is the
-// walk-on; {{context}} is the packed chat/character/lore preamble.
-export const DEFAULT_DIRECTOR_WALKON_PROMPT =
-    '{{context}}\n\nContinue the scene by writing the next message for {{name}}, ' +
-    'a walk-on character taking part in this conversation. Stay in character and ' +
-    'in the current scene, matching the established tone, and infer their voice ' +
-    'from how they have appeared so far. Write only {{name}}\'s reply — their ' +
-    'dialogue and actions — with no name label, and do not write for anyone else.';
-
-const WALKON_SYSTEM_PROMPT =
-    'You are writing a single in-character message for one walk-on character in a ' +
-    'group roleplay. Output only that character\'s message — no name label, no ' +
-    'narration of other characters, no commentary.';
-
 // Walk-on detection: a speaker line is a bracket-delimited name followed by a
 // colon, e.g. `[Tony Stark]: "Hello."`. The brackets delimit a (possibly
 // multi-word) name unambiguously. Not line-anchored, so multiple walk-ons in
@@ -690,8 +675,6 @@ function showDirectorPromptPreview() {
     showPromptPreview('Group Director — Prompt Preview', [
         { label: 'Speaker Pick — System Prompt (fixed)', text: DIRECTOR_SYSTEM_PROMPT },
         { label: 'Speaker Pick — User Prompt (assembled, with sample values)', text: composeDirectorPrompt(sampleRoster, sampleContext) },
-        { label: 'Walk-on Reply — System Prompt (fixed)', text: WALKON_SYSTEM_PROMPT },
-        { label: 'Walk-on Reply — User Prompt (assembled, with sample values)', text: composeWalkOnPrompt('Tony', sampleContext) },
     ]);
 }
 
@@ -898,68 +881,7 @@ async function rollDirector(ctx, roster) {
 
 // ─── Walk-on Voicing ───
 
-/** Assemble the walk-on generation prompt from the editable template. */
-function composeWalkOnPrompt(name, contextBlock) {
-    const configured = moduleSettings?.directorWalkOnPrompt;
-    const tpl = (typeof configured === 'string' && configured.trim())
-        ? configured
-        : DEFAULT_DIRECTOR_WALKON_PROMPT;
-    const { text, used } = applyTemplateMacros(tpl, {
-        name: name || '',
-        context: contextBlock || '',
-    });
-    let prompt = text;
-    if (!used.has('context') && contextBlock) prompt = `${contextBlock}\n\n${prompt}`;
-    return prompt;
-}
-
-/** Lowercased set of every name that could appear as a `Name:` speaker label. */
-function knownSpeakerNames(ctx) {
-    const set = new Set();
-    const group = getActiveGroup(ctx);
-    for (const avatar of group?.members || []) {
-        const char = (ctx.characters || []).find(c => c.avatar === avatar);
-        if (char?.name) set.add(char.name.toLowerCase());
-    }
-    for (const n of loadWalkOns()) set.add(n.toLowerCase());
-    return set;
-}
-
-// A leading speaker-label line, e.g. `Laura:` or `Tony Stark :`.
-const SPEAKER_LABEL_RE = /^[ \t]*([A-Za-z][\w '.-]{0,40}?)[ \t]*:/;
-
-/**
- * Trim a generated walk-on reply down to just that walk-on's single turn:
- * strips leading stray brackets / whitespace, drops a leading `Name:` label, and
- * truncates at the first later line that opens with another known speaker's label
- * (so a reply that bleeds into other characters' turns keeps only the first one).
- */
-function sanitizeWalkOnReply(text, name, ctx) {
-    let out = String(text || '').replace(/^[\s\]>]+/, '');
-    const nameEsc = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    out = out.replace(new RegExp(`^[ \\t]*${nameEsc}[ \\t]*:[ \\t]*`, 'i'), '').trim();
-
-    const known = knownSpeakerNames(ctx);
-    known.add(name.toLowerCase());
-    const lines = out.split('\n');
-    for (let i = 1; i < lines.length; i++) {
-        const m = lines[i].match(SPEAKER_LABEL_RE);
-        if (m && known.has(m[1].trim().toLowerCase())) {
-            return lines.slice(0, i).join('\n').trim();
-        }
-    }
-    return out.trim();
-}
-
-/** Post a generated walk-on reply as a named message (no card → nameplate only). */
-function postWalkOnMessage(ctx, name, text) {
-    const msg = makeSpeakerMessage(ctx, name, text, null, { tagSplit: false });
-    ctx.chat.push(msg);
-    if (typeof ctx.addOneMessage === 'function') ctx.addOneMessage(msg);
-    return ctx.saveChat();
-}
-
-/** Remove the message at `idx` and re-render (used to undo a failed/cancelled placeholder). */
+/** Remove the message at `idx` and re-render (used to undo a placeholder that produced nothing). */
 async function removeMessageAt(ctx, idx) {
     if (idx < 0 || idx >= (ctx.chat?.length || 0)) return;
     ctx.chat.splice(idx, 1);
@@ -981,15 +903,20 @@ function collapseToActiveSwipe(ctx, idx) {
 }
 
 /**
- * Voice a walk-on the *native* way: post a thin placeholder message under the
- * name, then drive ST's own swipe-regeneration on it (the same path as pressing
- * the swipe arrow), so the reply is produced by the real pipeline — proper
- * formatting, stop strings, name handling — with no custom prompt or sanitizing.
- * Returns 'ok' (posted), 'cancel' (user stopped — no fallback), or 'fail' (try raw).
+ * Voice a walk-on the native way: post a thin `…` placeholder under the name, then
+ * drive ST's own swipe-regeneration on it (the same path as pressing the swipe
+ * arrow) so the reply comes from the real pipeline — native formatting, stop
+ * strings, and name handling, with no custom prompt or sanitizing. The throwaway
+ * placeholder swipe is collapsed away afterward. ST shows its own generation
+ * indicator and Stop button, so there's no extension progress toast; if the user
+ * stops it before any text arrives, the placeholder is removed. Walk-ons only
+ * exist in group chats, where `ctx.swipe.right` is always available.
  */
-async function voiceWalkOnNative(ctx, name) {
-    const dismissProgress = cancellableProgressToast(`Generating ${name}'s reply… (click to cancel)`);
-    generationAborted = false;
+async function generateAndPostWalkOn(ctx, name) {
+    if (!ctx.groupId || typeof ctx.swipe?.right !== 'function') {
+        toast('Group Director: walk-ons can only be voiced in a group chat.', 'warning');
+        return;
+    }
     const placeholder = makeSpeakerMessage(ctx, name, '…', null, { tagSplit: false });
     ctx.chat.push(placeholder);
     const idx = ctx.chat.length - 1;
@@ -999,81 +926,19 @@ async function voiceWalkOnNative(ctx, name) {
         // Overswipe → regenerate → Generate('swipe'); awaits the full generation.
         await ctx.swipe.right();
         await waitForGroupSettle();
-        if (generationAborted) {
-            await removeMessageAt(ctx, idx);
-            return 'cancel';
-        }
         const text = String(ctx.chat?.[idx]?.mes || '').trim();
         if (!text || text === '…') {
             await removeMessageAt(ctx, idx);
-            return 'fail';
+            debug('Native walk-on swipe produced nothing for', name);
+            return;
         }
         collapseToActiveSwipe(ctx, idx);
         await ctx.saveChat();
         if (typeof ctx.printMessages === 'function') await ctx.printMessages();
         debug('Voiced walk-on natively for', name, '— length', text.length);
-        return 'ok';
     } catch (err) {
         debug('Native walk-on swipe threw:', err);
         await removeMessageAt(ctx, idx);
-        return generationAborted ? 'cancel' : 'fail';
-    } finally {
-        dismissProgress();
-    }
-}
-
-/**
- * Generate a reply in the walk-on's voice and post it as a named message. Prefers
- * the native swipe-regeneration path (`voiceWalkOnNative`); on failure falls back
- * to the director's own improv generation (raw/aligned) + sanitizer.
- */
-async function generateAndPostWalkOn(ctx, name) {
-    if (moduleSettings?.directorWalkOnNativeSwipe && ctx.groupId && ctx.swipe?.right) {
-        const result = await voiceWalkOnNative(ctx, name);
-        if (result === 'ok') return;
-        if (result === 'cancel') {
-            toast('Director cancelled.', 'info');
-            return;
-        }
-        debug('Native walk-on voicing failed; falling back to improv generation.');
-    }
-
-    const dismissProgress = cancellableProgressToast(`Writing ${name}'s reply… (click to cancel)`);
-    try {
-        let text;
-        if (useAlignedContext(ctx)) {
-            const quietPrompt = composeWalkOnPrompt(name, '');
-            const forceChId = resolveAnchorChid(ctx);
-            const raw = await ctx.generateQuietPrompt({ quietPrompt, responseLength: 0, forceChId, skipWIAN: false, removeReasoning: true });
-            if (generationAborted) {
-                toast('Director cancelled.', 'info');
-                return;
-            }
-            text = String(raw || '').trim();
-        } else {
-            const contextBlock = await buildContextPreamble({
-                includeChat: true,
-                responseLength: 0,
-                maxContextOverride: moduleSettings?.directorMaxContextOverride || 0,
-            });
-            const userPrompt = composeWalkOnPrompt(name, contextBlock);
-            const scratch = document.createElement('textarea');
-            const raw = await withSingleLineDisabled(() => streamingGenerate(
-                { prompt: userPrompt, systemPrompt: WALKON_SYSTEM_PROMPT, responseLength: 0 },
-                scratch,
-                { append: false },
-            ));
-            text = removeReasoningFromString(raw || '').trim();
-        }
-        text = sanitizeWalkOnReply(text, name, ctx);
-        if (!text) {
-            toast(`Group Director: no reply was generated for ${name}.`, 'warning');
-            return;
-        }
-        await postWalkOnMessage(ctx, name, text);
-        debug('Posted walk-on reply for', name, '— length', text.length);
-    } finally {
-        dismissProgress();
     }
 }
 
@@ -1406,24 +1271,6 @@ export function bindDirectorSettings(saveSettings) {
         includeWalkOnsCb.checked = !!moduleSettings.directorIncludeWalkOns;
         includeWalkOnsCb.addEventListener('change', () => {
             moduleSettings.directorIncludeWalkOns = includeWalkOnsCb.checked;
-            saveSettings();
-        });
-    }
-
-    const nativeSwipeCb = document.getElementById('director_walkon_native_swipe');
-    if (nativeSwipeCb) {
-        nativeSwipeCb.checked = !!moduleSettings.directorWalkOnNativeSwipe;
-        nativeSwipeCb.addEventListener('change', () => {
-            moduleSettings.directorWalkOnNativeSwipe = nativeSwipeCb.checked;
-            saveSettings();
-        });
-    }
-
-    const walkOnPromptArea = document.getElementById('director_walkon_prompt_textarea');
-    if (walkOnPromptArea) {
-        walkOnPromptArea.value = moduleSettings.directorWalkOnPrompt || DEFAULT_DIRECTOR_WALKON_PROMPT;
-        walkOnPromptArea.addEventListener('input', () => {
-            moduleSettings.directorWalkOnPrompt = walkOnPromptArea.value;
             saveSettings();
         });
     }
