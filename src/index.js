@@ -17,6 +17,7 @@ import {
     initPossession,
     isPossessing,
     getPossessedCharName,
+    getPossessedCharacter,
     postPossessedMessage,
     loadPossessionState,
     syncAllPossessionUI,
@@ -153,6 +154,15 @@ import {
     onRetryContinueGenerationEnded,
 } from './retry-continue.js';
 import {
+    initDirector,
+    bindDirectorSettings,
+    registerDirectorSlashCommands,
+    onDirectorChatChanged,
+    onDirectorMessageSent,
+    DEFAULT_DIRECTOR_PROMPT,
+    DEFAULT_DIRECTOR_RESPONSE_LENGTH,
+} from './director.js';
+import {
     setupToolPresets,
     migrateLegacyToolPresets,
 } from './prompt-templates.js';
@@ -253,6 +263,12 @@ const defaultSettings = {
     retryShowToasts: true,
     retryIndicatorStyle: 'border',
     retryDebugMode: false,
+    directorEnabled: false,
+    directorConfirm: true,
+    directorPrompt: DEFAULT_DIRECTOR_PROMPT,
+    directorResponseLength: DEFAULT_DIRECTOR_RESPONSE_LENGTH,
+    directorMaxContextOverride: 0,
+    directorDebugMode: false,
     silentGenerationDebugMode: false,
     silentGenerationStreaming: true,
     // toolPresets / activeToolPreset are intentionally absent here:
@@ -361,6 +377,14 @@ const TOOL_PRESET_CONFIG = [
             { key: 'imagePromptPrefill', label: 'Prefill', textareaId: 'image_prompt_prefill_textarea', defaultText: DEFAULT_IMAGE_PROMPT_PREFILL },
         ],
     },
+    {
+        toolKey: 'director',
+        label: 'Group Director',
+        containerId: 'director_presets',
+        fields: [
+            { key: 'directorPrompt', label: 'Instructions', textareaId: 'director_prompt_textarea', defaultText: DEFAULT_DIRECTOR_PROMPT },
+        ],
+    },
 ];
 
 // ─── State ───
@@ -417,6 +441,7 @@ function injectSettingsPanel() {
     bindCompactionSettings(saveSettings);
     bindImagePromptSettings(saveSettings);
     bindRetryContinueSettings(saveSettings);
+    bindDirectorSettings(saveSettings);
     bindSilentGenerationSettings(saveSettings);
 
     // Preset widgets go last: the module bindings above must attach their
@@ -468,6 +493,7 @@ function onChatChanged() {
     rescanImagePromptButtons();
     onCompactionChatChanged();
     onRetryContinueChatChanged();
+    onDirectorChatChanged();
     SSEDebug('Chat changed, state reloaded');
 }
 
@@ -513,6 +539,10 @@ jQuery(async () => {
     initCompaction({ settings, saveSettings, resyncChatState: onChatChanged });
     initImagePrompting({ settings, saveSettings });
     initRetryContinue({ settings });
+    initDirector({
+        settings,
+        possessionApi: { isPossessing, getPossessedCharacter, getPossessedCharName },
+    });
 
     loadPossessionState();
     injectSettingsPanel();
@@ -566,6 +596,7 @@ jQuery(async () => {
     eventSource.on(eventTypes.MESSAGE_SENT, async (idx) => {
         onMessageSent(idx);
         await onNarrativeGuidanceMessageSent(idx);
+        onDirectorMessageSent(idx);
     });
     eventSource.on(eventTypes.MESSAGE_RECEIVED, async (idx) => {
         onNarrativeGuidanceMessageReceived(idx);
@@ -606,6 +637,7 @@ jQuery(async () => {
     registerCompactionSlashCommand();
     registerImagePromptSlashCommand();
     registerRetryContinueSlashCommands();
+    registerDirectorSlashCommands();
 
     // Initial state
     syncAllPossessionUI();
