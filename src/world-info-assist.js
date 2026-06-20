@@ -230,7 +230,7 @@ function injectControls(formEl) {
             <span class="fa-solid fa-wand-magic-sparkles"></span>
             <span class="wia-btn-label">Assist</span>
         </div>
-        <label class="wia-context-toggle checkbox_label" title="Prepend the current chat / character context to the generation prompt">
+        <label class="wia-context-toggle checkbox_label" title="Prepend the current chat / character context to the generation prompt, and auto-include the chat's relevant World Info entries. The lore-book dropdown adds extra books on top of that.">
             <input type="checkbox" class="wia-context-cb" />
             <span>Use Chat Context</span>
         </label>

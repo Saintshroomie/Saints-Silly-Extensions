@@ -3176,7 +3176,8 @@ async function packRecentChatLines(chat, ctx, chatBudget) {
  *
  * @param {object} opts
  * @param {boolean} [opts.includeChat=false] - Include character card, persona, and recent chat messages.
- * @param {string[]} [opts.loreBookNames=[]] - Names of lore books whose enabled entries to include.
+ * @param {string[]} [opts.loreBookNames=[]] - Names of lore books whose enabled entries to include. Additive to any auto-activated World Info.
+ * @param {boolean} [opts.autoWorldInfo=true] - When `includeChat` is on, also auto-activate the chat's bound World Info (keyword-matched against the recent chat + character/persona, exactly as a real turn would) and fold the relevant entries in. Additive to `loreBookNames`. Set false to opt out.
  * @param {number}  [opts.responseLength=0] - Tokens reserved for the model's response; subtracted from the budget.
  * @param {number}  [opts.maxContextOverride=0] - If > 0, use this as the max-context size instead of `getMaxPromptTokens()`. Lets callers cap how much chat history they pull in independently of the model's real window.
  * @param {number}  [opts.excludeRecentCount=0] - Drop this many of the most recent messages before packing the chat. Compaction uses it so `{{context}}` is the chat *minus* the verbatim tail it carries over.
@@ -3185,6 +3186,7 @@ async function packRecentChatLines(chat, ctx, chatBudget) {
 async function buildContextPreamble({
     includeChat = false,
     loreBookNames = [],
+    autoWorldInfo = true,
     responseLength = 0,
     maxContextOverride = 0,
     excludeRecentCount = 0,
@@ -3231,6 +3233,29 @@ async function buildContextPreamble({
             } catch (err) {
                 console.error(`Saints-Silly-Extensions: failed to load lore book "${name}":`, err);
             }
+        }
+    }
+
+    // Auto-activate the chat's bound World Info the same way a real turn does:
+    // keyword-match the recent chat (+ character/persona) and fold in the entries
+    // that fire. This gives the relevant lore "for free" so the user needn't hand-
+    // pick books in the dropdown — it's additive to any `loreBookNames` above. A
+    // dry run, so it never emits WORLD_INFO_ACTIVATED or perturbs sticky/timed
+    // state on the live chat. Added before chat packing so it's counted in budget.
+    if (includeChat && autoWorldInfo && typeof ctx.getWorldInfoPrompt === 'function') {
+        try {
+            const includeNames = ctx.powerUserSettings?.world_info_include_names ?? true;
+            const chatForWI = (Array.isArray(ctx.chat) ? ctx.chat : [])
+                .filter(m => m && !m.is_system)
+                .map(m => (includeNames && m.name) ? `${m.name}: ${m.mes ?? ''}` : String(m.mes ?? ''))
+                .reverse();
+            const overrideValid = Number.isFinite(maxContextOverride) && maxContextOverride > 0;
+            const wiMaxContext = overrideValid ? maxContextOverride : __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_getMaxPromptTokens__();
+            const wi = await ctx.getWorldInfoPrompt(chatForWI, wiMaxContext, true);
+            const wiText = (wi?.worldInfoString || '').trim();
+            if (wiText) sections.push(`[World Info]\n${wiText}`);
+        } catch (err) {
+            console.error('Saints-Silly-Extensions: auto World Info activation failed.', err);
         }
     }
 
@@ -5682,7 +5707,7 @@ function buildModalBody() {
     root.className = 'acc-modal-body';
     root.innerHTML = `
         <div class="acc-context-section">
-            <label class="checkbox_label" title="Prepend the current chat / character context to the generation">
+            <label class="checkbox_label" title="Prepend the current chat / character context to the generation, and auto-include the chat's relevant World Info entries. The lore-book dropdown adds extra books on top of that.">
                 <input id="acc_use_chat_context" type="checkbox" />
                 <span>Use Chat Context</span>
             </label>
@@ -6376,7 +6401,7 @@ function injectControls(formEl) {
             <span class="fa-solid fa-wand-magic-sparkles"></span>
             <span class="wia-btn-label">Assist</span>
         </div>
-        <label class="wia-context-toggle checkbox_label" title="Prepend the current chat / character context to the generation prompt">
+        <label class="wia-context-toggle checkbox_label" title="Prepend the current chat / character context to the generation prompt, and auto-include the chat's relevant World Info entries. The lore-book dropdown adds extra books on top of that.">
             <input type="checkbox" class="wia-context-cb" />
             <span>Use Chat Context</span>
         </label>

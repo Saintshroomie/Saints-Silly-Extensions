@@ -359,7 +359,7 @@ function buildModalBody() {
     root.className = 'acc-modal-body';
     root.innerHTML = `
         <div class="acc-context-section">
-            <label class="checkbox_label" title="Prepend the current chat / character context to the generation">
+            <label class="checkbox_label" title="Prepend the current chat / character context to the generation, and auto-include the chat's relevant World Info entries. The lore-book dropdown adds extra books on top of that.">
                 <input id="acc_use_chat_context" type="checkbox" />
                 <span>Use Chat Context</span>
             </label>
