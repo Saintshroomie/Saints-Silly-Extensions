@@ -151,7 +151,6 @@ import {
     startDirectorObserver,
     rescanSplitButtons,
     DEFAULT_DIRECTOR_PROMPT,
-    DEFAULT_DIRECTOR_WALKON_PROMPT,
     DEFAULT_DIRECTOR_RESPONSE_LENGTH,
 } from './director.js';
 import {
@@ -250,11 +249,9 @@ const defaultSettings = {
     directorConfirm: true,
     directorAlignedContext: true,
     directorWalkOnsEnabled: true,
-    directorWalkOnNativeSwipe: true,
     directorWalkOnSplitAuto: true,
     directorIncludeWalkOns: true,
     directorPrompt: DEFAULT_DIRECTOR_PROMPT,
-    directorWalkOnPrompt: DEFAULT_DIRECTOR_WALKON_PROMPT,
     directorResponseLength: DEFAULT_DIRECTOR_RESPONSE_LENGTH,
     directorMaxContextOverride: 0,
     directorDebugMode: false,
@@ -363,7 +360,6 @@ const TOOL_PRESET_CONFIG = [
         containerId: 'director_presets',
         fields: [
             { key: 'directorPrompt', label: 'Instructions', textareaId: 'director_prompt_textarea', defaultText: DEFAULT_DIRECTOR_PROMPT },
-            { key: 'directorWalkOnPrompt', label: 'Walk-on Reply', textareaId: 'director_walkon_prompt_textarea', defaultText: DEFAULT_DIRECTOR_WALKON_PROMPT },
         ],
     },
 ];
