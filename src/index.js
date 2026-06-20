@@ -160,6 +160,7 @@ import {
     onDirectorChatChanged,
     onDirectorMessageSent,
     onDirectorGroupWrapperFinished,
+    onDirectorScanForWalkOns,
     attachDirectorSendInterceptor,
     DEFAULT_DIRECTOR_PROMPT,
     DEFAULT_DIRECTOR_RESPONSE_LENGTH,
@@ -267,6 +268,7 @@ const defaultSettings = {
     retryDebugMode: false,
     directorEnabled: false,
     directorConfirm: true,
+    directorWalkOnsEnabled: true,
     directorPrompt: DEFAULT_DIRECTOR_PROMPT,
     directorResponseLength: DEFAULT_DIRECTOR_RESPONSE_LENGTH,
     directorMaxContextOverride: 0,
@@ -603,6 +605,7 @@ jQuery(async () => {
         onMessageSent(idx);
         await onNarrativeGuidanceMessageSent(idx);
         onDirectorMessageSent();
+        onDirectorScanForWalkOns(idx);
     });
     eventSource.on(eventTypes.MESSAGE_RECEIVED, async (idx) => {
         onNarrativeGuidanceMessageReceived(idx);
@@ -611,6 +614,7 @@ jQuery(async () => {
         // chain. On a banned-phrase hit it drives a rewrite, or, while a Retry
         // checkpoint is active, a retry-continue from that checkpoint.
         onPhraseBanMessageReceived(idx);
+        onDirectorScanForWalkOns(idx);
     });
     if (eventTypes.USER_MESSAGE_RENDERED) {
         eventSource.on(eventTypes.USER_MESSAGE_RENDERED, onRetryContinueUserMessageRendered);
@@ -619,7 +623,10 @@ jQuery(async () => {
         eventSource.on(eventTypes.CHARACTER_MESSAGE_RENDERED, onRetryContinueCharacterMessageRendered);
     }
     if (eventTypes.MESSAGE_EDITED) {
-        eventSource.on(eventTypes.MESSAGE_EDITED, onRetryContinueMessageEdited);
+        eventSource.on(eventTypes.MESSAGE_EDITED, (id) => {
+            onRetryContinueMessageEdited(id);
+            onDirectorScanForWalkOns(parseInt(id, 10));
+        });
     }
     // Text Completion only: append Phrase Ban's learned list to the request's
     // sampler-level banned_strings whenever Phrase Ban is enabled.

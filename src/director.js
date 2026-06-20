@@ -67,6 +67,13 @@ const DIRECTOR_SYSTEM_PROMPT =
 
 export const DEFAULT_DIRECTOR_RESPONSE_LENGTH = 32;
 
+// Walk-on detection: a speaker line is a bracket-delimited name followed by a
+// colon at the start of a line, e.g. `[Tony Stark]: "Hello."`. The brackets
+// delimit a (possibly multi-word) name unambiguously.
+const WALKON_SPEAKER_RE = /^[ \t]*\[([^\]\n]{1,60})\][ \t]*:/gm;
+const MAX_WALKON_NAME_LENGTH = 60;
+const MAX_WALKONS = 50;
+
 // ─── Module State ───
 
 let moduleSettings = null;
@@ -83,6 +90,10 @@ let busy = false;
 // turn (vs a director-triggered member reply, which emits no MESSAGE_SENT).
 let userTurnPending = false;
 
+// Debounce timer for the walk-on textarea (write-through is immediate; only the
+// saveMetadata flush is debounced).
+let walkOnSaveTimer = null;
+
 // ─── Per-chat State ───
 
 function readState() {
@@ -90,15 +101,24 @@ function readState() {
     const raw = context.chatMetadata?.[DIRECTOR_METADATA_KEY];
     return {
         previousStrategy: Number.isFinite(raw?.previousStrategy) ? raw.previousStrategy : null,
+        walkOns: Array.isArray(raw?.walkOns)
+            ? raw.walkOns.filter(n => typeof n === 'string' && n.trim())
+            : [],
+    };
+}
+
+/** Write the per-chat director state into chatMetadata without flushing. */
+function writeState(state) {
+    const context = getContext();
+    context.chatMetadata[DIRECTOR_METADATA_KEY] = {
+        previousStrategy: Number.isFinite(state?.previousStrategy) ? state.previousStrategy : null,
+        walkOns: Array.isArray(state?.walkOns) ? state.walkOns : [],
     };
 }
 
 function saveState(state) {
-    const context = getContext();
-    context.chatMetadata[DIRECTOR_METADATA_KEY] = {
-        previousStrategy: Number.isFinite(state?.previousStrategy) ? state.previousStrategy : null,
-    };
-    context.saveMetadata();
+    writeState(state);
+    getContext().saveMetadata();
 }
 
 // ─── Group / Roster Helpers ───
@@ -190,7 +210,141 @@ async function restoreStrategy() {
             console.error('Group Director: failed to restore reply order:', err);
         }
     }
-    saveState({ previousStrategy: null });
+    // Preserve walkOns (and anything else) — only clear the captured strategy.
+    state.previousStrategy = null;
+    saveState(state);
+}
+
+// ─── Walk-on Detection ───
+
+/** Names that are real cast (group members + user persona), not walk-ons. */
+function buildExcludedNameSet(ctx) {
+    const set = new Set();
+    if (ctx.name1) set.add(ctx.name1.trim().toLowerCase());
+    const group = getActiveGroup(ctx);
+    if (group) {
+        for (const avatar of group.members || []) {
+            const char = (ctx.characters || []).find(c => c.avatar === avatar);
+            if (char?.name) set.add(char.name.trim().toLowerCase());
+        }
+    }
+    return set;
+}
+
+/** Extract bracket-delimited speaker names (`[Name]:`) from a message body. */
+function extractWalkOnNames(text) {
+    const names = [];
+    const seen = new Set();
+    WALKON_SPEAKER_RE.lastIndex = 0;
+    for (const m of String(text || '').matchAll(WALKON_SPEAKER_RE)) {
+        const name = (m[1] || '').trim();
+        if (!name) continue;
+        const key = name.toLowerCase();
+        if (seen.has(key)) continue;
+        seen.add(key);
+        names.push(name);
+    }
+    return names;
+}
+
+function loadWalkOns() {
+    return readState().walkOns;
+}
+
+function normalizeWalkOns(names) {
+    const seen = new Set();
+    const out = [];
+    for (const raw of names) {
+        const name = (raw || '').trim().slice(0, MAX_WALKON_NAME_LENGTH).trim();
+        if (!name) continue;
+        const key = name.toLowerCase();
+        if (seen.has(key)) continue;
+        seen.add(key);
+        out.push(name);
+    }
+    return out.slice(-MAX_WALKONS);
+}
+
+function sameList(a, b) {
+    return a.length === b.length && a.every((v, i) => v === b[i]);
+}
+
+/**
+ * Merge newly-detected names into the per-chat list, dropping anything that is a
+ * real cast member or the persona. Returns true if the stored list changed.
+ */
+function addWalkOns(names) {
+    const ctx = getContext();
+    const excluded = buildExcludedNameSet(ctx);
+    const candidates = names.filter(n => !excluded.has(n.trim().toLowerCase()));
+    if (!candidates.length) return false;
+
+    const state = readState();
+    const combined = normalizeWalkOns([...state.walkOns, ...candidates]);
+    if (sameList(combined, state.walkOns)) return false;
+
+    state.walkOns = combined;
+    saveState(state);
+    refreshWalkOnPanel();
+    return true;
+}
+
+/** Scan one message's text for walk-on speaker lines and learn any new names. */
+function scanMessageForWalkOns(index) {
+    const ctx = getContext();
+    if (!moduleSettings?.directorWalkOnsEnabled) return;
+    if (!ctx.groupId) return;
+    const idx = Number.isInteger(index) ? index : ctx.chat.length - 1;
+    const msg = ctx.chat?.[idx];
+    if (!msg || msg.is_system || typeof msg.mes !== 'string' || !msg.mes.trim()) return;
+    const names = extractWalkOnNames(msg.mes);
+    if (!names.length) return;
+    if (addWalkOns(names)) debug('Learned walk-on(s):', names);
+}
+
+/**
+ * Detached scan for a message index. Runs on `MESSAGE_SENT` / `MESSAGE_RECEIVED`
+ * / `MESSAGE_EDITED`; deferred via `setTimeout(0)` so member characters are
+ * fully unshallowed before we build the excluded-names set (same unshallow race
+ * the roster hits mid-pipeline).
+ */
+export function onDirectorScanForWalkOns(messageIndex) {
+    if (!moduleSettings?.directorWalkOnsEnabled) return;
+    const idx = Number.isInteger(messageIndex) ? messageIndex : undefined;
+    setTimeout(() => {
+        try {
+            scanMessageForWalkOns(idx);
+        } catch (err) {
+            console.error('Group Director walk-on scan failed:', err);
+        }
+    }, 0);
+}
+
+/** Scan every message in the current chat (manual backfill). */
+function scanWholeChatForWalkOns() {
+    const ctx = getContext();
+    if (!ctx.groupId) {
+        toast('Walk-on detection only runs in group chats.', 'warning');
+        return;
+    }
+    const excluded = buildExcludedNameSet(ctx);
+    const found = [];
+    const seen = new Set();
+    for (const msg of ctx.chat || []) {
+        if (!msg || msg.is_system || typeof msg.mes !== 'string') continue;
+        for (const name of extractWalkOnNames(msg.mes)) {
+            const key = name.toLowerCase();
+            if (excluded.has(key) || seen.has(key)) continue;
+            seen.add(key);
+            found.push(name);
+        }
+    }
+    const before = loadWalkOns().length;
+    addWalkOns(found);
+    const added = loadWalkOns().length - before;
+    toast(added > 0
+        ? `Found ${added} new walk-on${added === 1 ? '' : 's'}.`
+        : 'No new walk-on characters found.', added > 0 ? 'success' : 'info');
 }
 
 // ─── Prompt Assembly ───
@@ -481,6 +635,7 @@ export function onDirectorChatChanged() {
         // Self-heal: a chat we left in Manual mode, now that the Director is off.
         restoreStrategy().catch(err => console.error('Group Director: restoreStrategy failed:', err));
     }
+    refreshWalkOnPanel();
 }
 
 /**
@@ -585,6 +740,34 @@ export function registerDirectorSlashCommands() {
     }));
 }
 
+// ─── Walk-on List Panel ───
+
+/** Write the edited textarea through to chatMetadata, debouncing the flush. */
+function scheduleWalkOnSave(names) {
+    const state = readState();
+    state.walkOns = normalizeWalkOns(names);
+    writeState(state);
+    if (walkOnSaveTimer) clearTimeout(walkOnSaveTimer);
+    walkOnSaveTimer = setTimeout(() => {
+        walkOnSaveTimer = null;
+        getContext().saveMetadata();
+    }, 300);
+}
+
+function updateWalkOnCount() {
+    const el = document.getElementById('director_walkons_count');
+    if (el) el.textContent = String(loadWalkOns().length);
+}
+
+/** Repopulate the textarea from the current chat's list (never clobber typing). */
+function refreshWalkOnPanel() {
+    const textarea = document.getElementById('director_walkons_textarea');
+    if (textarea && document.activeElement !== textarea) {
+        textarea.value = loadWalkOns().join('\n');
+    }
+    updateWalkOnCount();
+}
+
 // ─── Settings Panel ───
 
 export function bindDirectorSettings(saveSettings) {
@@ -645,6 +828,27 @@ export function bindDirectorSettings(saveSettings) {
     document.getElementById('director_preview_btn')
         ?.addEventListener('click', showDirectorPromptPreview);
 
+    // Walk-on detection
+    const walkOnsCb = document.getElementById('director_walkons_enabled');
+    if (walkOnsCb) {
+        walkOnsCb.checked = !!moduleSettings.directorWalkOnsEnabled;
+        walkOnsCb.addEventListener('change', () => {
+            moduleSettings.directorWalkOnsEnabled = walkOnsCb.checked;
+            saveSettings();
+        });
+    }
+
+    const walkOnsArea = document.getElementById('director_walkons_textarea');
+    if (walkOnsArea) {
+        walkOnsArea.addEventListener('input', () => {
+            scheduleWalkOnSave(walkOnsArea.value.split('\n'));
+            updateWalkOnCount();
+        });
+    }
+
+    document.getElementById('director_walkons_scan')
+        ?.addEventListener('click', scanWholeChatForWalkOns);
+
     const debugCb = document.getElementById('director_debug_mode');
     if (debugCb) {
         debugCb.checked = !!moduleSettings.directorDebugMode;
@@ -653,6 +857,8 @@ export function bindDirectorSettings(saveSettings) {
             saveSettings();
         });
     }
+
+    refreshWalkOnPanel();
 }
 
 // ─── Init ───
