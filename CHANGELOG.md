@@ -42,10 +42,13 @@ released version. When cutting a release, move these notes into a new
   member) as if natively posted: automatically for AI replies (toggle), or on
   demand via a per-message scissors button. The **director can voice walk-ons**:
   when enabled they join the speaker roster and the confirm/override dialog
-  alongside real members, and choosing one generates a reply in that walk-on's
-  voice (editable template) and posts it under their name — trimmed to that
-  walk-on's single turn (a stray `Name:` label or a reply that runs on into
-  other characters' lines is cleaned up automatically). A **"Reuse chat
+  alongside real members, and choosing one posts a reply in that walk-on's
+  voice under their name. By default this uses **native swipe-regeneration**
+  (a placeholder is posted and SillyTavern's own swipe pipeline fills it in, so
+  formatting and stop strings are handled natively); turning that off uses the
+  director's own improv generation from an editable template (the reply is then
+  trimmed to the walk-on's single turn), and a failed native attempt falls back
+  to it automatically. A **"Reuse chat
   context (KV-cache friendly)"** toggle (default on) routes the director's silent
   generations through ST's normal pipeline (a quiet generation anchored to the
   last speaker) so their prompt prefix matches the chat and the KV cache stays

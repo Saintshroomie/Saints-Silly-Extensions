@@ -250,6 +250,7 @@ const defaultSettings = {
     directorConfirm: true,
     directorAlignedContext: true,
     directorWalkOnsEnabled: true,
+    directorWalkOnNativeSwipe: true,
     directorWalkOnSplitAuto: true,
     directorIncludeWalkOns: true,
     directorPrompt: DEFAULT_DIRECTOR_PROMPT,

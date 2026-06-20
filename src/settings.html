@@ -988,7 +988,12 @@
                         <span>Let the director voice walk-on characters</span>
                     </label>
 
-                    <small>Each message that contains <code>[Name]:</code> lines also gets a <span class="fa-solid fa-scissors"></span> button to split it on demand.</small>
+                    <label class="checkbox_label" title="Generate a chosen walk-on's reply the native way: post a placeholder under the name and run SillyTavern's own swipe-regeneration on it (proper formatting and stop strings). When off, the director uses its own improv generation with the template below. On failure it falls back to the template automatically.">
+                        <input id="director_walkon_native_swipe" type="checkbox" />
+                        <span>Voice walk-ons via native swipe-regeneration (recommended)</span>
+                    </label>
+
+                    <small>Each message that contains <code>[Name]:</code> lines also gets a <span class="fa-solid fa-scissors"></span> button to split it on demand. The reply template below is used only when native swipe-regeneration is off or fails.</small>
 
                     <div class="ng_inline_row">
                         <span><b>Walk-ons this chat:</b> <span id="director_walkons_count">0</span></span>

@@ -959,12 +959,85 @@ function postWalkOnMessage(ctx, name, text) {
     return ctx.saveChat();
 }
 
+/** Remove the message at `idx` and re-render (used to undo a failed/cancelled placeholder). */
+async function removeMessageAt(ctx, idx) {
+    if (idx < 0 || idx >= (ctx.chat?.length || 0)) return;
+    ctx.chat.splice(idx, 1);
+    await ctx.saveChat();
+    if (typeof ctx.printMessages === 'function') await ctx.printMessages();
+}
+
+/** Collapse a multi-swipe message down to just its active swipe (drops the placeholder). */
+function collapseToActiveSwipe(ctx, idx) {
+    const m = ctx.chat?.[idx];
+    if (!m || !Array.isArray(m.swipes) || m.swipes.length <= 1) return;
+    const id = Number(m.swipe_id) || 0;
+    const activeText = m.swipes[id];
+    const activeInfo = Array.isArray(m.swipe_info) ? m.swipe_info[id] : undefined;
+    m.swipes = [activeText];
+    m.swipe_info = [activeInfo || {}];
+    m.swipe_id = 0;
+    m.mes = activeText;
+}
+
 /**
- * Generate a reply in the walk-on's voice (improv from the scene) and post it as
- * a named message. The director owns this generation — walk-ons have no card, so
- * `force_chid` can't be used.
+ * Voice a walk-on the *native* way: post a thin placeholder message under the
+ * name, then drive ST's own swipe-regeneration on it (the same path as pressing
+ * the swipe arrow), so the reply is produced by the real pipeline — proper
+ * formatting, stop strings, name handling — with no custom prompt or sanitizing.
+ * Returns 'ok' (posted), 'cancel' (user stopped — no fallback), or 'fail' (try raw).
+ */
+async function voiceWalkOnNative(ctx, name) {
+    const dismissProgress = cancellableProgressToast(`Generating ${name}'s reply… (click to cancel)`);
+    generationAborted = false;
+    const placeholder = makeSpeakerMessage(ctx, name, '…', null, { tagSplit: false });
+    ctx.chat.push(placeholder);
+    const idx = ctx.chat.length - 1;
+    if (typeof ctx.addOneMessage === 'function') ctx.addOneMessage(placeholder);
+    await ctx.saveChat();
+    try {
+        // Overswipe → regenerate → Generate('swipe'); awaits the full generation.
+        await ctx.swipe.right();
+        await waitForGroupSettle();
+        if (generationAborted) {
+            await removeMessageAt(ctx, idx);
+            return 'cancel';
+        }
+        const text = String(ctx.chat?.[idx]?.mes || '').trim();
+        if (!text || text === '…') {
+            await removeMessageAt(ctx, idx);
+            return 'fail';
+        }
+        collapseToActiveSwipe(ctx, idx);
+        await ctx.saveChat();
+        if (typeof ctx.printMessages === 'function') await ctx.printMessages();
+        debug('Voiced walk-on natively for', name, '— length', text.length);
+        return 'ok';
+    } catch (err) {
+        debug('Native walk-on swipe threw:', err);
+        await removeMessageAt(ctx, idx);
+        return generationAborted ? 'cancel' : 'fail';
+    } finally {
+        dismissProgress();
+    }
+}
+
+/**
+ * Generate a reply in the walk-on's voice and post it as a named message. Prefers
+ * the native swipe-regeneration path (`voiceWalkOnNative`); on failure falls back
+ * to the director's own improv generation (raw/aligned) + sanitizer.
  */
 async function generateAndPostWalkOn(ctx, name) {
+    if (moduleSettings?.directorWalkOnNativeSwipe && ctx.groupId && ctx.swipe?.right) {
+        const result = await voiceWalkOnNative(ctx, name);
+        if (result === 'ok') return;
+        if (result === 'cancel') {
+            toast('Director cancelled.', 'info');
+            return;
+        }
+        debug('Native walk-on voicing failed; falling back to improv generation.');
+    }
+
     const dismissProgress = cancellableProgressToast(`Writing ${name}'s reply… (click to cancel)`);
     try {
         let text;
@@ -1333,6 +1406,15 @@ export function bindDirectorSettings(saveSettings) {
         includeWalkOnsCb.checked = !!moduleSettings.directorIncludeWalkOns;
         includeWalkOnsCb.addEventListener('change', () => {
             moduleSettings.directorIncludeWalkOns = includeWalkOnsCb.checked;
+            saveSettings();
+        });
+    }
+
+    const nativeSwipeCb = document.getElementById('director_walkon_native_swipe');
+    if (nativeSwipeCb) {
+        nativeSwipeCb.checked = !!moduleSettings.directorWalkOnNativeSwipe;
+        nativeSwipeCb.addEventListener('change', () => {
+            moduleSettings.directorWalkOnNativeSwipe = nativeSwipeCb.checked;
             saveSettings();
         });
     }
