@@ -892,6 +892,62 @@
         </div>
     </div>
 
+    <!-- ─── SSE Group Director ─── -->
+    <div class="inline-drawer">
+        <div class="inline-drawer-toggle inline-drawer-header">
+            <b><span class="fa-solid fa-clapperboard"></span> SSE Group Director</b>
+            <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+        </div>
+        <div class="inline-drawer-content" style="display: none;">
+
+            <small>In a group chat, lets an LLM "director" read the scene and choose who speaks next. While enabled, the active group is switched to Manual reply order (your previous setting is restored when you disable it). Use <code>/next</code> to roll again for back-to-back speakers.</small>
+
+            <label class="checkbox_label">
+                <input id="director_enabled" type="checkbox" />
+                <span>Enable Group Director</span>
+            </label>
+
+            <label class="checkbox_label" title="When on, each roll shows a dialog so you can confirm the director's pick or override it with another cast member. When off, the rolled pick is triggered immediately.">
+                <input id="director_confirm" type="checkbox" />
+                <span>Ask Before Generating (confirm / override the speaker)</span>
+            </label>
+
+            <div class="ng_inline_row">
+                <label for="director_response_length"><b>Response Token Limit:</b></label>
+                <input id="director_response_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="Maximum tokens for the director's choice. The reply is only a name, so this can stay small." />
+            </div>
+
+            <div class="ng_inline_row">
+                <label for="director_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label>
+                <input id="director_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer feeds the director. 0 = use the model's full context size." />
+                <small>0 = use model default</small>
+            </div>
+
+            <div class="saints_preset_block">
+                <label title="Save and switch named versions of the director instructions."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label>
+                <div class="saints_template_controls" id="director_presets"></div>
+                <div class="menu_button saints_preview_btn" id="director_preview_btn" title="Show the exact system prompt and assembled user prompt the director will send, with sample values.">
+                    <span class="fa-solid fa-eye"></span> Preview Assembled Prompt
+                </div>
+            </div>
+
+            <div class="inline-drawer saints_nested_drawer">
+                <div class="inline-drawer-toggle inline-drawer-header">
+                    <b>Director Instructions Template</b>
+                    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                </div>
+                <div class="inline-drawer-content" style="display: none;">
+                    <div class="ng_prompt_section">
+                        <textarea id="director_prompt_textarea" class="text_pole" rows="6"
+                            placeholder="Instructions sent as the user prompt when choosing the next speaker..."></textarea>
+                        <small>Sent as the user prompt each time the director picks a speaker. Placeholders: <code>{{context}}</code> (chat/character/lore preamble), <code>{{roster}}</code> (the numbered list of eligible speakers). If a placeholder is missing, the blocks are added automatically.</small>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
     <!-- ─── SSE Diagnostics ─── -->
     <div class="inline-drawer">
         <div class="inline-drawer-toggle inline-drawer-header">
@@ -943,6 +999,11 @@
             <label class="checkbox_label" title="Log detailed Retry Continue events (checkpoint set/clear, snapshot lock transitions, swipe creation) to the browser console.">
                 <input id="retry_continue_debug_mode" type="checkbox" />
                 <span>Retry Continue Debug Mode</span>
+            </label>
+
+            <label class="checkbox_label" title="Log detailed Group Director events (roster, roll, parsed pick, Manual-mode transitions) to the browser console.">
+                <input id="director_debug_mode" type="checkbox" />
+                <span>Group Director Debug Mode</span>
             </label>
 
             <label class="checkbox_label" title="Log silent-generation lifecycle (job start/abort/completion, stop-listener events, stream token counts) to the browser console. Useful when diagnosing stop-button behavior across backends.">

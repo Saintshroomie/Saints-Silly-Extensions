@@ -1253,3 +1253,40 @@
 #saints_silly_settings #retry_continue_clear {
     margin-top: 10px;
 }
+
+/* ─── Group Director ─── */
+
+.sse-director-dialog {
+    text-align: left;
+}
+
+.sse-director-heading {
+    font-size: 1.05em;
+    margin-bottom: 4px;
+}
+
+.sse-director-heading strong {
+    color: var(--SmartThemeQuoteColor, #e8a23a);
+}
+
+.sse-director-hint {
+    opacity: 0.75;
+    font-size: 0.9em;
+    margin-bottom: 10px;
+}
+
+.sse-director-choices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.sse-director-choice {
+    cursor: pointer;
+}
+
+.sse-director-choice.sse-director-suggested {
+    color: var(--SmartThemeQuoteColor, #e8a23a);
+    border-color: var(--SmartThemeQuoteColor, #e8a23a);
+}

@@ -12,6 +12,21 @@ _Changes that have landed on the development branch but are not yet part of a
 released version. When cutting a release, move these notes into a new
 `## [X.Y.Z]` section and run `npm version`._
 
+### Added
+- **Group Director** — an LLM-chosen turn order for group chats. While enabled,
+  the active group is switched to **Manual** reply order (your previous strategy
+  is restored when you disable it) so SillyTavern stops auto-picking; on each of
+  your turns a small "director" generation reads the scene and chooses who
+  should speak next, and that member is triggered via ST's native `force_chid`
+  group generation. A confirm/override dialog (toggleable) shows the rolled pick
+  with a button per cast member so you can accept or redirect it; the `/next`
+  (alias `/director`) slash command rolls again for back-to-back speakers.
+  **Muted members** (`disabled_members`) are never selectable, and if the
+  director picks the character you're currently **possessing**, it yields
+  silently so you can reply as them — just like native ST. Editable director
+  instructions (with `{{context}}` / `{{roster}}` macros), preset support, a
+  prompt preview, and per-tool response-length / max-context controls.
+
 ## [1.2.0] - 2026-06-19
 
 ### Added

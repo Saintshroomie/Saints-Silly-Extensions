@@ -17,6 +17,7 @@ See [CHANGELOG.md](CHANGELOG.md) for release notes and version history.
   - [Reformatting](#reformatting)
   - [Compaction](#compaction)
   - [Retry Continue](#retry-continue)
+  - [Group Director](#group-director)
 - [Installation](#installation)
   - [Manual Installation](#manual-installation)
 - [Configuration](#configuration)
@@ -29,6 +30,7 @@ See [CHANGELOG.md](CHANGELOG.md) for release notes and version history.
   - [Reformatting Settings](#reformatting-settings)
   - [Compaction Settings](#compaction-settings)
   - [Retry Continue Settings](#retry-continue-settings)
+  - [Group Director Settings](#group-director-settings)
   - [Silent Generation](#silent-generation)
   - [Diagnostics](#diagnostics)
   - [Tool Presets & Prompt Preview](#tool-presets--prompt-preview)
@@ -257,6 +259,24 @@ Automates the "edit the message to keep the good part, delete the bad part, hit 
 5. Not satisfied? Click **Retry** again — each attempt becomes a new swipe.
 6. Use the native **swipe arrows** to browse all retry results and pick the best one. `/retryclear` (or the **Clear Retry Checkpoint** button) drops the checkpoint.
 
+### Group Director
+
+Lets an LLM decide **who speaks next** in a group chat instead of SillyTavern's fixed reply-order strategies (Manual / Natural / List / Pooled).
+
+- **Intelligent turn order** — While enabled, the active group is switched to **Manual** reply order so ST stops auto-picking a speaker (your previous strategy is saved and restored when you disable the Director). On each of your turns, a small "director" generation reads the scene and chooses who should reply next; that member is then triggered through ST's own group generation, so the reply is a normal, full-card message.
+- **Confirm / override** — By default a dialog shows the director's pick alongside a button for every cast member, so you can accept the suggestion or redirect the turn to someone else. Turn the dialog off in settings to have the rolled pick fire immediately.
+- **Reliable by design** — The director is given a numbered roster and asked for just a name, so there's nothing fragile to parse out of an in-character reply.
+- **Respects mutes & Possession** — **Muted** group members are never selectable. If the director picks the character you're currently **possessing**, it yields silently and leaves the turn to you — exactly like native ST.
+- **`/next`** — Roll again for a back-to-back speaker without typing (useful for letting two characters exchange lines).
+- Editable director instructions (`{{context}}` / `{{roster}}` macros), preset support, and a prompt preview.
+
+**How to use**
+
+1. Open a **group chat** and enable **Group Director** in the extension settings.
+2. Send a message as usual. The director picks who replies next.
+3. In the confirm dialog, click **the suggested name** (or any other member) to let them speak — or press a different member to override the suggestion.
+4. Want another character to chime in before you reply? Run `/next` (or `/director`).
+
 ## Installation
 
 1. Open SillyTavern and go to **Extensions** > **Install Extension**
@@ -407,6 +427,17 @@ The drawer holds two self-contained tiers — **Long-term** (the overarching arc
 | Clear Retry Checkpoint | Button that drops the active checkpoint (same as `/retryclear`) |
 | Retry Continue Debug Mode | Log detailed Retry Continue events (checkpoint set/clear, snapshot lock transitions, swipe creation) to the browser console (in the Diagnostics drawer) |
 
+### Group Director Settings
+
+| Setting | Description |
+|---------|-------------|
+| Enable Group Director | Toggle the Director on/off. While on, the active group is switched to Manual reply order; turning it off restores your previous strategy (default off) |
+| Ask Before Generating | Show a confirm/override dialog with the rolled pick and a button per cast member. Off = trigger the rolled pick immediately (default on) |
+| Response Token Limit | Maximum tokens for the director's choice — the reply is only a name, so this can stay small (default 32) |
+| Max Context Override | Cap the tokens of chat context fed to the director; 0 = use the model's full context size (default 0) |
+| Director Instructions Template | The user prompt sent when choosing the next speaker. Macros: `{{context}}` (chat/character/lore preamble), `{{roster}}` (numbered list of eligible speakers) |
+| Group Director Debug Mode | Log detailed Director events (roster, roll, parsed pick, Manual-mode transitions) to the browser console (in the Diagnostics drawer) |
+
 ### Silent Generation
 
 | Setting | Description |
@@ -460,6 +491,7 @@ Generation templates support tool-specific placeholders, substituted in place. I
 | `/compact` | Open the Compaction modal to summarize the chat and start a fresh, compacted chat seeded with the summary plus the recent tail |
 | `/retry` | Retry the continuation from the saved checkpoint, creating a new swipe. If no checkpoint exists, sets one from the current message and continues |
 | `/retryclear` | Clear the active retry checkpoint |
+| `/next` (alias `/director`) | Group Director: roll for (and trigger) the next speaker in the current group chat |
 
 ## License
 
