@@ -269,7 +269,8 @@ Lets an LLM decide **who speaks next** in a group chat instead of SillyTavern's 
 - **Respects mutes & Possession** — **Muted** group members are never selectable. If the director picks the character you're currently **possessing**, it yields silently and leaves the turn to you — exactly like native ST.
 - **`/next`** — Roll again for a back-to-back speaker without typing (useful for letting two characters exchange lines).
 - **Empty Send advances the scene** — press Send with the input box empty and the director picks the next speaker (same as `/next`), instead of SillyTavern's default random pick.
-- **Walk-on character detection** — when the story introduces an ad-hoc character inline as a `[Name]:` speaker line (in a message you send, a possessed post, an AI reply, or an edit), its name is collected into a per-chat, editable list (real group members and your persona are ignored). A **Scan Chat for Walk-ons** button backfills names from earlier messages. This is the groundwork for the director voicing walk-ons in a future update.
+- **Walk-on character detection** — when the story introduces an ad-hoc character inline as a `[Name]:` speaker line (in a message you send, a possessed post, an AI reply, or an edit), its name is collected into a per-chat, editable list (real group members and your persona are ignored), with a toast on each new detection. A **Scan Chat for Walk-ons** button backfills names from earlier messages.
+- **Walk-on line splitting** — a `[Name]: "..."` line embedded in a message can be pulled out into its own message, posted under that name (using the matching character's avatar if it's a real member, otherwise a nameplate-only walk-on), as if SillyTavern had posted it. Happens automatically for AI replies (toggle) or on demand via a per-message <span title="scissors icon">✂</span> button on any message containing `[Name]:` lines. This is the groundwork for the director voicing walk-ons in a future update.
 - Editable director instructions (`{{context}}` / `{{roster}}` macros), preset support, and a prompt preview.
 
 **How to use**
@@ -439,6 +440,7 @@ The drawer holds two self-contained tiers — **Long-term** (the overarching arc
 | Max Context Override | Cap the tokens of chat context fed to the director; 0 = use the model's full context size (default 0) |
 | Director Instructions Template | The user prompt sent when choosing the next speaker. Macros: `{{context}}` (chat/character/lore preamble), `{{roster}}` (numbered list of eligible speakers) |
 | Detect walk-on characters | Scan new messages and edits for `[Name]:` speaker lines and collect ad-hoc character names into the per-chat list below (default on) |
+| Auto-split walk-on lines | When an AI reply contains `[Name]:` lines, automatically split each into its own posted message. User/edited messages use the per-message scissors button instead (default on) |
 | Walk-on Characters list | Per-chat, editable list of detected walk-on names (one per line). **Scan Chat for Walk-ons** backfills names from existing messages |
 | Group Director Debug Mode | Log detailed Director events (roster, roll, parsed pick, Manual-mode transitions, learned walk-ons) to the browser console (in the Diagnostics drawer) |
 

@@ -34,7 +34,11 @@ released version. When cutting a release, move these notes into a new
   including several in one message, with a toast on each new detection. Real
   members, your persona, and common meta-tags (`[OOC]:`, `[System]:`, …) are
   ignored, and a per-chat editable list is kept (with a "Scan Chat for Walk-ons"
-  backfill button). Groundwork for letting the director voice walk-ons later.
+  backfill button). Walk-on lines can also be **split into their own messages**,
+  posted under each name (with the matching character's avatar when it's a real
+  member) as if natively posted: automatically for AI replies (toggle), or on
+  demand via a per-message scissors button. Groundwork for letting the director
+  voice walk-ons later.
 
 ## [1.2.0] - 2026-06-19
 

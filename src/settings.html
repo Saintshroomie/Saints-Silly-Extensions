@@ -959,6 +959,13 @@
                         <span>Detect walk-on characters (<code>[Name]:</code> lines)</span>
                     </label>
 
+                    <label class="checkbox_label" title="When an AI reply contains [Name]: lines, automatically split each into its own message posted under that name. User and edited messages use the per-message scissors button instead.">
+                        <input id="director_walkon_split_auto" type="checkbox" />
+                        <span>Auto-split walk-on lines into separate messages (AI replies)</span>
+                    </label>
+
+                    <small>Each message that contains <code>[Name]:</code> lines also gets a <span class="fa-solid fa-scissors"></span> button to split it on demand.</small>
+
                     <div class="ng_inline_row">
                         <span><b>Walk-ons this chat:</b> <span id="director_walkons_count">0</span></span>
                         <div class="menu_button" id="director_walkons_scan" title="Scan every message in the current chat for [Name]: walk-on lines.">
