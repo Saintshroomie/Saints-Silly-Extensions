@@ -40,7 +40,12 @@ released version. When cutting a release, move these notes into a new
   demand via a per-message scissors button. The **director can voice walk-ons**:
   when enabled they join the speaker roster and the confirm/override dialog
   alongside real members, and choosing one generates a reply in that walk-on's
-  voice (editable template) and posts it under their name.
+  voice (editable template) and posts it under their name. A **"Reuse chat
+  context (KV-cache friendly)"** toggle (default on) routes the director's silent
+  generations through ST's normal pipeline (a quiet generation anchored to the
+  last speaker) so their prompt prefix matches the chat and the KV cache stays
+  warm — only the instruction tail is reprocessed — instead of the leaner
+  standalone prompt that busts the cache.
 
 ## [1.2.0] - 2026-06-19
 

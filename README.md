@@ -437,6 +437,7 @@ The drawer holds two self-contained tiers — **Long-term** (the overarching arc
 |---------|-------------|
 | Enable Group Director | Toggle the Director on/off. While on, the active group is switched to Manual reply order; turning it off restores your previous strategy (default off) |
 | Ask Before Generating | Show a confirm/override dialog with the rolled pick and a button per cast member. Off = trigger the rolled pick immediately (default on) |
+| Reuse chat context (KV-cache friendly) | Route the director's silent generations through ST's normal pipeline (a quiet generation anchored to the last speaker) so their prompt prefix matches the chat and the KV cache stays warm — only the instruction tail is reprocessed. Off = a leaner standalone prompt (uses `{{context}}` / Max Context Override) that reprocesses the whole prompt each time (default on) |
 | Response Token Limit | Maximum tokens for the director's choice — the reply is only a name, so this can stay small (default 32) |
 | Max Context Override | Cap the tokens of chat context fed to the director; 0 = use the model's full context size (default 0) |
 | Director Instructions Template | The user prompt sent when choosing the next speaker. Macros: `{{context}}` (chat/character/lore preamble), `{{roster}}` (numbered list of eligible speakers) |

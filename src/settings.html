@@ -912,6 +912,11 @@
                 <span>Ask Before Generating (confirm / override the speaker)</span>
             </label>
 
+            <label class="checkbox_label" title="On: the director's silent generations reuse the real chat prompt (via a quiet generation) and only append the instruction at the end, so the KV cache stays warm — at the cost of sending the full context. Off: a smaller standalone prompt (the {{context}} preamble + Max Context Override), which is leaner but reprocesses the whole prompt each time.">
+                <input id="director_aligned_context" type="checkbox" />
+                <span>Reuse chat context (KV-cache friendly)</span>
+            </label>
+
             <div class="ng_inline_row">
                 <label for="director_response_length"><b>Response Token Limit:</b></label>
                 <input id="director_response_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="Maximum tokens for the director's choice. The reply is only a name, so this can stay small." />
@@ -940,7 +945,7 @@
                     <div class="ng_prompt_section">
                         <textarea id="director_prompt_textarea" class="text_pole" rows="6"
                             placeholder="Instructions sent as the user prompt when choosing the next speaker..."></textarea>
-                        <small>Sent as the user prompt each time the director picks a speaker. Placeholders: <code>{{context}}</code> (chat/character/lore preamble), <code>{{roster}}</code> (the numbered list of eligible speakers). If a placeholder is missing, the blocks are added automatically.</small>
+                        <small>Sent each time the director picks a speaker. Placeholders: <code>{{roster}}</code> (the numbered list of eligible speakers) and <code>{{context}}</code> (chat/character/lore preamble — only used in the leaner non-"Reuse chat context" mode; in KV-cache-friendly mode the real chat is the context and this is ignored). If a placeholder is missing, the blocks are added automatically.</small>
                     </div>
                 </div>
             </div>
