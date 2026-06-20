@@ -20,10 +20,13 @@ released version. When cutting a release, move these notes into a new
   should speak next, and that member is triggered via ST's native `force_chid`
   group generation. A confirm/override dialog (toggleable) shows the rolled pick
   with a button per cast member so you can accept or redirect it; the `/next`
-  (alias `/director`) slash command rolls again for back-to-back speakers.
-  **Muted members** (`disabled_members`) are never selectable, and if the
-  director picks the character you're currently **possessing**, it yields
-  silently so you can reply as them — just like native ST. Editable director
+  (alias `/director`) slash command rolls again for back-to-back speakers. The
+  roster is numbered and the director is asked to reply with just the number;
+  an unparseable reply falls back deterministically to the next cast member
+  (never a walk-on) after the last speaker, so a turn is never skipped or
+  randomly assigned. **Muted members** (`disabled_members`) are never
+  selectable; the director always voices its pick — including the character you
+  are currently **possessing** (it no longer yields the turn). Editable director
   instructions (with `{{context}}` / `{{roster}}` macros), preset support, a
   prompt preview, and per-tool response-length / max-context controls. While the
   director is choosing, a click-to-cancel progress toast is shown (the silent
@@ -40,7 +43,9 @@ released version. When cutting a release, move these notes into a new
   demand via a per-message scissors button. The **director can voice walk-ons**:
   when enabled they join the speaker roster and the confirm/override dialog
   alongside real members, and choosing one generates a reply in that walk-on's
-  voice (editable template) and posts it under their name. A **"Reuse chat
+  voice (editable template) and posts it under their name — trimmed to that
+  walk-on's single turn (a stray `Name:` label or a reply that runs on into
+  other characters' lines is cleaned up automatically). A **"Reuse chat
   context (KV-cache friendly)"** toggle (default on) routes the director's silent
   generations through ST's normal pipeline (a quiet generation anchored to the
   last speaker) so their prompt prefix matches the chat and the KV cache stays

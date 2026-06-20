@@ -17,7 +17,6 @@ import {
     initPossession,
     isPossessing,
     getPossessedCharName,
-    getPossessedCharacter,
     postPossessedMessage,
     loadPossessionState,
     syncAllPossessionUI,
@@ -512,10 +511,7 @@ jQuery(async () => {
     // creates and seeds the fresh chat, so migrated metadata is re-applied.
     initCompaction({ settings, saveSettings, resyncChatState: onChatChanged });
     initRetryContinue({ settings });
-    initDirector({
-        settings,
-        possessionApi: { isPossessing, getPossessedCharacter, getPossessedCharName },
-    });
+    initDirector({ settings });
 
     loadPossessionState();
     injectSettingsPanel();
