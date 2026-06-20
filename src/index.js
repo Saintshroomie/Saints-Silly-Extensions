@@ -17,7 +17,6 @@ import {
     initPossession,
     isPossessing,
     getPossessedCharName,
-    getPossessedCharacter,
     postPossessedMessage,
     loadPossessionState,
     syncAllPossessionUI,
@@ -554,10 +553,7 @@ jQuery(async () => {
     initCompaction({ settings, saveSettings, resyncChatState: onChatChanged });
     initImagePrompting({ settings, saveSettings });
     initRetryContinue({ settings });
-    initDirector({
-        settings,
-        possessionApi: { isPossessing, getPossessedCharacter, getPossessedCharName },
-    });
+    initDirector({ settings });
 
     loadPossessionState();
     injectSettingsPanel();

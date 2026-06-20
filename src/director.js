@@ -54,16 +54,17 @@ const MANUAL_STRATEGY = group_activation_strategy?.MANUAL ?? 2;
 // placeholder is absent the block is prepended/appended, so custom templates
 // that drop one keep working.
 export const DEFAULT_DIRECTOR_PROMPT =
-    '{{context}}\n\nThe following characters are present in the scene:\n{{roster}}\n\n' +
+    '{{context}}\n\nThe characters who can speak next are listed below, numbered:\n{{roster}}\n\n' +
     'Based on the conversation so far, decide which single character should speak ' +
     'next — choose whoever would most naturally respond or drive the scene forward. ' +
-    'Reply with ONLY that character\'s name, exactly as written in the list above. ' +
-    'Output nothing else.';
+    'Reply with ONLY the number of that character from the list above — just the ' +
+    'number, nothing else.';
 
 const DIRECTOR_SYSTEM_PROMPT =
     'You are the turn director for a multi-character roleplay. Your only job is to ' +
-    'choose which one character should speak next. Respond with only the chosen ' +
-    'character\'s name and nothing else — no punctuation, no explanation, no quotes.';
+    'choose which one character should speak next from a numbered roster. Respond ' +
+    'with only the number of the chosen character and nothing else — no name, no ' +
+    'punctuation, no explanation.';
 
 export const DEFAULT_DIRECTOR_RESPONSE_LENGTH = 32;
 
@@ -99,7 +100,6 @@ const IGNORED_WALKON_TAGS = new Set([
 // ─── Module State ───
 
 let moduleSettings = null;
-let possessionApi = null;
 let debug = () => {};
 
 // Guards the decision phase (roll + dialog) so a second pass can't overlap. The
@@ -210,18 +210,6 @@ function resolveAnchorChid(ctx) {
         if (chid !== -1) return chid;
     }
     return null;
-}
-
-/** Whether a roster member is the character the user is currently possessing. */
-function isPossessedMember(member) {
-    if (!member || !possessionApi?.isPossessing?.()) return false;
-    const possessed = possessionApi.getPossessedCharacter?.();
-    if (possessed) {
-        if (possessed.avatar && member.avatar) return possessed.avatar === member.avatar;
-        if (possessed.name && member.name) return possessed.name === member.name;
-    }
-    const possessedName = possessionApi.getPossessedCharName?.();
-    return !!possessedName && possessedName === member.name;
 }
 
 // ─── Manual-mode Management ───
@@ -709,8 +697,26 @@ function showDirectorPromptPreview() {
 
 // ─── Pick Parsing ───
 
-function randomMember(roster) {
-    return roster[Math.floor(Math.random() * roster.length)];
+/**
+ * Deterministic fallback for an unusable reply: the next real member (never a
+ * walk-on) after the last character to speak, wrapping around the roster, and
+ * skipping the last speaker itself. Falls back to the first member, then the
+ * first roster entry, so it always returns something.
+ */
+function fallbackPick(roster, ctx) {
+    const n = roster.length;
+    const lastChid = resolveAnchorChid(ctx);
+    let lastIdx = lastChid !== null
+        ? roster.findIndex(r => r.kind === 'member' && r.chid === lastChid)
+        : -1;
+    for (let step = 1; step <= n; step++) {
+        const idx = (((lastIdx + step) % n) + n) % n;
+        const cand = roster[idx];
+        if (cand.kind !== 'member') continue;
+        if (idx === lastIdx) continue;
+        return cand;
+    }
+    return roster.find(r => r.kind === 'member') || roster[0];
 }
 
 /** Stable identity compare for roster entries (members by chid, walk-ons by name). */
@@ -722,13 +728,14 @@ function sameRosterEntry(a, b) {
 }
 
 /**
- * Map the director's raw reply to one roster member. Tries a roster index, then
- * an exact name, then a contained name, then a partial name. Falls back to a
- * random member so the loop never crashes on an unexpected reply.
+ * Map the director's raw reply to one roster member. Prefers the roster number
+ * (what the prompt asks for), then an exact name, then a contained/partial name.
+ * On an unusable reply, falls back deterministically (`fallbackPick`) to the next
+ * real member after the last speaker so the loop never crashes.
  */
-function parsePick(text, roster) {
+function parsePick(text, roster, ctx) {
     const cleaned = String(text || '').replace(/[*_`"'.,!?:;()[\]{}]/g, ' ').trim();
-    if (!cleaned) return randomMember(roster);
+    if (!cleaned) return fallbackPick(roster, ctx);
 
     const numMatch = cleaned.match(/\d+/);
     if (numMatch) {
@@ -748,8 +755,8 @@ function parsePick(text, roster) {
         if (member) return member;
     }
 
-    debug('No roster match for director reply; choosing at random. Reply was:', text);
-    return randomMember(roster);
+    debug('No roster match for director reply; using deterministic fallback. Reply was:', text);
+    return fallbackPick(roster, ctx);
 }
 
 // ─── Confirm / Override Dialog ───
@@ -883,7 +890,7 @@ async function rollDirector(ctx, roster) {
             text = removeReasoningFromString(raw || '').trim();
         }
         debug('Director raw reply:', JSON.stringify(text));
-        return parsePick(text, roster);
+        return parsePick(text, roster, ctx);
     } finally {
         dismissProgress();
     }
@@ -904,6 +911,44 @@ function composeWalkOnPrompt(name, contextBlock) {
     let prompt = text;
     if (!used.has('context') && contextBlock) prompt = `${contextBlock}\n\n${prompt}`;
     return prompt;
+}
+
+/** Lowercased set of every name that could appear as a `Name:` speaker label. */
+function knownSpeakerNames(ctx) {
+    const set = new Set();
+    const group = getActiveGroup(ctx);
+    for (const avatar of group?.members || []) {
+        const char = (ctx.characters || []).find(c => c.avatar === avatar);
+        if (char?.name) set.add(char.name.toLowerCase());
+    }
+    for (const n of loadWalkOns()) set.add(n.toLowerCase());
+    return set;
+}
+
+// A leading speaker-label line, e.g. `Laura:` or `Tony Stark :`.
+const SPEAKER_LABEL_RE = /^[ \t]*([A-Za-z][\w '.-]{0,40}?)[ \t]*:/;
+
+/**
+ * Trim a generated walk-on reply down to just that walk-on's single turn:
+ * strips leading stray brackets / whitespace, drops a leading `Name:` label, and
+ * truncates at the first later line that opens with another known speaker's label
+ * (so a reply that bleeds into other characters' turns keeps only the first one).
+ */
+function sanitizeWalkOnReply(text, name, ctx) {
+    let out = String(text || '').replace(/^[\s\]>]+/, '');
+    const nameEsc = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    out = out.replace(new RegExp(`^[ \\t]*${nameEsc}[ \\t]*:[ \\t]*`, 'i'), '').trim();
+
+    const known = knownSpeakerNames(ctx);
+    known.add(name.toLowerCase());
+    const lines = out.split('\n');
+    for (let i = 1; i < lines.length; i++) {
+        const m = lines[i].match(SPEAKER_LABEL_RE);
+        if (m && known.has(m[1].trim().toLowerCase())) {
+            return lines.slice(0, i).join('\n').trim();
+        }
+    }
+    return out.trim();
 }
 
 /** Post a generated walk-on reply as a named message (no card → nameplate only). */
@@ -947,6 +992,7 @@ async function generateAndPostWalkOn(ctx, name) {
             ));
             text = removeReasoningFromString(raw || '').trim();
         }
+        text = sanitizeWalkOnReply(text, name, ctx);
         if (!text) {
             toast(`Group Director: no reply was generated for ${name}.`, 'warning');
             return;
@@ -1028,12 +1074,6 @@ async function runDirector({ manual = false } = {}) {
             return;
         }
 
-        // Yield to the user when the suggestion is the character they possess.
-        if (isPossessedMember(suggested)) {
-            debug('Suggested speaker is the possessed character — yielding to the user.');
-            return;
-        }
-
         let chosen = suggested;
         if (moduleSettings.directorConfirm) {
             chosen = await showDirectorDialog(roster, suggested);
@@ -1041,12 +1081,9 @@ async function runDirector({ manual = false } = {}) {
                 debug('Director dialog cancelled.');
                 return;
             }
-            if (isPossessedMember(chosen)) {
-                debug('Override is the possessed character — yielding to the user.');
-                return;
-            }
         }
 
+        // The director always voices its pick — even the possessed character.
         await triggerChoice(ctx, chosen);
     } catch (err) {
         if (isSilentGenerationAbort(err)) {
@@ -1337,11 +1374,9 @@ export function bindDirectorSettings(saveSettings) {
 /**
  * @param {object} options
  * @param {object} options.settings - Shared mutable settings reference.
- * @param {object} options.possessionApi - { isPossessing, getPossessedCharacter, getPossessedCharName }.
  */
-export function initDirector({ settings, possessionApi: possession }) {
+export function initDirector({ settings }) {
     moduleSettings = settings;
-    possessionApi = possession || null;
     debug = createDebugLogger('DIRECTOR', () => moduleSettings.directorDebugMode);
     debug('Module initialized');
 }
