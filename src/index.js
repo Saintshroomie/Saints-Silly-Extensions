@@ -158,6 +158,7 @@ import {
     bindDirectorSettings,
     registerDirectorSlashCommands,
     onDirectorChatChanged,
+    onDirectorMessageSent,
     onDirectorGroupWrapperFinished,
     DEFAULT_DIRECTOR_PROMPT,
     DEFAULT_DIRECTOR_RESPONSE_LENGTH,
@@ -597,6 +598,7 @@ jQuery(async () => {
     eventSource.on(eventTypes.MESSAGE_SENT, async (idx) => {
         onMessageSent(idx);
         await onNarrativeGuidanceMessageSent(idx);
+        onDirectorMessageSent();
     });
     eventSource.on(eventTypes.MESSAGE_RECEIVED, async (idx) => {
         onNarrativeGuidanceMessageReceived(idx);
