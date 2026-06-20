@@ -10846,25 +10846,41 @@ async function rollDirector(ctx, roster) {
  *   toasts that are silent on the automatic path.
  */
 async function runDirector({ manual = false } = {}) {
-    if (!director_moduleSettings?.directorEnabled) return;
+    director_debug('runDirector — manual:', manual);
+    if (!director_moduleSettings?.directorEnabled) {
+        director_debug('runDirector skipped — disabled');
+        return;
+    }
 
     const ctx = getContext();
     if (!ctx.groupId) {
         if (manual) toast('Group Director only works in group chats.', 'warning');
+        director_debug('runDirector skipped — not a group chat');
         return;
     }
-    if (director_busy) return;
-    if (ctx.isGenerating) {
-        if (manual) toast('Wait for the current generation to finish.', 'warning');
+    if (director_busy) {
+        director_debug('runDirector skipped — already busy');
+        return;
+    }
+    // Only the manual path can race a live generation; the auto path runs after
+    // the group wrapper finishes, so is_group_generating is already false there.
+    if (manual && __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_is_group_generating__) {
+        toast('Wait for the current generation to finish.', 'warning');
+        director_debug('runDirector skipped — generation in progress');
         return;
     }
 
     const group = getActiveGroup(ctx);
-    if (!group) return;
+    if (!group) {
+        director_debug('runDirector skipped — no active group object');
+        return;
+    }
 
     const roster = buildRoster(ctx, group);
+    director_debug('Roster:', roster.map(m => m.name));
     if (!roster.length) {
         if (manual) toast('Group Director: no eligible (unmuted) characters to choose from.', 'warning');
+        director_debug('runDirector skipped — empty roster');
         return;
     }
 
@@ -10916,17 +10932,41 @@ function onDirectorChatChanged() {
     }
 }
 
-function onDirectorMessageSent(messageIndex) {
+/**
+ * Auto-trigger after a group turn settles. Fires on `GROUP_WRAPPER_FINISHED`
+ * (not `MESSAGE_SENT`): by then ST's send pipeline is done, members are fully
+ * loaded (so the roster isn't empty), and `is_group_generating` is false.
+ *
+ * Gating on the **last** message being a user message does double duty — it
+ * restricts rolls to genuine user turns and prevents a loop (a triggered member
+ * reply finishes with a character message as last, so it never re-rolls), and it
+ * naturally skips a possessed send (Possession makes the last message a
+ * character one).
+ *
+ * @param {{ selected_group?: string, type?: string }} [data] - Wrapper payload.
+ */
+function onDirectorGroupWrapperFinished(data) {
     if (!director_moduleSettings?.directorEnabled) return;
     const ctx = getContext();
     if (!ctx.groupId) return;
-    const idx = Number.isInteger(messageIndex) ? messageIndex : ctx.chat.length - 1;
-    const msg = ctx.chat?.[idx];
-    // Only react to a genuine user message — Possession rewrites the send into a
-    // character message, which should not drive a director turn.
-    if (!msg || !msg.is_user) return;
-    // Fire-and-forget so ST's send flow isn't blocked on the roll/dialog.
-    runDirector({ manual: false }).catch(err => console.error('Group Director auto-run failed:', err));
+    if (director_busy) return;
+    // Only react to a normal turn — skip swipe/continue/impersonate/quiet wrappers.
+    const type = data?.type;
+    if (type && type !== 'normal') {
+        director_debug('Group wrapper finished — ignoring type:', type);
+        return;
+    }
+    const last = ctx.chat?.[ctx.chat.length - 1];
+    if (!last || !last.is_user) {
+        director_debug('Group wrapper finished — last message is not a user message; no roll');
+        return;
+    }
+    director_debug('Group wrapper finished on a user turn — scheduling director roll');
+    // Defer so ST's Generate stack fully unwinds (releasing is_send_press) before
+    // we roll and trigger force_chid.
+    setTimeout(() => {
+        runDirector({ manual: false }).catch(err => console.error('Group Director auto-run failed:', err));
+    }, 0);
 }
 
 // ─── Slash Commands ───
@@ -11674,8 +11714,9 @@ function onCharacterPageLoadedHandler() {
     assisted_character_creation_onCharacterPageLoaded();
 }
 
-function onGroupWrapperFinishedHandler() {
+function onGroupWrapperFinishedHandler(data) {
     onGroupWrapperFinished();
+    onDirectorGroupWrapperFinished(data);
 }
 
 // ─── Initialization ───
@@ -11751,7 +11792,6 @@ jQuery(async () => {
     eventSource.on(eventTypes.MESSAGE_SENT, async (idx) => {
         onMessageSent(idx);
         await onNarrativeGuidanceMessageSent(idx);
-        onDirectorMessageSent(idx);
     });
     eventSource.on(eventTypes.MESSAGE_RECEIVED, async (idx) => {
         onNarrativeGuidanceMessageReceived(idx);
