@@ -41,7 +41,7 @@ import {
     applyTemplateMacros,
     showPromptPreview,
 } from './utils.js';
-import { isSilentGenerationAbort } from './silent-generation.js';
+import { isSilentGenerationAbort, abortAllGenerations } from './silent-generation.js';
 
 // ─── Constants ───
 
@@ -335,29 +335,56 @@ function triggerMember(ctx, member) {
 
 // ─── Director Roll ───
 
+/**
+ * Sticky, click-to-cancel progress toast shown while the silent director roll
+ * runs (the roll never surfaces ST's own Stop button). Clicking it aborts the
+ * generation via `abortAllGenerations`. Returns a dismiss callback.
+ */
+function showRollProgressToast() {
+    if (typeof toastr === 'undefined' || !toastr.info) return () => {};
+    const $toast = toastr.info('Director is choosing who speaks next… (click to cancel)', undefined, {
+        timeOut: 0,
+        extendedTimeOut: 0,
+        tapToDismiss: false,
+        closeButton: false,
+        onclick: () => abortAllGenerations('director-cancel'),
+    });
+    let dismissed = false;
+    return () => {
+        if (dismissed) return;
+        dismissed = true;
+        if ($toast) toastr.clear($toast);
+    };
+}
+
 async function rollDirector(ctx, roster) {
     const responseLength = resolveResponseLength();
     const rosterBlock = roster.map((m, i) => `${i + 1}. ${m.name}`).join('\n');
-    const contextBlock = await buildContextPreamble({
-        includeChat: true,
-        responseLength,
-        maxContextOverride: moduleSettings?.directorMaxContextOverride || 0,
-    });
-    const userPrompt = composeDirectorPrompt(rosterBlock, contextBlock);
+    const dismissProgress = showRollProgressToast();
+    try {
+        const contextBlock = await buildContextPreamble({
+            includeChat: true,
+            responseLength,
+            maxContextOverride: moduleSettings?.directorMaxContextOverride || 0,
+        });
+        const userPrompt = composeDirectorPrompt(rosterBlock, contextBlock);
 
-    debug('Director roll — roster:', roster.map(m => m.name), 'prompt length:', userPrompt.length);
+        debug('Director roll — roster:', roster.map(m => m.name), 'prompt length:', userPrompt.length);
 
-    // No visible target field is needed; stream into a detached scratch element.
-    const scratch = document.createElement('textarea');
-    const raw = await withSingleLineDisabled(() => streamingGenerate(
-        { prompt: userPrompt, systemPrompt: DIRECTOR_SYSTEM_PROMPT, responseLength },
-        scratch,
-        { append: false },
-    ));
+        // No visible target field is needed; stream into a detached scratch element.
+        const scratch = document.createElement('textarea');
+        const raw = await withSingleLineDisabled(() => streamingGenerate(
+            { prompt: userPrompt, systemPrompt: DIRECTOR_SYSTEM_PROMPT, responseLength },
+            scratch,
+            { append: false },
+        ));
 
-    const text = removeReasoningFromString(raw || '').trim();
-    debug('Director raw reply:', JSON.stringify(text));
-    return parsePick(text, roster);
+        const text = removeReasoningFromString(raw || '').trim();
+        debug('Director raw reply:', JSON.stringify(text));
+        return parsePick(text, roster);
+    } finally {
+        dismissProgress();
+    }
 }
 
 /**
@@ -435,6 +462,7 @@ async function runDirector({ manual = false } = {}) {
     } catch (err) {
         if (isSilentGenerationAbort(err)) {
             debug('Director roll cancelled by user.');
+            toast('Director cancelled.', 'info');
         } else {
             console.error('Group Director error:', err);
             toast(`Group Director failed: ${err.message}`, 'error');
