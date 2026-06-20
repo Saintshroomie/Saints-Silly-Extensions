@@ -10557,8 +10557,14 @@ let director_possessionApi = null;
 let director_debug = () => {};
 
 // Guards the decision phase (roll + dialog) so a second pass can't overlap. The
-// triggered native generation is fenced by ST's own `isGenerating` instead.
+// triggered native generation is fenced by `is_group_generating` instead.
 let director_busy = false;
+
+// Set on every user MESSAGE_SENT (possession-agnostic — we never read is_user),
+// consumed when the next group wrapper finishes. This is what tells the
+// wrapper-finished handler that the just-completed wrapper followed a *user*
+// turn (vs a director-triggered member reply, which emits no MESSAGE_SENT).
+let userTurnPending = false;
 
 // ─── Per-chat State ───
 
@@ -10933,32 +10939,51 @@ function onDirectorChatChanged() {
 }
 
 /**
+ * Mark that a user turn happened. Fires on `MESSAGE_SENT` (a genuine user send —
+ * including a possessed send, which Possession rewrites to a character message,
+ * but the event still fires). A director-triggered member reply emits
+ * `MESSAGE_RECEIVED`, not `MESSAGE_SENT`, so it never sets this flag — which is
+ * how the wrapper-finished handler tells a user turn from a triggered reply.
+ *
+ * Deliberately does NOT roll or build a roster here: `MESSAGE_SENT` fires
+ * mid-pipeline while group members are still being unshallowed, so the roster
+ * would be empty. The roll happens later, on the settled wrapper.
+ */
+function onDirectorMessageSent() {
+    if (!director_moduleSettings?.directorEnabled) return;
+    if (!getContext().groupId) return;
+    userTurnPending = true;
+    director_debug('User turn registered');
+}
+
+/**
  * Auto-trigger after a group turn settles. Fires on `GROUP_WRAPPER_FINISHED`
  * (not `MESSAGE_SENT`): by then ST's send pipeline is done, members are fully
  * loaded (so the roster isn't empty), and `is_group_generating` is false.
  *
- * Gating on the **last** message being a user message does double duty — it
- * restricts rolls to genuine user turns and prevents a loop (a triggered member
- * reply finishes with a character message as last, so it never re-rolls), and it
- * naturally skips a possessed send (Possession makes the last message a
- * character one).
+ * Rolls only when the wrapper followed a user turn (`userTurnPending`, set on
+ * `MESSAGE_SENT`). A director-triggered member reply sets no such flag, so it
+ * never re-rolls — no loop. The flag is consumed on *every* wrapper finish so a
+ * `continue`-with-text turn (which fires `MESSAGE_SENT` then a non-normal
+ * wrapper) can't leak it into a later turn.
  *
  * @param {{ selected_group?: string, type?: string }} [data] - Wrapper payload.
  */
 function onDirectorGroupWrapperFinished(data) {
+    const wasUserTurn = userTurnPending;
+    userTurnPending = false;
+
     if (!director_moduleSettings?.directorEnabled) return;
-    const ctx = getContext();
-    if (!ctx.groupId) return;
+    if (!getContext().groupId) return;
     if (director_busy) return;
+    if (!wasUserTurn) {
+        director_debug('Group wrapper finished — not a user turn; no roll');
+        return;
+    }
     // Only react to a normal turn — skip swipe/continue/impersonate/quiet wrappers.
     const type = data?.type;
     if (type && type !== 'normal') {
         director_debug('Group wrapper finished — ignoring type:', type);
-        return;
-    }
-    const last = ctx.chat?.[ctx.chat.length - 1];
-    if (!last || !last.is_user) {
-        director_debug('Group wrapper finished — last message is not a user message; no roll');
         return;
     }
     director_debug('Group wrapper finished on a user turn — scheduling director roll');
@@ -11792,6 +11817,7 @@ jQuery(async () => {
     eventSource.on(eventTypes.MESSAGE_SENT, async (idx) => {
         onMessageSent(idx);
         await onNarrativeGuidanceMessageSent(idx);
+        onDirectorMessageSent();
     });
     eventSource.on(eventTypes.MESSAGE_RECEIVED, async (idx) => {
         onNarrativeGuidanceMessageReceived(idx);
