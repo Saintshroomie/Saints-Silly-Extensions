@@ -1290,3 +1290,9 @@
     color: var(--SmartThemeQuoteColor, #e8a23a);
     border-color: var(--SmartThemeQuoteColor, #e8a23a);
 }
+
+/* Walk-on choices read as guests — dashed border to distinguish from members. */
+.sse-director-choice.sse-director-walkon {
+    border-style: dashed;
+    opacity: 0.92;
+}

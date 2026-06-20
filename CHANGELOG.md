@@ -37,8 +37,10 @@ released version. When cutting a release, move these notes into a new
   backfill button). Walk-on lines can also be **split into their own messages**,
   posted under each name (with the matching character's avatar when it's a real
   member) as if natively posted: automatically for AI replies (toggle), or on
-  demand via a per-message scissors button. Groundwork for letting the director
-  voice walk-ons later.
+  demand via a per-message scissors button. The **director can voice walk-ons**:
+  when enabled they join the speaker roster and the confirm/override dialog
+  alongside real members, and choosing one generates a reply in that walk-on's
+  voice (editable template) and posts it under their name.
 
 ## [1.2.0] - 2026-06-19
 

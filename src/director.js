@@ -67,6 +67,21 @@ const DIRECTOR_SYSTEM_PROMPT =
 
 export const DEFAULT_DIRECTOR_RESPONSE_LENGTH = 32;
 
+// When the director picks a walk-on (a character with no card), it generates the
+// reply itself from this template and posts it under that name. {{name}} is the
+// walk-on; {{context}} is the packed chat/character/lore preamble.
+export const DEFAULT_DIRECTOR_WALKON_PROMPT =
+    '{{context}}\n\nContinue the scene by writing the next message for {{name}}, ' +
+    'a walk-on character taking part in this conversation. Stay in character and ' +
+    'in the current scene, matching the established tone, and infer their voice ' +
+    'from how they have appeared so far. Write only {{name}}\'s reply — their ' +
+    'dialogue and actions — with no name label, and do not write for anyone else.';
+
+const WALKON_SYSTEM_PROMPT =
+    'You are writing a single in-character message for one walk-on character in a ' +
+    'group roleplay. Output only that character\'s message — no name label, no ' +
+    'narration of other characters, no commentary.';
+
 // Walk-on detection: a speaker line is a bracket-delimited name followed by a
 // colon, e.g. `[Tony Stark]: "Hello."`. The brackets delimit a (possibly
 // multi-word) name unambiguously. Not line-anchored, so multiple walk-ons in
@@ -136,24 +151,34 @@ function getActiveGroup(ctx) {
 }
 
 /**
- * Build the eligible speaker roster: every group member that is not muted,
- * resolved to its `context.characters` index. Muted members live in ST's
- * `group.disabled_members`, so excluding that set carries the native "muted
- * characters don't speak" rule over to the Director. Characters are matched by
- * avatar filename (names collide in groups).
+ * Build the speaker roster the director chooses from: every unmuted group member
+ * (`kind: 'member'`, with a `chid` for `force_chid`) plus, when enabled, the
+ * per-chat walk-on characters (`kind: 'walkon'`, name only — the director
+ * generates and posts their reply itself). Muted members live in ST's
+ * `group.disabled_members`. Members are matched by avatar (names collide).
  *
- * @returns {{ chid: number, name: string, avatar: string }[]}
+ * @returns {Array<{ kind: 'member', chid: number, name: string, avatar: string } | { kind: 'walkon', name: string }>}
  */
 function buildRoster(ctx, group) {
     const disabled = new Set(group.disabled_members || []);
     const roster = [];
+    const seenNames = new Set();
     for (const avatar of group.members || []) {
         if (disabled.has(avatar)) continue;
         const chid = (ctx.characters || []).findIndex(c => c.avatar === avatar);
         if (chid === -1) continue;
         const char = ctx.characters[chid];
         if (!char) continue;
-        roster.push({ chid, name: char.name, avatar });
+        roster.push({ kind: 'member', chid, name: char.name, avatar });
+        seenNames.add((char.name || '').toLowerCase());
+    }
+    if (moduleSettings?.directorIncludeWalkOns) {
+        for (const name of loadWalkOns()) {
+            const key = name.toLowerCase();
+            if (seenNames.has(key)) continue;
+            seenNames.add(key);
+            roster.push({ kind: 'walkon', name });
+        }
     }
     return roster;
 }
@@ -416,8 +441,12 @@ function parseWalkOnSegments(text) {
     return { head: str.slice(0, boundaries[0].start), segments };
 }
 
-/** Build a chat message posted under `name` (real character's avatar if known). */
-function makeSpeakerMessage(ctx, name, text, original) {
+/**
+ * Build a chat message posted under `name` (real character's avatar if known).
+ * `tagSplit` marks split-produced messages so they're never re-split / offered a
+ * split button; generated walk-on replies leave it off (no embedded line anyway).
+ */
+function makeSpeakerMessage(ctx, name, text, original, { tagSplit = true } = {}) {
     const char = (ctx.characters || []).find(c => (c.name || '').toLowerCase() === name.toLowerCase());
     const msg = {
         name: char ? char.name : name,
@@ -425,7 +454,7 @@ function makeSpeakerMessage(ctx, name, text, original) {
         is_system: false,
         send_date: original?.send_date ?? Date.now(),
         mes: text,
-        extra: { sseWalkOnSplit: true },
+        extra: tagSplit ? { sseWalkOnSplit: true } : {},
     };
     if (char?.avatar) {
         msg.force_avatar = `/characters/${char.avatar}`;
@@ -627,12 +656,14 @@ function composeDirectorPrompt(rosterBlock, contextBlock) {
 }
 
 function showDirectorPromptPreview() {
-    const sampleRoster = '1. Susan\n2. Tony';
+    const sampleRoster = '1. Susan\n2. Tony (walk-on)';
     const sampleContext =
         '(character cards, persona, selected lore books, and recent chat)';
     showPromptPreview('Group Director — Prompt Preview', [
-        { label: 'System Prompt (fixed)', text: DIRECTOR_SYSTEM_PROMPT },
-        { label: 'User Prompt (assembled, with sample values)', text: composeDirectorPrompt(sampleRoster, sampleContext) },
+        { label: 'Speaker Pick — System Prompt (fixed)', text: DIRECTOR_SYSTEM_PROMPT },
+        { label: 'Speaker Pick — User Prompt (assembled, with sample values)', text: composeDirectorPrompt(sampleRoster, sampleContext) },
+        { label: 'Walk-on Reply — System Prompt (fixed)', text: WALKON_SYSTEM_PROMPT },
+        { label: 'Walk-on Reply — User Prompt (assembled, with sample values)', text: composeWalkOnPrompt('Tony', sampleContext) },
     ]);
 }
 
@@ -640,6 +671,14 @@ function showDirectorPromptPreview() {
 
 function randomMember(roster) {
     return roster[Math.floor(Math.random() * roster.length)];
+}
+
+/** Stable identity compare for roster entries (members by chid, walk-ons by name). */
+function sameRosterEntry(a, b) {
+    if (!a || !b || a.kind !== b.kind) return false;
+    return a.kind === 'member'
+        ? a.chid === b.chid
+        : a.name.toLowerCase() === b.name.toLowerCase();
 }
 
 /**
@@ -707,10 +746,9 @@ async function showDirectorDialog(roster, suggested) {
     for (const member of roster) {
         const btn = document.createElement('div');
         btn.className = 'menu_button sse-director-choice';
-        if (member.avatar === suggested.avatar && member.chid === suggested.chid) {
-            btn.classList.add('sse-director-suggested');
-        }
-        btn.textContent = member.name;
+        if (member.kind === 'walkon') btn.classList.add('sse-director-walkon');
+        if (sameRosterEntry(member, suggested)) btn.classList.add('sse-director-suggested');
+        btn.textContent = member.kind === 'walkon' ? `${member.name} (walk-on)` : member.name;
         btn.addEventListener('click', () => {
             picked = member;
             popup.completeAffirmative();
@@ -738,13 +776,13 @@ function triggerMember(ctx, member) {
 // ─── Director Roll ───
 
 /**
- * Sticky, click-to-cancel progress toast shown while the silent director roll
- * runs (the roll never surfaces ST's own Stop button). Clicking it aborts the
- * generation via `abortAllGenerations`. Returns a dismiss callback.
+ * Sticky, click-to-cancel progress toast shown while a silent director
+ * generation runs (it never surfaces ST's own Stop button). Clicking it aborts
+ * via `abortAllGenerations`. Returns a dismiss callback.
  */
-function showRollProgressToast() {
+function cancellableProgressToast(message) {
     if (typeof toastr === 'undefined' || !toastr.info) return () => {};
-    const $toast = toastr.info('Director is choosing who speaks next… (click to cancel)', undefined, {
+    const $toast = toastr.info(message, undefined, {
         timeOut: 0,
         extendedTimeOut: 0,
         tapToDismiss: false,
@@ -759,9 +797,15 @@ function showRollProgressToast() {
     };
 }
 
+function showRollProgressToast() {
+    return cancellableProgressToast('Director is choosing who speaks next… (click to cancel)');
+}
+
 async function rollDirector(ctx, roster) {
     const responseLength = resolveResponseLength();
-    const rosterBlock = roster.map((m, i) => `${i + 1}. ${m.name}`).join('\n');
+    const rosterBlock = roster
+        .map((m, i) => `${i + 1}. ${m.name}${m.kind === 'walkon' ? ' (walk-on)' : ''}`)
+        .join('\n');
     const dismissProgress = showRollProgressToast();
     try {
         const contextBlock = await buildContextPreamble({
@@ -789,10 +833,77 @@ async function rollDirector(ctx, roster) {
     }
 }
 
+// ─── Walk-on Voicing ───
+
+/** Assemble the walk-on generation prompt from the editable template. */
+function composeWalkOnPrompt(name, contextBlock) {
+    const configured = moduleSettings?.directorWalkOnPrompt;
+    const tpl = (typeof configured === 'string' && configured.trim())
+        ? configured
+        : DEFAULT_DIRECTOR_WALKON_PROMPT;
+    const { text, used } = applyTemplateMacros(tpl, {
+        name: name || '',
+        context: contextBlock || '',
+    });
+    let prompt = text;
+    if (!used.has('context') && contextBlock) prompt = `${contextBlock}\n\n${prompt}`;
+    return prompt;
+}
+
+/** Post a generated walk-on reply as a named message (no card → nameplate only). */
+function postWalkOnMessage(ctx, name, text) {
+    const msg = makeSpeakerMessage(ctx, name, text, null, { tagSplit: false });
+    ctx.chat.push(msg);
+    if (typeof ctx.addOneMessage === 'function') ctx.addOneMessage(msg);
+    return ctx.saveChat();
+}
+
+/**
+ * Generate a reply in the walk-on's voice (improv from the scene) and post it as
+ * a named message. The director owns this generation — walk-ons have no card, so
+ * `force_chid` can't be used.
+ */
+async function generateAndPostWalkOn(ctx, name) {
+    const dismissProgress = cancellableProgressToast(`Writing ${name}'s reply… (click to cancel)`);
+    try {
+        const contextBlock = await buildContextPreamble({
+            includeChat: true,
+            responseLength: 0,
+            maxContextOverride: moduleSettings?.directorMaxContextOverride || 0,
+        });
+        const userPrompt = composeWalkOnPrompt(name, contextBlock);
+        const scratch = document.createElement('textarea');
+        const raw = await withSingleLineDisabled(() => streamingGenerate(
+            { prompt: userPrompt, systemPrompt: WALKON_SYSTEM_PROMPT, responseLength: 0 },
+            scratch,
+            { append: false },
+        ));
+        const text = removeReasoningFromString(raw || '').trim();
+        if (!text) {
+            toast(`Group Director: no reply was generated for ${name}.`, 'warning');
+            return;
+        }
+        await postWalkOnMessage(ctx, name, text);
+        debug('Posted walk-on reply for', name, '— length', text.length);
+    } finally {
+        dismissProgress();
+    }
+}
+
+/** Route a chosen roster entry: real members via force_chid, walk-ons via generation. */
+async function triggerChoice(ctx, chosen) {
+    if (chosen.kind === 'walkon') {
+        await generateAndPostWalkOn(ctx, chosen.name);
+    } else {
+        triggerMember(ctx, chosen);
+    }
+}
+
 /**
  * Run one director turn: roll a next speaker, optionally confirm/override, then
- * trigger that member — unless the choice is the possessed character, in which
- * case yield to the user.
+ * trigger that speaker — a real member via `force_chid`, or a walk-on by
+ * generating and posting its reply. Yields to the user if the choice is the
+ * possessed character.
  *
  * @param {{ manual?: boolean }} [opts] - `manual` surfaces "wrong context"
  *   toasts that are silent on the automatic path.
@@ -860,7 +971,7 @@ async function runDirector({ manual = false } = {}) {
             }
         }
 
-        triggerMember(ctx, chosen);
+        await triggerChoice(ctx, chosen);
     } catch (err) {
         if (isSilentGenerationAbort(err)) {
             debug('Director roll cancelled by user.');
@@ -1091,6 +1202,24 @@ export function bindDirectorSettings(saveSettings) {
         splitAutoCb.checked = !!moduleSettings.directorWalkOnSplitAuto;
         splitAutoCb.addEventListener('change', () => {
             moduleSettings.directorWalkOnSplitAuto = splitAutoCb.checked;
+            saveSettings();
+        });
+    }
+
+    const includeWalkOnsCb = document.getElementById('director_include_walkons');
+    if (includeWalkOnsCb) {
+        includeWalkOnsCb.checked = !!moduleSettings.directorIncludeWalkOns;
+        includeWalkOnsCb.addEventListener('change', () => {
+            moduleSettings.directorIncludeWalkOns = includeWalkOnsCb.checked;
+            saveSettings();
+        });
+    }
+
+    const walkOnPromptArea = document.getElementById('director_walkon_prompt_textarea');
+    if (walkOnPromptArea) {
+        walkOnPromptArea.value = moduleSettings.directorWalkOnPrompt || DEFAULT_DIRECTOR_WALKON_PROMPT;
+        walkOnPromptArea.addEventListener('input', () => {
+            moduleSettings.directorWalkOnPrompt = walkOnPromptArea.value;
             saveSettings();
         });
     }

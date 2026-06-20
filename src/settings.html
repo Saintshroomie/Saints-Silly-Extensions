@@ -947,6 +947,20 @@
 
             <div class="inline-drawer saints_nested_drawer">
                 <div class="inline-drawer-toggle inline-drawer-header">
+                    <b>Walk-on Reply Template</b>
+                    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                </div>
+                <div class="inline-drawer-content" style="display: none;">
+                    <div class="ng_prompt_section">
+                        <textarea id="director_walkon_prompt_textarea" class="text_pole" rows="6"
+                            placeholder="Instructions for generating a walk-on character's reply..."></textarea>
+                        <small>Used when the director picks a walk-on character (one with no card) to generate its reply, posted under that name. Placeholders: <code>{{name}}</code> (the walk-on), <code>{{context}}</code> (chat/character/lore preamble). If <code>{{context}}</code> is missing it is prepended automatically.</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="inline-drawer saints_nested_drawer">
+                <div class="inline-drawer-toggle inline-drawer-header">
                     <b><span class="fa-solid fa-user-plus"></span> Walk-on Characters</b>
                     <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
                 </div>
@@ -962,6 +976,11 @@
                     <label class="checkbox_label" title="When an AI reply contains [Name]: lines, automatically split each into its own message posted under that name. User and edited messages use the per-message scissors button instead.">
                         <input id="director_walkon_split_auto" type="checkbox" />
                         <span>Auto-split walk-on lines into separate messages (AI replies)</span>
+                    </label>
+
+                    <label class="checkbox_label" title="Let the director pick walk-on characters as the next speaker (alongside real members) and generate their reply, posting it under the walk-on's name.">
+                        <input id="director_include_walkons" type="checkbox" />
+                        <span>Let the director voice walk-on characters</span>
                     </label>
 
                     <small>Each message that contains <code>[Name]:</code> lines also gets a <span class="fa-solid fa-scissors"></span> button to split it on demand.</small>
