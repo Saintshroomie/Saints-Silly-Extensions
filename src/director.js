@@ -116,6 +116,12 @@ let userTurnPending = false;
 // saveMetadata flush is debounced).
 let walkOnSaveTimer = null;
 
+// Set when the user clicks the progress toast to cancel. Aligned-mode generations
+// go through ST's pipeline (generateQuietPrompt), which resolves rather than
+// throwing on stop — so we check this flag after the call instead of relying on
+// an AbortError (the lean/raw path still throws and is caught separately).
+let generationAborted = false;
+
 // ─── Per-chat State ───
 
 function readState() {
@@ -181,6 +187,29 @@ function buildRoster(ctx, group) {
         }
     }
     return roster;
+}
+
+/**
+ * The `context.characters` index of the most recent AI speaker, used as the
+ * aligned-mode `forceChId` anchor so the director's quiet generation reuses the
+ * KV cache that the just-generated message left warm. Resolves by avatar first,
+ * then name; returns null if no AI message resolves.
+ */
+function resolveAnchorChid(ctx) {
+    const chat = ctx.chat || [];
+    const chars = ctx.characters || [];
+    for (let i = chat.length - 1; i >= 0; i--) {
+        const m = chat[i];
+        if (!m || m.is_user || m.is_system) continue;
+        const avatar = m.original_avatar
+            || (typeof m.force_avatar === 'string' ? m.force_avatar.replace(/^\/characters\//, '') : null);
+        let chid = avatar ? chars.findIndex(c => c.avatar === avatar) : -1;
+        if (chid === -1 && m.name) {
+            chid = chars.findIndex(c => (c.name || '').toLowerCase() === m.name.toLowerCase());
+        }
+        if (chid !== -1) return chid;
+    }
+    return null;
 }
 
 /** Whether a roster member is the character the user is currently possessing. */
@@ -632,6 +661,17 @@ function resolveResponseLength() {
 }
 
 /**
+ * Aligned mode routes the director's silent generations through ST's normal
+ * pipeline (`generateQuietPrompt`) so their prompt prefix matches the chat and
+ * the KV cache is reused — only the instruction tail is reprocessed. Lean mode
+ * keeps the standalone raw path (smaller prompt, but cache-busting).
+ */
+function useAlignedContext(ctx) {
+    return !!moduleSettings?.directorAlignedContext
+        && typeof ctx.generateQuietPrompt === 'function';
+}
+
+/**
  * Assemble the director user prompt from the editable template. {{roster}} and
  * {{context}} are substituted in place; when a placeholder is absent the block
  * is appended (roster) / prepended (context) so old templates keep working.
@@ -787,7 +827,13 @@ function cancellableProgressToast(message) {
         extendedTimeOut: 0,
         tapToDismiss: false,
         closeButton: false,
-        onclick: () => abortAllGenerations('director-cancel'),
+        onclick: () => {
+            generationAborted = true;
+            // Lean (raw) path: abort the silent job. Aligned path: stop the
+            // pipeline generation. Call both — each is a no-op for the other.
+            try { getContext().stopGeneration?.(); } catch { /* ignore */ }
+            abortAllGenerations('director-cancel');
+        },
     });
     let dismissed = false;
     return () => {
@@ -808,24 +854,34 @@ async function rollDirector(ctx, roster) {
         .join('\n');
     const dismissProgress = showRollProgressToast();
     try {
-        const contextBlock = await buildContextPreamble({
-            includeChat: true,
-            responseLength,
-            maxContextOverride: moduleSettings?.directorMaxContextOverride || 0,
-        });
-        const userPrompt = composeDirectorPrompt(rosterBlock, contextBlock);
-
-        debug('Director roll — roster:', roster.map(m => m.name), 'prompt length:', userPrompt.length);
-
-        // No visible target field is needed; stream into a detached scratch element.
-        const scratch = document.createElement('textarea');
-        const raw = await withSingleLineDisabled(() => streamingGenerate(
-            { prompt: userPrompt, systemPrompt: DIRECTOR_SYSTEM_PROMPT, responseLength },
-            scratch,
-            { append: false },
-        ));
-
-        const text = removeReasoningFromString(raw || '').trim();
+        let text;
+        if (useAlignedContext(ctx)) {
+            // Aligned: build the *real* chat prompt and append our instruction at
+            // the tail (quiet prompt), so the long prefix matches the chat and the
+            // KV cache stays warm. Pinned to the last speaker's prompt.
+            const quietPrompt = composeDirectorPrompt(rosterBlock, '');
+            const forceChId = resolveAnchorChid(ctx);
+            debug('Director roll (aligned) — anchor chid:', forceChId);
+            const raw = await ctx.generateQuietPrompt({ quietPrompt, responseLength, forceChId, skipWIAN: false, removeReasoning: true });
+            if (generationAborted) return null;
+            text = String(raw || '').trim();
+        } else {
+            const contextBlock = await buildContextPreamble({
+                includeChat: true,
+                responseLength,
+                maxContextOverride: moduleSettings?.directorMaxContextOverride || 0,
+            });
+            const userPrompt = composeDirectorPrompt(rosterBlock, contextBlock);
+            debug('Director roll (lean) — prompt length:', userPrompt.length);
+            // No visible target field is needed; stream into a detached scratch element.
+            const scratch = document.createElement('textarea');
+            const raw = await withSingleLineDisabled(() => streamingGenerate(
+                { prompt: userPrompt, systemPrompt: DIRECTOR_SYSTEM_PROMPT, responseLength },
+                scratch,
+                { append: false },
+            ));
+            text = removeReasoningFromString(raw || '').trim();
+        }
         debug('Director raw reply:', JSON.stringify(text));
         return parsePick(text, roster);
     } finally {
@@ -866,19 +922,31 @@ function postWalkOnMessage(ctx, name, text) {
 async function generateAndPostWalkOn(ctx, name) {
     const dismissProgress = cancellableProgressToast(`Writing ${name}'s reply… (click to cancel)`);
     try {
-        const contextBlock = await buildContextPreamble({
-            includeChat: true,
-            responseLength: 0,
-            maxContextOverride: moduleSettings?.directorMaxContextOverride || 0,
-        });
-        const userPrompt = composeWalkOnPrompt(name, contextBlock);
-        const scratch = document.createElement('textarea');
-        const raw = await withSingleLineDisabled(() => streamingGenerate(
-            { prompt: userPrompt, systemPrompt: WALKON_SYSTEM_PROMPT, responseLength: 0 },
-            scratch,
-            { append: false },
-        ));
-        const text = removeReasoningFromString(raw || '').trim();
+        let text;
+        if (useAlignedContext(ctx)) {
+            const quietPrompt = composeWalkOnPrompt(name, '');
+            const forceChId = resolveAnchorChid(ctx);
+            const raw = await ctx.generateQuietPrompt({ quietPrompt, responseLength: 0, forceChId, skipWIAN: false, removeReasoning: true });
+            if (generationAborted) {
+                toast('Director cancelled.', 'info');
+                return;
+            }
+            text = String(raw || '').trim();
+        } else {
+            const contextBlock = await buildContextPreamble({
+                includeChat: true,
+                responseLength: 0,
+                maxContextOverride: moduleSettings?.directorMaxContextOverride || 0,
+            });
+            const userPrompt = composeWalkOnPrompt(name, contextBlock);
+            const scratch = document.createElement('textarea');
+            const raw = await withSingleLineDisabled(() => streamingGenerate(
+                { prompt: userPrompt, systemPrompt: WALKON_SYSTEM_PROMPT, responseLength: 0 },
+                scratch,
+                { append: false },
+            ));
+            text = removeReasoningFromString(raw || '').trim();
+        }
         if (!text) {
             toast(`Group Director: no reply was generated for ${name}.`, 'warning');
             return;
@@ -948,9 +1016,17 @@ async function runDirector({ manual = false } = {}) {
     }
 
     busy = true;
+    generationAborted = false;
     try {
         // One eligible speaker needs no LLM call.
         const suggested = roster.length === 1 ? roster[0] : await rollDirector(ctx, roster);
+
+        // Aligned mode resolves (rather than throwing) on cancel — bail quietly.
+        if (!suggested) {
+            debug('Director roll cancelled / produced no pick.');
+            if (generationAborted) toast('Director cancelled.', 'info');
+            return;
+        }
 
         // Yield to the user when the suggestion is the character they possess.
         if (isPossessedMember(suggested)) {
@@ -1149,6 +1225,15 @@ export function bindDirectorSettings(saveSettings) {
         confirmCb.checked = !!moduleSettings.directorConfirm;
         confirmCb.addEventListener('change', () => {
             moduleSettings.directorConfirm = confirmCb.checked;
+            saveSettings();
+        });
+    }
+
+    const alignedCb = document.getElementById('director_aligned_context');
+    if (alignedCb) {
+        alignedCb.checked = !!moduleSettings.directorAlignedContext;
+        alignedCb.addEventListener('change', () => {
+            moduleSettings.directorAlignedContext = alignedCb.checked;
             saveSettings();
         });
     }
