@@ -152,6 +152,7 @@ import {
     rescanSplitButtons,
     DEFAULT_DIRECTOR_PROMPT,
     DEFAULT_DIRECTOR_RESPONSE_LENGTH,
+    migrateDirectorPrompt,
 } from './director.js';
 import {
     setupToolPresets,
@@ -389,6 +390,12 @@ function loadSettings() {
     // NG presets) onto the new short-term track.
     if (migrateNarrativeGuidanceSettings(settings)) {
         SSEDebug('Migrated legacy Narrative Guidance settings to the short-term track');
+        migrated = true;
+    }
+    // Upgrade the stale name-based director prompt to the current number-based
+    // default (exact match only — customized templates are preserved).
+    if (migrateDirectorPrompt(settings)) {
+        SSEDebug('Upgraded legacy name-based Group Director prompt to the numbered-roster default');
         migrated = true;
     }
     if (migrated) saveSettings();
