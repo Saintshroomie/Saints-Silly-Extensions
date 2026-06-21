@@ -71,6 +71,46 @@ const DIRECTOR_SYSTEM_PROMPT =
 
 export const DEFAULT_DIRECTOR_RESPONSE_LENGTH = 32;
 
+// The pre-1.x director default asked the model to reply with the character's
+// *name*; it now hands the model a numbered roster and asks for the roster
+// *number* instead (more robust to parse). Installs that saved the old default
+// verbatim — i.e. never customized the template — still carry the name-based
+// text, which overrides the current default. `migrateDirectorPrompt` upgrades an
+// **exact** match (in settings and in any saved preset) to the current default;
+// any genuine edit won't match and is left untouched.
+const LEGACY_NAME_DIRECTOR_PROMPT =
+    '{{context}}\n\nThe following characters are present in the scene:\n{{roster}}\n\n' +
+    'Based on the conversation so far, decide which single character should speak ' +
+    'next — choose whoever would most naturally respond or drive the scene forward. ' +
+    'Reply with ONLY that character\'s name, exactly as written in the list above. ' +
+    'Output nothing else.';
+
+/**
+ * Upgrade a stale name-based director prompt to the current number-based default.
+ * Idempotent and exact-match only, so user customizations are preserved.
+ *
+ * @param {object} settings - Shared mutable settings reference.
+ * @returns {boolean} `true` if anything changed (caller should save settings).
+ */
+export function migrateDirectorPrompt(settings) {
+    if (!settings || typeof settings !== 'object') return false;
+    let changed = false;
+    if (settings.directorPrompt === LEGACY_NAME_DIRECTOR_PROMPT) {
+        settings.directorPrompt = DEFAULT_DIRECTOR_PROMPT;
+        changed = true;
+    }
+    const presets = settings.toolPresets?.director;
+    if (presets && typeof presets === 'object') {
+        for (const preset of Object.values(presets)) {
+            if (preset && preset.directorPrompt === LEGACY_NAME_DIRECTOR_PROMPT) {
+                preset.directorPrompt = DEFAULT_DIRECTOR_PROMPT;
+                changed = true;
+            }
+        }
+    }
+    return changed;
+}
+
 // Speaker-line detection. Two shapes are recognised:
 //   1. Bracketed `[Name]:` — explicit, unambiguous, matched anywhere in the line
 //      (so several walk-ons on one line are all caught).
