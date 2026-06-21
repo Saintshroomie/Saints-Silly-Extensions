@@ -270,6 +270,7 @@ const defaultSettings = {
     retryDebugMode: false,
     directorEnabled: false,
     directorConfirm: true,
+    directorConsecutiveTurns: 2,
     directorAlignedContext: true,
     directorWalkOnsEnabled: true,
     directorWalkOnSplitAuto: true,
