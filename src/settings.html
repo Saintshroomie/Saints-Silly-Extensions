@@ -907,10 +907,15 @@
                 <span>Enable Group Director</span>
             </label>
 
-            <label class="checkbox_label" title="When on, each roll shows a dialog so you can confirm the director's pick or override it with another cast member. When off, the rolled pick is triggered immediately.">
+            <label class="checkbox_label" title="When on, the confirm/override dialog pops up immediately — before the director decides — so you can just pick who replies next, or wait for the director's suggestion to appear. When off, the rolled pick is triggered immediately with a cancellable progress toast.">
                 <input id="director_confirm" type="checkbox" />
                 <span>Ask Before Generating (confirm / override the speaker)</span>
             </label>
+
+            <div class="ng_inline_row">
+                <label for="director_consecutive_turns"><b>Speakers Per Turn:</b></label>
+                <input id="director_consecutive_turns" type="number" min="1" step="1" class="text_pole ng_number_input" title="How many speakers the director chooses back-to-back after each of your turns. Each gets its own confirm/override dialog; cancelling one stops the chain. 1 = the classic single pick." />
+            </div>
 
             <label class="checkbox_label" title="On: the director's silent generations reuse the real chat prompt (via a quiet generation) and only append the instruction at the end, so the KV cache stays warm — at the cost of sending the full context. Off: a smaller standalone prompt (the {{context}} preamble + Max Context Override), which is leaner but reprocesses the whole prompt each time.">
                 <input id="director_aligned_context" type="checkbox" />

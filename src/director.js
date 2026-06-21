@@ -14,12 +14,15 @@
  * model only ever returns a tiny, controlled choice (a name or index) — there
  * is no need to parse the in-character reply.
  *
- * An optional confirm/override dialog lets the user accept the rolled pick or
- * pick a different cast member; a settings flag disables it for hands-off play.
+ * After each user turn the Director chains several speakers back-to-back
+ * (`directorConsecutiveTurns`, default 2), re-rolling once each reply settles and
+ * stopping the moment the user cancels a turn. With confirm/override enabled the
+ * dialog pops up **immediately** — before the decision is made — so the user can
+ * just pick who replies next, while the roll runs behind it and reveals its
+ * suggestion in place when it lands; a settings flag disables it for hands-off
+ * play (a cancellable progress toast instead).
  *
- * Possession-aware: if the director's chosen speaker is the character the user
- * is currently possessing, the Director yields silently (no dialog, no trigger)
- * so the user can reply as that character, exactly like native ST.
+ * The Director always voices its pick, including the possessed character.
  *
  * Per-chat state lives under `context.chatMetadata.director` as
  * `{ previousStrategy }` — the group's activation strategy captured the moment
@@ -68,19 +71,58 @@ const DIRECTOR_SYSTEM_PROMPT =
 
 export const DEFAULT_DIRECTOR_RESPONSE_LENGTH = 32;
 
-// Walk-on detection: a speaker line is a bracket-delimited name followed by a
-// colon, e.g. `[Tony Stark]: "Hello."`. The brackets delimit a (possibly
-// multi-word) name unambiguously. Not line-anchored, so multiple walk-ons in
-// one message — even on the same line — are all detected.
-const WALKON_SPEAKER_RE = /\[([^\]\n]{1,60})\][ \t]*:/g;
+// Speaker-line detection. Two shapes are recognised:
+//   1. Bracketed `[Name]:` — explicit, unambiguous, matched anywhere in the line
+//      (so several walk-ons on one line are all caught).
+//   2. Bare `Name:` at the START of a line — the shape the model actually emits,
+//      because in its context window group speakers only ever appear as `Name:`
+//      (never bracketed). Walk-on names aren't stop strings, so the model happily
+//      tacks `WalkOn: "…"` onto the end of another character's reply; line-anchored
+//      bare matching is what lets us split those back out. To keep false positives
+//      down the bare form must begin a line, start with a capital, be 1–4
+//      name-shaped words, and be followed by `: ` (colon + whitespace/quote).
+// Group 1 = bracketed name, group 2 = bare name.
+const SPEAKER_LINE_RE =
+    /\[([^\]\n]{1,60})\][ \t]*:|^[ \t]*([\p{Lu}][\p{L}\p{N}'’.-]{0,30}(?:[ \t]+[\p{Lu}][\p{L}\p{N}'’.-]{0,30}){0,3})[ \t]*:(?=[\s"'“”‘’])/gmu;
 const MAX_WALKON_NAME_LENGTH = 60;
 const MAX_WALKONS = 50;
 
-// Common bracketed meta-tags that look like `[Name]:` but aren't characters.
+// Director chains this many chosen speakers per user turn (back-to-back), unless
+// the user cancels a turn's dialog. Falls back when the setting is unset/invalid.
+const DEFAULT_DIRECTOR_CONSECUTIVE_TURNS = 2;
+
+// Names that look like `[Name]:` / `Name:` but aren't characters — bracketed
+// meta-tags plus common capitalised sentence-openers and labels that the
+// line-anchored bare matcher would otherwise mistake for a speaker.
 const IGNORED_WALKON_TAGS = new Set([
     'ooc', 'system', 'note', 'notes', 'narrator', 'setting', 'scene', 'continue',
     'author', 'author\'s note', 'translation', 'time', 'status', 'a/n', 'an',
+    'warning', 'tip', 'example', 'summary', 'step', 'chapter', 'part', 'location',
+    'pov', 'edit', 'update', 'reminder', 'important', 'objective', 'goal', 'mission',
+    'i', 'he', 'she', 'it', 'they', 'we', 'you', 'but', 'and', 'the', 'a', 'then',
+    'so', 'well', 'no', 'yes', 'oh', 'okay', 'ok', 'meanwhile', 'later', 'suddenly',
+    'finally', 'now', 'p.s', 'ps',
 ]);
+
+/**
+ * Find every speaker line (`[Name]:` anywhere, or a bare `Name:` at a line start)
+ * in `text`, skipping meta-tags. Returns ordered matches with the name and the
+ * offsets needed to split: `start` (where the speaker label begins) and
+ * `contentStart` (just after the colon).
+ *
+ * @returns {Array<{ name: string, start: number, contentStart: number }>}
+ */
+function matchSpeakerLines(text) {
+    const str = String(text || '');
+    const out = [];
+    SPEAKER_LINE_RE.lastIndex = 0;
+    for (const m of str.matchAll(SPEAKER_LINE_RE)) {
+        const name = ((m[1] ?? m[2]) || '').trim();
+        if (!name || IGNORED_WALKON_TAGS.has(name.toLowerCase())) continue;
+        out.push({ name, start: m.index, contentStart: m.index + m[0].length });
+    }
+    return out;
+}
 
 // ─── Module State ───
 
@@ -265,16 +307,12 @@ function buildExcludedNameSet(ctx) {
     return set;
 }
 
-/** Extract bracket-delimited speaker names (`[Name]:`) from a message body. */
+/** Extract speaker names (`[Name]:` or a bare line-start `Name:`) from a message body. */
 function extractWalkOnNames(text) {
     const names = [];
     const seen = new Set();
-    WALKON_SPEAKER_RE.lastIndex = 0;
-    for (const m of String(text || '').matchAll(WALKON_SPEAKER_RE)) {
-        const name = (m[1] || '').trim();
-        if (!name) continue;
+    for (const { name } of matchSpeakerLines(text)) {
         const key = name.toLowerCase();
-        if (IGNORED_WALKON_TAGS.has(key)) continue;
         if (seen.has(key)) continue;
         seen.add(key);
         names.push(name);
@@ -421,20 +459,14 @@ async function waitForGroupSettle(timeoutMs = 8000) {
 }
 
 /**
- * Split a message body at its `[Name]:` speaker boundaries (ignoring meta-tags).
- * Returns `{ head, segments: [{ name, text }] }`, where `head` is the text
- * before the first speaker line and each segment's text is the speaker's
- * content with the `[Name]:` prefix stripped.
+ * Split a message body at its speaker boundaries — `[Name]:` anywhere or a bare
+ * `Name:` at a line start (ignoring meta-tags). Returns `{ head, segments:
+ * [{ name, text }] }`, where `head` is the text before the first speaker line and
+ * each segment's text is the speaker's content with the `Name:` prefix stripped.
  */
 function parseWalkOnSegments(text) {
     const str = String(text || '');
-    const boundaries = [];
-    WALKON_SPEAKER_RE.lastIndex = 0;
-    for (const m of str.matchAll(WALKON_SPEAKER_RE)) {
-        const name = (m[1] || '').trim();
-        if (!name || IGNORED_WALKON_TAGS.has(name.toLowerCase())) continue;
-        boundaries.push({ name, start: m.index, contentStart: m.index + m[0].length });
-    }
+    const boundaries = matchSpeakerLines(str);
     if (!boundaries.length) return { head: str, segments: [] };
     const segments = boundaries.map((b, i) => {
         const end = i + 1 < boundaries.length ? boundaries[i + 1].start : str.length;
@@ -745,22 +777,62 @@ function parsePick(text, roster, ctx) {
 // ─── Confirm / Override Dialog ───
 
 /**
- * Show the rolled suggestion with a button per cast member to override it.
- * Resolves to the chosen member, or `null` if the user cancels.
+ * Decide the next speaker for one turn.
+ *
+ * With confirm/override on, the dialog opens **immediately** (before any decision)
+ * so the user has the fast path of just picking someone, while the director's roll
+ * runs behind it and reveals its suggestion when it lands. With confirm off, a
+ * cancellable progress toast is shown and the rolled pick is returned directly.
+ *
+ * @returns {Promise<object|null>} The chosen roster entry, or `null` if cancelled.
  */
-async function showDirectorDialog(roster, suggested) {
+async function decideSpeaker(ctx, roster) {
+    // One eligible speaker — nothing to decide or confirm.
+    if (roster.length === 1) return roster[0];
+
+    if (moduleSettings.directorConfirm) {
+        return await chooseWithDialog(ctx, roster);
+    }
+
+    // Hands-off: roll behind a cancellable progress toast and trigger the pick.
+    const dismiss = showRollProgressToast();
+    try {
+        return await rollDirector(ctx, roster);
+    } catch (err) {
+        if (isSilentGenerationAbort(err)) return null;
+        throw err;
+    } finally {
+        dismiss();
+    }
+}
+
+/** Abort an in-flight director roll (the lean path throws; aligned reads the flag). */
+function abortRoll() {
+    generationAborted = true;
+    try { getContext().stopGeneration?.(); } catch { /* ignore */ }
+    abortAllGenerations('director-cancel');
+}
+
+/**
+ * Open the confirm/override dialog right away (carrying the "director is choosing"
+ * status the progress toast used to show), run the roll concurrently, and reveal
+ * the suggestion in-place when it resolves. The user can click any cast member at
+ * any time — that wins immediately and the still-running roll is aborted.
+ *
+ * Resolves to the chosen roster entry, or `null` if the user cancels.
+ */
+async function chooseWithDialog(ctx, roster) {
     const root = document.createElement('div');
     root.className = 'sse-director-dialog';
 
     const heading = document.createElement('div');
     heading.className = 'sse-director-heading';
-    heading.innerHTML = 'The director suggests: <strong></strong>';
-    heading.querySelector('strong').textContent = suggested.name;
+    heading.textContent = 'Director is choosing who speaks next…';
     root.appendChild(heading);
 
     const hint = document.createElement('div');
     hint.className = 'sse-director-hint';
-    hint.textContent = 'Confirm the suggestion, or choose who should speak next:';
+    hint.textContent = 'Pick who should speak next, or wait for the director’s suggestion:';
     root.appendChild(hint);
 
     const choices = document.createElement('div');
@@ -768,39 +840,70 @@ async function showDirectorDialog(roster, suggested) {
     root.appendChild(choices);
 
     let picked = null;
+    let settled = false;
     const popup = new Popup(root, POPUP_TYPE.TEXT, '', {
         okButton: false,
         cancelButton: 'Cancel',
     });
 
+    const btnByEntry = new Map();
     for (const member of roster) {
         const btn = document.createElement('div');
         btn.className = 'menu_button sse-director-choice';
         if (member.kind === 'walkon') btn.classList.add('sse-director-walkon');
-        if (sameRosterEntry(member, suggested)) btn.classList.add('sse-director-suggested');
         btn.textContent = member.kind === 'walkon' ? `${member.name} (walk-on)` : member.name;
         btn.addEventListener('click', () => {
             picked = member;
+            settled = true;
+            abortRoll(); // user chose — the suggestion is moot
             popup.completeAffirmative();
         });
         choices.appendChild(btn);
+        btnByEntry.set(member, btn);
     }
 
+    // Roll behind the open dialog; surface the suggestion when it lands.
+    rollDirector(ctx, roster).then((suggested) => {
+        if (settled) return;
+        if (suggested) {
+            heading.innerHTML = 'The director suggests: <strong></strong>';
+            heading.querySelector('strong').textContent = suggested.name;
+            hint.textContent = 'Confirm the suggestion, or choose who should speak next:';
+            const entry = roster.find(r => sameRosterEntry(r, suggested));
+            const btn = entry && btnByEntry.get(entry);
+            if (btn) btn.classList.add('sse-director-suggested');
+        } else {
+            heading.textContent = 'Director cancelled — choose who speaks next:';
+        }
+    }).catch((err) => {
+        if (settled) return;
+        if (!isSilentGenerationAbort(err)) console.error('Group Director roll failed:', err);
+        heading.textContent = 'Choose who should speak next:';
+    });
+
     const result = await popup.show();
+    settled = true;
     if (result === POPUP_RESULT.AFFIRMATIVE && picked) return picked;
+    abortRoll(); // cancelled — stop the roll if it's still running
     return null;
 }
 
 // ─── Trigger ───
 
-function triggerMember(ctx, member) {
+/**
+ * Trigger a member's reply via ST's native `force_chid` generation and await it.
+ * Awaiting is what lets `runDirector` chain the next turn only after this reply
+ * has fully landed (the dialog is already closed by now, so there's no emit to
+ * hold). Generation errors are surfaced but don't abort the chain.
+ */
+async function triggerMember(ctx, member) {
     debug('Triggering member:', member.name, '(chid', member.chid + ')');
-    // Fire-and-forget: awaiting would hold the MESSAGE_SENT emit / dialog open
-    // for the whole reply. ST's own isGenerating guard prevents overlap.
-    Promise.resolve(ctx.generate('normal', { force_chid: member.chid })).catch(err => {
+    try {
+        await ctx.generate('normal', { force_chid: member.chid });
+    } catch (err) {
         console.error('Group Director: trigger failed:', err);
         toast(`Failed to trigger ${member.name}: ${err.message}`, 'error');
-    });
+    }
 }
 
 // ─── Director Roll ───
@@ -837,46 +940,47 @@ function showRollProgressToast() {
     return cancellableProgressToast('Director is choosing who speaks next… (click to cancel)');
 }
 
+/**
+ * Run the director generation and parse a pick. Pure — no progress UI of its own
+ * (callers own that: the no-dialog path shows a cancellable toast, the confirm
+ * path shows status in the open dialog). Returns the parsed pick, or `null` if
+ * the generation was cancelled in aligned mode (the lean path throws instead).
+ */
 async function rollDirector(ctx, roster) {
     const responseLength = resolveResponseLength();
     const rosterBlock = roster
         .map((m, i) => `${i + 1}. ${m.name}${m.kind === 'walkon' ? ' (walk-on)' : ''}`)
         .join('\n');
-    const dismissProgress = showRollProgressToast();
-    try {
-        let text;
-        if (useAlignedContext(ctx)) {
-            // Aligned: build the *real* chat prompt and append our instruction at
-            // the tail (quiet prompt), so the long prefix matches the chat and the
-            // KV cache stays warm. Pinned to the last speaker's prompt.
-            const quietPrompt = composeDirectorPrompt(rosterBlock, '');
-            const forceChId = resolveAnchorChid(ctx);
-            debug('Director roll (aligned) — anchor chid:', forceChId);
-            const raw = await ctx.generateQuietPrompt({ quietPrompt, responseLength, forceChId, skipWIAN: false, removeReasoning: true });
-            if (generationAborted) return null;
-            text = String(raw || '').trim();
-        } else {
-            const contextBlock = await buildContextPreamble({
-                includeChat: true,
-                responseLength,
-                maxContextOverride: moduleSettings?.directorMaxContextOverride || 0,
-            });
-            const userPrompt = composeDirectorPrompt(rosterBlock, contextBlock);
-            debug('Director roll (lean) — prompt length:', userPrompt.length);
-            // No visible target field is needed; stream into a detached scratch element.
-            const scratch = document.createElement('textarea');
-            const raw = await withSingleLineDisabled(() => streamingGenerate(
-                { prompt: userPrompt, systemPrompt: DIRECTOR_SYSTEM_PROMPT, responseLength },
-                scratch,
-                { append: false },
-            ));
-            text = removeReasoningFromString(raw || '').trim();
-        }
-        debug('Director raw reply:', JSON.stringify(text));
-        return parsePick(text, roster, ctx);
-    } finally {
-        dismissProgress();
+    let text;
+    if (useAlignedContext(ctx)) {
+        // Aligned: build the *real* chat prompt and append our instruction at
+        // the tail (quiet prompt), so the long prefix matches the chat and the
+        // KV cache stays warm. Pinned to the last speaker's prompt.
+        const quietPrompt = composeDirectorPrompt(rosterBlock, '');
+        const forceChId = resolveAnchorChid(ctx);
+        debug('Director roll (aligned) — anchor chid:', forceChId);
+        const raw = await ctx.generateQuietPrompt({ quietPrompt, responseLength, forceChId, skipWIAN: false, removeReasoning: true });
+        if (generationAborted) return null;
+        text = String(raw || '').trim();
+    } else {
+        const contextBlock = await buildContextPreamble({
+            includeChat: true,
+            responseLength,
+            maxContextOverride: moduleSettings?.directorMaxContextOverride || 0,
+        });
+        const userPrompt = composeDirectorPrompt(rosterBlock, contextBlock);
+        debug('Director roll (lean) — prompt length:', userPrompt.length);
+        // No visible target field is needed; stream into a detached scratch element.
+        const scratch = document.createElement('textarea');
+        const raw = await withSingleLineDisabled(() => streamingGenerate(
+            { prompt: userPrompt, systemPrompt: DIRECTOR_SYSTEM_PROMPT, responseLength },
+            scratch,
+            { append: false },
+        ));
+        text = removeReasoningFromString(raw || '').trim();
     }
+    debug('Director raw reply:', JSON.stringify(text));
+    return parsePick(text, roster, ctx);
 }
 
 // ─── Walk-on Voicing ───
@@ -942,25 +1046,34 @@ async function generateAndPostWalkOn(ctx, name) {
     }
 }
 
-/** Route a chosen roster entry: real members via force_chid, walk-ons via generation. */
+/** Route a chosen roster entry: real members via force_chid, walk-ons via generation. Awaits either. */
 async function triggerChoice(ctx, chosen) {
     if (chosen.kind === 'walkon') {
         await generateAndPostWalkOn(ctx, chosen.name);
     } else {
-        triggerMember(ctx, chosen);
+        await triggerMember(ctx, chosen);
     }
 }
 
+/** How many speakers the director chains back-to-back per invocation. */
+function resolveConsecutiveTurns() {
+    const n = moduleSettings?.directorConsecutiveTurns;
+    return Number.isFinite(n) && n > 0 ? Math.floor(n) : DEFAULT_DIRECTOR_CONSECUTIVE_TURNS;
+}
+
 /**
- * Run one director turn: roll a next speaker, optionally confirm/override, then
- * trigger that speaker — a real member via `force_chid`, or a walk-on by
- * generating and posting its reply. Yields to the user if the choice is the
- * possessed character.
+ * Run the director: choose a next speaker (confirm/override dialog or hands-off
+ * roll) and trigger that speaker — a real member via `force_chid`, or a walk-on
+ * by generating and posting its reply. Repeats for up to `turns` speakers
+ * back-to-back (default `directorConsecutiveTurns`), re-rolling after each reply
+ * settles, and stops early the moment the user cancels a turn's dialog/roll. The
+ * director always voices its pick — even the possessed character.
  *
- * @param {{ manual?: boolean }} [opts] - `manual` surfaces "wrong context"
- *   toasts that are silent on the automatic path.
+ * @param {{ manual?: boolean, turns?: number }} [opts] - `manual` surfaces
+ *   "wrong context" toasts that are silent on the automatic path; `turns`
+ *   overrides the configured chain length (e.g. `/next` steps a single speaker).
  */
-async function runDirector({ manual = false } = {}) {
+async function runDirector({ manual = false, turns } = {}) {
     debug('runDirector — manual:', manual);
     if (!moduleSettings?.directorEnabled) {
         debug('runDirector skipped — disabled');
@@ -985,44 +1098,51 @@ async function runDirector({ manual = false } = {}) {
         return;
     }
 
-    const group = getActiveGroup(ctx);
-    if (!group) {
-        debug('runDirector skipped — no active group object');
-        return;
-    }
-
-    const roster = buildRoster(ctx, group);
-    debug('Roster:', roster.map(m => m.name));
-    if (!roster.length) {
-        if (manual) toast('Group Director: no eligible (unmuted) characters to choose from.', 'warning');
-        debug('runDirector skipped — empty roster');
-        return;
-    }
+    const total = Number.isFinite(turns) && turns > 0 ? Math.floor(turns) : resolveConsecutiveTurns();
 
     busy = true;
-    generationAborted = false;
     try {
-        // One eligible speaker needs no LLM call.
-        const suggested = roster.length === 1 ? roster[0] : await rollDirector(ctx, roster);
-
-        // Aligned mode resolves (rather than throwing) on cancel — bail quietly.
-        if (!suggested) {
-            debug('Director roll cancelled / produced no pick.');
-            if (generationAborted) toast('Director cancelled.', 'info');
-            return;
-        }
-
-        let chosen = suggested;
-        if (moduleSettings.directorConfirm) {
-            chosen = await showDirectorDialog(roster, suggested);
-            if (!chosen) {
-                debug('Director dialog cancelled.');
-                return;
+        for (let turn = 0; turn < total; turn++) {
+            // Re-fetch each turn: the previous reply mutated the chat (and roster
+            // membership/unshallow state can shift across a triggered generation).
+            const turnCtx = getContext();
+            if (!turnCtx.groupId) break;
+            const group = getActiveGroup(turnCtx);
+            if (!group) {
+                debug('runDirector stopping — no active group object');
+                break;
             }
-        }
 
-        // The director always voices its pick — even the possessed character.
-        await triggerChoice(ctx, chosen);
+            const roster = buildRoster(turnCtx, group);
+            debug(`Turn ${turn + 1}/${total} roster:`, roster.map(m => m.name));
+            if (!roster.length) {
+                if (manual && turn === 0) toast('Group Director: no eligible (unmuted) characters to choose from.', 'warning');
+                debug('runDirector stopping — empty roster');
+                break;
+            }
+
+            generationAborted = false;
+            let chosen;
+            try {
+                chosen = await decideSpeaker(turnCtx, roster);
+            } catch (err) {
+                if (isSilentGenerationAbort(err)) chosen = null;
+                else throw err;
+            }
+
+            if (!chosen) {
+                debug('Director turn cancelled / no pick — stopping chain at turn', turn + 1);
+                if (generationAborted) toast('Director cancelled.', 'info');
+                break;
+            }
+
+            // We have a valid pick; clear any abort flag the dialog set when it
+            // closed its (now-irrelevant) background roll, then voice the speaker
+            // and wait for the reply to settle before the next turn rolls.
+            generationAborted = false;
+            await triggerChoice(turnCtx, chosen);
+            await waitForGroupSettle();
+        }
     } catch (err) {
         if (isSilentGenerationAbort(err)) {
             debug('Director roll cancelled by user.');
@@ -1143,10 +1263,11 @@ export function registerDirectorSlashCommands() {
         name: 'next',
         aliases: ['director'],
         callback: async () => {
-            await runDirector({ manual: true });
+            // Manual step — a single speaker (the auto path chains several).
+            await runDirector({ manual: true, turns: 1 });
             return '';
         },
-        helpString: 'Group Director: roll for (and trigger) the next speaker in the current group chat.',
+        helpString: 'Group Director: roll for (and trigger) the next single speaker in the current group chat.',
     }));
 }
 
@@ -1201,6 +1322,18 @@ export function bindDirectorSettings(saveSettings) {
         confirmCb.addEventListener('change', () => {
             moduleSettings.directorConfirm = confirmCb.checked;
             saveSettings();
+        });
+    }
+
+    const consecutiveInput = document.getElementById('director_consecutive_turns');
+    if (consecutiveInput) {
+        consecutiveInput.value = moduleSettings.directorConsecutiveTurns || DEFAULT_DIRECTOR_CONSECUTIVE_TURNS;
+        consecutiveInput.addEventListener('input', () => {
+            const n = parseInt(consecutiveInput.value, 10);
+            if (Number.isFinite(n) && n > 0) {
+                moduleSettings.directorConsecutiveTurns = n;
+                saveSettings();
+            }
         });
     }
 

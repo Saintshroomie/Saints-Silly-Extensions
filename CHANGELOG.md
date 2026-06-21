@@ -63,6 +63,26 @@ released version. When cutting a release, move these notes into a new
   last speaker) so their prompt prefix matches the chat and the KV cache stays
   warm — only the instruction tail is reprocessed — instead of the leaner
   standalone prompt that busts the cache.
+- **Group Director — multiple speakers per turn.** After each of your turns the
+  director chains several speakers back-to-back (new **Speakers Per Turn**
+  setting, default 2), re-deciding after each reply settles, so one message can
+  play out a short multi-character exchange. Cancelling any turn's dialog stops
+  the chain; `/next` still steps a single speaker.
+- **Group Director — pick instantly.** With confirm/override on, the dialog now
+  opens *immediately*, before the director decides, so you can just click who
+  replies next. The roll runs in the background and highlights its suggestion
+  when ready; the "director is choosing…" status moved from the toast into the
+  dialog.
+
+### Changed
+- **Group Director — walk-on detection now catches bare `Name:` lines.** In
+  addition to explicit `[Name]:` markers, the director recognises a bare `Name:`
+  at the start of a line as a speaker line (line-anchored and name-shaped to
+  limit false positives). This catches the walk-on replies the model slips onto
+  the end of another character's message — it only ever sees `Name:` in its
+  context (never bracketed) and walk-on names aren't stop strings — for both
+  detection and line-splitting. (With auto-split on, script-style cards that
+  write real members' dialogue as `Name: "..."` lines will be split too.)
 
 ## [1.2.0] - 2026-06-19
 
