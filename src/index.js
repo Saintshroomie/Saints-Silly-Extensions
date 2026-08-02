@@ -122,6 +122,16 @@ import {
     DEFAULT_COMPACTION_TAIL_LENGTH,
 } from './compaction.js';
 import {
+    initImagePrompting,
+    bindImagePromptSettings,
+    registerImagePromptSlashCommand,
+    createImagePromptMenuItem,
+    seedImagePromptPresets,
+    DEFAULT_IMAGE_PROMPT_PROMPT,
+    DEFAULT_IMAGE_PROMPT_PREFILL,
+    DEFAULT_IMAGE_PROMPT_RESPONSE_LENGTH,
+} from './image-prompting.js';
+import {
     initRetryContinue,
     bindRetryContinueSettings,
     createRetryContinueButtons,
@@ -225,6 +235,12 @@ const defaultSettings = {
     compactionMaxContextOverride: 0,
     compactionMigrateState: true,
     compactionDebugMode: false,
+    imagePromptEnabled: true,
+    imagePromptDebugMode: false,
+    imagePromptPrompt: DEFAULT_IMAGE_PROMPT_PROMPT,
+    imagePromptPrefill: DEFAULT_IMAGE_PROMPT_PREFILL,
+    imagePromptResponseLength: DEFAULT_IMAGE_PROMPT_RESPONSE_LENGTH,
+    imagePromptMaxContextOverride: 0,
     retryAutoContinue: true,
     retryAutoSetOnContinue: false,
     retryShowToasts: true,
@@ -329,6 +345,15 @@ const TOOL_PRESET_CONFIG = [
             { key: 'compactionSummaryPrefill', label: 'Summary Prefill', textareaId: 'compaction_summary_prefill_textarea', defaultText: DEFAULT_COMPACTION_SUMMARY_PREFILL },
         ],
     },
+    {
+        toolKey: 'image-prompt',
+        label: 'Image Prompting',
+        containerId: 'image_prompt_presets',
+        fields: [
+            { key: 'imagePromptPrompt', label: 'Prompt', textareaId: 'image_prompt_prompt_textarea', defaultText: DEFAULT_IMAGE_PROMPT_PROMPT },
+            { key: 'imagePromptPrefill', label: 'Prefill', textareaId: 'image_prompt_prefill_textarea', defaultText: DEFAULT_IMAGE_PROMPT_PREFILL },
+        ],
+    },
 ];
 
 // ─── State ───
@@ -357,6 +382,12 @@ function loadSettings() {
         SSEDebug('Migrated legacy Narrative Guidance settings to the short-term track');
         migrated = true;
     }
+    // Ship the alternate diffusion-model targets (Anima, pure Danbooru) as
+    // ready-made Image Prompting presets; the built-in Default covers Krea 2.
+    if (seedImagePromptPresets(settings)) {
+        SSEDebug('Seeded built-in Image Prompting presets');
+        migrated = true;
+    }
     if (migrated) saveSettings();
     SSEDebug('Settings loaded:', JSON.stringify(settings));
 }
@@ -377,6 +408,7 @@ function injectSettingsPanel() {
     bindNarrativeGuidanceSettings(saveSettings);
     bindReformattingSettings(saveSettings);
     bindCompactionSettings(saveSettings);
+    bindImagePromptSettings(saveSettings);
     bindRetryContinueSettings(saveSettings);
     bindSilentGenerationSettings(saveSettings);
 
@@ -470,6 +502,7 @@ jQuery(async () => {
     // resyncChatState re-runs the per-chat state reload after a compaction
     // creates and seeds the fresh chat, so migrated metadata is re-applied.
     initCompaction({ settings, saveSettings, resyncChatState: onChatChanged });
+    initImagePrompting({ settings, saveSettings });
     initRetryContinue({ settings });
 
     loadPossessionState();
@@ -490,6 +523,9 @@ jQuery(async () => {
 
     // Compaction UI — launch item in the hamburger (options) menu.
     createCompactionMenuItem();
+
+    // Image Prompting UI — launch item in the hamburger (options) menu.
+    createImagePromptMenuItem();
 
     // Retry Continue UI — Retry buttons in the hamburger + quick-action bars,
     // plus the optional auto-set-on-Continue hook on ST's native Continue.
@@ -551,6 +587,7 @@ jQuery(async () => {
     registerPhraseBanSlashCommand();
     registerReformattingSlashCommand();
     registerCompactionSlashCommand();
+    registerImagePromptSlashCommand();
     registerRetryContinueSlashCommands();
 
     // Initial state

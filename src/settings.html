@@ -829,6 +829,72 @@
         </div>
     </div>
 
+    <!-- ─── SSE Image Prompting ─── -->
+    <div class="inline-drawer">
+        <div class="inline-drawer-toggle inline-drawer-header">
+            <b><span class="fa-solid fa-image"></span> SSE Image Prompting</b>
+            <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+        </div>
+        <div class="inline-drawer-content" style="display: none;">
+
+            <small>Adds an <span class="fa-solid fa-image"></span> <b>Image Prompt</b> item
+                to the hamburger menu (and <code>/imageprompt</code>) that reads the current
+                chat and any selected lore books and silently generates a ready-to-paste
+                prompt for an external image tool (ComfyUI, etc.) depicting the current
+                moment. The <b>Default</b> preset targets Krea 2 (natural-language prose);
+                the seeded <b>Anima (Tags + Prose)</b> and <b>Danbooru Tags</b> presets
+                target Anima Base and pure booru-tag models.</small>
+
+            <label class="checkbox_label">
+                <input id="image_prompt_enabled" type="checkbox" />
+                <span>Enable Image Prompting</span>
+            </label>
+
+            <div class="ng_inline_row">
+                <label for="image_prompt_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label>
+                <input id="image_prompt_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for image-prompt generations. 0 = use the model's full context size." />
+                <small>0 = use model default</small>
+            </div>
+
+            <div class="saints_preset_block">
+                <label title="Save and switch named bundles of the Image Prompting prompt + prefill below — one preset per diffusion-model family. The prompt describes the prefill's opening, so they are saved together."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label>
+                <div class="saints_template_controls" id="image_prompt_presets"></div>
+                <div class="menu_button saints_preview_btn" id="image_prompt_preview_btn" title="Show the exact system prompt, assembled user prompt, and prefill Image Prompting will send, with sample values.">
+                    <span class="fa-solid fa-eye"></span> Preview Assembled Prompt
+                </div>
+            </div>
+
+            <div class="inline-drawer saints_nested_drawer">
+                <div class="inline-drawer-toggle inline-drawer-header">
+                    <b>Prompt Template</b>
+                    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                </div>
+                <div class="inline-drawer-content" style="display: none;">
+                    <div class="acc_prompt_section">
+                        <textarea id="image_prompt_prompt_textarea" class="text_pole" rows="12"
+                            placeholder="Enter your image-prompt template..."></textarea>
+                        <small>Sent as the user prompt for each generation. Placeholders: <code>{{context}}</code> (chat/lore preamble, when enabled in the modal), <code>{{guidance}}</code> (your optional Guidance). If a placeholder is missing, the context is prepended and the guidance appended automatically.</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="inline-drawer saints_nested_drawer">
+                <div class="inline-drawer-toggle inline-drawer-header">
+                    <b>Prefill Template</b>
+                    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                </div>
+                <div class="inline-drawer-content" style="display: none;">
+                    <div class="acc_prompt_section">
+                        <textarea id="image_prompt_prefill_textarea" class="text_pole" rows="2"
+                            placeholder="Optional assistant-prefix the model continues (e.g. quality tags). Also kept at the start of the final prompt."></textarea>
+                        <small>Optional. Sent as an assistant prefix the model continues from, and kept at the start of the final image prompt (the tag-based presets use it for quality tags like <code>masterpiece, best quality</code>). If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
     <!-- ─── SSE Retry Continue ─── -->
     <div class="inline-drawer">
         <div class="inline-drawer-toggle inline-drawer-header">
@@ -938,6 +1004,11 @@
             <label class="checkbox_label" title="Log detailed Compaction events (prompt measurement, auto-trigger checks, summary generation, commit pipeline) to the browser console.">
                 <input id="compaction_debug_mode" type="checkbox" />
                 <span>Compaction Debug Mode</span>
+            </label>
+
+            <label class="checkbox_label" title="Log detailed Image Prompting events, prompts, and generations to the browser console.">
+                <input id="image_prompt_debug_mode" type="checkbox" />
+                <span>Image Prompting Debug Mode</span>
             </label>
 
             <label class="checkbox_label" title="Log detailed Retry Continue events (checkpoint set/clear, snapshot lock transitions, swipe creation) to the browser console.">

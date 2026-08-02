@@ -1,6 +1,6 @@
 # Saint's Silly Extensions
 
-A [SillyTavern](https://github.com/SillyTavern/SillyTavern) third-party extension that adds nine integrated roleplay tools: **Possession**, **Phrasing**, **Phrase Ban**, **Assisted Character Creation**, **World Info Assist**, **Narrative Guidance**, **Reformatting**, **Compaction**, and **Retry Continue**.
+A [SillyTavern](https://github.com/SillyTavern/SillyTavern) third-party extension that adds ten integrated roleplay tools: **Possession**, **Phrasing**, **Phrase Ban**, **Assisted Character Creation**, **World Info Assist**, **Narrative Guidance**, **Reformatting**, **Compaction**, **Image Prompting**, and **Retry Continue**.
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes and version history.
 
@@ -16,6 +16,7 @@ See [CHANGELOG.md](CHANGELOG.md) for release notes and version history.
   - [Narrative Guidance](#narrative-guidance)
   - [Reformatting](#reformatting)
   - [Compaction](#compaction)
+  - [Image Prompting](#image-prompting)
   - [Retry Continue](#retry-continue)
 - [Installation](#installation)
   - [Manual Installation](#manual-installation)
@@ -28,6 +29,7 @@ See [CHANGELOG.md](CHANGELOG.md) for release notes and version history.
   - [Narrative Guidance Settings](#narrative-guidance-settings)
   - [Reformatting Settings](#reformatting-settings)
   - [Compaction Settings](#compaction-settings)
+  - [Image Prompting Settings](#image-prompting-settings)
   - [Retry Continue Settings](#retry-continue-settings)
   - [Silent Generation](#silent-generation)
   - [Diagnostics](#diagnostics)
@@ -237,6 +239,28 @@ Compaction **summarizes the chat, starts a fresh chat seeded with that summary p
 5. When the **Story so far** preview reads well, click **Compact**. A fresh chat is created, seeded with the summary plus the last *N* messages (swipes intact), with your per-chat extension state carried over. The original chat stays in your chat history.
 6. Continue roleplaying — you take the next turn. Generation is fast again because the context window has been reset.
 
+### Image Prompting
+
+Turns the current moment of your roleplay into a ready-to-paste prompt for an external image-generation tool (ComfyUI, Krea, Forge, etc.) — so you can render the scene you're playing without writing the diffusion prompt yourself.
+
+- **One click from the hamburger menu** — Click the <span title="image icon">🖼</span> **Image Prompt** item next to Continue (or run `/imageprompt`). A modal (mirroring Assisted Character Creation) opens; **Generate** performs a silent generation that reads the current chat, character cards, persona, and any selected **lore books**, and streams an image prompt into an editable textarea. Refine with **Continue / Checkpoint / Retry**, cap each generation with **Max Tokens**, and stop mid-stream at any time.
+- **A prompt style per diffusion model, managed as presets** — The prompt template teaches the LLM the *target model's* ideal prompt style, and the Preset dropdown keeps one template per model family:
+  - **Default** targets **Krea 2** — flowing natural-language prose (subject first, then action, environment, composition, lighting, mood, style), the format Krea 2's encoder is built for.
+  - **Anima (Tags + Prose)** targets **Circlestone Labs' Anima Base** — a Danbooru tag block (rating → character count → appearance/clothing/pose/setting tags, lowercase with spaces) followed by a short natural-language passage, with the `masterpiece, best quality, score_7, ` quality prefix supplied as the prefill.
+  - **Danbooru Tags** — a pure comma-separated booru tag list for tag-native anime models (Illustrious, NoobAI, Pony derivatives, …), with `masterpiece, best quality, ` as the prefill.
+  All three are fully editable, and you can save your own presets for any other diffusion model.
+- **Optional guidance** — A free-text field for extra direction (what to focus on, camera angle, art style, details to emphasize) that is folded into the generation.
+- **Copy & go** — A **Copy** button beside the output and a **Copy & Close** confirm button put the finished prompt on your clipboard for pasting into your image tool.
+
+**How to use**
+
+1. Play your roleplay to a moment worth illustrating.
+2. Click **Image Prompt** in the hamburger (options) menu next to the input field, or run `/imageprompt`.
+3. Leave **Use Chat Context** on, optionally select **lore books** and add **Guidance**, then click **Generate**.
+4. Edit the streamed-in prompt freely, or refine it with **Continue / Checkpoint / Retry**.
+5. Click **Copy & Close** (or the **Copy** button) and paste the prompt into ComfyUI or your image tool of choice.
+6. Rendering for a different model? Switch the **Preset** in the settings drawer (e.g. to **Anima (Tags + Prose)** or **Danbooru Tags**) and generate again.
+
 ### Retry Continue
 
 Automates the "edit the message to keep the good part, delete the bad part, hit Continue" workflow — and keeps every attempt as a swipe so you can compare and pick the best.
@@ -396,6 +420,18 @@ The drawer holds two self-contained tiers — **Long-term** (the overarching arc
 | Summary Guidance (per-chat, in the modal) | Specific details the summary must preserve. Stored with the chat and remembered across compactions of the same storyline |
 | Compaction Debug Mode | Log detailed Compaction events (prompt measurement, auto-trigger, summary generation, commit pipeline) to the browser console (in the Diagnostics drawer) |
 
+### Image Prompting Settings
+
+| Setting | Description |
+|---------|-------------|
+| Enable Image Prompting | Toggle the Image Prompting feature, its **Image Prompt** menu item, and `/imageprompt` |
+| Max Context Override | If > 0, caps how many tokens of context the chat-packer uses for image-prompt generations. 0 = use the model's full context size |
+| Preset / Preview Assembled Prompt | Save named bundles of the prompt + prefill — one per diffusion-model family — and preview exactly what gets sent (see Tool Presets & Prompt Preview below). Ships with **Anima (Tags + Prose)** and **Danbooru Tags** presets alongside the Krea 2-targeting **Default** |
+| Prompt Template | The user prompt for each generation, teaching the LLM the target diffusion model's prompt style. Supports `{{context}}` (chat/lore preamble, when enabled in the modal) and `{{guidance}}` (your optional Guidance) placeholders; if missing, the context is prepended and the guidance appended |
+| Prefill Template | Optional assistant prefix the model continues from, kept at the start of the final image prompt — the tag-based presets use it for quality tags (e.g. `masterpiece, best quality, `). Prefill echoes from backends that ignore prefills are stripped automatically |
+| Max Tokens (in the modal) | Maximum tokens per generation (default 500), persisted as the new default when changed |
+| Image Prompting Debug Mode | Log detailed Image Prompting events, prompts, and generations to the browser console (in the Diagnostics drawer) |
+
 ### Retry Continue Settings
 
 | Setting | Description |
@@ -421,7 +457,7 @@ The drawer holds two self-contained tiers — **Long-term** (the overarching arc
 
 ### Tool Presets & Prompt Preview
 
-Each tool's settings drawer (Phrasing, Phrase Ban, Assisted Character Creation, World Info Assist, Narrative Guidance, Reformatting) has a **Preset** block that saves and restores *all* of that tool's editable prompt fields together — so a prompt that describes its prefill's format always travels with that prefill:
+Each tool's settings drawer (Phrasing, Phrase Ban, Assisted Character Creation, World Info Assist, Narrative Guidance, Reformatting, Compaction, Image Prompting) has a **Preset** block that saves and restores *all* of that tool's editable prompt fields together — so a prompt that describes its prefill's format always travels with that prefill:
 
 | Control | Description |
 |---------|-------------|
@@ -447,6 +483,8 @@ Generation templates support tool-specific placeholders, substituted in place. I
 | World Info Assist | `{{context}}`, `{{guidance}}`, `{{title}}` |
 | Narrative Guidance | `{{context}}`, `{{themes}}`, plus `{{longGuidance}}` for the short-term tier (generation instructions); `{{guidance}}` (injection template) |
 | Reformatting | `{{message}}` (LLM prompt) |
+| Compaction | `{{context}}`, `{{guidance}}` |
+| Image Prompting | `{{context}}`, `{{guidance}}` |
 
 ## Slash Commands
 
@@ -458,6 +496,7 @@ Generation templates support tool-specific placeholders, substituted in place. I
 | `/phraseban` | Scan the last message against the Phrase Ban regex list and rewrite it (as a new swipe) if banned phrasing is found |
 | `/reformat` | Reformat the last message using the configured engine (keeps the original as a swipe) |
 | `/compact` | Open the Compaction modal to summarize the chat and start a fresh, compacted chat seeded with the summary plus the recent tail |
+| `/imageprompt` | Open the Image Prompting modal to generate a diffusion-model prompt depicting the current moment of the chat |
 | `/retry` | Retry the continuation from the saved checkpoint, creating a new swipe. If no checkpoint exists, sets one from the current message and continues |
 | `/retryclear` | Clear the active retry checkpoint |
 
