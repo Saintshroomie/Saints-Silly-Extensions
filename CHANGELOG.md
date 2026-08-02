@@ -12,6 +12,20 @@ _Changes that have landed on the development branch but are not yet part of a
 released version. When cutting a release, move these notes into a new
 `## [X.Y.Z]` section and run `npm version`._
 
+### Added
+- **Image Prompting** — new tool that turns the current moment of the chat
+  into a ready-to-paste prompt for an external image-generation tool
+  (ComfyUI, etc.). An **Image Prompt** item in the hamburger menu (and
+  `/imageprompt`) opens a modal mirroring Assisted Character Creation:
+  a silent generation reads the current chat and any selected lore books and
+  streams an image prompt into an editable textarea, with **Generate /
+  Continue / Checkpoint / Retry**, a Max Tokens cap, optional free-text
+  guidance, and **Copy** / **Copy & Close** buttons. The prompt template is
+  preset-managed per diffusion-model family: the **Default** targets Krea 2
+  (natural-language prose), and seeded **Anima (Tags + Prose)** and
+  **Danbooru Tags** presets target Circlestone Labs' Anima Base and pure
+  booru-tag models, with quality-tag prefills supplied where appropriate.
+
 ## [1.2.0] - 2026-06-19
 
 ### Added

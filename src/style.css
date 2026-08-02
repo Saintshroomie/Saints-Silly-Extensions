@@ -950,6 +950,216 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════
+   IMAGE PROMPTING MODAL STYLES (rendered inside ST's Popup; mirror the ACC flex chain)
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+.ip-modal-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0%;
+    min-height: 0;
+    text-align: left;
+}
+
+.ip-context-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    padding: 8px 10px;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 4px;
+}
+
+.ip-context-section .checkbox_label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9em;
+    cursor: pointer;
+}
+
+.ip-guidance-section {
+    margin-bottom: 12px;
+}
+
+.ip-guidance-section textarea {
+    width: 100%;
+    margin-top: 4px;
+    resize: vertical;
+}
+
+.ip-action-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.ip-action-btn {
+    flex: 1 1 0;
+    min-width: 130px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.ip-action-btn.ip-disabled {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.ip-generate-btn {
+    color: var(--SmartThemeQuoteColor, #e8a23a);
+}
+
+.ip-tokens-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-bottom: 12px;
+    font-size: 0.85em;
+    opacity: 0.85;
+}
+
+.ip-tokens-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    user-select: none;
+}
+
+.ip-tokens-input {
+    width: 90px !important;
+    padding: 2px 6px !important;
+    font-size: 0.9em !important;
+    text-align: center;
+}
+
+.ip-status-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    background: var(--SmartThemeBodyColor, #222);
+    border-radius: 4px;
+    color: var(--SmartThemeQuoteColor, #e8a23a);
+    font-size: 0.9em;
+}
+
+.ip-output-section {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0%;
+    min-height: 0;
+}
+
+.ip-output-section label {
+    margin-bottom: 4px;
+}
+
+.ip-prompt-output {
+    width: 100%;
+    flex: 1 1 0%;
+    min-height: 180px;
+    resize: vertical;
+}
+
+.ip-hidden {
+    display: none !important;
+}
+
+.ip-modal-body .ip-field-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.ip-modal-body .ip-field-header-buttons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ip-modal-body .ip-clear-btn {
+    font-size: 0.8em;
+    padding: 2px 8px;
+    opacity: 0.85;
+}
+
+.ip-modal-body .ip-clear-btn:hover {
+    opacity: 1;
+}
+
+/* Image Prompting lore-book picker (shares the ACC picker shape) */
+.ip-lorebook-picker {
+    position: relative;
+    font-size: 0.9em;
+}
+
+.ip-lorebook-picker > summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 4px 8px;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0.85;
+}
+
+.ip-lorebook-picker > summary::-webkit-details-marker {
+    display: none;
+}
+
+.ip-lorebook-picker > summary:hover {
+    opacity: 1;
+}
+
+.ip-lorebook-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 2px;
+    z-index: 10002;
+    min-width: 240px;
+    max-height: 260px;
+    overflow-y: auto;
+    background: var(--SmartThemeBlurTintColor, #1a1a2e);
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 4px;
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.ip-lorebook-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.ip-lorebook-empty {
+    opacity: 0.6;
+    font-style: italic;
+}
+
+/* Image Prompting launch item in the hamburger menu */
+#image_prompt_menu_button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
    NARRATIVE GUIDANCE SETTINGS STYLES
    ═══════════════════════════════════════════════════════════════════════════════ */
 
