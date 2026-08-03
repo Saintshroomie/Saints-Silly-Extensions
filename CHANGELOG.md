@@ -25,6 +25,14 @@ released version. When cutting a release, move these notes into a new
   (natural-language prose), and seeded **Anima (Tags + Prose)** and
   **Danbooru Tags** presets target Circlestone Labs' Anima Base and pure
   booru-tag models, with quality-tag prefills supplied where appropriate.
+- **Image Prompting: per-chat saved prompts** — a **Save** button beside the
+  modal's output stores the finished image prompt with the current chat
+  (`chatMetadata.imagePrompting.savedPrompts`), and a **Saved Prompts**
+  section at the bottom of the modal lists everything saved there (newest
+  first) with per-entry **Load / Copy / Delete** buttons — so a good prompt
+  can be retrieved and re-rendered later in that chat. Saved prompts survive
+  reloads, travel with chat exports, and are carried into the fresh chat by
+  Compaction's state migration alongside the other per-chat extension state.
 
 ## [1.2.0] - 2026-06-19
 
