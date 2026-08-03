@@ -54,6 +54,7 @@ import {
     abortAllGenerations,
     isSilentGenerationAbort,
 } from './silent-generation.js';
+import { createToolPresetSelector } from './prompt-templates.js';
 
 // ─── Defaults ───
 
@@ -646,6 +647,10 @@ function buildModalBody() {
             <div class="cc-lorebook-host"></div>
             <small class="cc-context-hint">Selected lore books are folded into the summary so canon isn't lost.</small>
         </div>
+        <div class="cc-preset-row">
+            <label class="cc-preset-label"><span class="fa-solid fa-file-pen"></span> Prompt Preset:</label>
+            <div class="cc-preset-host"></div>
+        </div>
         <div class="cc-guidance-section">
             <div class="cc-field-header">
                 <label for="cc_guidance"><b>Summary Guidance:</b></label>
@@ -703,6 +708,16 @@ function buildModalBody() {
     });
     root.querySelector('.cc-lorebook-host').replaceWith(picker.element);
     root._ccLorebookPicker = picker;
+
+    // Point-of-use preset selection — which summary prompt + prefill bundle
+    // Generate Summary uses, synced with the settings widget (which also
+    // manages presets).
+    root.querySelector('.cc-preset-host').replaceWith(createToolPresetSelector({
+        toolKey: 'compaction',
+        className: 'cc-preset-select',
+        title: 'Prompt preset used for Generate Summary — the bundle of summary prompt + prefill. '
+            + 'Save and edit presets in the extension settings.',
+    }));
 
     debug('Modal body built — guidance length:', (guidanceEl?.value || '').length, 'response length:', tokenInput?.value);
     return root;

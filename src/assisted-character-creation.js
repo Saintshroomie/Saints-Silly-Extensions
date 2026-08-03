@@ -27,6 +27,7 @@ import {
     abortAllGenerations,
     isSilentGenerationAbort,
 } from './silent-generation.js';
+import { createToolPresetSelector } from './prompt-templates.js';
 
 // ─── Default Prompt ───
 
@@ -365,6 +366,10 @@ function buildModalBody() {
             </label>
             <div class="acc-lorebook-host"></div>
         </div>
+        <div class="acc-preset-row">
+            <label class="acc-preset-label"><span class="fa-solid fa-file-pen"></span> Prompt Preset:</label>
+            <div class="acc-preset-host"></div>
+        </div>
         <div class="acc-brief-section">
             <div class="acc-field-header">
                 <label for="acc_character_brief"><b>Character Brief:</b></label>
@@ -436,6 +441,16 @@ function buildModalBody() {
     });
     root.querySelector('.acc-lorebook-host').replaceWith(picker.element);
     root._accLorebookPicker = picker;
+
+    // Point-of-use preset selection — which prompt + prefill bundle
+    // Generate/Continue uses, synced with the settings widget (which also
+    // manages presets).
+    root.querySelector('.acc-preset-host').replaceWith(createToolPresetSelector({
+        toolKey: 'acc',
+        className: 'acc-preset-select',
+        title: 'Prompt preset used for Generate/Continue — the bundle of prompt + prefill that shapes '
+            + 'the character sheet. Save and edit presets in the extension settings.',
+    }));
 
     return root;
 }

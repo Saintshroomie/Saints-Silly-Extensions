@@ -39,6 +39,7 @@ import {
     abortAllGenerations,
     isSilentGenerationAbort,
 } from './silent-generation.js';
+import { createToolPresetSelector } from './prompt-templates.js';
 
 // ─── Default Prompts ───
 
@@ -629,6 +630,10 @@ function buildModalBody() {
             </label>
             <div class="ip-lorebook-host"></div>
         </div>
+        <div class="ip-preset-row">
+            <label class="ip-preset-label"><span class="fa-solid fa-file-pen"></span> Prompt Preset:</label>
+            <div class="ip-preset-host"></div>
+        </div>
         <div class="ip-guidance-section">
             <div class="ip-field-header">
                 <label for="ip_guidance"><b>Guidance (optional):</b></label>
@@ -717,6 +722,17 @@ function buildModalBody() {
     });
     root.querySelector('.ip-lorebook-host').replaceWith(picker.element);
     root._ipLorebookPicker = picker;
+
+    // Point-of-use preset selection — one preset per diffusion-model family
+    // (Default targets Krea 2; Anima / Danbooru Tags ship seeded), synced
+    // with the settings widget (which also manages presets).
+    root.querySelector('.ip-preset-host').replaceWith(createToolPresetSelector({
+        toolKey: 'image-prompt',
+        className: 'ip-preset-select',
+        title: 'Prompt preset used for Generate — pick the template for your target diffusion model '
+            + '(e.g. Default for Krea 2, Anima, Danbooru Tags). Save and edit presets in the '
+            + 'extension settings.',
+    }));
 
     return root;
 }
