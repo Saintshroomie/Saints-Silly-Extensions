@@ -13,6 +13,18 @@ released version. When cutting a release, move these notes into a new
 `## [X.Y.Z]` section and run `npm version`._
 
 ### Added
+- **Point-of-use preset selection** — the tools with an interactive surface
+  now let you pick their prompt preset right where the work happens instead
+  of detouring into the settings drawer: a **Prompt Preset** dropdown in the
+  **Assisted Character Creation**, **Compaction**, and **Image Prompting**
+  modals, and a **Preset** dropdown on every World Info entry's **Assist**
+  row (so the type of entry World Info Assist produces is chosen per
+  generation). The new dropdowns mirror the settings widget — same preset
+  list, same **(modified)** dirty marker, same discard-unsaved-changes
+  confirmation — and stay in sync with it and with each other; changing the
+  selection anywhere updates everywhere. Preset management (Save as New /
+  Update / Rename / Delete) remains in the settings drawer next to the
+  prompt fields the presets bundle.
 - **Image Prompting** — new tool that turns the current moment of the chat
   into a ready-to-paste prompt for an external image-generation tool
   (ComfyUI, etc.). An **Image Prompt** item in the hamburger menu (and

@@ -1588,3 +1588,55 @@
 #saints_silly_settings #retry_continue_clear {
     margin-top: 10px;
 }
+
+/* ─── Point-of-use Preset Selectors ─── */
+
+/* Shared base for the compact preset dropdowns mounted at each tool's
+   working surface (modals, WIA entry rows). */
+.saints_preset_select {
+    flex: 0 1 auto;
+    width: auto !important;
+    min-width: 120px;
+    max-width: 260px;
+}
+
+.acc-preset-row,
+.ip-preset-row,
+.cc-preset-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 0.9em;
+}
+
+.acc-preset-label,
+.ip-preset-label,
+.cc-preset-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    user-select: none;
+    opacity: 0.85;
+}
+
+.wia-controls .wia-preset-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85em;
+    opacity: 0.85;
+}
+
+.wia-controls .wia-preset-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    user-select: none;
+}
+
+.wia-controls .wia-preset-select {
+    max-width: 160px;
+    padding: 2px 6px !important;
+    font-size: 0.9em !important;
+}

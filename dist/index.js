@@ -1619,7 +1619,59 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Saint's Silly Extensions — Combin
 #saints_silly_settings #retry_continue_clear {
     margin-top: 10px;
 }
-`, "",{"version":3,"sources":["webpack://./src/style.css"],"names":[],"mappings":"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","sourcesContent":["/* Saint's Silly Extensions — Combined Styles */\n\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SHARED: LORE BOOK PICKER\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Applied to every lore book picker (ACC / WIA / NG / Compaction) via the shared\n   factory. The picker text is pure UI and must not be selectable: tapping a\n   selectable lore book name engages Android Chrome's text-selection/magnifier\n   subsystem, which can crash the renderer (\"Aw, Snap\"). Disabling selection +\n   the touch callout/highlight keeps taps lightweight. user-select inherits, so\n   one rule on the root covers the summary and every list item. */\n.sse-lorebook-picker,\n.sse-lorebook-picker * {\n    -webkit-user-select: none;\n    user-select: none;\n    -webkit-touch-callout: none;\n    -webkit-tap-highlight-color: transparent;\n}\n\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   POSSESSION STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Group Chat: Radio Button Toggle ── */\n\n.possession_radio_wrapper {\n    display: inline-flex;\n    align-items: center;\n    margin-left: 4px;\n    cursor: pointer;\n}\n\n.possession_radio {\n    width: 16px;\n    height: 16px;\n    border-radius: 50%;\n    border: 2px solid var(--SmartThemeBorderColor, #555);\n    background: transparent;\n    cursor: pointer;\n    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;\n    position: relative;\n    flex-shrink: 0;\n}\n\n.possession_radio:hover {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.possession_radio.possession_active {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n    background: var(--SmartThemeQuoteColor, #e8a23a);\n    box-shadow: inset 0 0 0 3px var(--SmartThemeBlurTintColor, #1a1a2e);\n}\n\n/* ── Solo Chat: Possess Toggle Button ── */\n\n#possession_solo_btn {\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    cursor: pointer;\n    position: relative;\n}\n\n#possession_solo_btn:hover {\n    opacity: 1;\n}\n\n#possession_solo_btn.possession_active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n#possession_solo_btn.possession_active::after {\n    content: '';\n    position: absolute;\n    bottom: -2px;\n    left: 50%;\n    transform: translateX(-50%);\n    width: 6px;\n    height: 6px;\n    border-radius: 50%;\n    background-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Group member highlight when possessed ── */\n\n.group_member.possession_possessed {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n/* ── Possession Impersonate Button (Character Avatar) ── */\n\n#possession_impersonate_btn {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease;\n    padding: 2px;\n}\n\n#possession_impersonate_btn:hover {\n    opacity: 1;\n}\n\n.possession_impersonate_avatar {\n    width: 26px;\n    height: 26px;\n    border-radius: 50%;\n    object-fit: cover;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    transition: border-color 0.15s ease;\n}\n\n#possession_impersonate_btn:hover .possession_impersonate_avatar {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hide controls when extension is disabled ── */\n\n.possession_hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PHRASING STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Input Area Button (next to Send) ── */\n\n#phrasing_send_button {\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    padding: 3px;\n    font-size: 1.2em;\n}\n\n#phrasing_send_button:hover {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hamburger Menu Item ── */\n\n#phrasing_menu_button {\n    cursor: pointer;\n}\n\n#phrasing_menu_button .fa-solid {\n    margin-right: 5px;\n    width: 1em;\n    text-align: center;\n}\n\n/* ── Hide buttons during generation ── */\n\n.phrasing-hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SETTINGS PANEL STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .inline-drawer-content {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n    padding: 8px 0;\n}\n\n/* Nested drawers (template fields inside each tool's panel) — slightly\n   indented and with a smaller, dimmer header so they read as a sub-section\n   rather than a peer of the top-level tool drawer. */\n#saints_silly_settings .saints_nested_drawer {\n    margin: 4px 0 4px 4px;\n    border-left: 2px solid var(--SmartThemeBorderColor, #555);\n    padding-left: 8px;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-toggle {\n    font-size: 0.95em;\n    opacity: 0.85;\n    padding: 2px 0;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-toggle:hover {\n    opacity: 1;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-content {\n    padding: 4px 0 4px 0;\n}\n\n#saints_silly_settings .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_section_header {\n    margin: 4px 0 2px 0;\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_divider {\n    border: none;\n    border-top: 1px solid var(--SmartThemeBorderColor, #555);\n    margin: 8px 0;\n}\n\n#saints_silly_settings .phrasing_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #phrasing_prompt_textarea {\n    width: 100%;\n    min-height: 120px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .acc_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #acc_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC MODAL STYLES (rendered inside ST's Popup; chrome is provided by Popup)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n.acc-modal-body {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n    text-align: left;\n}\n\n.acc-brief-section {\n    margin-bottom: 12px;\n}\n\n.acc-brief-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.acc-action-row {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    margin-bottom: 8px;\n}\n\n.acc-tokens-row {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 6px;\n    margin-bottom: 12px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.acc-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.acc-tokens-input {\n    width: 80px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n.acc-action-btn {\n    flex: 1 1 0;\n    min-width: 110px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n.acc-action-btn.acc-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.acc-generate-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.acc-status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    background: var(--SmartThemeBodyColor, #222);\n    border-radius: 4px;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 0.9em;\n}\n\n.acc-description-section {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.acc-description-section label {\n    margin-bottom: 4px;\n}\n\n.acc-description-output {\n    width: 100%;\n    flex: 1 1 0%;\n    min-height: 200px;\n    resize: vertical;\n}\n\n.acc-description-output[disabled] {\n    opacity: 0.5;\n    cursor: not-allowed;\n}\n\n.acc-hidden {\n    display: none !important;\n}\n\n/* ACC Launch button in character creator */\n#acc_launch_btn {\n    display: flex;\n    align-items: center;\n    gap: 4px;\n}\n\n/* Field header row: label on the left, Clear button on the right. */\n.acc-modal-body .acc-field-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin-bottom: 4px;\n}\n\n.acc-modal-body .acc-clear-btn {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.acc-modal-body .acc-clear-btn:hover {\n    opacity: 1;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   WORLD INFO ASSIST STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Settings panel */\n#saints_silly_settings .wia_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #wia_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* Per-entry assist controls injected into each WI entry form */\n.wia-controls {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    flex-wrap: wrap;\n    margin: 6px 0 6px 0;\n}\n\n.wia-controls .wia-btn {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    cursor: pointer;\n    font-size: 0.85em;\n    padding: 4px 8px;\n}\n\n.wia-controls .wia-btn-assist {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.wia-controls .wia-btn-label {\n    font-weight: 500;\n}\n\n.wia-controls .wia-spinner {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 1em;\n    display: inline-flex;\n    align-items: center;\n    padding: 4px 6px;\n}\n\n.wia-controls .wia-hidden {\n    display: none !important;\n}\n\n/* Use Chat Context checkbox */\n.wia-controls .wia-context-toggle {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    font-size: 0.85em;\n    cursor: pointer;\n    opacity: 0.85;\n    user-select: none;\n}\n\n.wia-controls .wia-context-toggle:hover {\n    opacity: 1;\n}\n\n/* Lore book multi-select picker (per-entry) */\n.wia-controls .wia-lorebook-picker {\n    position: relative;\n    font-size: 0.85em;\n}\n\n.wia-controls .wia-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.wia-controls .wia-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.wia-controls .wia-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.wia-controls .wia-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 50;\n    min-width: 220px;\n    max-height: 240px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);\n}\n\n.wia-controls .wia-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.wia-controls .wia-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Inline Clear-content button on the WIA controls row */\n/* Content-clear row — sits directly above the entry's content textarea so\n   it's unambiguous which field the button clears. */\n.wia-content-clear-row {\n    display: flex;\n    justify-content: flex-end;\n    margin: 2px 0 4px 0;\n}\n\n.wia-content-clear-row .wia-btn-clear-content {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.wia-content-clear-row .wia-btn-clear-content:hover {\n    opacity: 1;\n}\n\n/* Per-entry guidance section — sits between the controls and the entry's\n   content textarea so it's clearly the user's *input* to the assist. */\n.wia-guidance-block {\n    margin: 0 0 8px 0;\n}\n\n.wia-guidance-block .wia-guidance-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin: 0 0 4px 0;\n}\n\n.wia-guidance-block .wia-guidance-label {\n    font-size: 0.9em;\n    font-weight: 500;\n    opacity: 0.9;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n}\n\n.wia-guidance-block .wia-btn-clear-guidance {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.wia-guidance-block .wia-btn-clear-guidance:hover {\n    opacity: 1;\n}\n\n.wia-guidance-block .wia-guidance-textarea {\n    width: 100%;\n    resize: vertical;\n    min-height: 60px;\n    font-size: 0.9em;\n}\n\n/* Per-entry token limit row */\n.wia-controls .wia-tokens-row {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.85em;\n    opacity: 0.85;\n    margin-left: auto;\n}\n\n.wia-controls .wia-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.wia-controls .wia-tokens-input {\n    width: 72px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n/* ── ACC modal: context preamble controls ── */\n\n.acc-context-section {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: wrap;\n    margin-bottom: 12px;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.acc-context-section .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.9em;\n    cursor: pointer;\n}\n\n.acc-lorebook-picker {\n    position: relative;\n    font-size: 0.9em;\n}\n\n.acc-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.acc-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.acc-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.acc-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 10002;\n    min-width: 240px;\n    max-height: 260px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\n}\n\n.acc-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.acc-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   COMPACTION MODAL STYLES (rendered inside ST's Popup; mirror the ACC flex chain)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n.cc-modal-body {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n    text-align: left;\n}\n\n.cc-usage-banner {\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    font-size: 0.9em;\n    opacity: 0.9;\n}\n\n.cc-usage-banner.cc-usage-high {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n    opacity: 1;\n}\n\n.cc-context-section {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: wrap;\n    margin-bottom: 12px;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.cc-context-hint {\n    opacity: 0.7;\n}\n\n.cc-guidance-section {\n    margin-bottom: 12px;\n}\n\n.cc-guidance-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.cc-action-row {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    margin-bottom: 8px;\n}\n\n.cc-action-btn {\n    flex: 1 1 0;\n    min-width: 130px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n.cc-action-btn.cc-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.cc-generate-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.cc-tokens-row {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 6px;\n    margin-bottom: 12px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.cc-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.cc-tokens-input {\n    width: 90px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n.cc-status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    background: var(--SmartThemeBodyColor, #222);\n    border-radius: 4px;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 0.9em;\n}\n\n.cc-summary-section {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.cc-summary-section label {\n    margin-bottom: 4px;\n}\n\n.cc-summary-output {\n    width: 100%;\n    flex: 1 1 0%;\n    min-height: 200px;\n    resize: vertical;\n}\n\n.cc-hidden {\n    display: none !important;\n}\n\n.cc-modal-body .cc-field-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin-bottom: 4px;\n}\n\n.cc-modal-body .cc-clear-btn {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.cc-modal-body .cc-clear-btn:hover {\n    opacity: 1;\n}\n\n.cc-confirm .cc-dont-ask {\n    margin-top: 10px;\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n/* Compaction lore-book picker (shares the ACC picker shape) */\n.cc-lorebook-picker {\n    position: relative;\n    font-size: 0.9em;\n}\n\n.cc-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.cc-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.cc-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.cc-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 10002;\n    min-width: 240px;\n    max-height: 260px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\n}\n\n.cc-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.cc-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Compaction launch item in the hamburger menu */\n#compaction_menu_button {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n/* The seeded \"Story so far\" recap message. The class is applied to the .mes\n   node by tagCompactionSummaries() (extra.sse_summary alone has no DOM hook). */\n#chat .mes.cc-summary-message {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n#chat .mes.cc-summary-message .ch_name .name_text {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-style: italic;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   IMAGE PROMPTING MODAL STYLES (rendered inside ST's Popup; mirror the ACC flex chain)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n.ip-modal-body {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n    text-align: left;\n}\n\n.ip-context-section {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: wrap;\n    margin-bottom: 12px;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.ip-context-section .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.9em;\n    cursor: pointer;\n}\n\n.ip-guidance-section {\n    margin-bottom: 12px;\n}\n\n.ip-guidance-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.ip-action-row {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    margin-bottom: 8px;\n}\n\n.ip-action-btn {\n    flex: 1 1 0;\n    min-width: 130px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n.ip-action-btn.ip-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.ip-generate-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.ip-tokens-row {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 6px;\n    margin-bottom: 12px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.ip-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.ip-tokens-input {\n    width: 90px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n.ip-status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    background: var(--SmartThemeBodyColor, #222);\n    border-radius: 4px;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 0.9em;\n}\n\n.ip-output-section {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.ip-output-section label {\n    margin-bottom: 4px;\n}\n\n.ip-prompt-output {\n    width: 100%;\n    flex: 1 1 0%;\n    min-height: 180px;\n    resize: vertical;\n}\n\n.ip-hidden {\n    display: none !important;\n}\n\n.ip-modal-body .ip-field-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin-bottom: 4px;\n}\n\n.ip-modal-body .ip-field-header-buttons {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n.ip-modal-body .ip-clear-btn {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.ip-modal-body .ip-clear-btn:hover {\n    opacity: 1;\n}\n\n/* Image Prompting lore-book picker (shares the ACC picker shape) */\n.ip-lorebook-picker {\n    position: relative;\n    font-size: 0.9em;\n}\n\n.ip-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.ip-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.ip-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.ip-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 10002;\n    min-width: 240px;\n    max-height: 260px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\n}\n\n.ip-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.ip-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Image Prompting saved-prompt store (per-chat) */\n.ip-saved-section {\n    margin-top: 8px;\n}\n\n.ip-saved-picker {\n    font-size: 0.9em;\n}\n\n.ip-saved-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.ip-saved-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.ip-saved-picker > summary:hover {\n    opacity: 1;\n}\n\n.ip-saved-list {\n    margin-top: 4px;\n    max-height: 220px;\n    overflow-y: auto;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n}\n\n.ip-saved-item {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 4px 6px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.ip-saved-item-info {\n    flex: 1;\n    min-width: 0;\n}\n\n.ip-saved-item-head {\n    display: flex;\n    align-items: baseline;\n    justify-content: space-between;\n    gap: 8px;\n}\n\n.ip-saved-item-title {\n    font-weight: bold;\n    white-space: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n\n.ip-saved-item-untitled {\n    font-weight: normal;\n    font-style: italic;\n    opacity: 0.7;\n}\n\n.ip-saved-item-date {\n    font-size: 0.85em;\n    opacity: 0.7;\n    flex-shrink: 0;\n}\n\n.ip-saved-item-preview {\n    white-space: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n\n.ip-saved-item-buttons {\n    display: flex;\n    gap: 4px;\n    flex-shrink: 0;\n}\n\n.ip-saved-item-btn {\n    font-size: 0.85em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.ip-saved-item-btn:hover {\n    opacity: 1;\n}\n\n.ip-saved-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Image Prompting launch item in the hamburger menu */\n#image_prompt_menu_button {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   NARRATIVE GUIDANCE SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_subsection_header {\n    margin: 12px 0 4px 0;\n    opacity: 0.85;\n}\n\n#saints_silly_settings .ng_field_header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n}\n\n#saints_silly_settings .ng_clear_guidance_button {\n    font-size: 0.85em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n#saints_silly_settings .ng_clear_guidance_button:hover {\n    opacity: 1;\n}\n\n#saints_silly_settings .ng_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings .ng_prompt_section textarea {\n    width: 100%;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .ng_inline_row {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin: 6px 0;\n}\n\n#saints_silly_settings .ng_number_input {\n    width: 5em;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng_select_input {\n    width: auto;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng-lorebook-picker {\n    margin: 8px 0;\n}\n\n#saints_silly_settings .ng-lorebook-list {\n    margin-top: 4px;\n    padding: 6px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n}\n\n#saints_silly_settings .ng-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n#saints_silly_settings .ng-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n#saints_silly_settings [id$=\"_regenerate_now\"].disabled,\n#saints_silly_settings [id$=\"_continue_now\"].disabled,\n#saints_silly_settings [id$=\"_retry_now\"].disabled {\n    opacity: 0.6;\n    pointer-events: none;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PROMPT TEMPLATE CONTROLS (shared, one row per prompt)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_template_controls {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin-top: 6px;\n}\n\n#saints_silly_settings .saints_template_select {\n    width: 100%;\n}\n\n#saints_silly_settings .saints_template_buttons {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button {\n    flex: 1 1 0;\n    min-width: 100px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button.disabled {\n    opacity: 0.5;\n    pointer-events: none;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   TOOL PRESET BLOCK & PROMPT PREVIEW\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_preset_block {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin: 8px 0;\n    padding: 8px;\n    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));\n    border-radius: 6px;\n}\n\n#saints_silly_settings .saints_preview_btn {\n    align-self: flex-start;\n    white-space: nowrap;\n}\n\n.sse-prompt-preview {\n    text-align: left;\n}\n\n.sse-prompt-preview h3 {\n    margin: 0 0 10px 0;\n}\n\n.sse-preview-section {\n    margin-bottom: 12px;\n}\n\n.sse-preview-label {\n    font-weight: bold;\n    opacity: 0.8;\n    margin-bottom: 4px;\n}\n\n.sse-preview-text {\n    white-space: pre-wrap;\n    word-break: break-word;\n    text-align: left;\n    font-size: calc(var(--mainFontSize, 14px) * 0.85);\n    background-color: rgba(0, 0, 0, 0.2);\n    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));\n    border-radius: 6px;\n    padding: 8px;\n    margin: 0;\n    max-height: 40vh;\n    overflow-y: auto;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   REFORMATTING\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Engine-specific option blocks; toggled by the Engine dropdown. */\n#saints_silly_settings .reformatting_section {\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    margin-top: 6px;\n}\n\n#saints_silly_settings .reformatting-hidden {\n    display: none;\n}\n\n/* Mutually-exclusive asterisk-handling choice. */\n#saints_silly_settings .reformatting_radio_group {\n    display: flex;\n    flex-direction: column;\n    gap: 2px;\n    margin: 2px 0 4px 12px;\n}\n\n/* Per-message reformat button — inherits ST's .mes_button sizing; this just\n   gives it a subtle hover tint consistent with the other quick buttons. */\n.sse-reformat-button {\n    cursor: pointer;\n}\n\n.sse-reformat-button:hover {\n    color: var(--SmartThemeQuoteColor, #6bf);\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PHRASE BAN\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .phrase_ban_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings .phrase_ban_section textarea {\n    width: 100%;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n/* Live pattern-list validation readout under the patterns textarea. */\n#saints_silly_settings #phrase_ban_pattern_status {\n    display: block;\n    margin-top: 4px;\n    opacity: 0.8;\n}\n\n#saints_silly_settings #phrase_ban_pattern_status.phrase-ban-status-error {\n    color: var(--warning, #e8a23a);\n    opacity: 1;\n}\n\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   RETRY CONTINUE\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Retry Continue button (hamburger menu item) */\n#option_retry_continue {\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n}\n\n#option_retry_continue:hover {\n    opacity: 1;\n}\n\n/* Active state — checkpoint is set */\n#option_retry_continue.retry-active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* Retry Continue quick-action button */\n#quick_retry_continue {\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    font-size: 1.1em;\n    padding: 2px 5px;\n    position: relative;\n}\n\n#quick_retry_continue:hover {\n    opacity: 1;\n}\n\n#quick_retry_continue.retry-active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n#quick_retry_continue.retry-active::after {\n    content: '';\n    position: absolute;\n    bottom: -2px;\n    left: 50%;\n    transform: translateX(-50%);\n    width: 6px;\n    height: 6px;\n    border-radius: 50%;\n    background-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* Message indicator: colored left border */\n.mes.retry-checkpoint-border {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n/* Message indicator: bookmark icon */\n.retry-checkpoint-indicator {\n    margin-left: 6px;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 0.85em;\n    vertical-align: middle;\n}\n\n/* Settings: spacing for the Clear Checkpoint button */\n#saints_silly_settings #retry_continue_clear {\n    margin-top: 10px;\n}\n"],"sourceRoot":""}]);
+
+/* ─── Point-of-use Preset Selectors ─── */
+
+/* Shared base for the compact preset dropdowns mounted at each tool's
+   working surface (modals, WIA entry rows). */
+.saints_preset_select {
+    flex: 0 1 auto;
+    width: auto !important;
+    min-width: 120px;
+    max-width: 260px;
+}
+
+.acc-preset-row,
+.ip-preset-row,
+.cc-preset-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 0.9em;
+}
+
+.acc-preset-label,
+.ip-preset-label,
+.cc-preset-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    user-select: none;
+    opacity: 0.85;
+}
+
+.wia-controls .wia-preset-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85em;
+    opacity: 0.85;
+}
+
+.wia-controls .wia-preset-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    user-select: none;
+}
+
+.wia-controls .wia-preset-select {
+    max-width: 160px;
+    padding: 2px 6px !important;
+    font-size: 0.9em !important;
+}
+`, "",{"version":3,"sources":["webpack://./src/style.css"],"names":[],"mappings":"AAAA,+CAA+C;;;AAG/C;;oFAEoF;;AAEpF;;;;;iEAKiE;AACjE;;IAEI,yBAAyB;IACzB,iBAAiB;IACjB,2BAA2B;IAC3B,wCAAwC;AAC5C;;;AAGA;;oFAEoF;;AAEpF,0CAA0C;;AAE1C;IACI,oBAAoB;IACpB,mBAAmB;IACnB,gBAAgB;IAChB,eAAe;AACnB;;AAEA;IACI,WAAW;IACX,YAAY;IACZ,kBAAkB;IAClB,oDAAoD;IACpD,uBAAuB;IACvB,eAAe;IACf,iFAAiF;IACjF,kBAAkB;IAClB,cAAc;AAClB;;AAEA;IACI,kDAAkD;AACtD;;AAEA;IACI,kDAAkD;IAClD,gDAAgD;IAChD,mEAAmE;AACvE;;AAEA,2CAA2C;;AAE3C;IACI,YAAY;IACZ,gDAAgD;IAChD,eAAe;IACf,kBAAkB;AACtB;;AAEA;IACI,UAAU;AACd;;AAEA;IACI,UAAU;IACV,2CAA2C;AAC/C;;AAEA;IACI,WAAW;IACX,kBAAkB;IAClB,YAAY;IACZ,SAAS;IACT,2BAA2B;IAC3B,UAAU;IACV,WAAW;IACX,kBAAkB;IAClB,sDAAsD;AAC1D;;AAEA,gDAAgD;;AAEhD;IACI,sEAAsE;AAC1E;;AAEA,2DAA2D;;AAE3D;IACI,aAAa;IACb,mBAAmB;IACnB,uBAAuB;IACvB,eAAe;IACf,YAAY;IACZ,8BAA8B;IAC9B,YAAY;AAChB;;AAEA;IACI,UAAU;AACd;;AAEA;IACI,WAAW;IACX,YAAY;IACZ,kBAAkB;IAClB,iBAAiB;IACjB,oDAAoD;IACpD,mCAAmC;AACvC;;AAEA;IACI,kDAAkD;AACtD;;AAEA,mDAAmD;;AAEnD;IACI,wBAAwB;AAC5B;;AAEA;;oFAEoF;;AAEpF,2CAA2C;;AAE3C;IACI,eAAe;IACf,aAAa;IACb,mBAAmB;IACnB,uBAAuB;IACvB,YAAY;IACZ,gDAAgD;IAChD,YAAY;IACZ,gBAAgB;AACpB;;AAEA;IACI,UAAU;IACV,2CAA2C;AAC/C;;AAEA,8BAA8B;;AAE9B;IACI,eAAe;AACnB;;AAEA;IACI,iBAAiB;IACjB,UAAU;IACV,kBAAkB;AACtB;;AAEA,yCAAyC;;AAEzC;IACI,wBAAwB;AAC5B;;AAEA;;oFAEoF;;AAEpF;IACI,aAAa;IACb,sBAAsB;IACtB,QAAQ;IACR,cAAc;AAClB;;AAEA;;qDAEqD;AACrD;IACI,qBAAqB;IACrB,yDAAyD;IACzD,iBAAiB;AACrB;;AAEA;IACI,iBAAiB;IACjB,aAAa;IACb,cAAc;AAClB;;AAEA;IACI,UAAU;AACd;;AAEA;IACI,oBAAoB;AACxB;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;AACZ;;AAEA;IACI,mBAAmB;IACnB,aAAa;IACb,mBAAmB;IACnB,QAAQ;AACZ;;AAEA;IACI,YAAY;IACZ,wDAAwD;IACxD,aAAa;AACjB;;AAEA;IACI,eAAe;IACf,kBAAkB;AACtB;;AAEA;IACI,WAAW;IACX,iBAAiB;IACjB,gBAAgB;IAChB,sBAAsB;IACtB,gBAAgB;IAChB,eAAe;AACnB;;AAEA;IACI,aAAa;IACb,QAAQ;IACR,eAAe;IACf,eAAe;AACnB;;AAEA;IACI,OAAO;IACP,YAAY;IACZ,kBAAkB;IAClB,mBAAmB;AACvB;;AAEA;;oFAEoF;;AAEpF;IACI,eAAe;IACf,kBAAkB;AACtB;;AAEA;IACI,WAAW;IACX,iBAAiB;IACjB,gBAAgB;IAChB,sBAAsB;IACtB,gBAAgB;IAChB,eAAe;AACnB;;AAEA;IACI,aAAa;IACb,QAAQ;IACR,eAAe;IACf,eAAe;AACnB;;AAEA;IACI,OAAO;IACP,YAAY;IACZ,kBAAkB;IAClB,mBAAmB;AACvB;;AAEA;;oFAEoF;;AAEpF;IACI,aAAa;IACb,sBAAsB;IACtB,YAAY;IACZ,aAAa;IACb,gBAAgB;AACpB;;AAEA;IACI,mBAAmB;AACvB;;AAEA;IACI,WAAW;IACX,eAAe;IACf,gBAAgB;AACpB;;AAEA;IACI,aAAa;IACb,eAAe;IACf,QAAQ;IACR,kBAAkB;AACtB;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,yBAAyB;IACzB,QAAQ;IACR,mBAAmB;IACnB,iBAAiB;IACjB,aAAa;AACjB;;AAEA;IACI,oBAAoB;IACpB,mBAAmB;IACnB,QAAQ;IACR,iBAAiB;AACrB;;AAEA;IACI,sBAAsB;IACtB,2BAA2B;IAC3B,2BAA2B;IAC3B,kBAAkB;AACtB;;AAEA;IACI,WAAW;IACX,gBAAgB;IAChB,kBAAkB;IAClB,mBAAmB;AACvB;;AAEA;IACI,YAAY;IACZ,oBAAoB;AACxB;;AAEA;IACI,2CAA2C;AAC/C;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;IACR,iBAAiB;IACjB,mBAAmB;IACnB,4CAA4C;IAC5C,kBAAkB;IAClB,2CAA2C;IAC3C,gBAAgB;AACpB;;AAEA;IACI,aAAa;IACb,sBAAsB;IACtB,YAAY;IACZ,aAAa;AACjB;;AAEA;IACI,kBAAkB;AACtB;;AAEA;IACI,WAAW;IACX,YAAY;IACZ,iBAAiB;IACjB,gBAAgB;AACpB;;AAEA;IACI,YAAY;IACZ,mBAAmB;AACvB;;AAEA;IACI,wBAAwB;AAC5B;;AAEA,2CAA2C;AAC3C;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;AACZ;;AAEA,oEAAoE;AACpE;IACI,aAAa;IACb,mBAAmB;IACnB,8BAA8B;IAC9B,QAAQ;IACR,kBAAkB;AACtB;;AAEA;IACI,gBAAgB;IAChB,gBAAgB;IAChB,aAAa;AACjB;;AAEA;IACI,UAAU;AACd;;AAEA;;oFAEoF;;AAEpF,mBAAmB;AACnB;IACI,eAAe;IACf,kBAAkB;AACtB;;AAEA;IACI,WAAW;IACX,iBAAiB;IACjB,gBAAgB;IAChB,sBAAsB;IACtB,gBAAgB;IAChB,eAAe;AACnB;;AAEA;IACI,aAAa;IACb,QAAQ;IACR,eAAe;IACf,eAAe;AACnB;;AAEA;IACI,OAAO;IACP,YAAY;IACZ,kBAAkB;IAClB,mBAAmB;AACvB;;AAEA,+DAA+D;AAC/D;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;IACR,eAAe;IACf,mBAAmB;AACvB;;AAEA;IACI,oBAAoB;IACpB,mBAAmB;IACnB,QAAQ;IACR,eAAe;IACf,iBAAiB;IACjB,gBAAgB;AACpB;;AAEA;IACI,2CAA2C;AAC/C;;AAEA;IACI,gBAAgB;AACpB;;AAEA;IACI,2CAA2C;IAC3C,cAAc;IACd,oBAAoB;IACpB,mBAAmB;IACnB,gBAAgB;AACpB;;AAEA;IACI,wBAAwB;AAC5B;;AAEA,8BAA8B;AAC9B;IACI,oBAAoB;IACpB,mBAAmB;IACnB,QAAQ;IACR,iBAAiB;IACjB,eAAe;IACf,aAAa;IACb,iBAAiB;AACrB;;AAEA;IACI,UAAU;AACd;;AAEA,8CAA8C;AAC9C;IACI,kBAAkB;IAClB,iBAAiB;AACrB;;AAEA;IACI,eAAe;IACf,gBAAgB;IAChB,gBAAgB;IAChB,oDAAoD;IACpD,kBAAkB;IAClB,oBAAoB;IACpB,mBAAmB;IACnB,QAAQ;IACR,aAAa;AACjB;;AAEA;IACI,aAAa;AACjB;;AAEA;IACI,UAAU;AACd;;AAEA;IACI,kBAAkB;IAClB,SAAS;IACT,OAAO;IACP,eAAe;IACf,WAAW;IACX,gBAAgB;IAChB,iBAAiB;IACjB,gBAAgB;IAChB,mDAAmD;IACnD,oDAAoD;IACpD,kBAAkB;IAClB,gBAAgB;IAChB,aAAa;IACb,sBAAsB;IACtB,QAAQ;IACR,yCAAyC;AAC7C;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;IACR,eAAe;AACnB;;AAEA;IACI,YAAY;IACZ,kBAAkB;AACtB;;AAEA,wDAAwD;AACxD;oDACoD;AACpD;IACI,aAAa;IACb,yBAAyB;IACzB,mBAAmB;AACvB;;AAEA;IACI,gBAAgB;IAChB,gBAAgB;IAChB,aAAa;AACjB;;AAEA;IACI,UAAU;AACd;;AAEA;uEACuE;AACvE;IACI,iBAAiB;AACrB;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,8BAA8B;IAC9B,QAAQ;IACR,iBAAiB;AACrB;;AAEA;IACI,gBAAgB;IAChB,gBAAgB;IAChB,YAAY;IACZ,oBAAoB;IACpB,mBAAmB;IACnB,QAAQ;AACZ;;AAEA;IACI,gBAAgB;IAChB,gBAAgB;IAChB,aAAa;AACjB;;AAEA;IACI,UAAU;AACd;;AAEA;IACI,WAAW;IACX,gBAAgB;IAChB,gBAAgB;IAChB,gBAAgB;AACpB;;AAEA,8BAA8B;AAC9B;IACI,oBAAoB;IACpB,mBAAmB;IACnB,QAAQ;IACR,iBAAiB;IACjB,aAAa;IACb,iBAAiB;AACrB;;AAEA;IACI,oBAAoB;IACpB,mBAAmB;IACnB,QAAQ;IACR,iBAAiB;AACrB;;AAEA;IACI,sBAAsB;IACtB,2BAA2B;IAC3B,2BAA2B;IAC3B,kBAAkB;AACtB;;AAEA,+CAA+C;;AAE/C;IACI,aAAa;IACb,mBAAmB;IACnB,SAAS;IACT,eAAe;IACf,mBAAmB;IACnB,iBAAiB;IACjB,oDAAoD;IACpD,kBAAkB;AACtB;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;IACR,gBAAgB;IAChB,eAAe;AACnB;;AAEA;IACI,kBAAkB;IAClB,gBAAgB;AACpB;;AAEA;IACI,eAAe;IACf,gBAAgB;IAChB,gBAAgB;IAChB,oDAAoD;IACpD,kBAAkB;IAClB,oBAAoB;IACpB,mBAAmB;IACnB,QAAQ;IACR,aAAa;AACjB;;AAEA;IACI,aAAa;AACjB;;AAEA;IACI,UAAU;AACd;;AAEA;IACI,kBAAkB;IAClB,SAAS;IACT,OAAO;IACP,eAAe;IACf,cAAc;IACd,gBAAgB;IAChB,iBAAiB;IACjB,gBAAgB;IAChB,mDAAmD;IACnD,oDAAoD;IACpD,kBAAkB;IAClB,gBAAgB;IAChB,aAAa;IACb,sBAAsB;IACtB,QAAQ;IACR,yCAAyC;AAC7C;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;IACR,eAAe;AACnB;;AAEA;IACI,YAAY;IACZ,kBAAkB;AACtB;;AAEA;;oFAEoF;;AAEpF;IACI,aAAa;IACb,sBAAsB;IACtB,YAAY;IACZ,aAAa;IACb,gBAAgB;AACpB;;AAEA;IACI,iBAAiB;IACjB,mBAAmB;IACnB,oDAAoD;IACpD,kBAAkB;IAClB,gBAAgB;IAChB,YAAY;AAChB;;AAEA;IACI,2CAA2C;IAC3C,kDAAkD;IAClD,UAAU;AACd;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,SAAS;IACT,eAAe;IACf,mBAAmB;IACnB,iBAAiB;IACjB,oDAAoD;IACpD,kBAAkB;AACtB;;AAEA;IACI,YAAY;AAChB;;AAEA;IACI,mBAAmB;AACvB;;AAEA;IACI,WAAW;IACX,eAAe;IACf,gBAAgB;AACpB;;AAEA;IACI,aAAa;IACb,eAAe;IACf,QAAQ;IACR,kBAAkB;AACtB;;AAEA;IACI,WAAW;IACX,gBAAgB;IAChB,kBAAkB;IAClB,mBAAmB;AACvB;;AAEA;IACI,YAAY;IACZ,oBAAoB;AACxB;;AAEA;IACI,2CAA2C;AAC/C;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,yBAAyB;IACzB,QAAQ;IACR,mBAAmB;IACnB,iBAAiB;IACjB,aAAa;AACjB;;AAEA;IACI,oBAAoB;IACpB,mBAAmB;IACnB,QAAQ;IACR,iBAAiB;AACrB;;AAEA;IACI,sBAAsB;IACtB,2BAA2B;IAC3B,2BAA2B;IAC3B,kBAAkB;AACtB;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;IACR,iBAAiB;IACjB,mBAAmB;IACnB,4CAA4C;IAC5C,kBAAkB;IAClB,2CAA2C;IAC3C,gBAAgB;AACpB;;AAEA;IACI,aAAa;IACb,sBAAsB;IACtB,YAAY;IACZ,aAAa;AACjB;;AAEA;IACI,kBAAkB;AACtB;;AAEA;IACI,WAAW;IACX,YAAY;IACZ,iBAAiB;IACjB,gBAAgB;AACpB;;AAEA;IACI,wBAAwB;AAC5B;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,8BAA8B;IAC9B,QAAQ;IACR,kBAAkB;AACtB;;AAEA;IACI,gBAAgB;IAChB,gBAAgB;IAChB,aAAa;AACjB;;AAEA;IACI,UAAU;AACd;;AAEA;IACI,gBAAgB;IAChB,aAAa;IACb,mBAAmB;IACnB,QAAQ;AACZ;;AAEA,8DAA8D;AAC9D;IACI,kBAAkB;IAClB,gBAAgB;AACpB;;AAEA;IACI,eAAe;IACf,gBAAgB;IAChB,gBAAgB;IAChB,oDAAoD;IACpD,kBAAkB;IAClB,oBAAoB;IACpB,mBAAmB;IACnB,QAAQ;IACR,aAAa;AACjB;;AAEA;IACI,aAAa;AACjB;;AAEA;IACI,UAAU;AACd;;AAEA;IACI,kBAAkB;IAClB,SAAS;IACT,OAAO;IACP,eAAe;IACf,cAAc;IACd,gBAAgB;IAChB,iBAAiB;IACjB,gBAAgB;IAChB,mDAAmD;IACnD,oDAAoD;IACpD,kBAAkB;IAClB,gBAAgB;IAChB,aAAa;IACb,sBAAsB;IACtB,QAAQ;IACR,yCAAyC;AAC7C;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;IACR,eAAe;AACnB;;AAEA;IACI,YAAY;IACZ,kBAAkB;AACtB;;AAEA,iDAAiD;AACjD;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;AACZ;;AAEA;gFACgF;AAChF;IACI,sEAAsE;AAC1E;;AAEA;IACI,2CAA2C;IAC3C,kBAAkB;AACtB;;AAEA;;oFAEoF;;AAEpF;IACI,aAAa;IACb,sBAAsB;IACtB,YAAY;IACZ,aAAa;IACb,gBAAgB;AACpB;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,SAAS;IACT,eAAe;IACf,mBAAmB;IACnB,iBAAiB;IACjB,oDAAoD;IACpD,kBAAkB;AACtB;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;IACR,gBAAgB;IAChB,eAAe;AACnB;;AAEA;IACI,mBAAmB;AACvB;;AAEA;IACI,WAAW;IACX,eAAe;IACf,gBAAgB;AACpB;;AAEA;IACI,aAAa;IACb,eAAe;IACf,QAAQ;IACR,kBAAkB;AACtB;;AAEA;IACI,WAAW;IACX,gBAAgB;IAChB,kBAAkB;IAClB,mBAAmB;AACvB;;AAEA;IACI,YAAY;IACZ,oBAAoB;AACxB;;AAEA;IACI,2CAA2C;AAC/C;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,yBAAyB;IACzB,QAAQ;IACR,mBAAmB;IACnB,iBAAiB;IACjB,aAAa;AACjB;;AAEA;IACI,oBAAoB;IACpB,mBAAmB;IACnB,QAAQ;IACR,iBAAiB;AACrB;;AAEA;IACI,sBAAsB;IACtB,2BAA2B;IAC3B,2BAA2B;IAC3B,kBAAkB;AACtB;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;IACR,iBAAiB;IACjB,mBAAmB;IACnB,4CAA4C;IAC5C,kBAAkB;IAClB,2CAA2C;IAC3C,gBAAgB;AACpB;;AAEA;IACI,aAAa;IACb,sBAAsB;IACtB,YAAY;IACZ,aAAa;AACjB;;AAEA;IACI,kBAAkB;AACtB;;AAEA;IACI,WAAW;IACX,YAAY;IACZ,iBAAiB;IACjB,gBAAgB;AACpB;;AAEA;IACI,wBAAwB;AAC5B;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,8BAA8B;IAC9B,QAAQ;IACR,kBAAkB;AACtB;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;AACZ;;AAEA;IACI,gBAAgB;IAChB,gBAAgB;IAChB,aAAa;AACjB;;AAEA;IACI,UAAU;AACd;;AAEA,mEAAmE;AACnE;IACI,kBAAkB;IAClB,gBAAgB;AACpB;;AAEA;IACI,eAAe;IACf,gBAAgB;IAChB,gBAAgB;IAChB,oDAAoD;IACpD,kBAAkB;IAClB,oBAAoB;IACpB,mBAAmB;IACnB,QAAQ;IACR,aAAa;AACjB;;AAEA;IACI,aAAa;AACjB;;AAEA;IACI,UAAU;AACd;;AAEA;IACI,kBAAkB;IAClB,SAAS;IACT,OAAO;IACP,eAAe;IACf,cAAc;IACd,gBAAgB;IAChB,iBAAiB;IACjB,gBAAgB;IAChB,mDAAmD;IACnD,oDAAoD;IACpD,kBAAkB;IAClB,gBAAgB;IAChB,aAAa;IACb,sBAAsB;IACtB,QAAQ;IACR,yCAAyC;AAC7C;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;IACR,eAAe;AACnB;;AAEA;IACI,YAAY;IACZ,kBAAkB;AACtB;;AAEA,kDAAkD;AAClD;IACI,eAAe;AACnB;;AAEA;IACI,gBAAgB;AACpB;;AAEA;IACI,eAAe;IACf,gBAAgB;IAChB,gBAAgB;IAChB,oDAAoD;IACpD,kBAAkB;IAClB,oBAAoB;IACpB,mBAAmB;IACnB,QAAQ;IACR,aAAa;AACjB;;AAEA;IACI,aAAa;AACjB;;AAEA;IACI,UAAU;AACd;;AAEA;IACI,eAAe;IACf,iBAAiB;IACjB,gBAAgB;IAChB,oDAAoD;IACpD,kBAAkB;IAClB,gBAAgB;IAChB,aAAa;IACb,sBAAsB;IACtB,QAAQ;AACZ;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;IACR,gBAAgB;IAChB,oDAAoD;IACpD,kBAAkB;AACtB;;AAEA;IACI,OAAO;IACP,YAAY;AAChB;;AAEA;IACI,aAAa;IACb,qBAAqB;IACrB,8BAA8B;IAC9B,QAAQ;AACZ;;AAEA;IACI,iBAAiB;IACjB,mBAAmB;IACnB,gBAAgB;IAChB,uBAAuB;AAC3B;;AAEA;IACI,mBAAmB;IACnB,kBAAkB;IAClB,YAAY;AAChB;;AAEA;IACI,iBAAiB;IACjB,YAAY;IACZ,cAAc;AAClB;;AAEA;IACI,mBAAmB;IACnB,gBAAgB;IAChB,uBAAuB;AAC3B;;AAEA;IACI,aAAa;IACb,QAAQ;IACR,cAAc;AAClB;;AAEA;IACI,iBAAiB;IACjB,gBAAgB;IAChB,aAAa;AACjB;;AAEA;IACI,UAAU;AACd;;AAEA;IACI,YAAY;IACZ,kBAAkB;AACtB;;AAEA,sDAAsD;AACtD;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;AACZ;;AAEA;;oFAEoF;;AAEpF;IACI,oBAAoB;IACpB,aAAa;AACjB;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,8BAA8B;IAC9B,QAAQ;AACZ;;AAEA;IACI,iBAAiB;IACjB,gBAAgB;IAChB,aAAa;AACjB;;AAEA;IACI,UAAU;AACd;;AAEA;IACI,eAAe;IACf,kBAAkB;AACtB;;AAEA;IACI,WAAW;IACX,gBAAgB;IAChB,sBAAsB;IACtB,gBAAgB;IAChB,eAAe;AACnB;;AAEA;IACI,aAAa;IACb,QAAQ;IACR,eAAe;IACf,eAAe;AACnB;;AAEA;IACI,OAAO;IACP,YAAY;IACZ,kBAAkB;IAClB,mBAAmB;AACvB;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;IACR,eAAe;IACf,aAAa;AACjB;;AAEA;IACI,UAAU;IACV,cAAc;AAClB;;AAEA;IACI,WAAW;IACX,cAAc;AAClB;;AAEA;IACI,aAAa;AACjB;;AAEA;IACI,eAAe;IACf,gBAAgB;IAChB,oDAAoD;IACpD,kBAAkB;IAClB,aAAa;IACb,sBAAsB;IACtB,QAAQ;AACZ;;AAEA;IACI,aAAa;IACb,mBAAmB;IACnB,QAAQ;IACR,eAAe;AACnB;;AAEA;IACI,YAAY;IACZ,kBAAkB;AACtB;;AAEA;;;IAGI,YAAY;IACZ,oBAAoB;AACxB;;AAEA;;oFAEoF;;AAEpF;IACI,aAAa;IACb,sBAAsB;IACtB,QAAQ;IACR,eAAe;AACnB;;AAEA;IACI,WAAW;AACf;;AAEA;IACI,aAAa;IACb,QAAQ;IACR,eAAe;AACnB;;AAEA;IACI,WAAW;IACX,gBAAgB;IAChB,kBAAkB;IAClB,mBAAmB;AACvB;;AAEA;IACI,YAAY;IACZ,oBAAoB;AACxB;;AAEA;;oFAEoF;;AAEpF;IACI,aAAa;IACb,sBAAsB;IACtB,QAAQ;IACR,aAAa;IACb,YAAY;IACZ,wEAAwE;IACxE,kBAAkB;AACtB;;AAEA;IACI,sBAAsB;IACtB,mBAAmB;AACvB;;AAEA;IACI,gBAAgB;AACpB;;AAEA;IACI,kBAAkB;AACtB;;AAEA;IACI,mBAAmB;AACvB;;AAEA;IACI,iBAAiB;IACjB,YAAY;IACZ,kBAAkB;AACtB;;AAEA;IACI,qBAAqB;IACrB,sBAAsB;IACtB,gBAAgB;IAChB,iDAAiD;IACjD,oCAAoC;IACpC,wEAAwE;IACxE,kBAAkB;IAClB,YAAY;IACZ,SAAS;IACT,gBAAgB;IAChB,gBAAgB;AACpB;;AAEA;;oFAEoF;;AAEpF,mEAAmE;AACnE;IACI,aAAa;IACb,sBAAsB;IACtB,QAAQ;IACR,eAAe;AACnB;;AAEA;IACI,aAAa;AACjB;;AAEA,iDAAiD;AACjD;IACI,aAAa;IACb,sBAAsB;IACtB,QAAQ;IACR,sBAAsB;AAC1B;;AAEA;0EAC0E;AAC1E;IACI,eAAe;AACnB;;AAEA;IACI,wCAAwC;AAC5C;;AAEA;;oFAEoF;;AAEpF;IACI,eAAe;IACf,kBAAkB;AACtB;;AAEA;IACI,WAAW;IACX,gBAAgB;IAChB,sBAAsB;IACtB,gBAAgB;IAChB,eAAe;AACnB;;AAEA,sEAAsE;AACtE;IACI,cAAc;IACd,eAAe;IACf,YAAY;AAChB;;AAEA;IACI,8BAA8B;IAC9B,UAAU;AACd;;;AAGA;;oFAEoF;;AAEpF,gDAAgD;AAChD;IACI,eAAe;IACf,YAAY;IACZ,gDAAgD;AACpD;;AAEA;IACI,UAAU;AACd;;AAEA,qCAAqC;AACrC;IACI,UAAU;IACV,2CAA2C;AAC/C;;AAEA,uCAAuC;AACvC;IACI,eAAe;IACf,YAAY;IACZ,gDAAgD;IAChD,gBAAgB;IAChB,gBAAgB;IAChB,kBAAkB;AACtB;;AAEA;IACI,UAAU;AACd;;AAEA;IACI,UAAU;IACV,2CAA2C;AAC/C;;AAEA;IACI,WAAW;IACX,kBAAkB;IAClB,YAAY;IACZ,SAAS;IACT,2BAA2B;IAC3B,UAAU;IACV,WAAW;IACX,kBAAkB;IAClB,sDAAsD;AAC1D;;AAEA,2CAA2C;AAC3C;IACI,sEAAsE;AAC1E;;AAEA,qCAAqC;AACrC;IACI,gBAAgB;IAChB,2CAA2C;IAC3C,iBAAiB;IACjB,sBAAsB;AAC1B;;AAEA,sDAAsD;AACtD;IACI,gBAAgB;AACpB;;AAEA,0CAA0C;;AAE1C;8CAC8C;AAC9C;IACI,cAAc;IACd,sBAAsB;IACtB,gBAAgB;IAChB,gBAAgB;AACpB;;AAEA;;;IAGI,aAAa;IACb,mBAAmB;IACnB,QAAQ;IACR,kBAAkB;IAClB,gBAAgB;AACpB;;AAEA;;;IAGI,oBAAoB;IACpB,mBAAmB;IACnB,QAAQ;IACR,iBAAiB;IACjB,aAAa;AACjB;;AAEA;IACI,oBAAoB;IACpB,mBAAmB;IACnB,QAAQ;IACR,iBAAiB;IACjB,aAAa;AACjB;;AAEA;IACI,oBAAoB;IACpB,mBAAmB;IACnB,QAAQ;IACR,iBAAiB;AACrB;;AAEA;IACI,gBAAgB;IAChB,2BAA2B;IAC3B,2BAA2B;AAC/B","sourcesContent":["/* Saint's Silly Extensions — Combined Styles */\n\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SHARED: LORE BOOK PICKER\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Applied to every lore book picker (ACC / WIA / NG / Compaction) via the shared\n   factory. The picker text is pure UI and must not be selectable: tapping a\n   selectable lore book name engages Android Chrome's text-selection/magnifier\n   subsystem, which can crash the renderer (\"Aw, Snap\"). Disabling selection +\n   the touch callout/highlight keeps taps lightweight. user-select inherits, so\n   one rule on the root covers the summary and every list item. */\n.sse-lorebook-picker,\n.sse-lorebook-picker * {\n    -webkit-user-select: none;\n    user-select: none;\n    -webkit-touch-callout: none;\n    -webkit-tap-highlight-color: transparent;\n}\n\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   POSSESSION STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Group Chat: Radio Button Toggle ── */\n\n.possession_radio_wrapper {\n    display: inline-flex;\n    align-items: center;\n    margin-left: 4px;\n    cursor: pointer;\n}\n\n.possession_radio {\n    width: 16px;\n    height: 16px;\n    border-radius: 50%;\n    border: 2px solid var(--SmartThemeBorderColor, #555);\n    background: transparent;\n    cursor: pointer;\n    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;\n    position: relative;\n    flex-shrink: 0;\n}\n\n.possession_radio:hover {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.possession_radio.possession_active {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n    background: var(--SmartThemeQuoteColor, #e8a23a);\n    box-shadow: inset 0 0 0 3px var(--SmartThemeBlurTintColor, #1a1a2e);\n}\n\n/* ── Solo Chat: Possess Toggle Button ── */\n\n#possession_solo_btn {\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    cursor: pointer;\n    position: relative;\n}\n\n#possession_solo_btn:hover {\n    opacity: 1;\n}\n\n#possession_solo_btn.possession_active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n#possession_solo_btn.possession_active::after {\n    content: '';\n    position: absolute;\n    bottom: -2px;\n    left: 50%;\n    transform: translateX(-50%);\n    width: 6px;\n    height: 6px;\n    border-radius: 50%;\n    background-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Group member highlight when possessed ── */\n\n.group_member.possession_possessed {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n/* ── Possession Impersonate Button (Character Avatar) ── */\n\n#possession_impersonate_btn {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease;\n    padding: 2px;\n}\n\n#possession_impersonate_btn:hover {\n    opacity: 1;\n}\n\n.possession_impersonate_avatar {\n    width: 26px;\n    height: 26px;\n    border-radius: 50%;\n    object-fit: cover;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    transition: border-color 0.15s ease;\n}\n\n#possession_impersonate_btn:hover .possession_impersonate_avatar {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hide controls when extension is disabled ── */\n\n.possession_hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PHRASING STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Input Area Button (next to Send) ── */\n\n#phrasing_send_button {\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    padding: 3px;\n    font-size: 1.2em;\n}\n\n#phrasing_send_button:hover {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hamburger Menu Item ── */\n\n#phrasing_menu_button {\n    cursor: pointer;\n}\n\n#phrasing_menu_button .fa-solid {\n    margin-right: 5px;\n    width: 1em;\n    text-align: center;\n}\n\n/* ── Hide buttons during generation ── */\n\n.phrasing-hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SETTINGS PANEL STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .inline-drawer-content {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n    padding: 8px 0;\n}\n\n/* Nested drawers (template fields inside each tool's panel) — slightly\n   indented and with a smaller, dimmer header so they read as a sub-section\n   rather than a peer of the top-level tool drawer. */\n#saints_silly_settings .saints_nested_drawer {\n    margin: 4px 0 4px 4px;\n    border-left: 2px solid var(--SmartThemeBorderColor, #555);\n    padding-left: 8px;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-toggle {\n    font-size: 0.95em;\n    opacity: 0.85;\n    padding: 2px 0;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-toggle:hover {\n    opacity: 1;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-content {\n    padding: 4px 0 4px 0;\n}\n\n#saints_silly_settings .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_section_header {\n    margin: 4px 0 2px 0;\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_divider {\n    border: none;\n    border-top: 1px solid var(--SmartThemeBorderColor, #555);\n    margin: 8px 0;\n}\n\n#saints_silly_settings .phrasing_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #phrasing_prompt_textarea {\n    width: 100%;\n    min-height: 120px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .acc_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #acc_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC MODAL STYLES (rendered inside ST's Popup; chrome is provided by Popup)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n.acc-modal-body {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n    text-align: left;\n}\n\n.acc-brief-section {\n    margin-bottom: 12px;\n}\n\n.acc-brief-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.acc-action-row {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    margin-bottom: 8px;\n}\n\n.acc-tokens-row {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 6px;\n    margin-bottom: 12px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.acc-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.acc-tokens-input {\n    width: 80px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n.acc-action-btn {\n    flex: 1 1 0;\n    min-width: 110px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n.acc-action-btn.acc-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.acc-generate-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.acc-status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    background: var(--SmartThemeBodyColor, #222);\n    border-radius: 4px;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 0.9em;\n}\n\n.acc-description-section {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.acc-description-section label {\n    margin-bottom: 4px;\n}\n\n.acc-description-output {\n    width: 100%;\n    flex: 1 1 0%;\n    min-height: 200px;\n    resize: vertical;\n}\n\n.acc-description-output[disabled] {\n    opacity: 0.5;\n    cursor: not-allowed;\n}\n\n.acc-hidden {\n    display: none !important;\n}\n\n/* ACC Launch button in character creator */\n#acc_launch_btn {\n    display: flex;\n    align-items: center;\n    gap: 4px;\n}\n\n/* Field header row: label on the left, Clear button on the right. */\n.acc-modal-body .acc-field-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin-bottom: 4px;\n}\n\n.acc-modal-body .acc-clear-btn {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.acc-modal-body .acc-clear-btn:hover {\n    opacity: 1;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   WORLD INFO ASSIST STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Settings panel */\n#saints_silly_settings .wia_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #wia_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* Per-entry assist controls injected into each WI entry form */\n.wia-controls {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    flex-wrap: wrap;\n    margin: 6px 0 6px 0;\n}\n\n.wia-controls .wia-btn {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    cursor: pointer;\n    font-size: 0.85em;\n    padding: 4px 8px;\n}\n\n.wia-controls .wia-btn-assist {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.wia-controls .wia-btn-label {\n    font-weight: 500;\n}\n\n.wia-controls .wia-spinner {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 1em;\n    display: inline-flex;\n    align-items: center;\n    padding: 4px 6px;\n}\n\n.wia-controls .wia-hidden {\n    display: none !important;\n}\n\n/* Use Chat Context checkbox */\n.wia-controls .wia-context-toggle {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    font-size: 0.85em;\n    cursor: pointer;\n    opacity: 0.85;\n    user-select: none;\n}\n\n.wia-controls .wia-context-toggle:hover {\n    opacity: 1;\n}\n\n/* Lore book multi-select picker (per-entry) */\n.wia-controls .wia-lorebook-picker {\n    position: relative;\n    font-size: 0.85em;\n}\n\n.wia-controls .wia-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.wia-controls .wia-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.wia-controls .wia-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.wia-controls .wia-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 50;\n    min-width: 220px;\n    max-height: 240px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);\n}\n\n.wia-controls .wia-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.wia-controls .wia-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Inline Clear-content button on the WIA controls row */\n/* Content-clear row — sits directly above the entry's content textarea so\n   it's unambiguous which field the button clears. */\n.wia-content-clear-row {\n    display: flex;\n    justify-content: flex-end;\n    margin: 2px 0 4px 0;\n}\n\n.wia-content-clear-row .wia-btn-clear-content {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.wia-content-clear-row .wia-btn-clear-content:hover {\n    opacity: 1;\n}\n\n/* Per-entry guidance section — sits between the controls and the entry's\n   content textarea so it's clearly the user's *input* to the assist. */\n.wia-guidance-block {\n    margin: 0 0 8px 0;\n}\n\n.wia-guidance-block .wia-guidance-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin: 0 0 4px 0;\n}\n\n.wia-guidance-block .wia-guidance-label {\n    font-size: 0.9em;\n    font-weight: 500;\n    opacity: 0.9;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n}\n\n.wia-guidance-block .wia-btn-clear-guidance {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.wia-guidance-block .wia-btn-clear-guidance:hover {\n    opacity: 1;\n}\n\n.wia-guidance-block .wia-guidance-textarea {\n    width: 100%;\n    resize: vertical;\n    min-height: 60px;\n    font-size: 0.9em;\n}\n\n/* Per-entry token limit row */\n.wia-controls .wia-tokens-row {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.85em;\n    opacity: 0.85;\n    margin-left: auto;\n}\n\n.wia-controls .wia-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.wia-controls .wia-tokens-input {\n    width: 72px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n/* ── ACC modal: context preamble controls ── */\n\n.acc-context-section {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: wrap;\n    margin-bottom: 12px;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.acc-context-section .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.9em;\n    cursor: pointer;\n}\n\n.acc-lorebook-picker {\n    position: relative;\n    font-size: 0.9em;\n}\n\n.acc-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.acc-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.acc-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.acc-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 10002;\n    min-width: 240px;\n    max-height: 260px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\n}\n\n.acc-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.acc-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   COMPACTION MODAL STYLES (rendered inside ST's Popup; mirror the ACC flex chain)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n.cc-modal-body {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n    text-align: left;\n}\n\n.cc-usage-banner {\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    font-size: 0.9em;\n    opacity: 0.9;\n}\n\n.cc-usage-banner.cc-usage-high {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n    opacity: 1;\n}\n\n.cc-context-section {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: wrap;\n    margin-bottom: 12px;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.cc-context-hint {\n    opacity: 0.7;\n}\n\n.cc-guidance-section {\n    margin-bottom: 12px;\n}\n\n.cc-guidance-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.cc-action-row {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    margin-bottom: 8px;\n}\n\n.cc-action-btn {\n    flex: 1 1 0;\n    min-width: 130px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n.cc-action-btn.cc-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.cc-generate-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.cc-tokens-row {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 6px;\n    margin-bottom: 12px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.cc-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.cc-tokens-input {\n    width: 90px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n.cc-status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    background: var(--SmartThemeBodyColor, #222);\n    border-radius: 4px;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 0.9em;\n}\n\n.cc-summary-section {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.cc-summary-section label {\n    margin-bottom: 4px;\n}\n\n.cc-summary-output {\n    width: 100%;\n    flex: 1 1 0%;\n    min-height: 200px;\n    resize: vertical;\n}\n\n.cc-hidden {\n    display: none !important;\n}\n\n.cc-modal-body .cc-field-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin-bottom: 4px;\n}\n\n.cc-modal-body .cc-clear-btn {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.cc-modal-body .cc-clear-btn:hover {\n    opacity: 1;\n}\n\n.cc-confirm .cc-dont-ask {\n    margin-top: 10px;\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n/* Compaction lore-book picker (shares the ACC picker shape) */\n.cc-lorebook-picker {\n    position: relative;\n    font-size: 0.9em;\n}\n\n.cc-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.cc-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.cc-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.cc-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 10002;\n    min-width: 240px;\n    max-height: 260px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\n}\n\n.cc-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.cc-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Compaction launch item in the hamburger menu */\n#compaction_menu_button {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n/* The seeded \"Story so far\" recap message. The class is applied to the .mes\n   node by tagCompactionSummaries() (extra.sse_summary alone has no DOM hook). */\n#chat .mes.cc-summary-message {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n#chat .mes.cc-summary-message .ch_name .name_text {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-style: italic;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   IMAGE PROMPTING MODAL STYLES (rendered inside ST's Popup; mirror the ACC flex chain)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n.ip-modal-body {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n    text-align: left;\n}\n\n.ip-context-section {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: wrap;\n    margin-bottom: 12px;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.ip-context-section .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.9em;\n    cursor: pointer;\n}\n\n.ip-guidance-section {\n    margin-bottom: 12px;\n}\n\n.ip-guidance-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.ip-action-row {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    margin-bottom: 8px;\n}\n\n.ip-action-btn {\n    flex: 1 1 0;\n    min-width: 130px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n.ip-action-btn.ip-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.ip-generate-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.ip-tokens-row {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 6px;\n    margin-bottom: 12px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.ip-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.ip-tokens-input {\n    width: 90px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n.ip-status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    background: var(--SmartThemeBodyColor, #222);\n    border-radius: 4px;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 0.9em;\n}\n\n.ip-output-section {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.ip-output-section label {\n    margin-bottom: 4px;\n}\n\n.ip-prompt-output {\n    width: 100%;\n    flex: 1 1 0%;\n    min-height: 180px;\n    resize: vertical;\n}\n\n.ip-hidden {\n    display: none !important;\n}\n\n.ip-modal-body .ip-field-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin-bottom: 4px;\n}\n\n.ip-modal-body .ip-field-header-buttons {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n.ip-modal-body .ip-clear-btn {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.ip-modal-body .ip-clear-btn:hover {\n    opacity: 1;\n}\n\n/* Image Prompting lore-book picker (shares the ACC picker shape) */\n.ip-lorebook-picker {\n    position: relative;\n    font-size: 0.9em;\n}\n\n.ip-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.ip-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.ip-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.ip-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 10002;\n    min-width: 240px;\n    max-height: 260px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\n}\n\n.ip-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.ip-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Image Prompting saved-prompt store (per-chat) */\n.ip-saved-section {\n    margin-top: 8px;\n}\n\n.ip-saved-picker {\n    font-size: 0.9em;\n}\n\n.ip-saved-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.ip-saved-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.ip-saved-picker > summary:hover {\n    opacity: 1;\n}\n\n.ip-saved-list {\n    margin-top: 4px;\n    max-height: 220px;\n    overflow-y: auto;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n}\n\n.ip-saved-item {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 4px 6px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.ip-saved-item-info {\n    flex: 1;\n    min-width: 0;\n}\n\n.ip-saved-item-head {\n    display: flex;\n    align-items: baseline;\n    justify-content: space-between;\n    gap: 8px;\n}\n\n.ip-saved-item-title {\n    font-weight: bold;\n    white-space: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n\n.ip-saved-item-untitled {\n    font-weight: normal;\n    font-style: italic;\n    opacity: 0.7;\n}\n\n.ip-saved-item-date {\n    font-size: 0.85em;\n    opacity: 0.7;\n    flex-shrink: 0;\n}\n\n.ip-saved-item-preview {\n    white-space: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n\n.ip-saved-item-buttons {\n    display: flex;\n    gap: 4px;\n    flex-shrink: 0;\n}\n\n.ip-saved-item-btn {\n    font-size: 0.85em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.ip-saved-item-btn:hover {\n    opacity: 1;\n}\n\n.ip-saved-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Image Prompting launch item in the hamburger menu */\n#image_prompt_menu_button {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   NARRATIVE GUIDANCE SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_subsection_header {\n    margin: 12px 0 4px 0;\n    opacity: 0.85;\n}\n\n#saints_silly_settings .ng_field_header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n}\n\n#saints_silly_settings .ng_clear_guidance_button {\n    font-size: 0.85em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n#saints_silly_settings .ng_clear_guidance_button:hover {\n    opacity: 1;\n}\n\n#saints_silly_settings .ng_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings .ng_prompt_section textarea {\n    width: 100%;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .ng_inline_row {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin: 6px 0;\n}\n\n#saints_silly_settings .ng_number_input {\n    width: 5em;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng_select_input {\n    width: auto;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng-lorebook-picker {\n    margin: 8px 0;\n}\n\n#saints_silly_settings .ng-lorebook-list {\n    margin-top: 4px;\n    padding: 6px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n}\n\n#saints_silly_settings .ng-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n#saints_silly_settings .ng-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n#saints_silly_settings [id$=\"_regenerate_now\"].disabled,\n#saints_silly_settings [id$=\"_continue_now\"].disabled,\n#saints_silly_settings [id$=\"_retry_now\"].disabled {\n    opacity: 0.6;\n    pointer-events: none;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PROMPT TEMPLATE CONTROLS (shared, one row per prompt)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_template_controls {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin-top: 6px;\n}\n\n#saints_silly_settings .saints_template_select {\n    width: 100%;\n}\n\n#saints_silly_settings .saints_template_buttons {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button {\n    flex: 1 1 0;\n    min-width: 100px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button.disabled {\n    opacity: 0.5;\n    pointer-events: none;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   TOOL PRESET BLOCK & PROMPT PREVIEW\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_preset_block {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin: 8px 0;\n    padding: 8px;\n    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));\n    border-radius: 6px;\n}\n\n#saints_silly_settings .saints_preview_btn {\n    align-self: flex-start;\n    white-space: nowrap;\n}\n\n.sse-prompt-preview {\n    text-align: left;\n}\n\n.sse-prompt-preview h3 {\n    margin: 0 0 10px 0;\n}\n\n.sse-preview-section {\n    margin-bottom: 12px;\n}\n\n.sse-preview-label {\n    font-weight: bold;\n    opacity: 0.8;\n    margin-bottom: 4px;\n}\n\n.sse-preview-text {\n    white-space: pre-wrap;\n    word-break: break-word;\n    text-align: left;\n    font-size: calc(var(--mainFontSize, 14px) * 0.85);\n    background-color: rgba(0, 0, 0, 0.2);\n    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));\n    border-radius: 6px;\n    padding: 8px;\n    margin: 0;\n    max-height: 40vh;\n    overflow-y: auto;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   REFORMATTING\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Engine-specific option blocks; toggled by the Engine dropdown. */\n#saints_silly_settings .reformatting_section {\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    margin-top: 6px;\n}\n\n#saints_silly_settings .reformatting-hidden {\n    display: none;\n}\n\n/* Mutually-exclusive asterisk-handling choice. */\n#saints_silly_settings .reformatting_radio_group {\n    display: flex;\n    flex-direction: column;\n    gap: 2px;\n    margin: 2px 0 4px 12px;\n}\n\n/* Per-message reformat button — inherits ST's .mes_button sizing; this just\n   gives it a subtle hover tint consistent with the other quick buttons. */\n.sse-reformat-button {\n    cursor: pointer;\n}\n\n.sse-reformat-button:hover {\n    color: var(--SmartThemeQuoteColor, #6bf);\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PHRASE BAN\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .phrase_ban_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings .phrase_ban_section textarea {\n    width: 100%;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n/* Live pattern-list validation readout under the patterns textarea. */\n#saints_silly_settings #phrase_ban_pattern_status {\n    display: block;\n    margin-top: 4px;\n    opacity: 0.8;\n}\n\n#saints_silly_settings #phrase_ban_pattern_status.phrase-ban-status-error {\n    color: var(--warning, #e8a23a);\n    opacity: 1;\n}\n\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   RETRY CONTINUE\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Retry Continue button (hamburger menu item) */\n#option_retry_continue {\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n}\n\n#option_retry_continue:hover {\n    opacity: 1;\n}\n\n/* Active state — checkpoint is set */\n#option_retry_continue.retry-active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* Retry Continue quick-action button */\n#quick_retry_continue {\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    font-size: 1.1em;\n    padding: 2px 5px;\n    position: relative;\n}\n\n#quick_retry_continue:hover {\n    opacity: 1;\n}\n\n#quick_retry_continue.retry-active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n#quick_retry_continue.retry-active::after {\n    content: '';\n    position: absolute;\n    bottom: -2px;\n    left: 50%;\n    transform: translateX(-50%);\n    width: 6px;\n    height: 6px;\n    border-radius: 50%;\n    background-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* Message indicator: colored left border */\n.mes.retry-checkpoint-border {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n/* Message indicator: bookmark icon */\n.retry-checkpoint-indicator {\n    margin-left: 6px;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 0.85em;\n    vertical-align: middle;\n}\n\n/* Settings: spacing for the Clear Checkpoint button */\n#saints_silly_settings #retry_continue_clear {\n    margin-top: 10px;\n}\n\n/* ─── Point-of-use Preset Selectors ─── */\n\n/* Shared base for the compact preset dropdowns mounted at each tool's\n   working surface (modals, WIA entry rows). */\n.saints_preset_select {\n    flex: 0 1 auto;\n    width: auto !important;\n    min-width: 120px;\n    max-width: 260px;\n}\n\n.acc-preset-row,\n.ip-preset-row,\n.cc-preset-row {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    margin-bottom: 8px;\n    font-size: 0.9em;\n}\n\n.acc-preset-label,\n.ip-preset-label,\n.cc-preset-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n    opacity: 0.85;\n}\n\n.wia-controls .wia-preset-row {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.wia-controls .wia-preset-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.wia-controls .wia-preset-select {\n    max-width: 160px;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n}\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -5629,6 +5681,447 @@ function registerPhraseBanSlashCommand() {
 
 ;// external "../../../../reasoning.js"
 
+;// ./src/prompt-templates.js
+/**
+ * Tool Presets — named, reusable bundles of every editable prompt/prefill a
+ * tool owns, replacing the old per-field prompt templates. One dropdown +
+ * Save/Update/Rename/Delete per tool keeps coupled fields (e.g. a prompt
+ * that describes its prefill's format) saved and restored together.
+ * Persisted at the extension-settings level (across chats) under
+ * `toolPresets` / `activeToolPreset`.
+ *
+ * The bound textareas remain the single live source of truth: selecting a
+ * preset loads each field's text into its textarea and re-dispatches `input`
+ * so the owning module's existing live-binding persists textarea → settings.
+ * Editing a textarea never silently mutates the preset — the dropdown shows
+ * "(modified)" until the user clicks Update or saves a new preset, and
+ * switching presets with unsaved changes asks for confirmation first.
+ *
+ * Preset *management* (Save/Update/Rename/Delete) lives in the settings
+ * panel, next to the textareas the presets bundle. Preset *selection* is
+ * also available at the point of use: createToolPresetSelector returns a
+ * compact dropdown (mounted in the ACC / Image Prompting / Compaction
+ * modals and on every WIA entry's Assist row) that shares state with the
+ * settings widget — changing the selection anywhere updates everywhere.
+ */
+
+const DEFAULT_ID = '__default__';
+const DEFAULT_LABEL = 'Default';
+
+// toolKey -> { toolKey, label, fields, settings, saveSettings, listeners }.
+// Populated by setupToolPresets at startup; consulted by the point-of-use
+// selectors and the shared activation logic.
+const toolRegistry = new Map();
+
+function getTool(toolKey) {
+    return toolRegistry.get(toolKey) || null;
+}
+
+function notifyPresetChange(tool) {
+    // Copy first: listeners may unsubscribe themselves while iterating.
+    for (const listener of [...tool.listeners]) {
+        try {
+            listener();
+        } catch (err) {
+            console.error('Tool preset listener failed:', err);
+        }
+    }
+}
+
+function getActiveId(tool) {
+    return tool.settings.activeToolPreset[tool.toolKey] || DEFAULT_ID;
+}
+
+function getPresets(tool) {
+    return tool.settings.toolPresets[tool.toolKey];
+}
+
+function getPresetValues(tool, id) {
+    const values = {};
+    const stored = id === DEFAULT_ID ? null : getPresets(tool)[id];
+    for (const field of tool.fields) {
+        const text = stored?.[field.key];
+        values[field.key] = (typeof text === 'string') ? text : field.defaultText;
+    }
+    return values;
+}
+
+function getCurrentValues(tool) {
+    const values = {};
+    for (const field of tool.fields) {
+        const live = tool.settings[field.key];
+        values[field.key] = (typeof live === 'string') ? live : field.defaultText;
+    }
+    return values;
+}
+
+function isDirty(tool) {
+    const current = getCurrentValues(tool);
+    const preset = getPresetValues(tool, getActiveId(tool));
+    return tool.fields.some(f => current[f.key] !== preset[f.key]);
+}
+
+function loadPresetIntoTextareas(tool, id) {
+    const values = getPresetValues(tool, id);
+    for (const field of tool.fields) {
+        const textarea = document.getElementById(field.textareaId);
+        if (textarea) {
+            textarea.value = values[field.key];
+            // Re-dispatch input so the owning module's live-binding
+            // persists the new text into settings.
+            textarea.dispatchEvent(new Event('input', { bubbles: true }));
+        } else {
+            tool.settings[field.key] = values[field.key];
+        }
+    }
+}
+
+function presetOptionLabel(id, activeId, dirty) {
+    const base = id === DEFAULT_ID ? DEFAULT_LABEL : id;
+    return (id === activeId && dirty) ? `${base} (modified)` : base;
+}
+
+function isValidName(name, existingNames, currentName = null) {
+    if (!name || !name.trim()) return { ok: false, reason: 'Name cannot be empty.' };
+    const trimmed = name.trim();
+    if (trimmed === DEFAULT_ID) return { ok: false, reason: `Name "${DEFAULT_ID}" is reserved.` };
+    if (trimmed === DEFAULT_LABEL) return { ok: false, reason: `Name "${DEFAULT_LABEL}" is reserved.` };
+    if (trimmed !== currentName && existingNames.includes(trimmed)) {
+        return { ok: false, reason: `A preset named "${trimmed}" already exists.` };
+    }
+    return { ok: true, name: trimmed };
+}
+
+/**
+ * Switch a tool's active preset (guarded by the shared unsaved-changes
+ * confirmation) and load its texts into the tool's prompt fields. Used by
+ * both the settings widget and the point-of-use selectors so the behavior
+ * is identical everywhere. Notifies every mounted selector on success.
+ *
+ * @param {string} toolKey - Tool id from TOOL_PRESET_CONFIG, e.g. 'acc'.
+ * @param {string} id - Preset name, or the internal Default id.
+ * @returns {boolean} `true` if the preset is now active (including "already
+ *   was"); `false` if the switch was refused or the preset doesn't exist.
+ */
+function activateToolPreset(toolKey, id) {
+    const tool = getTool(toolKey);
+    if (!tool) return false;
+    const previous = getActiveId(tool);
+    if (id === previous) return true;
+    if (id !== DEFAULT_ID && getPresets(tool)[id] === undefined) return false;
+    if (isDirty(tool)) {
+        const ok = window.confirm(
+            `The ${tool.label} prompt fields have unsaved changes that will be replaced by `
+            + `"${id === DEFAULT_ID ? DEFAULT_LABEL : id}". Discard them?`,
+        );
+        if (!ok) return false;
+    }
+    tool.settings.activeToolPreset[tool.toolKey] = id;
+    tool.saveSettings();
+    loadPresetIntoTextareas(tool, id);
+    notifyPresetChange(tool);
+    return true;
+}
+
+/**
+ * Create a compact preset dropdown for mounting at a tool's point of use
+ * (a modal, a World Info entry row). It mirrors the settings widget — same
+ * preset list, same active selection, same "(modified)" dirty marker, same
+ * discard confirmation — and stays in sync with it and with every other
+ * selector for the tool.
+ *
+ * The selector manages its own lifecycle: once it has been in the DOM and
+ * is later removed (modal closed, entry row torn down), the next change
+ * notification unsubscribes it.
+ *
+ * @param {object} opts
+ * @param {string} opts.toolKey     Tool id from TOOL_PRESET_CONFIG, e.g. 'acc'.
+ * @param {string} [opts.className] Extra class(es) for the <select>.
+ * @param {string} [opts.title]     Tooltip text.
+ * @returns {HTMLSelectElement}
+ */
+function createToolPresetSelector({ toolKey, className = '', title = '' }) {
+    const select = document.createElement('select');
+    select.className = ['text_pole', 'saints_preset_select', className].filter(Boolean).join(' ');
+    if (title) select.title = title;
+
+    const tool = getTool(toolKey);
+    if (!tool) {
+        // The tool was never registered (setupToolPresets runs at startup,
+        // so this shouldn't happen in practice). Render inert.
+        select.disabled = true;
+        select.appendChild(new Option(DEFAULT_LABEL, DEFAULT_ID, true, true));
+        return select;
+    }
+
+    let wasConnected = false;
+    const refresh = () => {
+        if (select.isConnected) {
+            wasConnected = true;
+        } else if (wasConnected) {
+            tool.listeners.delete(refresh);
+            return;
+        }
+        const active = getActiveId(tool);
+        const dirty = isDirty(tool);
+        const names = Object.keys(getPresets(tool)).sort((a, b) => a.localeCompare(b));
+        select.innerHTML = '';
+        select.appendChild(new Option(
+            presetOptionLabel(DEFAULT_ID, active, dirty), DEFAULT_ID, false, active === DEFAULT_ID));
+        for (const name of names) {
+            select.appendChild(new Option(
+                presetOptionLabel(name, active, dirty), name, false, active === name));
+        }
+    };
+
+    select.addEventListener('change', () => {
+        // On success the change notification refreshes every selector,
+        // including this one; on refusal snap back to the active preset.
+        if (!activateToolPreset(toolKey, select.value)) refresh();
+    });
+
+    tool.listeners.add(refresh);
+    refresh();
+    return select;
+}
+
+/**
+ * One-time migration from the legacy per-field template system
+ * (`promptTemplates` / `activePromptTemplate`) to per-tool presets.
+ *
+ * Each legacy named template becomes a preset whose other fields hold the
+ * built-in defaults; name collisions across a tool's fields get a
+ * "(Field Label)" suffix. The legacy settings keys are left in place so a
+ * downgrade loses nothing. Every tool's active preset starts at Default and
+ * the user's current live texts are preserved untouched — the dirty marker
+ * shows "(modified)" where they had customized.
+ *
+ * @param {object} settings - Shared mutable settings reference.
+ * @param {Array<{ toolKey: string, fields: Array<{ key: string, label: string, defaultText: string, legacyDefaultText?: string }> }>} tools
+ * @returns {boolean} `true` if a migration ran (caller should save settings).
+ */
+function migrateLegacyToolPresets(settings, tools) {
+    if (settings.toolPresets && typeof settings.toolPresets === 'object') return false;
+
+    settings.toolPresets = {};
+    settings.activeToolPreset = {};
+    for (const tool of tools) {
+        settings.toolPresets[tool.toolKey] = {};
+        settings.activeToolPreset[tool.toolKey] = DEFAULT_ID;
+
+        // Saved settings from versions whose default templates predate the
+        // {{macro}} placeholders hold the old default text verbatim. Upgrade
+        // exact matches to the current default so untouched installs don't
+        // show a spurious "(modified)" marker (assembled output is identical
+        // either way).
+        for (const field of tool.fields) {
+            if (field.legacyDefaultText !== undefined
+                && settings[field.key] === field.legacyDefaultText) {
+                settings[field.key] = field.defaultText;
+            }
+        }
+    }
+
+    const legacy = settings.promptTemplates;
+    if (legacy && typeof legacy === 'object') {
+        for (const tool of tools) {
+            const presets = settings.toolPresets[tool.toolKey];
+            for (const field of tool.fields) {
+                const saved = legacy[field.key];
+                if (!saved || typeof saved !== 'object') continue;
+                for (const [name, text] of Object.entries(saved)) {
+                    if (typeof text !== 'string') continue;
+                    let presetName = name;
+                    if (presets[presetName] !== undefined) presetName = `${name} (${field.label})`;
+                    let n = 2;
+                    while (presets[presetName] !== undefined) presetName = `${name} (${field.label} ${n++})`;
+                    const preset = {};
+                    for (const f of tool.fields) {
+                        preset[f.key] = (f.key === field.key) ? text : f.defaultText;
+                    }
+                    presets[presetName] = preset;
+                }
+            }
+        }
+    }
+    return true;
+}
+
+/**
+ * Render the full preset management widget (dropdown + Save/Update/Rename/
+ * Delete) for one tool into the settings panel, and register the tool so
+ * point-of-use selectors (createToolPresetSelector) can share its state.
+ *
+ * @param {object} opts
+ * @param {string}   opts.toolKey       Tool id, e.g. 'acc'.
+ * @param {string}   opts.label         Human label used in confirm dialogs.
+ * @param {string}   opts.containerId   Id of the empty <div> to render into (no '#').
+ * @param {Array<{ key: string, label: string, textareaId: string, defaultText: string }>} opts.fields
+ *                   The settings keys / textareas bundled into this tool's presets.
+ * @param {object}   opts.settings      Shared mutable settings reference.
+ * @param {Function} opts.saveSettings  () => void — persists settings.
+ */
+function setupToolPresets({ toolKey, label, containerId, fields, settings, saveSettings }) {
+    if (!settings.toolPresets) settings.toolPresets = {};
+    if (!settings.activeToolPreset) settings.activeToolPreset = {};
+    if (!settings.toolPresets[toolKey]) settings.toolPresets[toolKey] = {};
+    if (!settings.activeToolPreset[toolKey]) settings.activeToolPreset[toolKey] = DEFAULT_ID;
+
+    // Register (or re-register) the tool for the shared activation logic
+    // and the point-of-use selectors, even if the settings container is
+    // missing — selection elsewhere must still work.
+    const tool = { toolKey, label, fields, settings, saveSettings, listeners: new Set() };
+    toolRegistry.set(toolKey, tool);
+
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    container.innerHTML = `
+        <select class="text_pole saints_template_select" id="${containerId}_select"></select>
+        <div class="saints_template_buttons">
+            <div class="menu_button" data-action="save" title="Save the current texts of every ${label} prompt field as a new named preset">
+                <span class="fa-solid fa-plus"></span> Save as New
+            </div>
+            <div class="menu_button" data-action="update" title="Overwrite the selected preset with the current texts">
+                <span class="fa-solid fa-floppy-disk"></span> Update
+            </div>
+            <div class="menu_button" data-action="rename" title="Rename the selected preset">
+                <span class="fa-solid fa-pen"></span> Rename
+            </div>
+            <div class="menu_button" data-action="delete" title="Delete the selected preset">
+                <span class="fa-solid fa-trash"></span> Delete
+            </div>
+        </div>
+    `;
+
+    const select = container.querySelector('select');
+    const buttons = {
+        save:   container.querySelector('[data-action="save"]'),
+        update: container.querySelector('[data-action="update"]'),
+        rename: container.querySelector('[data-action="rename"]'),
+        delete: container.querySelector('[data-action="delete"]'),
+    };
+
+    function refreshDirtyMarker() {
+        const dirty = isDirty(tool);
+        const active = getActiveId(tool);
+        for (const opt of select.options) {
+            opt.textContent = presetOptionLabel(opt.value, active, dirty);
+        }
+        select.title = dirty
+            ? 'The prompt fields differ from this preset. Use Update or Save as New to keep the changes.'
+            : '';
+    }
+
+    function refreshDropdown() {
+        const active = getActiveId(tool);
+        const names = Object.keys(getPresets(tool)).sort((a, b) => a.localeCompare(b));
+        select.innerHTML = '';
+        select.appendChild(new Option(DEFAULT_LABEL, DEFAULT_ID, false, active === DEFAULT_ID));
+        for (const name of names) {
+            select.appendChild(new Option(name, name, false, active === name));
+        }
+        refreshButtonStates();
+        refreshDirtyMarker();
+    }
+
+    function refreshButtonStates() {
+        const isDefault = getActiveId(tool) === DEFAULT_ID;
+        buttons.update.classList.toggle('disabled', isDefault);
+        buttons.rename.classList.toggle('disabled', isDefault);
+        buttons.delete.classList.toggle('disabled', isDefault);
+    }
+
+    function existingNames() {
+        return Object.keys(getPresets(tool));
+    }
+
+    // ── Actions ──
+
+    buttons.save.addEventListener('click', () => {
+        const raw = window.prompt(`Name for the new ${label} preset:`, '');
+        if (raw === null) return;
+        const result = isValidName(raw, existingNames());
+        if (!result.ok) {
+            window.alert(result.reason);
+            return;
+        }
+        getPresets(tool)[result.name] = getCurrentValues(tool);
+        settings.activeToolPreset[toolKey] = result.name;
+        saveSettings();
+        notifyPresetChange(tool);
+    });
+
+    buttons.update.addEventListener('click', () => {
+        const active = getActiveId(tool);
+        if (active === DEFAULT_ID) return;
+        getPresets(tool)[active] = getCurrentValues(tool);
+        saveSettings();
+        notifyPresetChange(tool);
+    });
+
+    buttons.rename.addEventListener('click', () => {
+        const active = getActiveId(tool);
+        if (active === DEFAULT_ID) return;
+        const raw = window.prompt('Rename preset:', active);
+        if (raw === null) return;
+        const result = isValidName(raw, existingNames(), active);
+        if (!result.ok) {
+            window.alert(result.reason);
+            return;
+        }
+        if (result.name === active) return;
+        getPresets(tool)[result.name] = getPresets(tool)[active];
+        delete getPresets(tool)[active];
+        settings.activeToolPreset[toolKey] = result.name;
+        saveSettings();
+        notifyPresetChange(tool);
+    });
+
+    buttons.delete.addEventListener('click', () => {
+        const active = getActiveId(tool);
+        if (active === DEFAULT_ID) return;
+        if (!window.confirm(`Delete preset "${active}"?`)) return;
+        delete getPresets(tool)[active];
+        // Non-destructive: keep the live texts and fall back to Default —
+        // the dirty marker shows "(modified)" if they differ from it.
+        settings.activeToolPreset[toolKey] = DEFAULT_ID;
+        saveSettings();
+        notifyPresetChange(tool);
+    });
+
+    select.addEventListener('change', () => {
+        // Shared activation (dirty-check confirm + load + notify). On
+        // refusal snap the dropdown back to the still-active preset.
+        if (!activateToolPreset(toolKey, select.value)) {
+            select.value = getActiveId(tool);
+        }
+    });
+
+    // ── Dirty tracking ──
+
+    // Modules bind their settings persistence to 'input' before this widget
+    // is set up, so by the time this listener runs the settings value is
+    // already current. Notify so point-of-use selectors update their
+    // "(modified)" marker too.
+    for (const field of fields) {
+        document.getElementById(field.textareaId)
+            ?.addEventListener('input', () => notifyPresetChange(tool));
+    }
+
+    // The settings widget itself stays in sync through the same channel as
+    // the point-of-use selectors (it's permanently mounted, so no
+    // disconnect handling is needed).
+    tool.listeners.add(refreshDropdown);
+
+    // ── Initial paint ──
+
+    // Never overwrite the textareas at init: the modules already loaded the
+    // live settings values into them, and those are the source of truth. If
+    // they differ from the active preset, the dirty marker says so.
+    refreshDropdown();
+}
+
 ;// ./src/assisted-character-creation.js
 /**
  * Assisted Character Creation (ACC)
@@ -5637,6 +6130,7 @@ function registerPhraseBanSlashCommand() {
  * generates a complete description, optionally extends or re-rolls it,
  * and clicks Done to copy it into SillyTavern's description field.
  */
+
 
 
 
@@ -5980,6 +6474,10 @@ function buildModalBody() {
             </label>
             <div class="acc-lorebook-host"></div>
         </div>
+        <div class="acc-preset-row">
+            <label class="acc-preset-label"><span class="fa-solid fa-file-pen"></span> Prompt Preset:</label>
+            <div class="acc-preset-host"></div>
+        </div>
         <div class="acc-brief-section">
             <div class="acc-field-header">
                 <label for="acc_character_brief"><b>Character Brief:</b></label>
@@ -6051,6 +6549,16 @@ function buildModalBody() {
     });
     root.querySelector('.acc-lorebook-host').replaceWith(picker.element);
     root._accLorebookPicker = picker;
+
+    // Point-of-use preset selection — which prompt + prefill bundle
+    // Generate/Continue uses, synced with the settings widget (which also
+    // manages presets).
+    root.querySelector('.acc-preset-host').replaceWith(createToolPresetSelector({
+        toolKey: 'acc',
+        className: 'acc-preset-select',
+        title: 'Prompt preset used for Generate/Continue — the bundle of prompt + prefill that shapes '
+            + 'the character sheet. Save and edit presets in the extension settings.',
+    }));
 
     return root;
 }
@@ -6470,6 +6978,7 @@ function setStatusBar(message) {
 
 
 
+
 // ─── Default Prompt ───
 
 // {{context}} and {{guidance}} are this extension's placeholders
@@ -6680,6 +7189,10 @@ function injectControls(formEl) {
             <span class="fa-solid fa-rotate-right"></span>
         </div>
         <div class="wia-spinner wia-hidden" title="Generating..."><span class="fa-solid fa-spinner fa-spin"></span></div>
+        <div class="wia-preset-row">
+            <label class="wia-preset-label"><span class="fa-solid fa-file-pen"></span> Preset:</label>
+            <span class="wia-preset-host"></span>
+        </div>
         <div class="wia-tokens-row">
             <label class="wia-tokens-label"><span class="fa-solid fa-coins"></span> Max Tokens:</label>
             <input type="number" class="text_pole wia-tokens-input" min="50" max="8192" step="50" />
@@ -6797,6 +7310,15 @@ function injectControls(formEl) {
     const picker = createLoreBookPicker({ classPrefix: 'wia-lorebook' });
     controls.querySelector('.wia-lorebook-host').replaceWith(picker.element);
     controls._wiaLorebookPicker = picker;
+
+    // Point-of-use preset selection — which prompt/prefill bundle Assist
+    // uses, synced with the settings widget (which also manages presets).
+    controls.querySelector('.wia-preset-host').replaceWith(createToolPresetSelector({
+        toolKey: 'wia',
+        className: 'wia-preset-select',
+        title: 'Prompt preset used by Assist — the bundle of prompt + prefills that decides what kind '
+            + 'of entry gets produced. Save and edit presets in the extension settings.',
+    }));
 
     // Seed initial button visibility from the current content — an entry may
     // load with text already, which should expose Continue immediately.
@@ -8884,6 +9406,7 @@ function registerReformattingSlashCommand() {
 
 
 
+
 // ─── Defaults ───
 
 const DEFAULT_COMPACTION_SUMMARY_PROMPT = `{{context}}[
@@ -9475,6 +9998,10 @@ function compaction_buildModalBody() {
             <div class="cc-lorebook-host"></div>
             <small class="cc-context-hint">Selected lore books are folded into the summary so canon isn't lost.</small>
         </div>
+        <div class="cc-preset-row">
+            <label class="cc-preset-label"><span class="fa-solid fa-file-pen"></span> Prompt Preset:</label>
+            <div class="cc-preset-host"></div>
+        </div>
         <div class="cc-guidance-section">
             <div class="cc-field-header">
                 <label for="cc_guidance"><b>Summary Guidance:</b></label>
@@ -9532,6 +10059,16 @@ function compaction_buildModalBody() {
     });
     root.querySelector('.cc-lorebook-host').replaceWith(picker.element);
     root._ccLorebookPicker = picker;
+
+    // Point-of-use preset selection — which summary prompt + prefill bundle
+    // Generate Summary uses, synced with the settings widget (which also
+    // manages presets).
+    root.querySelector('.cc-preset-host').replaceWith(createToolPresetSelector({
+        toolKey: 'compaction',
+        className: 'cc-preset-select',
+        title: 'Prompt preset used for Generate Summary — the bundle of summary prompt + prefill. '
+            + 'Save and edit presets in the extension settings.',
+    }));
 
     compaction_debug('Modal body built — guidance length:', (guidanceEl?.value || '').length, 'response length:', tokenInput?.value);
     return root;
@@ -9999,6 +10536,7 @@ async function createFreshChat() {
  * copied / deleted from the Saved Prompts section of the modal, so a good
  * prompt bound to a scene can be retrieved later in that chat.
  */
+
 
 
 
@@ -10596,6 +11134,10 @@ function image_prompting_buildModalBody() {
             </label>
             <div class="ip-lorebook-host"></div>
         </div>
+        <div class="ip-preset-row">
+            <label class="ip-preset-label"><span class="fa-solid fa-file-pen"></span> Prompt Preset:</label>
+            <div class="ip-preset-host"></div>
+        </div>
         <div class="ip-guidance-section">
             <div class="ip-field-header">
                 <label for="ip_guidance"><b>Guidance (optional):</b></label>
@@ -10684,6 +11226,17 @@ function image_prompting_buildModalBody() {
     });
     root.querySelector('.ip-lorebook-host').replaceWith(picker.element);
     root._ipLorebookPicker = picker;
+
+    // Point-of-use preset selection — one preset per diffusion-model family
+    // (Default targets Krea 2; Anima / Danbooru Tags ship seeded), synced
+    // with the settings widget (which also manages presets).
+    root.querySelector('.ip-preset-host').replaceWith(createToolPresetSelector({
+        toolKey: 'image-prompt',
+        className: 'ip-preset-select',
+        title: 'Prompt preset used for Generate — pick the template for your target diffusion model '
+            + '(e.g. Default for Krea 2, Anima, Danbooru Tags). Save and edit presets in the '
+            + 'extension settings.',
+    }));
 
     return root;
 }
@@ -11922,319 +12475,6 @@ function onRetryContinueGenerationStarted() {
 function onRetryContinueGenerationEnded() {
     retry_continue_debug('event: GENERATION_ENDED — showing quick button');
     showQuickRetryButton();
-}
-
-;// ./src/prompt-templates.js
-/**
- * Tool Presets — named, reusable bundles of every editable prompt/prefill a
- * tool owns, replacing the old per-field prompt templates. One dropdown +
- * Save/Update/Rename/Delete per tool keeps coupled fields (e.g. a prompt
- * that describes its prefill's format) saved and restored together.
- * Persisted at the extension-settings level (across chats) under
- * `toolPresets` / `activeToolPreset`.
- *
- * The bound textareas remain the single live source of truth: selecting a
- * preset loads each field's text into its textarea and re-dispatches `input`
- * so the owning module's existing live-binding persists textarea → settings.
- * Editing a textarea never silently mutates the preset — the dropdown shows
- * "(modified)" until the user clicks Update or saves a new preset, and
- * switching presets with unsaved changes asks for confirmation first.
- */
-
-const DEFAULT_ID = '__default__';
-const DEFAULT_LABEL = 'Default';
-
-function isValidName(name, existingNames, currentName = null) {
-    if (!name || !name.trim()) return { ok: false, reason: 'Name cannot be empty.' };
-    const trimmed = name.trim();
-    if (trimmed === DEFAULT_ID) return { ok: false, reason: `Name "${DEFAULT_ID}" is reserved.` };
-    if (trimmed === DEFAULT_LABEL) return { ok: false, reason: `Name "${DEFAULT_LABEL}" is reserved.` };
-    if (trimmed !== currentName && existingNames.includes(trimmed)) {
-        return { ok: false, reason: `A preset named "${trimmed}" already exists.` };
-    }
-    return { ok: true, name: trimmed };
-}
-
-/**
- * One-time migration from the legacy per-field template system
- * (`promptTemplates` / `activePromptTemplate`) to per-tool presets.
- *
- * Each legacy named template becomes a preset whose other fields hold the
- * built-in defaults; name collisions across a tool's fields get a
- * "(Field Label)" suffix. The legacy settings keys are left in place so a
- * downgrade loses nothing. Every tool's active preset starts at Default and
- * the user's current live texts are preserved untouched — the dirty marker
- * shows "(modified)" where they had customized.
- *
- * @param {object} settings - Shared mutable settings reference.
- * @param {Array<{ toolKey: string, fields: Array<{ key: string, label: string, defaultText: string, legacyDefaultText?: string }> }>} tools
- * @returns {boolean} `true` if a migration ran (caller should save settings).
- */
-function migrateLegacyToolPresets(settings, tools) {
-    if (settings.toolPresets && typeof settings.toolPresets === 'object') return false;
-
-    settings.toolPresets = {};
-    settings.activeToolPreset = {};
-    for (const tool of tools) {
-        settings.toolPresets[tool.toolKey] = {};
-        settings.activeToolPreset[tool.toolKey] = DEFAULT_ID;
-
-        // Saved settings from versions whose default templates predate the
-        // {{macro}} placeholders hold the old default text verbatim. Upgrade
-        // exact matches to the current default so untouched installs don't
-        // show a spurious "(modified)" marker (assembled output is identical
-        // either way).
-        for (const field of tool.fields) {
-            if (field.legacyDefaultText !== undefined
-                && settings[field.key] === field.legacyDefaultText) {
-                settings[field.key] = field.defaultText;
-            }
-        }
-    }
-
-    const legacy = settings.promptTemplates;
-    if (legacy && typeof legacy === 'object') {
-        for (const tool of tools) {
-            const presets = settings.toolPresets[tool.toolKey];
-            for (const field of tool.fields) {
-                const saved = legacy[field.key];
-                if (!saved || typeof saved !== 'object') continue;
-                for (const [name, text] of Object.entries(saved)) {
-                    if (typeof text !== 'string') continue;
-                    let presetName = name;
-                    if (presets[presetName] !== undefined) presetName = `${name} (${field.label})`;
-                    let n = 2;
-                    while (presets[presetName] !== undefined) presetName = `${name} (${field.label} ${n++})`;
-                    const preset = {};
-                    for (const f of tool.fields) {
-                        preset[f.key] = (f.key === field.key) ? text : f.defaultText;
-                    }
-                    presets[presetName] = preset;
-                }
-            }
-        }
-    }
-    return true;
-}
-
-/**
- * Render a preset dropdown + action buttons for one tool.
- *
- * @param {object} opts
- * @param {string}   opts.toolKey       Tool id, e.g. 'acc'.
- * @param {string}   opts.label         Human label used in confirm dialogs.
- * @param {string}   opts.containerId   Id of the empty <div> to render into (no '#').
- * @param {Array<{ key: string, label: string, textareaId: string, defaultText: string }>} opts.fields
- *                   The settings keys / textareas bundled into this tool's presets.
- * @param {object}   opts.settings      Shared mutable settings reference.
- * @param {Function} opts.saveSettings  () => void — persists settings.
- */
-function setupToolPresets({ toolKey, label, containerId, fields, settings, saveSettings }) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-
-    if (!settings.toolPresets) settings.toolPresets = {};
-    if (!settings.activeToolPreset) settings.activeToolPreset = {};
-    if (!settings.toolPresets[toolKey]) settings.toolPresets[toolKey] = {};
-    if (!settings.activeToolPreset[toolKey]) settings.activeToolPreset[toolKey] = DEFAULT_ID;
-
-    container.innerHTML = `
-        <select class="text_pole saints_template_select" id="${containerId}_select"></select>
-        <div class="saints_template_buttons">
-            <div class="menu_button" data-action="save" title="Save the current texts of every ${label} prompt field as a new named preset">
-                <span class="fa-solid fa-plus"></span> Save as New
-            </div>
-            <div class="menu_button" data-action="update" title="Overwrite the selected preset with the current texts">
-                <span class="fa-solid fa-floppy-disk"></span> Update
-            </div>
-            <div class="menu_button" data-action="rename" title="Rename the selected preset">
-                <span class="fa-solid fa-pen"></span> Rename
-            </div>
-            <div class="menu_button" data-action="delete" title="Delete the selected preset">
-                <span class="fa-solid fa-trash"></span> Delete
-            </div>
-        </div>
-    `;
-
-    const select = container.querySelector('select');
-    const buttons = {
-        save:   container.querySelector('[data-action="save"]'),
-        update: container.querySelector('[data-action="update"]'),
-        rename: container.querySelector('[data-action="rename"]'),
-        delete: container.querySelector('[data-action="delete"]'),
-    };
-
-    const presets = () => settings.toolPresets[toolKey];
-
-    function getActiveId() {
-        return settings.activeToolPreset[toolKey] || DEFAULT_ID;
-    }
-
-    function getPresetValues(id) {
-        const values = {};
-        const stored = id === DEFAULT_ID ? null : presets()[id];
-        for (const field of fields) {
-            const text = stored?.[field.key];
-            values[field.key] = (typeof text === 'string') ? text : field.defaultText;
-        }
-        return values;
-    }
-
-    function getCurrentValues() {
-        const values = {};
-        for (const field of fields) {
-            const live = settings[field.key];
-            values[field.key] = (typeof live === 'string') ? live : field.defaultText;
-        }
-        return values;
-    }
-
-    function isDirty() {
-        const current = getCurrentValues();
-        const preset = getPresetValues(getActiveId());
-        return fields.some(f => current[f.key] !== preset[f.key]);
-    }
-
-    function refreshDirtyMarker() {
-        const dirty = isDirty();
-        const active = getActiveId();
-        for (const opt of select.options) {
-            const base = opt.value === DEFAULT_ID ? DEFAULT_LABEL : opt.value;
-            opt.textContent = (opt.value === active && dirty) ? `${base} (modified)` : base;
-        }
-        select.title = dirty
-            ? 'The prompt fields differ from this preset. Use Update or Save as New to keep the changes.'
-            : '';
-    }
-
-    function refreshDropdown() {
-        const active = getActiveId();
-        const names = Object.keys(presets()).sort((a, b) => a.localeCompare(b));
-        select.innerHTML = '';
-        select.appendChild(new Option(DEFAULT_LABEL, DEFAULT_ID, false, active === DEFAULT_ID));
-        for (const name of names) {
-            select.appendChild(new Option(name, name, false, active === name));
-        }
-        refreshButtonStates();
-        refreshDirtyMarker();
-    }
-
-    function refreshButtonStates() {
-        const isDefault = getActiveId() === DEFAULT_ID;
-        buttons.update.classList.toggle('disabled', isDefault);
-        buttons.rename.classList.toggle('disabled', isDefault);
-        buttons.delete.classList.toggle('disabled', isDefault);
-    }
-
-    function loadPresetIntoTextareas(id) {
-        const values = getPresetValues(id);
-        for (const field of fields) {
-            const textarea = document.getElementById(field.textareaId);
-            if (textarea) {
-                textarea.value = values[field.key];
-                // Re-dispatch input so the owning module's live-binding
-                // persists the new text into settings.
-                textarea.dispatchEvent(new Event('input', { bubbles: true }));
-            } else {
-                settings[field.key] = values[field.key];
-            }
-        }
-    }
-
-    function existingNames() {
-        return Object.keys(presets());
-    }
-
-    // ── Actions ──
-
-    buttons.save.addEventListener('click', () => {
-        const raw = window.prompt(`Name for the new ${label} preset:`, '');
-        if (raw === null) return;
-        const result = isValidName(raw, existingNames());
-        if (!result.ok) {
-            window.alert(result.reason);
-            return;
-        }
-        presets()[result.name] = getCurrentValues();
-        settings.activeToolPreset[toolKey] = result.name;
-        saveSettings();
-        refreshDropdown();
-    });
-
-    buttons.update.addEventListener('click', () => {
-        const active = getActiveId();
-        if (active === DEFAULT_ID) return;
-        presets()[active] = getCurrentValues();
-        saveSettings();
-        refreshDirtyMarker();
-    });
-
-    buttons.rename.addEventListener('click', () => {
-        const active = getActiveId();
-        if (active === DEFAULT_ID) return;
-        const raw = window.prompt('Rename preset:', active);
-        if (raw === null) return;
-        const result = isValidName(raw, existingNames(), active);
-        if (!result.ok) {
-            window.alert(result.reason);
-            return;
-        }
-        if (result.name === active) return;
-        presets()[result.name] = presets()[active];
-        delete presets()[active];
-        settings.activeToolPreset[toolKey] = result.name;
-        saveSettings();
-        refreshDropdown();
-    });
-
-    buttons.delete.addEventListener('click', () => {
-        const active = getActiveId();
-        if (active === DEFAULT_ID) return;
-        if (!window.confirm(`Delete preset "${active}"?`)) return;
-        delete presets()[active];
-        // Non-destructive: keep the live texts and fall back to Default —
-        // the dirty marker shows "(modified)" if they differ from it.
-        settings.activeToolPreset[toolKey] = DEFAULT_ID;
-        saveSettings();
-        refreshDropdown();
-    });
-
-    select.addEventListener('change', () => {
-        const previous = getActiveId();
-        if (select.value === previous) return;
-        if (isDirty()) {
-            const ok = window.confirm(
-                `The ${label} prompt fields have unsaved changes that will be replaced by `
-                + `"${select.value === DEFAULT_ID ? DEFAULT_LABEL : select.value}". Discard them?`,
-            );
-            if (!ok) {
-                select.value = previous;
-                return;
-            }
-        }
-        settings.activeToolPreset[toolKey] = select.value;
-        saveSettings();
-        loadPresetIntoTextareas(select.value);
-        refreshButtonStates();
-        refreshDirtyMarker();
-    });
-
-    // ── Dirty tracking ──
-
-    // Modules bind their settings persistence to 'input' before this widget
-    // is set up, so by the time this listener runs the settings value is
-    // already current.
-    for (const field of fields) {
-        document.getElementById(field.textareaId)
-            ?.addEventListener('input', refreshDirtyMarker);
-    }
-
-    // ── Initial paint ──
-
-    // Never overwrite the textareas at init: the modules already loaded the
-    // live settings values into them, and those are the source of truth. If
-    // they differ from the active preset, the dirty marker says so.
-    refreshDropdown();
 }
 
 ;// ./src/index.js

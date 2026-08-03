@@ -124,7 +124,7 @@ Notes: detection happens after the reply arrives (regex can't run inside the mod
 
 A modal-based character creator that adds an **Assist** button to SillyTavern's character creation page, letting you draft a complete character description from a short brief.
 
-- **Customizable prompt template** — A built-in prompt instructs the model to produce a structured, bracketed character sheet covering name, age, physical description, voice, clothing, equipment, personality, motivations, backstory, relationships, secrets, and more. Edit it freely in the settings panel (with `{{context}}` / `{{brief}}` placeholders); save the prompt + prefill together as named presets and preview the assembled prompt (see Tool Presets & Prompt Preview below).
+- **Customizable prompt template** — A built-in prompt instructs the model to produce a structured, bracketed character sheet covering name, age, physical description, voice, clothing, equipment, personality, motivations, backstory, relationships, secrets, and more. Edit it freely in the settings panel (with `{{context}}` / `{{brief}}` placeholders); save the prompt + prefill together as named presets and preview the assembled prompt (see Tool Presets & Prompt Preview below). A **Prompt Preset** dropdown in the modal itself switches between your saved presets without leaving the task.
 - **Max Tokens control** — A token-count input in the modal sets the response length for each generation (default 1000). Persisted between sessions.
 - **Character Brief** — Type a few sentences describing your concept, setting, and any anchor details. The prompt template is sent first, followed by the brief.
 - **Generate** — One-shot full character description from the brief; replaces the textarea.
@@ -156,7 +156,7 @@ Adds an **Assist** button to every World Info / lore book entry, letting you dra
 - **Dedicated Assist Guidance field** — A separate guidance textarea sits between the Assist button row and the entry's content textarea. Type a rough idea, tone, canon notes, or anything else you want the model to consider — it's used as the seed for every Assist / Retry / Continue on that entry. The guidance is saved on the entry itself (in its `extensions` field) so it persists across page reloads and travels with the lorebook on export.
 - **Continue / Retry** — After a generation, the Assist button is replaced by Continue (extends the current entry) and Retry (re-runs Assist with your saved guidance, replacing the content).
 - **Clear buttons** — Each field has its own labeled button directly above it: **Clear Guidance** in the Assist Guidance header, and **Clear Content** just above the entry's content textarea.
-- **Editable prompt template** — The default prompt instructs the model to emit a `[ Subject: Description ]` world lore artifact with no commentary. You can edit it freely in the settings panel (with `{{context}}` / `{{guidance}}` / `{{title}}` placeholders); save the prompt + prefills together as named presets and preview the assembled prompt (see Tool Presets & Prompt Preview below).
+- **Editable prompt template** — The default prompt instructs the model to emit a `[ Subject: Description ]` world lore artifact with no commentary. You can edit it freely in the settings panel (with `{{context}}` / `{{guidance}}` / `{{title}}` placeholders); save the prompt + prefills together as named presets and preview the assembled prompt (see Tool Presets & Prompt Preview below). A **Preset** dropdown on each entry's Assist row switches between your saved presets right where you're drafting — so you can pick what type of entry gets produced per generation.
 - **No schema** — Unlike Assisted Character Creation, World Info Assist has no schema. The prompt itself defines the desired output format.
 
 **How to use**
@@ -225,7 +225,7 @@ Long chats (1000+ messages) eventually fill the model's context window. Once ful
 
 Compaction **summarizes the chat, starts a fresh chat seeded with that summary plus the recent tail, migrates per-chat extension state, and resumes** — resetting the context window and restoring fast generation. It's periodic context compaction, analogous to what agent harnesses do when they compact a long conversation.
 
-- **Guided summary modal** (mirrors Assisted Character Creation) — Add **Summary Guidance** demanding specific details be captured, pick which **lore books** to fold in, then **Generate / Continue / Checkpoint / Retry** a summary preview you can freely edit. The summary streams in live and the Stop button cancels it. Clicking **Compact** commits.
+- **Guided summary modal** (mirrors Assisted Character Creation) — Add **Summary Guidance** demanding specific details be captured, pick which **lore books** to fold in and which **Prompt Preset** to summarize with, then **Generate / Continue / Checkpoint / Retry** a summary preview you can freely edit. The summary streams in live and the Stop button cancels it. Clicking **Compact** commits.
 - **The handoff** — The summary lands in the new chat as a visible, editable **"Story so far"** message, followed by the last *N* messages (default 20) copied over **verbatim with swipes preserved**. The old chat is left intact and selectable from history.
 - **Manual or automatic trigger** — Trigger it from the <span title="compress icon">🗜</span> **Compact Chat** item in the hamburger menu or with `/compact`. With **Auto-open at threshold** on, the modal opens on its own once the *measured* outgoing prompt crosses your % of the context window (with an optional confirmation dialog). The trigger is the **only** automatic part — every compaction still requires you to act in the modal. Nothing is ever rewritten headlessly.
 - **State migration** — Possession, Narrative Guidance, Phrase Ban, and saved Image Prompt per-chat state carry over to the new chat (World Info Assist guidance travels on the lorebook automatically). Your Summary Guidance is remembered per-chat across compactions of the same storyline.
@@ -244,7 +244,7 @@ Compaction **summarizes the chat, starts a fresh chat seeded with that summary p
 Turns the current moment of your roleplay into a ready-to-paste prompt for an external image-generation tool (ComfyUI, Krea, Forge, etc.) — so you can render the scene you're playing without writing the diffusion prompt yourself.
 
 - **One click from the hamburger menu** — Click the <span title="image icon">🖼</span> **Image Prompt** item next to Continue (or run `/imageprompt`). A modal (mirroring Assisted Character Creation) opens; **Generate** performs a silent generation that reads the current chat, character cards, persona, and any selected **lore books**, and streams an image prompt into an editable textarea. Refine with **Continue / Checkpoint / Retry**, cap each generation with **Max Tokens**, and stop mid-stream at any time.
-- **A prompt style per diffusion model, managed as presets** — The prompt template teaches the LLM the *target model's* ideal prompt style, and the Preset dropdown keeps one template per model family:
+- **A prompt style per diffusion model, managed as presets** — The prompt template teaches the LLM the *target model's* ideal prompt style, and the **Prompt Preset** dropdown — right in the modal — keeps one template per model family:
   - **Default** targets **Krea 2** — flowing natural-language prose (subject first, then action, environment, composition, lighting, mood, style), the format Krea 2's encoder is built for.
   - **Anima (Tags + Prose)** targets **Circlestone Labs' Anima Base** — a Danbooru tag block (rating → character count → appearance/clothing/pose/setting tags, lowercase with spaces) followed by a short natural-language passage, with the `masterpiece, best quality, score_7, ` quality prefix supplied as the prefill.
   - **Danbooru Tags** — a pure comma-separated booru tag list for tag-native anime models (Illustrious, NoobAI, Pony derivatives, …), with `masterpiece, best quality, ` as the prefill.
@@ -261,7 +261,7 @@ Turns the current moment of your roleplay into a ready-to-paste prompt for an ex
 4. Edit the streamed-in prompt freely, or refine it with **Continue / Checkpoint / Retry**.
 5. Click **Copy & Close** (or the **Copy** button) and paste the prompt into ComfyUI or your image tool of choice.
 6. Want to keep it? Click **Save**, give it a title (or accept the suggested one) — the prompt is stored with the chat, and the **Saved Prompts** section lets you reload, copy, rename, or delete it any time you reopen the modal in that chat.
-7. Rendering for a different model? Switch the **Preset** in the settings drawer (e.g. to **Anima (Tags + Prose)** or **Danbooru Tags**) and generate again.
+7. Rendering for a different model? Switch the **Prompt Preset** right in the modal (e.g. to **Anima (Tags + Prose)** or **Danbooru Tags**) and generate again.
 
 ### Retry Continue
 
@@ -470,6 +470,8 @@ Each tool's settings drawer (Phrasing, Phrase Ban, Assisted Character Creation, 
 | Delete | Delete the currently selected preset; selection falls back to Default without touching the current texts. Disabled when Default is selected. |
 
 Presets persist at the extension-settings level and are shared across all chats. Templates saved with the older per-field system are converted to presets automatically on first load.
+
+**Pick your preset where you work** — for the tools with an interactive surface, the same preset dropdown also appears at the point of use, so you don't have to detour into the settings drawer to switch templates mid-task: the Assisted Character Creation, Compaction, and Image Prompting modals each have a **Prompt Preset** selector, and every World Info entry's Assist row has a **Preset** selector. All of these mirror the settings drawer's dropdown — same preset list, same **(modified)** marker, same discard confirmation — and changing the selection in one place updates it everywhere. Managing presets (Save as New / Update / Rename / Delete) stays in the settings drawer, next to the editable prompt fields the presets bundle.
 
 Next to each Preset block, **Preview Assembled Prompt** opens a read-only popup showing exactly what the tool will send to the model — the fixed system prompt, the fully assembled user prompt (with sample values in place of your brief/guidance/context), and the prefill(s) — so there is never any mystery about what surrounds your template.
 

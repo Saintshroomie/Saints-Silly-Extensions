@@ -31,6 +31,7 @@ import {
     isSilentGenerationAbort,
     abortAllGenerations,
 } from './silent-generation.js';
+import { createToolPresetSelector } from './prompt-templates.js';
 
 // ─── Default Prompt ───
 
@@ -242,6 +243,10 @@ function injectControls(formEl) {
             <span class="fa-solid fa-rotate-right"></span>
         </div>
         <div class="wia-spinner wia-hidden" title="Generating..."><span class="fa-solid fa-spinner fa-spin"></span></div>
+        <div class="wia-preset-row">
+            <label class="wia-preset-label"><span class="fa-solid fa-file-pen"></span> Preset:</label>
+            <span class="wia-preset-host"></span>
+        </div>
         <div class="wia-tokens-row">
             <label class="wia-tokens-label"><span class="fa-solid fa-coins"></span> Max Tokens:</label>
             <input type="number" class="text_pole wia-tokens-input" min="50" max="8192" step="50" />
@@ -359,6 +364,15 @@ function injectControls(formEl) {
     const picker = createLoreBookPicker({ classPrefix: 'wia-lorebook' });
     controls.querySelector('.wia-lorebook-host').replaceWith(picker.element);
     controls._wiaLorebookPicker = picker;
+
+    // Point-of-use preset selection — which prompt/prefill bundle Assist
+    // uses, synced with the settings widget (which also manages presets).
+    controls.querySelector('.wia-preset-host').replaceWith(createToolPresetSelector({
+        toolKey: 'wia',
+        className: 'wia-preset-select',
+        title: 'Prompt preset used by Assist — the bundle of prompt + prefills that decides what kind '
+            + 'of entry gets produced. Save and edit presets in the extension settings.',
+    }));
 
     // Seed initial button visibility from the current content — an entry may
     // load with text already, which should expose Continue immediately.
