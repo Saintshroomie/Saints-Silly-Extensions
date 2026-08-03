@@ -251,7 +251,7 @@ Turns the current moment of your roleplay into a ready-to-paste prompt for an ex
   All three are fully editable, and you can save your own presets for any other diffusion model.
 - **Optional guidance** — A free-text field for extra direction (what to focus on, camera angle, art style, details to emphasize) that is folded into the generation.
 - **Copy & go** — A **Copy** button beside the output and a **Copy & Close** confirm button put the finished prompt on your clipboard for pasting into your image tool.
-- **Saved prompts, bound to the chat** — A **Save** button beside the output stores the finished prompt with the current chat, and the **Saved Prompts** section at the bottom of the modal lists everything saved there (newest first) with per-entry **Load / Copy / Delete** buttons. Saved prompts live in the chat's metadata, so they survive reloads, travel with chat exports, and carry into the fresh chat on Compaction — perfect for re-rendering a scene later or keeping a set of prompts per storyline.
+- **Saved prompts, bound to the chat** — A **Save** button beside the output stores the finished prompt with the current chat under a title of your choosing (a suggestion is offered from the prompt's opening words), and the **Saved Prompts** section at the bottom of the modal lists everything saved there (newest first, titled) with per-entry **Load / Copy / Rename / Delete** buttons. Saved prompts live in the chat's metadata, so they survive reloads, travel with chat exports, and carry into the fresh chat on Compaction — perfect for re-rendering a scene later or keeping a set of prompts per storyline.
 
 **How to use**
 
@@ -260,7 +260,7 @@ Turns the current moment of your roleplay into a ready-to-paste prompt for an ex
 3. Leave **Use Chat Context** on, optionally select **lore books** and add **Guidance**, then click **Generate**.
 4. Edit the streamed-in prompt freely, or refine it with **Continue / Checkpoint / Retry**.
 5. Click **Copy & Close** (or the **Copy** button) and paste the prompt into ComfyUI or your image tool of choice.
-6. Want to keep it? Click **Save** — the prompt is stored with the chat, and the **Saved Prompts** section lets you reload, copy, or delete it any time you reopen the modal in that chat.
+6. Want to keep it? Click **Save**, give it a title (or accept the suggested one) — the prompt is stored with the chat, and the **Saved Prompts** section lets you reload, copy, rename, or delete it any time you reopen the modal in that chat.
 7. Rendering for a different model? Switch the **Preset** in the settings drawer (e.g. to **Anima (Tags + Prose)** or **Danbooru Tags**) and generate again.
 
 ### Retry Continue
@@ -386,7 +386,7 @@ The drawer holds two self-contained tiers — **Long-term** (the overarching arc
 | Role | Role used when injecting the guidance (System / User / Assistant) |
 | Lore Books (per-chat) | Optional picker for lore books to feed into that tier's generation context. Stored per chat (resets on a new chat); missing books are dropped automatically |
 | Themes / Story Arcs (per-chat) | Themes, ideas, or arcs for the model to weave into the tier's next round of guidance |
-| Active Guidance (per-chat) | The tier's currently active guidance paragraph. Edit directly to hand-tune steering; edits apply on the next AI turn. |
+| Active Guidance (per-chat) | The tier's currently active guidance paragraph. Edit directly to hand-tune steering; edits apply on the next AI turn. A **Clear** button beside the label wipes the tier's guidance and removes its prompt injection in one click. |
 | Turns Remaining / -1 / Reset / Regenerate Now | Manual controls over that tier's per-chat counter and on-demand regeneration |
 
 ### Reformatting Settings

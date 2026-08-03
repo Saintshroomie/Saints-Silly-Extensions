@@ -426,7 +426,12 @@
                     </div>
 
                     <div class="ng_prompt_section">
-                        <label for="ng_long_active_guidance_textarea"><b>Active Guidance:</b></label>
+                        <div class="ng_field_header">
+                            <label for="ng_long_active_guidance_textarea"><b>Active Guidance:</b></label>
+                            <div class="menu_button ng_clear_guidance_button" id="ng_long_clear_guidance_button" title="Clear the active long-term guidance (and its prompt injection)">
+                                <span class="fa-solid fa-eraser"></span> Clear
+                            </div>
+                        </div>
                         <textarea id="ng_long_active_guidance_textarea" class="text_pole" rows="6"
                             placeholder="The currently active long-term arc. Edit freely; changes apply on the next AI turn."></textarea>
                     </div>
@@ -557,7 +562,12 @@
                     </div>
 
                     <div class="ng_prompt_section">
-                        <label for="ng_short_active_guidance_textarea"><b>Active Guidance:</b></label>
+                        <div class="ng_field_header">
+                            <label for="ng_short_active_guidance_textarea"><b>Active Guidance:</b></label>
+                            <div class="menu_button ng_clear_guidance_button" id="ng_short_clear_guidance_button" title="Clear the active short-term guidance (and its prompt injection)">
+                                <span class="fa-solid fa-eraser"></span> Clear
+                            </div>
+                        </div>
                         <textarea id="ng_short_active_guidance_textarea" class="text_pole" rows="6"
                             placeholder="The currently active short-term beats. Edit freely; changes apply on the next AI turn."></textarea>
                     </div>

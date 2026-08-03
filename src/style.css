@@ -1207,9 +1207,30 @@
     min-width: 0;
 }
 
+.ip-saved-item-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.ip-saved-item-title {
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ip-saved-item-untitled {
+    font-weight: normal;
+    font-style: italic;
+    opacity: 0.7;
+}
+
 .ip-saved-item-date {
     font-size: 0.85em;
     opacity: 0.7;
+    flex-shrink: 0;
 }
 
 .ip-saved-item-preview {
@@ -1253,6 +1274,23 @@
 #saints_silly_settings .saints_subsection_header {
     margin: 12px 0 4px 0;
     opacity: 0.85;
+}
+
+#saints_silly_settings .ng_field_header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+#saints_silly_settings .ng_clear_guidance_button {
+    font-size: 0.85em;
+    padding: 2px 8px;
+    opacity: 0.85;
+}
+
+#saints_silly_settings .ng_clear_guidance_button:hover {
+    opacity: 1;
 }
 
 #saints_silly_settings .ng_prompt_section {

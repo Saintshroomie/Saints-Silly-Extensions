@@ -185,7 +185,7 @@ const persistedModalState = {
 
 // ─── Saved Prompt Store (per-chat) ───
 
-// Per-chat metadata key. Holds `{ savedPrompts: [{ id, text, savedAt }] }` —
+// Per-chat metadata key. Holds `{ savedPrompts: [{ id, title, text, savedAt }] }` —
 // image prompts the user chose to keep, bound to the chat they were generated
 // from so they travel with chat exports and survive reloads. Compaction
 // migrates the key into the fresh chat like the other per-chat SSE state.
@@ -204,7 +204,7 @@ function hasActiveChat() {
  * Read the saved prompts for the current chat. Pure read apart from
  * backfilling missing ids in place (session-stable, persisted on the next
  * write) so every entry is addressable by the Load/Copy/Delete buttons.
- * @returns {Array<{ id: string, text: string, savedAt: number }>}
+ * @returns {Array<{ id: string, title: string, text: string, savedAt: number }>}
  */
 function readSavedPrompts() {
     const raw = getContext().chatMetadata?.[IP_METADATA_KEY]?.savedPrompts;
@@ -212,9 +212,22 @@ function readSavedPrompts() {
     const valid = raw.filter(p => p && typeof p.text === 'string' && p.text.trim());
     for (const p of valid) {
         if (typeof p.id !== 'string' || !p.id) p.id = makeSavedPromptId();
+        if (typeof p.title !== 'string') p.title = '';
         if (typeof p.savedAt !== 'number') p.savedAt = 0;
     }
     return valid;
+}
+
+/**
+ * Suggest a title for a prompt being saved: its first line, cut at a word
+ * boundary. Only a suggestion — the user can replace or blank it.
+ */
+function suggestPromptTitle(text) {
+    const firstLine = text.split('\n')[0].trim();
+    if (firstLine.length <= 48) return firstLine;
+    const cut = firstLine.slice(0, 48);
+    const lastSpace = cut.lastIndexOf(' ');
+    return (lastSpace > 24 ? cut.slice(0, lastSpace) : cut) + '…';
 }
 
 /** Write the list through to chatMetadata (removing the key when empty). */
@@ -248,11 +261,26 @@ function saveOutputToChat() {
         toast('This image prompt is already saved to this chat.', 'info');
         return;
     }
-    prompts.push({ id: makeSavedPromptId(), text, savedAt: Date.now() });
+    // Cancel aborts the save; an emptied field saves the prompt untitled.
+    const title = window.prompt('Title for this saved prompt:', suggestPromptTitle(text));
+    if (title === null) return;
+    prompts.push({ id: makeSavedPromptId(), title: title.trim(), text, savedAt: Date.now() });
     writeSavedPrompts(prompts);
     renderSavedPrompts();
     toast('Image prompt saved to this chat.', 'success');
     debug('Saved prompt to chat, total:', prompts.length);
+}
+
+function renameSavedPrompt(id) {
+    if (isGenerating) return;
+    const prompts = readSavedPrompts();
+    const entry = prompts.find(p => p.id === id);
+    if (!entry) return;
+    const title = window.prompt('New title for this saved prompt:', entry.title || '');
+    if (title === null) return;
+    entry.title = title.trim();
+    writeSavedPrompts(prompts);
+    renderSavedPrompts();
 }
 
 function deleteSavedPrompt(id) {
@@ -331,10 +359,21 @@ function buildSavedPromptRow(entry) {
     info.className = 'ip-saved-item-info';
     info.title = entry.text;
 
+    const head = document.createElement('div');
+    head.className = 'ip-saved-item-head';
+
+    const title = document.createElement('div');
+    title.className = 'ip-saved-item-title';
+    if (!entry.title) title.classList.add('ip-saved-item-untitled');
+    title.textContent = entry.title || 'Untitled prompt';
+    head.appendChild(title);
+
     const date = document.createElement('div');
     date.className = 'ip-saved-item-date';
     date.textContent = formatSavedPromptDate(entry.savedAt);
-    info.appendChild(date);
+    head.appendChild(date);
+
+    info.appendChild(head);
 
     const preview = document.createElement('div');
     preview.className = 'ip-saved-item-preview';
@@ -347,6 +386,7 @@ function buildSavedPromptRow(entry) {
     buttons.className = 'ip-saved-item-buttons';
     buttons.appendChild(buildSavedPromptButton('fa-file-import', 'Load this prompt into the editor above', () => loadSavedPrompt(entry.id)));
     buttons.appendChild(buildSavedPromptButton('fa-copy', 'Copy this prompt to the clipboard', () => copyToClipboard(entry.text)));
+    buttons.appendChild(buildSavedPromptButton('fa-pen', 'Rename this saved prompt', () => renameSavedPrompt(entry.id)));
     buttons.appendChild(buildSavedPromptButton('fa-trash-can', 'Delete this saved prompt', () => {
         if (isGenerating) return;
         if (!window.confirm('Delete this saved image prompt?')) return;

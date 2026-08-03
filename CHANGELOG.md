@@ -27,12 +27,18 @@ released version. When cutting a release, move these notes into a new
   booru-tag models, with quality-tag prefills supplied where appropriate.
 - **Image Prompting: per-chat saved prompts** — a **Save** button beside the
   modal's output stores the finished image prompt with the current chat
-  (`chatMetadata.imagePrompting.savedPrompts`), and a **Saved Prompts**
-  section at the bottom of the modal lists everything saved there (newest
-  first) with per-entry **Load / Copy / Delete** buttons — so a good prompt
-  can be retrieved and re-rendered later in that chat. Saved prompts survive
-  reloads, travel with chat exports, and are carried into the fresh chat by
-  Compaction's state migration alongside the other per-chat extension state.
+  (`chatMetadata.imagePrompting.savedPrompts`) under a title of your choosing
+  (a suggestion is offered from the prompt's opening words), and a **Saved
+  Prompts** section at the bottom of the modal lists everything saved there
+  (newest first, titled) with per-entry **Load / Copy / Rename / Delete**
+  buttons — so a good prompt can be found and re-rendered later in that
+  chat. Saved prompts survive reloads, travel with chat exports, and are
+  carried into the fresh chat by Compaction's state migration alongside the
+  other per-chat extension state.
+- **Narrative Guidance: Clear buttons for Active Guidance** — each tier's
+  **Active Guidance** textarea now has a **Clear** button beside its label
+  that wipes the tier's per-chat guidance and removes its prompt injection
+  in one click (no more select-all-delete to silence a stale arc).
 
 ## [1.2.0] - 2026-06-19
 
