@@ -1152,6 +1152,114 @@
     font-style: italic;
 }
 
+/* Image Prompting saved-prompt store (per-chat) */
+.ip-saved-section {
+    margin-top: 8px;
+}
+
+.ip-saved-picker {
+    font-size: 0.9em;
+}
+
+.ip-saved-picker > summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 4px 8px;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0.85;
+}
+
+.ip-saved-picker > summary::-webkit-details-marker {
+    display: none;
+}
+
+.ip-saved-picker > summary:hover {
+    opacity: 1;
+}
+
+.ip-saved-list {
+    margin-top: 4px;
+    max-height: 220px;
+    overflow-y: auto;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 4px;
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ip-saved-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 6px;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 4px;
+}
+
+.ip-saved-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.ip-saved-item-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.ip-saved-item-title {
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ip-saved-item-untitled {
+    font-weight: normal;
+    font-style: italic;
+    opacity: 0.7;
+}
+
+.ip-saved-item-date {
+    font-size: 0.85em;
+    opacity: 0.7;
+    flex-shrink: 0;
+}
+
+.ip-saved-item-preview {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ip-saved-item-buttons {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.ip-saved-item-btn {
+    font-size: 0.85em;
+    padding: 2px 8px;
+    opacity: 0.85;
+}
+
+.ip-saved-item-btn:hover {
+    opacity: 1;
+}
+
+.ip-saved-empty {
+    opacity: 0.6;
+    font-style: italic;
+}
+
 /* Image Prompting launch item in the hamburger menu */
 #image_prompt_menu_button {
     display: flex;
@@ -1166,6 +1274,23 @@
 #saints_silly_settings .saints_subsection_header {
     margin: 12px 0 4px 0;
     opacity: 0.85;
+}
+
+#saints_silly_settings .ng_field_header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+#saints_silly_settings .ng_clear_guidance_button {
+    font-size: 0.85em;
+    padding: 2px 8px;
+    opacity: 0.85;
+}
+
+#saints_silly_settings .ng_clear_guidance_button:hover {
+    opacity: 1;
 }
 
 #saints_silly_settings .ng_prompt_section {

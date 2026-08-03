@@ -96,7 +96,7 @@ const SUMMARY_MESSAGE_NAME = 'Story so far';
 const COMPACTION_METADATA_KEY = 'compaction';
 
 // SSE per-chat metadata keys carried into the fresh chat on compaction.
-const MIGRATED_METADATA_KEYS = ['possession', 'narrativeGuidance', 'phraseBan'];
+const MIGRATED_METADATA_KEYS = ['possession', 'narrativeGuidance', 'phraseBan', 'imagePrompting'];
 
 // ─── Module State ───
 

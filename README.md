@@ -228,7 +228,7 @@ Compaction **summarizes the chat, starts a fresh chat seeded with that summary p
 - **Guided summary modal** (mirrors Assisted Character Creation) — Add **Summary Guidance** demanding specific details be captured, pick which **lore books** to fold in, then **Generate / Continue / Checkpoint / Retry** a summary preview you can freely edit. The summary streams in live and the Stop button cancels it. Clicking **Compact** commits.
 - **The handoff** — The summary lands in the new chat as a visible, editable **"Story so far"** message, followed by the last *N* messages (default 20) copied over **verbatim with swipes preserved**. The old chat is left intact and selectable from history.
 - **Manual or automatic trigger** — Trigger it from the <span title="compress icon">🗜</span> **Compact Chat** item in the hamburger menu or with `/compact`. With **Auto-open at threshold** on, the modal opens on its own once the *measured* outgoing prompt crosses your % of the context window (with an optional confirmation dialog). The trigger is the **only** automatic part — every compaction still requires you to act in the modal. Nothing is ever rewritten headlessly.
-- **State migration** — Possession, Narrative Guidance, and Phrase Ban per-chat state carry over to the new chat (World Info Assist guidance travels on the lorebook automatically). Your Summary Guidance is remembered per-chat across compactions of the same storyline.
+- **State migration** — Possession, Narrative Guidance, Phrase Ban, and saved Image Prompt per-chat state carry over to the new chat (World Info Assist guidance travels on the lorebook automatically). Your Summary Guidance is remembered per-chat across compactions of the same storyline.
 
 **How to use**
 
@@ -251,6 +251,7 @@ Turns the current moment of your roleplay into a ready-to-paste prompt for an ex
   All three are fully editable, and you can save your own presets for any other diffusion model.
 - **Optional guidance** — A free-text field for extra direction (what to focus on, camera angle, art style, details to emphasize) that is folded into the generation.
 - **Copy & go** — A **Copy** button beside the output and a **Copy & Close** confirm button put the finished prompt on your clipboard for pasting into your image tool.
+- **Saved prompts, bound to the chat** — A **Save** button beside the output stores the finished prompt with the current chat under a title of your choosing (a suggestion is offered from the prompt's opening words), and the **Saved Prompts** section at the bottom of the modal lists everything saved there (newest first, titled) with per-entry **Load / Copy / Rename / Delete** buttons. Saved prompts live in the chat's metadata, so they survive reloads, travel with chat exports, and carry into the fresh chat on Compaction — perfect for re-rendering a scene later or keeping a set of prompts per storyline.
 
 **How to use**
 
@@ -259,7 +260,8 @@ Turns the current moment of your roleplay into a ready-to-paste prompt for an ex
 3. Leave **Use Chat Context** on, optionally select **lore books** and add **Guidance**, then click **Generate**.
 4. Edit the streamed-in prompt freely, or refine it with **Continue / Checkpoint / Retry**.
 5. Click **Copy & Close** (or the **Copy** button) and paste the prompt into ComfyUI or your image tool of choice.
-6. Rendering for a different model? Switch the **Preset** in the settings drawer (e.g. to **Anima (Tags + Prose)** or **Danbooru Tags**) and generate again.
+6. Want to keep it? Click **Save**, give it a title (or accept the suggested one) — the prompt is stored with the chat, and the **Saved Prompts** section lets you reload, copy, rename, or delete it any time you reopen the modal in that chat.
+7. Rendering for a different model? Switch the **Preset** in the settings drawer (e.g. to **Anima (Tags + Prose)** or **Danbooru Tags**) and generate again.
 
 ### Retry Continue
 
@@ -384,7 +386,7 @@ The drawer holds two self-contained tiers — **Long-term** (the overarching arc
 | Role | Role used when injecting the guidance (System / User / Assistant) |
 | Lore Books (per-chat) | Optional picker for lore books to feed into that tier's generation context. Stored per chat (resets on a new chat); missing books are dropped automatically |
 | Themes / Story Arcs (per-chat) | Themes, ideas, or arcs for the model to weave into the tier's next round of guidance |
-| Active Guidance (per-chat) | The tier's currently active guidance paragraph. Edit directly to hand-tune steering; edits apply on the next AI turn. |
+| Active Guidance (per-chat) | The tier's currently active guidance paragraph. Edit directly to hand-tune steering; edits apply on the next AI turn. A **Clear** button beside the label wipes the tier's guidance and removes its prompt injection in one click. |
 | Turns Remaining / -1 / Reset / Regenerate Now | Manual controls over that tier's per-chat counter and on-demand regeneration |
 
 ### Reformatting Settings
@@ -409,7 +411,7 @@ The drawer holds two self-contained tiers — **Long-term** (the overarching arc
 | Enable Compaction | Toggle the Compaction feature, its **Compact Chat** menu item, `/compact`, and the auto-trigger |
 | Auto-open at threshold | When on, automatically open the Compaction modal after a turn finishes once the measured prompt crosses the threshold. The modal still requires you to act — nothing is rewritten headlessly |
 | Confirm before auto-opening | Show a confirmation dialog (with a **Don't ask again** option) before auto-opening the modal |
-| Migrate per-chat extension state | Carry Possession, Narrative Guidance, and Phrase Ban per-chat state into the compacted chat (World Info Assist guidance travels on the lorebook automatically) |
+| Migrate per-chat extension state | Carry Possession, Narrative Guidance, Phrase Ban, and saved Image Prompt per-chat state into the compacted chat (World Info Assist guidance travels on the lorebook automatically) |
 | Auto Threshold (%) | Percent of the model's context window (measured outgoing prompt) that triggers the auto-open (default 90) |
 | Tail Length | How many of the most recent messages are copied into the new chat verbatim, swipes preserved (default 20). Older messages are replaced by the summary |
 | Summary Token Limit | Maximum tokens for the summary generation (default 1200) |

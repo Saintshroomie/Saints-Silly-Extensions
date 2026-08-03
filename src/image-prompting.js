@@ -8,6 +8,11 @@
  * can keep one template per diffusion-model family: the Default targets
  * Krea 2 (natural-language prose); seeded presets target Anima
  * (Danbooru tags + prose) and pure Danbooru-tag models.
+ *
+ * Generated prompts can be saved to a per-chat store
+ * (`chatMetadata.imagePrompting.savedPrompts`) and browsed / reloaded /
+ * copied / deleted from the Saved Prompts section of the modal, so a good
+ * prompt bound to a scene can be retrieved later in that chat.
  */
 
 import { removeReasoningFromString } from '../../../../reasoning.js';
@@ -20,6 +25,7 @@ import { SlashCommandParser } from '../../../../slash-commands/SlashCommandParse
 import { SlashCommand } from '../../../../slash-commands/SlashCommand.js';
 import {
     createDebugLogger,
+    getContext,
     toast,
     buildContextPreamble,
     createLoreBookPicker,
@@ -176,6 +182,229 @@ const persistedModalState = {
     selectedLoreBooks: [],
     responseLength: null, // null means "use saved setting"
 };
+
+// ─── Saved Prompt Store (per-chat) ───
+
+// Per-chat metadata key. Holds `{ savedPrompts: [{ id, title, text, savedAt }] }` —
+// image prompts the user chose to keep, bound to the chat they were generated
+// from so they travel with chat exports and survive reloads. Compaction
+// migrates the key into the fresh chat like the other per-chat SSE state.
+const IP_METADATA_KEY = 'imagePrompting';
+
+function makeSavedPromptId() {
+    return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function hasActiveChat() {
+    const chatId = getContext().chatId;
+    return chatId !== undefined && chatId !== null && chatId !== '';
+}
+
+/**
+ * Read the saved prompts for the current chat. Pure read apart from
+ * backfilling missing ids in place (session-stable, persisted on the next
+ * write) so every entry is addressable by the Load/Copy/Delete buttons.
+ * @returns {Array<{ id: string, title: string, text: string, savedAt: number }>}
+ */
+function readSavedPrompts() {
+    const raw = getContext().chatMetadata?.[IP_METADATA_KEY]?.savedPrompts;
+    if (!Array.isArray(raw)) return [];
+    const valid = raw.filter(p => p && typeof p.text === 'string' && p.text.trim());
+    for (const p of valid) {
+        if (typeof p.id !== 'string' || !p.id) p.id = makeSavedPromptId();
+        if (typeof p.title !== 'string') p.title = '';
+        if (typeof p.savedAt !== 'number') p.savedAt = 0;
+    }
+    return valid;
+}
+
+/**
+ * Suggest a title for a prompt being saved: its first line, cut at a word
+ * boundary. Only a suggestion — the user can replace or blank it.
+ */
+function suggestPromptTitle(text) {
+    const firstLine = text.split('\n')[0].trim();
+    if (firstLine.length <= 48) return firstLine;
+    const cut = firstLine.slice(0, 48);
+    const lastSpace = cut.lastIndexOf(' ');
+    return (lastSpace > 24 ? cut.slice(0, lastSpace) : cut) + '…';
+}
+
+/** Write the list through to chatMetadata (removing the key when empty). */
+function writeSavedPrompts(list) {
+    const context = getContext();
+    if (!context.chatMetadata) {
+        debug('writeSavedPrompts: no chatMetadata, skipping');
+        return;
+    }
+    if (list.length) {
+        context.chatMetadata[IP_METADATA_KEY] = { savedPrompts: list };
+    } else if (context.chatMetadata[IP_METADATA_KEY]) {
+        delete context.chatMetadata[IP_METADATA_KEY];
+    }
+    context.saveMetadata();
+}
+
+function saveOutputToChat() {
+    if (isGenerating) return;
+    const text = document.getElementById('ip_prompt_output')?.value?.trim() || '';
+    if (!text) {
+        toast('Image prompt is empty. Nothing to save.', 'warning');
+        return;
+    }
+    if (!hasActiveChat()) {
+        toast('Open a chat first — saved prompts are stored with the chat.', 'warning');
+        return;
+    }
+    const prompts = readSavedPrompts();
+    if (prompts.some(p => p.text === text)) {
+        toast('This image prompt is already saved to this chat.', 'info');
+        return;
+    }
+    // Cancel aborts the save; an emptied field saves the prompt untitled.
+    const title = window.prompt('Title for this saved prompt:', suggestPromptTitle(text));
+    if (title === null) return;
+    prompts.push({ id: makeSavedPromptId(), title: title.trim(), text, savedAt: Date.now() });
+    writeSavedPrompts(prompts);
+    renderSavedPrompts();
+    toast('Image prompt saved to this chat.', 'success');
+    debug('Saved prompt to chat, total:', prompts.length);
+}
+
+function renameSavedPrompt(id) {
+    if (isGenerating) return;
+    const prompts = readSavedPrompts();
+    const entry = prompts.find(p => p.id === id);
+    if (!entry) return;
+    const title = window.prompt('New title for this saved prompt:', entry.title || '');
+    if (title === null) return;
+    entry.title = title.trim();
+    writeSavedPrompts(prompts);
+    renderSavedPrompts();
+}
+
+function deleteSavedPrompt(id) {
+    const prompts = readSavedPrompts();
+    const remaining = prompts.filter(p => p.id !== id);
+    if (remaining.length === prompts.length) return;
+    writeSavedPrompts(remaining);
+    renderSavedPrompts();
+    toast('Saved image prompt deleted.', 'success');
+}
+
+function loadSavedPrompt(id) {
+    if (isGenerating) return;
+    const entry = readSavedPrompts().find(p => p.id === id);
+    if (!entry) return;
+    const output = document.getElementById('ip_prompt_output');
+    if (!output) return;
+    const current = output.value.trim();
+    if (current && current !== entry.text
+        && !window.confirm('Replace the current image prompt with the saved one?')) {
+        return;
+    }
+    output.value = entry.text;
+    // Loading replaces the working prompt wholesale, so the old Retry
+    // restore point no longer describes anything on screen — drop it,
+    // mirroring the Clear button.
+    restorePoint = null;
+    lastAction = null;
+    refreshActionButtonStates();
+    toast('Saved image prompt loaded.', 'success');
+}
+
+function formatSavedPromptDate(savedAt) {
+    if (!savedAt) return 'Unknown date';
+    try {
+        return new Date(savedAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+    } catch {
+        return new Date(savedAt).toLocaleString();
+    }
+}
+
+/**
+ * (Re)render the Saved Prompts section of the open modal from chatMetadata.
+ * Rows are built with createElement/textContent — prompt text is user/LLM
+ * content and must never pass through innerHTML.
+ */
+function renderSavedPrompts() {
+    const list = document.getElementById('ip_saved_list');
+    const count = document.getElementById('ip_saved_count');
+    if (!list) return;
+
+    const prompts = readSavedPrompts().slice().sort((a, b) => b.savedAt - a.savedAt);
+    if (count) count.textContent = String(prompts.length);
+    list.innerHTML = '';
+
+    if (!prompts.length) {
+        const empty = document.createElement('div');
+        empty.className = 'ip-saved-empty';
+        empty.textContent = hasActiveChat()
+            ? 'No saved prompts in this chat yet. Click Save under the image prompt to keep one.'
+            : 'Open a chat to save and browse image prompts — they are stored with the chat.';
+        list.appendChild(empty);
+        return;
+    }
+
+    for (const entry of prompts) {
+        list.appendChild(buildSavedPromptRow(entry));
+    }
+}
+
+function buildSavedPromptRow(entry) {
+    const row = document.createElement('div');
+    row.className = 'ip-saved-item';
+
+    const info = document.createElement('div');
+    info.className = 'ip-saved-item-info';
+    info.title = entry.text;
+
+    const head = document.createElement('div');
+    head.className = 'ip-saved-item-head';
+
+    const title = document.createElement('div');
+    title.className = 'ip-saved-item-title';
+    if (!entry.title) title.classList.add('ip-saved-item-untitled');
+    title.textContent = entry.title || 'Untitled prompt';
+    head.appendChild(title);
+
+    const date = document.createElement('div');
+    date.className = 'ip-saved-item-date';
+    date.textContent = formatSavedPromptDate(entry.savedAt);
+    head.appendChild(date);
+
+    info.appendChild(head);
+
+    const preview = document.createElement('div');
+    preview.className = 'ip-saved-item-preview';
+    preview.textContent = entry.text;
+    info.appendChild(preview);
+
+    row.appendChild(info);
+
+    const buttons = document.createElement('div');
+    buttons.className = 'ip-saved-item-buttons';
+    buttons.appendChild(buildSavedPromptButton('fa-file-import', 'Load this prompt into the editor above', () => loadSavedPrompt(entry.id)));
+    buttons.appendChild(buildSavedPromptButton('fa-copy', 'Copy this prompt to the clipboard', () => copyToClipboard(entry.text)));
+    buttons.appendChild(buildSavedPromptButton('fa-pen', 'Rename this saved prompt', () => renameSavedPrompt(entry.id)));
+    buttons.appendChild(buildSavedPromptButton('fa-trash-can', 'Delete this saved prompt', () => {
+        if (isGenerating) return;
+        if (!window.confirm('Delete this saved image prompt?')) return;
+        deleteSavedPrompt(entry.id);
+    }));
+    row.appendChild(buttons);
+
+    return row;
+}
+
+function buildSavedPromptButton(icon, title, onClick) {
+    const btn = document.createElement('div');
+    btn.className = 'menu_button interactable ip-saved-item-btn';
+    btn.title = title;
+    btn.innerHTML = `<span class="fa-solid ${icon}"></span>`;
+    btn.addEventListener('click', onClick);
+    return btn;
+}
 
 // ─── Init ───
 
@@ -437,6 +666,9 @@ function buildModalBody() {
             <div class="ip-field-header">
                 <label for="ip_prompt_output"><b>Image Prompt:</b></label>
                 <div class="ip-field-header-buttons">
+                    <div id="ip_save_output_btn" class="menu_button interactable ip-clear-btn" title="Save the image prompt to this chat so it can be retrieved later">
+                        <span class="fa-solid fa-floppy-disk"></span> Save
+                    </div>
                     <div id="ip_copy_output_btn" class="menu_button interactable ip-clear-btn" title="Copy the image prompt to the clipboard">
                         <span class="fa-solid fa-copy"></span> Copy
                     </div>
@@ -446,6 +678,15 @@ function buildModalBody() {
                 </div>
             </div>
             <textarea id="ip_prompt_output" class="text_pole ip-prompt-output" rows="14" placeholder="The generated image prompt will appear here. Edit it freely, then copy it into ComfyUI or your image tool."></textarea>
+        </div>
+        <div class="ip-saved-section">
+            <details class="ip-saved-picker">
+                <summary title="Image prompts saved to this chat — load, copy, or delete them">
+                    <span class="fa-solid fa-bookmark"></span>
+                    <span>Saved Prompts (<span id="ip_saved_count">0</span>)</span>
+                </summary>
+                <div id="ip_saved_list" class="ip-saved-list"></div>
+            </details>
         </div>
     `;
 
@@ -497,6 +738,9 @@ function bindModalHandlers() {
             saveSettingsFn?.();
         }
     });
+
+    document.getElementById('ip_save_output_btn')?.addEventListener('click', saveOutputToChat);
+    renderSavedPrompts();
 
     document.getElementById('ip_copy_output_btn')?.addEventListener('click', () => {
         if (isGenerating) return;

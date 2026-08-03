@@ -953,6 +953,19 @@ function bindTrackControls(track, saveSettings) {
         });
     }
 
+    trackEl(track, 'clear_guidance_button')?.addEventListener('click', () => {
+        // A regen/continue in flight owns the textarea (streaming into it);
+        // clearing under it would just be overwritten — ignore the click.
+        if (runtime[track.id].regenInProgress) return;
+        const state = loadChatState(track);
+        state.guidance = '';
+        saveChatState(track, state);
+        if (guidanceArea) guidanceArea.value = '';
+        reapplyInjection(track);
+        refreshNGActionButtonStates(track);
+        debug(`[${track.id}] Active guidance cleared via Clear button`);
+    });
+
     trackEl(track, 'decrement_button')?.addEventListener('click', () => {
         const state = loadChatState(track);
         if (state.turnsRemaining > 0) {
