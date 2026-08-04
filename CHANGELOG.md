@@ -47,6 +47,16 @@ released version. When cutting a release, move these notes into a new
   chat. Saved prompts survive reloads, travel with chat exports, and are
   carried into the fresh chat by Compaction's state migration alongside the
   other per-chat extension state.
+- **Image Prompting: per-message button to prompt an earlier moment** — every
+  chat message now gets its own <span title="image icon">🖼</span> button
+  (alongside the other per-message quick actions, toggleable in the Image
+  Prompting settings) that opens the Image Prompt modal *anchored at that
+  message*: the chat context packed into the generation ends there, so the
+  generated prompt depicts that moment of the story instead of the latest
+  one, and a Generate starts immediately. An anchor bar at the top of the
+  modal shows which message the context ends at, with a **Full Chat** button
+  to drop the anchor; the anchor holds for every Generate/Continue in that
+  modal session and clears when the modal closes.
 - **Narrative Guidance: Clear buttons for Active Guidance** — each tier's
   **Active Guidance** textarea now has a **Clear** button beside its label
   that wipes the tier's per-chat guidance and removes its prompt injection

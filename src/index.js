@@ -126,6 +126,8 @@ import {
     bindImagePromptSettings,
     registerImagePromptSlashCommand,
     createImagePromptMenuItem,
+    startImagePromptObserver,
+    rescanImagePromptButtons,
     seedImagePromptPresets,
     DEFAULT_IMAGE_PROMPT_PROMPT,
     DEFAULT_IMAGE_PROMPT_PREFILL,
@@ -236,6 +238,7 @@ const defaultSettings = {
     compactionMigrateState: true,
     compactionDebugMode: false,
     imagePromptEnabled: true,
+    imagePromptMessageButtonEnabled: true,
     imagePromptDebugMode: false,
     imagePromptPrompt: DEFAULT_IMAGE_PROMPT_PROMPT,
     imagePromptPrefill: DEFAULT_IMAGE_PROMPT_PREFILL,
@@ -457,6 +460,7 @@ function onChatChanged() {
     onNarrativeGuidanceChatChanged();
     onPhraseBanChatChanged();
     rescanReformatButtons();
+    rescanImagePromptButtons();
     onCompactionChatChanged();
     onRetryContinueChatChanged();
     SSEDebug('Chat changed, state reloaded');
@@ -513,6 +517,10 @@ jQuery(async () => {
 
     // Watch the chat for messages and inject per-message reformat buttons.
     startReformattingObserver();
+
+    // Watch the chat for messages and inject per-message image-prompt
+    // buttons (each anchors the modal's context at that message).
+    startImagePromptObserver();
 
     // Possession UI
     attachContinueInterceptor();

@@ -244,6 +244,7 @@ Compaction **summarizes the chat, starts a fresh chat seeded with that summary p
 Turns the current moment of your roleplay into a ready-to-paste prompt for an external image-generation tool (ComfyUI, Krea, Forge, etc.) — so you can render the scene you're playing without writing the diffusion prompt yourself.
 
 - **One click from the hamburger menu** — Click the <span title="image icon">🖼</span> **Image Prompt** item next to Continue (or run `/imageprompt`). A modal (mirroring Assisted Character Creation) opens; **Generate** performs a silent generation that reads the current chat, character cards, persona, and any selected **lore books**, and streams an image prompt into an editable textarea. Refine with **Continue / Checkpoint / Retry**, cap each generation with **Max Tokens**, and stop mid-stream at any time.
+- **Prompt any earlier moment** — Every chat message also gets its own <span title="image icon">🖼</span> button (next to the per-message quick actions, toggleable in settings). Clicking it opens the same modal *anchored at that message* — the chat context fed to the LLM ends there, so the generated prompt depicts that moment of the story instead of the latest one — and starts generating immediately. An anchor bar at the top of the modal shows which message the context ends at; click **Full Chat** on it to drop the anchor and go back to the current moment. The anchor holds for every Generate/Continue until you drop it or close the modal.
 - **A prompt style per diffusion model, managed as presets** — The prompt template teaches the LLM the *target model's* ideal prompt style, and the **Prompt Preset** dropdown — right in the modal — keeps one template per model family:
   - **Default** targets **Krea 2** — flowing natural-language prose (subject first, then action, environment, composition, lighting, mood, style), the format Krea 2's encoder is built for.
   - **Anima (Tags + Prose)** targets **Circlestone Labs' Anima Base** — a Danbooru tag block (rating → character count → appearance/clothing/pose/setting tags, lowercase with spaces) followed by a short natural-language passage, with the `masterpiece, best quality, score_7, ` quality prefix supplied as the prefill.
@@ -256,7 +257,7 @@ Turns the current moment of your roleplay into a ready-to-paste prompt for an ex
 **How to use**
 
 1. Play your roleplay to a moment worth illustrating.
-2. Click **Image Prompt** in the hamburger (options) menu next to the input field, or run `/imageprompt`.
+2. Click **Image Prompt** in the hamburger (options) menu next to the input field, or run `/imageprompt`. (Illustrating an earlier scene? Click the <span title="image icon">🖼</span> button on that message instead — the modal opens anchored there and generates right away.)
 3. Leave **Use Chat Context** on, optionally select **lore books** and add **Guidance**, then click **Generate**.
 4. Edit the streamed-in prompt freely, or refine it with **Continue / Checkpoint / Retry**.
 5. Click **Copy & Close** (or the **Copy** button) and paste the prompt into ComfyUI or your image tool of choice.
@@ -427,6 +428,7 @@ The drawer holds two self-contained tiers — **Long-term** (the overarching arc
 | Setting | Description |
 |---------|-------------|
 | Enable Image Prompting | Toggle the Image Prompting feature, its **Image Prompt** menu item, and `/imageprompt` |
+| Per-message 🖼 button | Add an image button to every chat message that opens the modal anchored at that message (the chat context ends there, so the prompt depicts that moment) and generates immediately. On by default |
 | Max Context Override | If > 0, caps how many tokens of context the chat-packer uses for image-prompt generations. 0 = use the model's full context size |
 | Preset / Preview Assembled Prompt | Save named bundles of the prompt + prefill — one per diffusion-model family — and preview exactly what gets sent (see Tool Presets & Prompt Preview below). Ships with **Anima (Tags + Prose)** and **Danbooru Tags** presets alongside the Krea 2-targeting **Default** |
 | Prompt Template | The user prompt for each generation, teaching the LLM the target diffusion model's prompt style. Supports `{{context}}` (chat/lore preamble, when enabled in the modal) and `{{guidance}}` (your optional Guidance) placeholders; if missing, the context is prepended and the guidance appended |

@@ -1049,6 +1049,32 @@
     font-size: 0.9em;
 }
 
+/* Context-anchor bar — shown when the modal was opened from a per-message
+   button, so the packed chat context ends at that message. */
+.ip-anchor-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    margin-bottom: 8px;
+    background: var(--SmartThemeBodyColor, #222);
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.ip-anchor-bar .fa-anchor {
+    color: var(--SmartThemeQuoteColor, #e8a23a);
+}
+
+.ip-anchor-text {
+    flex: 1 1 0%;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    opacity: 0.9;
+}
+
 .ip-output-section {
     display: flex;
     flex-direction: column;
@@ -1486,6 +1512,15 @@
 }
 
 .sse-reformat-button:hover {
+    color: var(--SmartThemeQuoteColor, #6bf);
+}
+
+/* Image Prompting per-message button (same shape as the reformat button) */
+.sse-image-prompt-button {
+    cursor: pointer;
+}
+
+.sse-image-prompt-button:hover {
     color: var(--SmartThemeQuoteColor, #6bf);
 }
 
