@@ -801,6 +801,7 @@ async function packRecentChatLines(chat, ctx, chatBudget) {
  * @param {number}  [opts.responseLength=0] - Tokens reserved for the model's response; subtracted from the budget.
  * @param {number}  [opts.maxContextOverride=0] - If > 0, use this as the max-context size instead of `getMaxPromptTokens()`. Lets callers cap how much chat history they pull in independently of the model's real window.
  * @param {number}  [opts.excludeRecentCount=0] - Drop this many of the most recent messages before packing the chat. Compaction uses it so `{{context}}` is the chat *minus* the verbatim tail it carries over.
+ * @param {number|null} [opts.endAtMessageIndex=null] - If a finite index ≥ 0, only chat messages up to and including this index are packed, making the anchored message the tail of the Recent Chat. Image Prompting uses it to depict an earlier moment of the chat. Applied before `excludeRecentCount`.
  * @returns {Promise<string>} The composed preamble, or '' if nothing was included.
  */
 export async function buildContextPreamble({
@@ -809,6 +810,7 @@ export async function buildContextPreamble({
     responseLength = 0,
     maxContextOverride = 0,
     excludeRecentCount = 0,
+    endAtMessageIndex = null,
 } = {}) {
     const sections = [];
     const ctx = getContext();
@@ -858,11 +860,16 @@ export async function buildContextPreamble({
     // Pack recent chat into whatever budget remains.
     if (includeChat) {
         const fullChat = Array.isArray(ctx.chat) ? ctx.chat : [];
+        // Optionally anchor the tail at a specific message (inclusive), so
+        // the packed chat ends at an earlier moment of the story.
+        const anchoredChat = (Number.isFinite(endAtMessageIndex) && endAtMessageIndex >= 0)
+            ? fullChat.slice(0, endAtMessageIndex + 1)
+            : fullChat;
         // Optionally drop the most-recent N messages (the verbatim tail a
         // caller is carrying over elsewhere) so they aren't double-counted.
         const chat = (Number.isFinite(excludeRecentCount) && excludeRecentCount > 0)
-            ? fullChat.slice(0, Math.max(0, fullChat.length - excludeRecentCount))
-            : fullChat;
+            ? anchoredChat.slice(0, Math.max(0, anchoredChat.length - excludeRecentCount))
+            : anchoredChat;
         if (chat.length) {
             let recentBlock = '';
             try {

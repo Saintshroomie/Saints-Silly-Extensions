@@ -172,6 +172,16 @@ let activeAction = null;       // which button initiated the current generation
 let lastAction = null;         // 'generate' | 'continue' — what Retry should redo
 let restorePoint = null;       // textarea snapshot used by Retry
 
+// When set, the chat context packed into {{context}} ends at this message
+// index (inclusive) instead of the live end of the chat — the per-message
+// button uses it to depict an earlier moment. Lives for one modal session
+// only (cleared on close); the anchor bar in the modal shows and clears it.
+let contextAnchorIndex = null;
+
+// Per-message button observer state (mirrors the Reformatting observer).
+let messageButtonObserver = null;
+let messageButtonListenersInstalled = false;
+
 // Modal contents are remembered across open/close so the user doesn't lose
 // their generated prompt, guidance, or context-toggle selections. Cleared
 // only via the explicit Clear buttons inside the modal. Chat context
@@ -451,6 +461,107 @@ export function createImagePromptMenuItem() {
     debug('Launch menu item injected');
 }
 
+// ─── Per-message Button ───
+
+// Mirrors Reformatting's per-message button: injected into `.mes_buttons`,
+// kept present by a `#chat` MutationObserver. Clicking it opens the modal
+// anchored at that message — the packed chat context ends there, so the
+// generated prompt depicts that moment of the story — and starts a Generate
+// right away.
+
+function messageButtonsEnabled() {
+    return !!(moduleSettings?.imagePromptEnabled && moduleSettings?.imagePromptMessageButtonEnabled);
+}
+
+function makeMessageButton() {
+    const btn = document.createElement('div');
+    btn.className = 'mes_button sse-image-prompt-button fa-solid fa-image interactable';
+    btn.title = 'Generate an image prompt for this moment (chat context ends at this message)';
+    btn.tabIndex = 0;
+    btn.addEventListener('click', onMessageButtonClick);
+    return btn;
+}
+
+function onMessageButtonClick(event) {
+    const mesEl = event.currentTarget.closest('.mes');
+    if (!mesEl) return;
+    const mesId = mesEl.getAttribute('mesid');
+    const index = mesId !== null ? parseInt(mesId, 10) : -1;
+    if (index < 0 || Number.isNaN(index)) return;
+    if (getContext().isGenerating) return;
+    // Auto-generate is opt-in — by default the modal opens anchored but
+    // idle, so there's time to add guidance before pressing Generate.
+    openImagePromptModal({
+        anchorIndex: index,
+        autoGenerate: !!moduleSettings?.imagePromptMessageButtonAutoGenerate,
+    });
+}
+
+/** Inject the image-prompt button into a single `.mes` element if eligible. */
+function injectMessageButtonInto(mesEl) {
+    if (!(mesEl instanceof HTMLElement)) return;
+    if (!mesEl.matches?.('.mes')) return;
+    // User and AI messages both make valid moments to depict; skip only
+    // hidden/system messages (the context packer skips them anyway).
+    if (mesEl.getAttribute('is_system') === 'true') return;
+    const buttons = mesEl.querySelector('.mes_buttons');
+    if (!buttons) return;
+    if (buttons.querySelector('.sse-image-prompt-button')) return;
+
+    // Sit alongside the other quick buttons, before the hover-revealed group.
+    const extra = buttons.querySelector('.extraMesButtons');
+    const btn = makeMessageButton();
+    if (extra) {
+        buttons.insertBefore(btn, extra);
+    } else {
+        buttons.appendChild(btn);
+    }
+}
+
+/** (Re)scan every message in the chat and inject buttons where missing. */
+export function rescanImagePromptButtons() {
+    if (!messageButtonsEnabled()) return;
+    document.querySelectorAll('#chat .mes').forEach(injectMessageButtonInto);
+}
+
+/** Remove every injected image-prompt button (on disable). */
+export function removeAllImagePromptButtons() {
+    document.querySelectorAll('.sse-image-prompt-button').forEach(el => el.remove());
+}
+
+/**
+ * Watch the chat for messages appearing / re-rendering and keep each
+ * message's image-prompt button present. ST re-renders message nodes on
+ * swipe, edit, and load, which can drop injected DOM — the observer re-adds
+ * it. Same shape as the Reformatting observer.
+ */
+export function startImagePromptObserver() {
+    if (messageButtonListenersInstalled) return;
+    messageButtonListenersInstalled = true;
+
+    const attachObserver = () => {
+        if (messageButtonObserver) return;
+        const chat = document.getElementById('chat');
+        if (!chat) return;
+        messageButtonObserver = new MutationObserver((mutations) => {
+            if (!messageButtonsEnabled()) return;
+            for (const m of mutations) {
+                for (const node of m.addedNodes) {
+                    if (!(node instanceof HTMLElement)) continue;
+                    if (node.matches?.('.mes')) injectMessageButtonInto(node);
+                    node.querySelectorAll?.('.mes').forEach(injectMessageButtonInto);
+                }
+            }
+        });
+        messageButtonObserver.observe(chat, { childList: true, subtree: true });
+        debug('Chat observer attached');
+    };
+
+    attachObserver();
+    rescanImagePromptButtons();
+    debug('Image-prompt message-button observer installed');
+}
+
 // ─── Settings Bindings ───
 
 /**
@@ -459,11 +570,39 @@ export function createImagePromptMenuItem() {
  * @param {function} saveSettings
  */
 export function bindImagePromptSettings(saveSettings) {
+    const syncMessageButtons = () => {
+        if (messageButtonsEnabled()) {
+            rescanImagePromptButtons();
+        } else {
+            removeAllImagePromptButtons();
+        }
+    };
+
     const enabledCb = document.getElementById('image_prompt_enabled');
     if (enabledCb) {
         enabledCb.checked = moduleSettings.imagePromptEnabled;
         enabledCb.addEventListener('change', () => {
             moduleSettings.imagePromptEnabled = enabledCb.checked;
+            saveSettings();
+            syncMessageButtons();
+        });
+    }
+
+    const messageButtonCb = document.getElementById('image_prompt_message_button_enabled');
+    if (messageButtonCb) {
+        messageButtonCb.checked = !!moduleSettings.imagePromptMessageButtonEnabled;
+        messageButtonCb.addEventListener('change', () => {
+            moduleSettings.imagePromptMessageButtonEnabled = messageButtonCb.checked;
+            saveSettings();
+            syncMessageButtons();
+        });
+    }
+
+    const autoGenerateCb = document.getElementById('image_prompt_message_button_autogenerate');
+    if (autoGenerateCb) {
+        autoGenerateCb.checked = !!moduleSettings.imagePromptMessageButtonAutoGenerate;
+        autoGenerateCb.addEventListener('change', () => {
+            moduleSettings.imagePromptMessageButtonAutoGenerate = autoGenerateCb.checked;
             saveSettings();
         });
     }
@@ -536,7 +675,7 @@ function showImagePromptPreview() {
 let activePopup = null;
 let activeBody = null;
 
-async function openImagePromptModal() {
+async function openImagePromptModal({ anchorIndex = null, autoGenerate = false } = {}) {
     if (activePopup) return;
     if (!moduleSettings?.imagePromptEnabled) {
         toast('Image Prompting is disabled. Enable it in the extension settings first.', 'warning');
@@ -550,6 +689,7 @@ async function openImagePromptModal() {
     // persist across modal sessions.
     lastAction = null;
     restorePoint = null;
+    contextAnchorIndex = (Number.isInteger(anchorIndex) && anchorIndex >= 0) ? anchorIndex : null;
 
     const body = buildModalBody();
 
@@ -561,8 +701,10 @@ async function openImagePromptModal() {
         allowVerticalScrolling: true,
         onOpen: () => {
             bindModalHandlers();
+            refreshAnchorBar();
             refreshActionButtonStates();
-            debug('Modal opened');
+            debug('Modal opened', contextAnchorIndex !== null ? `(anchored at message ${contextAnchorIndex})` : '');
+            if (autoGenerate) handleGenerate();
         },
         onClosing: (p) => {
             if (p.result === POPUP_RESULT.AFFIRMATIVE) {
@@ -603,6 +745,7 @@ async function openImagePromptModal() {
         activeAction = null;
         lastAction = null;
         restorePoint = null;
+        contextAnchorIndex = null;
         debug('Modal closed');
     }
 }
@@ -629,6 +772,13 @@ function buildModalBody() {
                 <span>Use Chat Context</span>
             </label>
             <div class="ip-lorebook-host"></div>
+        </div>
+        <div id="ip_anchor_bar" class="ip-anchor-bar ip-hidden">
+            <span class="fa-solid fa-anchor"></span>
+            <span id="ip_anchor_text" class="ip-anchor-text"></span>
+            <div id="ip_anchor_clear_btn" class="menu_button interactable ip-clear-btn" title="Drop the anchor and use the full chat up to the latest message instead">
+                <span class="fa-solid fa-xmark"></span> Full Chat
+            </div>
         </div>
         <div class="ip-preset-row">
             <label class="ip-preset-label"><span class="fa-solid fa-file-pen"></span> Prompt Preset:</label>
@@ -768,6 +918,11 @@ function bindModalHandlers() {
         }
         copyToClipboard(text);
     });
+    document.getElementById('ip_anchor_clear_btn')?.addEventListener('click', () => {
+        if (isGenerating) return;
+        contextAnchorIndex = null;
+        refreshAnchorBar();
+    });
     document.getElementById('ip_clear_guidance_btn')?.addEventListener('click', () => {
         if (isGenerating) return;
         const guidance = document.getElementById('ip_guidance');
@@ -787,6 +942,31 @@ function bindModalHandlers() {
         out.focus();
         refreshActionButtonStates();
     });
+}
+
+/**
+ * Show or hide the context-anchor bar to match `contextAnchorIndex`. The
+ * label is built with textContent — the message snippet is user/LLM content
+ * and must never pass through innerHTML. If the anchored message no longer
+ * exists (chat shrank while the modal was open), the anchor is dropped.
+ */
+function refreshAnchorBar() {
+    const bar = document.getElementById('ip_anchor_bar');
+    const label = document.getElementById('ip_anchor_text');
+    if (!bar || !label) return;
+
+    const msg = (contextAnchorIndex !== null) ? getContext().chat?.[contextAnchorIndex] : null;
+    if (!msg) {
+        contextAnchorIndex = null;
+        bar.classList.add('ip-hidden');
+        return;
+    }
+
+    const snippet = (msg.mes || '').replace(/\s+/g, ' ').trim();
+    const preview = snippet.length > 80 ? `${snippet.slice(0, 80)}…` : snippet;
+    const who = msg.name ? ` — ${msg.name}` : '';
+    label.textContent = `Context ends at message #${contextAnchorIndex}${who}: ${preview}`;
+    bar.classList.remove('ip-hidden');
 }
 
 async function copyToClipboard(text) {
@@ -1062,14 +1242,21 @@ function getResponseLength() {
 async function buildPreambleBlock(ctxOptions) {
     if (!ctxOptions) return '';
     if (!ctxOptions.includeChat && !(ctxOptions.loreBookNames && ctxOptions.loreBookNames.length)) return '';
+    const anchored = contextAnchorIndex !== null;
     const preamble = await buildContextPreamble({
         ...ctxOptions,
         responseLength: getResponseLength(),
         maxContextOverride: moduleSettings?.imagePromptMaxContextOverride || 0,
+        ...(anchored ? { endAtMessageIndex: contextAnchorIndex } : {}),
     });
     if (!preamble) return '';
-    debug('Context preamble length:', preamble.length);
-    return `Scene to visualize (the roleplay chat, characters, and selected lore):\n${preamble}\n\n`;
+    debug('Context preamble length:', preamble.length, anchored ? `(anchored at message ${contextAnchorIndex})` : '');
+    // When anchored, the packed chat ends at the chosen message, so tell the
+    // model that the final message — not "now" — is the moment to depict.
+    const header = anchored
+        ? 'Scene to visualize (the roleplay chat up to the chosen moment, characters, and selected lore — the final message of the Recent Chat is the current moment to depict):'
+        : 'Scene to visualize (the roleplay chat, characters, and selected lore):';
+    return `${header}\n${preamble}\n\n`;
 }
 
 function stopGeneration() {

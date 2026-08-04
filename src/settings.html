@@ -851,13 +851,25 @@
                 to the hamburger menu (and <code>/imageprompt</code>) that reads the current
                 chat and any selected lore books and silently generates a ready-to-paste
                 prompt for an external image tool (ComfyUI, etc.) depicting the current
-                moment. The <b>Default</b> preset targets Krea 2 (natural-language prose);
+                moment. A per-message <span class="fa-solid fa-image"></span> button (toggleable
+                below) opens the same modal anchored at that message, to depict an earlier
+                moment of the chat. The <b>Default</b> preset targets Krea 2 (natural-language prose);
                 the seeded <b>Anima (Tags + Prose)</b> and <b>Danbooru Tags</b> presets
                 target Anima Base and pure booru-tag models.</small>
 
             <label class="checkbox_label">
                 <input id="image_prompt_enabled" type="checkbox" />
                 <span>Enable Image Prompting</span>
+            </label>
+
+            <label class="checkbox_label" title="Add an image button to every chat message that opens the Image Prompt modal anchored at that message — the chat context ends there, so the generated prompt depicts that moment instead of the latest one.">
+                <input id="image_prompt_message_button_enabled" type="checkbox" />
+                <span>Per-message <span class="fa-solid fa-image"></span> button (prompt an earlier moment)</span>
+            </label>
+
+            <label class="checkbox_label" title="If enabled, the per-message button starts a Generate as soon as the modal opens. Off by default so there's time to add Guidance or switch presets first.">
+                <input id="image_prompt_message_button_autogenerate" type="checkbox" />
+                <span>Auto-generate on per-message button</span>
             </label>
 
             <div class="ng_inline_row">
