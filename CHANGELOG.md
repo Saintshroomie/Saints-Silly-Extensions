@@ -53,7 +53,9 @@ released version. When cutting a release, move these notes into a new
   Prompting settings) that opens the Image Prompt modal *anchored at that
   message*: the chat context packed into the generation ends there, so the
   generated prompt depicts that moment of the story instead of the latest
-  one, and a Generate starts immediately. An anchor bar at the top of the
+  one — with time to add Guidance or switch presets before generating (an
+  optional **Auto-generate** setting starts the Generate immediately
+  instead). An anchor bar at the top of the
   modal shows which message the context ends at, with a **Full Chat** button
   to drop the anchor; the anchor holds for every Generate/Continue in that
   modal session and clears when the modal closes.

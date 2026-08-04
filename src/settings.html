@@ -867,6 +867,11 @@
                 <span>Per-message <span class="fa-solid fa-image"></span> button (prompt an earlier moment)</span>
             </label>
 
+            <label class="checkbox_label" title="If enabled, the per-message button starts a Generate as soon as the modal opens. Off by default so there's time to add Guidance or switch presets first.">
+                <input id="image_prompt_message_button_autogenerate" type="checkbox" />
+                <span>Auto-generate on per-message button</span>
+            </label>
+
             <div class="ng_inline_row">
                 <label for="image_prompt_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label>
                 <input id="image_prompt_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for image-prompt generations. 0 = use the model's full context size." />

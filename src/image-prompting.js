@@ -489,7 +489,12 @@ function onMessageButtonClick(event) {
     const index = mesId !== null ? parseInt(mesId, 10) : -1;
     if (index < 0 || Number.isNaN(index)) return;
     if (getContext().isGenerating) return;
-    openImagePromptModal({ anchorIndex: index, autoGenerate: true });
+    // Auto-generate is opt-in — by default the modal opens anchored but
+    // idle, so there's time to add guidance before pressing Generate.
+    openImagePromptModal({
+        anchorIndex: index,
+        autoGenerate: !!moduleSettings?.imagePromptMessageButtonAutoGenerate,
+    });
 }
 
 /** Inject the image-prompt button into a single `.mes` element if eligible. */
@@ -590,6 +595,15 @@ export function bindImagePromptSettings(saveSettings) {
             moduleSettings.imagePromptMessageButtonEnabled = messageButtonCb.checked;
             saveSettings();
             syncMessageButtons();
+        });
+    }
+
+    const autoGenerateCb = document.getElementById('image_prompt_message_button_autogenerate');
+    if (autoGenerateCb) {
+        autoGenerateCb.checked = !!moduleSettings.imagePromptMessageButtonAutoGenerate;
+        autoGenerateCb.addEventListener('change', () => {
+            moduleSettings.imagePromptMessageButtonAutoGenerate = autoGenerateCb.checked;
+            saveSettings();
         });
     }
 

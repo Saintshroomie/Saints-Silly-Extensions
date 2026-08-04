@@ -239,6 +239,7 @@ const defaultSettings = {
     compactionDebugMode: false,
     imagePromptEnabled: true,
     imagePromptMessageButtonEnabled: true,
+    imagePromptMessageButtonAutoGenerate: false,
     imagePromptDebugMode: false,
     imagePromptPrompt: DEFAULT_IMAGE_PROMPT_PROMPT,
     imagePromptPrefill: DEFAULT_IMAGE_PROMPT_PREFILL,
