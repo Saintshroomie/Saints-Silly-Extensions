@@ -21,6 +21,39 @@
 
 
 /* ═══════════════════════════════════════════════════════════════════════════════
+   SHARED: BANNERS & STATUS BARS
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* One readable surface for every modal banner / status bar (ACC, Compaction,
+   Image Prompting). ST's --SmartThemeBodyColor is the *text* colour, not a
+   background — painting a bar with it renders the block in the same colour as
+   the text on top of it, which is what made these unreadable (a white bar with
+   near-white text on light themes). The surface is a translucent black wash
+   instead: it darkens whatever the theme's own background is, so body-coloured
+   text keeps its contrast on both light and dark themes. */
+.acc-status-bar,
+.cc-status-bar,
+.ip-status-bar,
+.ip-anchor-bar,
+.cc-usage-banner {
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));
+    border-radius: 4px;
+    color: var(--SmartThemeBodyColor, #ddd);
+}
+
+/* The accent lives on the icon, never on the message text: a theme accent
+   (gold, etc.) can fall below readable contrast on a light background, the
+   body colour can't. */
+.acc-status-bar > .fa-solid,
+.cc-status-bar > .fa-solid,
+.ip-status-bar > .fa-solid,
+.ip-anchor-bar > .fa-solid {
+    color: var(--SmartThemeQuoteColor, #e8a23a);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════════
    POSSESSION STYLES
    ═══════════════════════════════════════════════════════════════════════════════ */
 
@@ -348,15 +381,13 @@
     color: var(--SmartThemeQuoteColor, #e8a23a);
 }
 
+/* Surface/colour come from the shared banner rule at the top of this file. */
 .acc-status-bar {
     display: flex;
     align-items: center;
     gap: 8px;
     padding: 8px 12px;
     margin-bottom: 12px;
-    background: var(--SmartThemeBodyColor, #222);
-    border-radius: 4px;
-    color: var(--SmartThemeQuoteColor, #e8a23a);
     font-size: 0.9em;
 }
 
@@ -728,19 +759,19 @@
     text-align: left;
 }
 
+/* Surface/colour come from the shared banner rule at the top of this file. */
 .cc-usage-banner {
     padding: 8px 12px;
     margin-bottom: 12px;
-    border: 1px solid var(--SmartThemeBorderColor, #555);
-    border-radius: 4px;
     font-size: 0.9em;
-    opacity: 0.9;
 }
 
+/* The alarm is carried by the tinted surface, the accent border and the weight
+   — not by recolouring the text, which is the readable part. */
 .cc-usage-banner.cc-usage-high {
-    color: var(--SmartThemeQuoteColor, #e8a23a);
+    background-color: rgba(232, 162, 58, 0.18);
     border-color: var(--SmartThemeQuoteColor, #e8a23a);
-    opacity: 1;
+    font-weight: 600;
 }
 
 .cc-context-section {
@@ -815,15 +846,13 @@
     text-align: center;
 }
 
+/* Surface/colour come from the shared banner rule at the top of this file. */
 .cc-status-bar {
     display: flex;
     align-items: center;
     gap: 8px;
     padding: 8px 12px;
     margin-bottom: 12px;
-    background: var(--SmartThemeBodyColor, #222);
-    border-radius: 4px;
-    color: var(--SmartThemeQuoteColor, #e8a23a);
     font-size: 0.9em;
 }
 
@@ -1037,15 +1066,13 @@
     text-align: center;
 }
 
+/* Surface/colour come from the shared banner rule at the top of this file. */
 .ip-status-bar {
     display: flex;
     align-items: center;
     gap: 8px;
     padding: 8px 12px;
     margin-bottom: 12px;
-    background: var(--SmartThemeBodyColor, #222);
-    border-radius: 4px;
-    color: var(--SmartThemeQuoteColor, #e8a23a);
     font-size: 0.9em;
 }
 
@@ -1057,13 +1084,7 @@
     gap: 8px;
     padding: 6px 12px;
     margin-bottom: 8px;
-    background: var(--SmartThemeBodyColor, #222);
-    border-radius: 4px;
     font-size: 0.9em;
-}
-
-.ip-anchor-bar .fa-anchor {
-    color: var(--SmartThemeQuoteColor, #e8a23a);
 }
 
 .ip-anchor-text {
@@ -1548,8 +1569,14 @@
     opacity: 0.8;
 }
 
+/* Same reasoning as the Compaction usage banner: warning colour goes on the
+   rule and the tint, the text stays at the theme's readable body colour. */
 #saints_silly_settings #phrase_ban_pattern_status.phrase-ban-status-error {
-    color: var(--warning, #e8a23a);
+    color: var(--SmartThemeBodyColor, #ddd);
+    background-color: rgba(232, 162, 58, 0.18);
+    border-left: 3px solid var(--warning, #e8a23a);
+    border-radius: 3px;
+    padding: 2px 6px;
     opacity: 1;
 }
 
