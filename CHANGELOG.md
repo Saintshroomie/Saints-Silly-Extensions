@@ -64,6 +64,16 @@ released version. When cutting a release, move these notes into a new
   that wipes the tier's per-chat guidance and removes its prompt injection
   in one click (no more select-all-delete to silence a stale arc).
 
+### Fixed
+- **Unreadable banners and status bars** — the generation status bars (ACC,
+  Compaction, Image Prompting), Image Prompting's context-anchor bar,
+  Compaction's context-usage banner, and Phrase Ban's pattern-error readout
+  were drawing their text in the theme's accent colour on a background taken
+  from the theme's *text* colour, which on light themes produced pale text on
+  a near-white block. They now sit on a subtly darkened, bordered surface with
+  body-coloured text (accent kept on the icon, border and warning tint), so
+  they stay legible on light and dark themes alike.
+
 ## [1.2.0] - 2026-06-19
 
 ### Added
