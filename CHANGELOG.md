@@ -13,6 +13,17 @@ released version. When cutting a release, move these notes into a new
 `## [X.Y.Z]` section and run `npm version`._
 
 ### Added
+- **Phrasing: Auto Phrasing** — a new toggle (off by default) that runs the
+  rephrase on *every* message you send instead of only when you press the
+  quill. Sending — by button, Enter, or Ctrl+Enter — rewrites the typed text
+  and then sends the result; while possessing a character, the rewritten
+  message is posted as that character and the reply is triggered, so the turn
+  plays out exactly as a normal send would. Empty sends (SillyTavern's
+  continue/regenerate path), slash commands typed into the chat box, and
+  sends made while a message is being edited are left untouched. Stopping
+  mid-rewrite sends nothing: whatever was generated stays in the chat box to
+  edit and send by hand, and if the rewrite produces nothing at all your
+  original text is put back.
 - **Point-of-use preset selection** — the tools with an interactive surface
   now let you pick their prompt preset right where the work happens instead
   of detouring into the settings drawer: a **Prompt Preset** dropdown in the

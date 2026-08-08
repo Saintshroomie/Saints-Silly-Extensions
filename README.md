@@ -65,6 +65,7 @@ Enrich your messages with LLM-generated narration, actions, and detail that stay
   - **Empty input** — Rephrases the last message in chat, using its latest swipe as the seed text
   - **Editing a message** — Confirms the edit, then rephrases that message
   - **Text in input** — Enriches your typed text
+- **Auto Phrasing** — Optional mode that runs the rephrase on *every* message you send, so you never have to press the quill first. Sending (button, Enter, or Ctrl+Enter) rewrites your text and then sends the result; while possessing a character, the rewritten message is posted as that character and the reply is triggered, exactly as a normal send would. Stopping mid-rewrite sends nothing — whatever was generated stays in the chat box for you to edit and send by hand.
 - **Seed text reinjection** — Rephrased messages remember their original seed prompt, so if you Continue a rephrased message the seed is reinjected to guide the continue generation
 - **Custom prompts** — Customize the phrasing prompt and save any number of named preset variants (see Tool Presets & Prompt Preview below)
 - **Inverse Guidance** — Optional mode that feeds every existing swipe of the target message into the prompt and asks the model to produce a swipe that is wildly different in tone, pacing, and approach. Comes with its own editable prompt template (with `{{phrasingSwipes}}` and `{{phrasingSeed}}` placeholders).
@@ -76,6 +77,7 @@ Love the gist, but not the phrasing of a generation? Wish you could easily guide
 
 **Paraphrasing for {{user}}:**
 1. Enter your paraphrase, and press the quill button to trigger a standard SillyTavern Impersonation that is guided by your written text.
+2. Tired of pressing the quill every turn? Turn on **Auto Phrasing** in the settings and every message you send is rewritten first — type the paraphrase, hit Send, and the enriched version is what goes out.
 
 **Paraphrasing for {{char}}:**
 1. Press the quill button on the most recent message (must be a character message) and Phrasing will guide a swipe generation with that message.
@@ -89,6 +91,7 @@ When Possession and Phrasing are used together, you can quickly take over charac
 1. Select a character to possess.
 2. Type a paraphrase of what you want your possessed character to do or say or feel, and press the quill button to let the LLM do the hard work.
 3. Pressing the quill button again will perform a swipe using the active message as the guiding seed.
+4. With **Auto Phrasing** on, step 2 happens on plain Send: your paraphrase is posted and rewritten as the possessed character, and the reply is generated afterwards just like a normal turn.
 
 ### Phrase Ban
 
@@ -321,6 +324,7 @@ Open **Extensions** > **Saint's Silly Extensions** in SillyTavern's settings pan
 | Setting | Description |
 |---------|-------------|
 | Enable Phrasing! | Toggle the phrasing feature on/off |
+| Auto Phrasing | Rephrase every message you send without pressing the quill first. Off by default. Slash commands, empty sends (continue/regenerate) and sends made while a message is being edited are left alone |
 | Debug Mode | Log detailed phrasing events to the browser console |
 | Inverse Guidance | When enabled, rephrasing a message includes all of its existing swipes in the prompt and asks the model to produce something wildly different |
 | Preset / Preview Assembled Prompt | Save named bundles of both Phrasing prompt fields and preview exactly what gets injected (see Tool Presets & Prompt Preview below) |
