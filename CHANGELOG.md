@@ -12,7 +12,20 @@ _Changes that have landed on the development branch but are not yet part of a
 released version. When cutting a release, move these notes into a new
 `## [X.Y.Z]` section and run `npm version`._
 
+## [1.3.0] - 2026-08-08
+
 ### Added
+- **Phrasing: Auto Phrasing** — a new toggle (off by default) that runs the
+  rephrase on *every* message you send instead of only when you press the
+  quill. Sending — by button, Enter, or Ctrl+Enter — rewrites the typed text
+  and then sends the result; while possessing a character, the rewritten
+  message is posted as that character and the reply is triggered, so the turn
+  plays out exactly as a normal send would. Empty sends (SillyTavern's
+  continue/regenerate path), slash commands typed into the chat box, and
+  sends made while a message is being edited are left untouched. Stopping
+  mid-rewrite sends nothing: whatever was generated stays in the chat box to
+  edit and send by hand, and if the rewrite produces nothing at all your
+  original text is put back.
 - **Point-of-use preset selection** — the tools with an interactive surface
   now let you pick their prompt preset right where the work happens instead
   of detouring into the settings drawer: a **Prompt Preset** dropdown in the
@@ -162,6 +175,7 @@ Initial release. Bundles seven roleplay tools for SillyTavern:
 Plus shared infrastructure: cancellable **Silent Generation** (with live
 streaming) and per-tool **Prompt Presets**.
 
-[Unreleased]: https://github.com/Saintshroomie/Saints-Silly-Extensions/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/Saintshroomie/Saints-Silly-Extensions/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/Saintshroomie/Saints-Silly-Extensions/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/Saintshroomie/Saints-Silly-Extensions/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/Saintshroomie/Saints-Silly-Extensions/releases/tag/v1.1.0

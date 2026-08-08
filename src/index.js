@@ -38,10 +38,12 @@ import {
     applyPhrasingEnabledState,
     createInputAreaButton,
     createHamburgerMenuItem,
+    attachAutoPhrasingInterceptor,
     bindPhrasingSettings,
     registerPhrasingSlashCommand,
     onGenerationStarted as phrasingGenStarted,
     onGenerationEnded as phrasingGenEnded,
+    onGenerationStopped as phrasingGenStopped,
     rewriteMessageWithTemplate,
     DEFAULT_PHRASING_PROMPT,
     DEFAULT_PHRASING_INVERSE_PROMPT,
@@ -164,6 +166,7 @@ const defaultSettings = {
     possessionShowToast: true,
     possessionDebugMode: false,
     phrasingEnabled: true,
+    phrasingAutoEnabled: false,
     phrasingDebugMode: false,
     phrasingInverseGuidance: false,
     phrasingPrompt: DEFAULT_PHRASING_PROMPT,
@@ -447,9 +450,10 @@ function onGenerationEnded() {
 }
 
 function onGenerationStopped() {
-    // Same cleanup as ended
+    // Same cleanup as ended, plus Phrasing notes the stop so an Auto Phrasing
+    // rewrite the user interrupted is never sent on its own.
     possessionGenEnded();
-    phrasingGenEnded();
+    phrasingGenStopped();
     showPossessionImpersonateButton();
     onRetryContinueGenerationEnded();
     SSEDebug('Generation stopped');
@@ -529,6 +533,10 @@ jQuery(async () => {
     // Phrasing UI
     createInputAreaButton();
     createHamburgerMenuItem();
+
+    // Auto Phrasing — intercept the send affordances so every message can be
+    // rewritten before it goes out (no-op while the setting is off).
+    attachAutoPhrasingInterceptor();
 
     // Compaction UI — launch item in the hamburger (options) menu.
     createCompactionMenuItem();

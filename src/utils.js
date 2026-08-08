@@ -164,6 +164,19 @@ export function getEditingMessageIndex() {
 // ─── Generation Lifecycle ───
 
 /**
+ * Whether SillyTavern is currently running a generation. `deactivateSendButtons`
+ * stamps `data-generating` on `<body>` for the whole generation and
+ * `activateSendButtons` removes it, which is the only generation flag the host
+ * exposes to extensions (`context.isGenerating` is not part of the context
+ * object) — so the DOM stamp is the source of truth.
+ *
+ * @returns {boolean}
+ */
+export function isGenerationInProgress() {
+    return document.body?.dataset?.generating === 'true';
+}
+
+/**
  * Returns a Promise that resolves when the current LLM generation ends
  * (either normally or via user stop). Resolves with the text of the last
  * message in the chat, or '' on timeout / empty chat.

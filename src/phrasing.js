@@ -17,6 +17,7 @@ import {
     createDebugLogger,
     confirmActiveMessageEdit,
     getEditingMessageIndex,
+    isGenerationInProgress,
     waitForGenerationEnd,
     showPromptPreview,
 } from './utils.js';
@@ -41,6 +42,15 @@ Now produce a wildly different rewrite of:
 // ─── State ───
 
 let phrasingActive = false;
+
+// Auto Phrasing: true while an intercepted send is being rewritten. Both the
+// re-entrancy guard for the interceptor and the pass-through flag for the
+// programmatic re-send we fire once the rewrite lands.
+let autoPhrasingBusy = false;
+
+// Set when a generation is stopped by the user. Reset at the start of every
+// Auto Phrasing run: a rewrite the user stopped is never sent automatically.
+let autoPhrasingStopped = false;
 
 /** @type {{ settings: object }} */
 let ctx = null;
@@ -163,11 +173,19 @@ export function applyPhrasingEnabledState() {
 
 // ─── Primary Flow (Input Enrichment) ───
 
-async function doPrimaryFlow(seedText) {
+/**
+ * @param {string} seedText
+ * @param {object} [options]
+ * @param {(index: number) => void} [options.onMessagePosted] - Called with the
+ *   chat index once a possessed message has been posted, before it is rewritten.
+ *   Lets callers tell "nothing happened" apart from "the message is in the chat
+ *   but the rewrite did not finish".
+ */
+async function doPrimaryFlow(seedText, options = {}) {
     debug('doPrimaryFlow — starting, seed length:', seedText.length);
     const context = getContext();
 
-    if (context.isGenerating) {
+    if (isGenerationInProgress()) {
         debug('doPrimaryFlow — ABORTED: generation in progress');
         return '';
     }
@@ -186,6 +204,7 @@ async function doPrimaryFlow(seedText) {
                 debug('doPrimaryFlow — FAILED: could not post possessed message');
                 return '';
             }
+            options.onMessagePosted?.(messageIndex);
 
             await new Promise(resolve => setTimeout(resolve, 100));
 
@@ -331,7 +350,7 @@ async function onInputPhrasingClick() {
     if (!ctx.settings.phrasingEnabled) return;
 
     const context = getContext();
-    if (context.isGenerating) return;
+    if (isGenerationInProgress()) return;
 
     hideAllPhrasingButtons();
 
@@ -375,6 +394,202 @@ async function onInputPhrasingClick() {
     }
 }
 
+// ─── Auto Phrasing (Send Interception) ───
+
+/**
+ * Whether SillyTavern would send the message on a bare Enter. Mirrors the
+ * host's own `shouldSendOnEnter()`, read off the context object so an older
+ * host that doesn't expose it can't break the module import.
+ */
+function sendsOnEnter() {
+    const context = getContext();
+    if (typeof context.shouldSendOnEnter === 'function') {
+        return !!context.shouldSendOnEnter();
+    }
+    // Fallback: the raw power-user setting (-1 disabled / 0 auto / 1 enabled).
+    const mode = context.powerUserSettings?.send_on_enter;
+    if (mode === -1) return false;
+    if (mode === 0) {
+        return typeof context.isMobile === 'function' ? !context.isMobile() : true;
+    }
+    return true;
+}
+
+/**
+ * The pending input text if this send should be rewritten first, or `null` if
+ * Auto Phrasing must keep its hands off and let SillyTavern send normally.
+ *
+ * @returns {string|null}
+ */
+function getAutoPhrasingInput() {
+    if (!ctx.settings.phrasingEnabled || !ctx.settings.phrasingAutoEnabled) return null;
+    // Our own re-send (and any rewrite still in flight) passes straight through.
+    if (autoPhrasingBusy || phrasingActive) return null;
+    if (isGenerationInProgress()) return null;
+
+    const textarea = document.getElementById('send_textarea');
+    const text = textarea?.value?.trim();
+    // An empty send is the host's continue/regenerate path — nothing to rewrite.
+    if (!text) return null;
+    // Text typed into the chat box starting with "/" runs as a slash command.
+    if (text.startsWith('/')) return null;
+    // A message edit owns the input; let the host handle (and warn about) it.
+    if (getEditingMessageIndex() >= 0) return null;
+
+    const context = getContext();
+    // Neither a character nor a group: impersonate has nothing to write as.
+    if (context.characterId === undefined && !context.groupId) return null;
+
+    return text;
+}
+
+/**
+ * Rewrite the pending input, then complete the send the user asked for:
+ * the enriched text is sent as a normal message, or — while possessing — the
+ * rewritten message is already in the chat, so the reply is triggered instead.
+ *
+ * @param {string} inputText - The raw text taken from the chat box.
+ */
+async function runAutoPhrasing(inputText) {
+    const textarea = document.getElementById('send_textarea');
+    const possessing = !!possessionApi?.isPossessing();
+    let posted = false;
+
+    debug('runAutoPhrasing — starting, possessed:', possessing, '| input length:', inputText.length);
+
+    autoPhrasingBusy = true;
+    autoPhrasingStopped = false;
+    hideAllPhrasingButtons();
+
+    const setInput = (value) => {
+        if (!textarea) return;
+        textarea.value = value;
+        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+
+    try {
+        setInput('');
+
+        const seedText = possessing
+            ? formatSeedWithSpeaker(inputText, false, possessionApi.getPossessedCharName())
+            : formatSeedWithSpeaker(inputText, true);
+
+        const result = await doPrimaryFlow(seedText, {
+            onMessagePosted: () => { posted = true; },
+        });
+
+        if (possessing) {
+            if (!posted) {
+                debug('runAutoPhrasing — nothing was posted, handing the text back');
+                setInput(inputText);
+                toastr.warning('Auto Phrasing could not post the message. Your text was left in the chat box.', 'Phrasing!');
+                return;
+            }
+            if (autoPhrasingStopped) {
+                debug('runAutoPhrasing — stopped by the user; reply not triggered');
+                return;
+            }
+            await triggerReplyGeneration();
+            return;
+        }
+
+        if (!result) {
+            debug('runAutoPhrasing — rewrite produced nothing, handing the text back');
+            setInput(inputText);
+            if (!autoPhrasingStopped) {
+                toastr.warning('Auto Phrasing produced nothing. Your text was left in the chat box.', 'Phrasing!');
+            }
+            return;
+        }
+
+        if (autoPhrasingStopped) {
+            // Keep whatever was streamed before the stop, unsent, so it can be
+            // edited and sent by hand.
+            debug('runAutoPhrasing — stopped by the user; partial rewrite left in the chat box');
+            return;
+        }
+
+        debug('runAutoPhrasing — sending rewrite, length:', result.length);
+        submitCurrentInput();
+    } catch (err) {
+        console.error('[PHRASING] Auto Phrasing failed:', err);
+        // Never swallow the user's message on an unexpected failure.
+        if (!posted && !textarea?.value?.trim()) setInput(inputText);
+        toastr.error('Auto Phrasing failed. See the console for details.', 'Phrasing!');
+    } finally {
+        autoPhrasingBusy = false;
+        showAllPhrasingButtons();
+        debug('runAutoPhrasing — complete');
+    }
+}
+
+/**
+ * Send whatever is in the chat box through the host's own send path. Called
+ * while `autoPhrasingBusy` is still set, so the click passes our interceptor.
+ */
+function submitCurrentInput() {
+    const sendButton = document.getElementById('send_but');
+    if (!sendButton) {
+        debug('submitCurrentInput — no send button found');
+        return;
+    }
+    sendButton.click();
+}
+
+/**
+ * Possessed sends post the message themselves, so the turn still needs the
+ * reply the user expected from pressing Send.
+ */
+async function triggerReplyGeneration() {
+    const context = getContext();
+    debug('triggerReplyGeneration — triggering the reply');
+    await context.executeSlashCommandsWithOptions('/trigger');
+}
+
+/**
+ * Intercepts the host's send affordances (button, Enter, Ctrl+Enter) so a
+ * message is rewritten before it is sent. Mirrors Possession's Continue
+ * interceptor: capture phase, so it runs ahead of SillyTavern's own handlers.
+ */
+export function attachAutoPhrasingInterceptor() {
+    document.addEventListener('click', (event) => {
+        if (!event.target.closest('#send_but')) return;
+
+        const inputText = getAutoPhrasingInput();
+        if (inputText === null) return;
+
+        event.stopImmediatePropagation();
+        event.preventDefault();
+
+        debug('Intercepted send button for Auto Phrasing');
+        runAutoPhrasing(inputText);
+    }, { capture: true });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' || event.isComposing) return;
+        // Shift+Enter is a newline; Alt+Enter is the host's Continue hotkey.
+        if (event.shiftKey || event.altKey) return;
+        // A popup owns the keyboard while it is open (the host skips its own
+        // hotkeys too).
+        if (document.querySelector('dialog[open]')) return;
+        // Plain Enter only sends while the chat box has focus; Ctrl+Enter is a
+        // global hotkey that sends whenever the box holds text.
+        if (!event.ctrlKey && document.activeElement !== document.getElementById('send_textarea')) return;
+        if (!sendsOnEnter()) return;
+
+        const inputText = getAutoPhrasingInput();
+        if (inputText === null) return;
+
+        event.stopImmediatePropagation();
+        event.preventDefault();
+
+        debug('Intercepted Enter for Auto Phrasing');
+        runAutoPhrasing(inputText);
+    }, { capture: true });
+
+    debug('Attached Auto Phrasing send interceptor');
+}
+
 // ─── Generation Lifecycle ───
 
 export function onGenerationStarted() {
@@ -389,6 +604,13 @@ export function onGenerationEnded() {
     clearPhrasingInjection();
     phrasingActive = false;
     showAllPhrasingButtons();
+}
+
+export function onGenerationStopped() {
+    // A rewrite the user stopped must never be auto-sent — runAutoPhrasing
+    // reads this after its generation settles.
+    autoPhrasingStopped = true;
+    onGenerationEnded();
 }
 
 // ─── UI Creation ───
@@ -435,6 +657,16 @@ export function bindPhrasingSettings(saveSettings) {
             ctx.settings.phrasingEnabled = e.target.checked;
             saveSettings();
             applyPhrasingEnabledState();
+        });
+    }
+
+    const phrasingAutoEnabled = document.getElementById('phrasing_auto_enabled');
+    if (phrasingAutoEnabled) {
+        phrasingAutoEnabled.checked = ctx.settings.phrasingAutoEnabled;
+        phrasingAutoEnabled.addEventListener('change', (e) => {
+            ctx.settings.phrasingAutoEnabled = e.target.checked;
+            saveSettings();
+            debug('autoPhrasing toggled to', ctx.settings.phrasingAutoEnabled);
         });
     }
 
