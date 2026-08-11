@@ -15,14 +15,18 @@ released version. When cutting a release, move these notes into a new
 ### Added
 - **Automatic World Info in AI-assisted context** — whenever **Use Chat Context**
   is on (Assisted Character Creation, World Info Assist, Narrative Guidance,
-  Compaction, and the Group Director's leaner non-cache mode), the extension now
-  auto-activates the chat's bound World Info — keyword-matching the recent chat
-  and character/persona exactly as a real turn would — and folds the relevant
-  entries into the generation context. You no longer have to hand-pick lore books
-  for the AI tools to "know" the current scene's lore; the lore-book dropdown
-  becomes an **additive override** for extra books that wouldn't otherwise match.
+  Compaction, Image Prompting, and the Group Director's leaner non-cache mode),
+  the extension now auto-activates the chat's bound World Info — keyword-matching
+  the recent chat and character/persona exactly as a real turn would — and folds
+  the relevant entries into the generation context. You no longer have to
+  hand-pick lore books for the AI tools to "know" the current scene's lore; the
+  lore-book dropdown becomes an **additive override** for extra books that
+  wouldn't otherwise match.
   Activation is a side-effect-free dry run (it never disturbs the live chat's
-  World Info state) and is counted against each tool's context budget.
+  World Info state) and is counted against each tool's context budget. When a
+  tool anchors its context at an earlier message (Image Prompting's per-message
+  button), World Info is matched only against the chat up to that anchor, so an
+  anchored prompt never picks up lore the story hasn't reached yet.
 
 - **Group Director** — an LLM-chosen turn order for group chats. While enabled,
   the active group is switched to **Manual** reply order (your previous strategy

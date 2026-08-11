@@ -778,6 +778,21 @@ export async function estimateChatTokens() {
 }
 
 /**
+ * Cut a chat off at an anchor message (inclusive), so everything downstream sees
+ * the story as it stood at that moment. Both the World Info activation and the
+ * chat packing use it, so an anchored caller never picks up later-story content.
+ *
+ * @param {object[]} chat - The full chat array.
+ * @param {number|null} endAtMessageIndex - Anchor index, or null/invalid for no cut.
+ * @returns {object[]} The anchored slice (the input array when there's no anchor).
+ */
+function anchorChat(chat, endAtMessageIndex) {
+    return (Number.isFinite(endAtMessageIndex) && endAtMessageIndex >= 0)
+        ? chat.slice(0, endAtMessageIndex + 1)
+        : chat;
+}
+
+/**
  * Pack as many recent chat lines as the token budget allows, newest first,
  * but return them in chronological order. Returns '' if nothing fits.
  */
@@ -881,7 +896,11 @@ export async function buildContextPreamble({
     if (includeChat && autoWorldInfo && typeof ctx.getWorldInfoPrompt === 'function') {
         try {
             const includeNames = ctx.powerUserSettings?.world_info_include_names ?? true;
-            const chatForWI = (Array.isArray(ctx.chat) ? ctx.chat : [])
+            // Respect the caller's anchor: matching against messages *after* the
+            // anchored moment would activate lore the story hasn't reached yet.
+            // (`excludeRecentCount` is deliberately not applied — that tail is
+            // still part of the same moment, just carried verbatim elsewhere.)
+            const chatForWI = anchorChat(Array.isArray(ctx.chat) ? ctx.chat : [], endAtMessageIndex)
                 .filter(m => m && !m.is_system)
                 .map(m => (includeNames && m.name) ? `${m.name}: ${m.mes ?? ''}` : String(m.mes ?? ''))
                 .reverse();
@@ -900,9 +919,7 @@ export async function buildContextPreamble({
         const fullChat = Array.isArray(ctx.chat) ? ctx.chat : [];
         // Optionally anchor the tail at a specific message (inclusive), so
         // the packed chat ends at an earlier moment of the story.
-        const anchoredChat = (Number.isFinite(endAtMessageIndex) && endAtMessageIndex >= 0)
-            ? fullChat.slice(0, endAtMessageIndex + 1)
-            : fullChat;
+        const anchoredChat = anchorChat(fullChat, endAtMessageIndex);
         // Optionally drop the most-recent N messages (the verbatim tail a
         // caller is carrying over elsewhere) so they aren't double-counted.
         const chat = (Number.isFinite(excludeRecentCount) && excludeRecentCount > 0)
