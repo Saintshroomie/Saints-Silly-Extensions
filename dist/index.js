@@ -4623,9 +4623,62 @@ function clearPhrasingInjection() {
     __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_setExtensionPrompt__(PHRASING_INJECTION_KEY, '', __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_types__.NONE, 0);
 }
 
+// ─── Seed Storage (per swipe) ───
+
 /**
- * Called from the continue interceptor — reinjects the phrasing seed prompt
- * if the last message was rephrased.
+ * Read the stored rephrase prompt for one swipe of a message.
+ *
+ * The seed is keyed per swipe (`swipe_info[id].phrasing_seed`) because only the
+ * swipe a rephrase actually produced was written against that prompt — swiping
+ * away from it must not carry the instruction along.
+ *
+ * Chats written before per-swipe keying stored a single seed on the message
+ * itself. That value is only unambiguous when the message has no swipe history,
+ * so it is used as a fallback in that case alone; on a legacy rephrased message
+ * (always 2+ swipes) it is deliberately ignored rather than guessed at.
+ *
+ * @param {object} message - Chat message object.
+ * @param {number} [swipeId] - Swipe to read; defaults to the active swipe.
+ * @returns {string|null} The stored prompt, or null when this swipe has none.
+ */
+function getPhrasingSeed(message, swipeId) {
+    if (!message) return null;
+
+    const id = swipeId ?? message.swipe_id ?? 0;
+    const info = Array.isArray(message.swipe_info) ? message.swipe_info[id] : null;
+    if (info?.[PHRASING_SEED_EXTRA_KEY]) return info[PHRASING_SEED_EXTRA_KEY];
+
+    if (!Array.isArray(message.swipes) || message.swipes.length <= 1) {
+        return message.extra?.[PHRASING_SEED_EXTRA_KEY] || null;
+    }
+    return null;
+}
+
+/**
+ * Store the rephrase prompt against one swipe of a message. Pads `swipe_info`
+ * so it stays parallel with `swipes` (ST and other tools index the two together).
+ *
+ * @param {object} message - Chat message object.
+ * @param {number} [swipeId] - Swipe to stamp; defaults to the active swipe.
+ * @param {string} assembledPrompt - The assembled prompt to store.
+ */
+function setPhrasingSeed(message, swipeId, assembledPrompt) {
+    if (!message || !assembledPrompt) return;
+
+    const id = swipeId ?? message.swipe_id ?? 0;
+    if (!Array.isArray(message.swipe_info)) message.swipe_info = [];
+    const needed = Math.max(Array.isArray(message.swipes) ? message.swipes.length : 0, id + 1);
+    while (message.swipe_info.length < needed) message.swipe_info.push({});
+    if (!message.swipe_info[id]) message.swipe_info[id] = {};
+
+    message.swipe_info[id][PHRASING_SEED_EXTRA_KEY] = assembledPrompt;
+    phrasing_debug('setPhrasingSeed — stored seed on swipe', id, '| length:', assembledPrompt.length);
+}
+
+/**
+ * Called from the continue interceptors (native Continue, Retry Continue) —
+ * reinjects the phrasing seed prompt if the last message's active swipe was
+ * produced by a rephrase.
  */
 function handlePhrasingSeedReinjection() {
     if (!phrasing_ctx.settings.phrasingEnabled) return;
@@ -4635,10 +4688,10 @@ function handlePhrasingSeedReinjection() {
     if (lastIndex < 0) return;
 
     const message = context.chat[lastIndex];
-    const storedPrompt = message?.extra?.[PHRASING_SEED_EXTRA_KEY];
+    const storedPrompt = getPhrasingSeed(message);
     if (!storedPrompt) return;
 
-    phrasing_debug('Reinjecting phrasing seed for continue on message', lastIndex);
+    phrasing_debug('Reinjecting phrasing seed for continue on message', lastIndex, 'swipe', message.swipe_id ?? 0);
     injectPhrasingPrompt(storedPrompt);
 }
 
@@ -4729,6 +4782,23 @@ async function doPrimaryFlow(seedText, options = {}) {
 
 // ─── Swipe Mode ───
 
+/**
+ * Persist the assembled rephrase prompt against the message's active swipe.
+ * Re-resolves the message from the live chat: the swipe generation may have
+ * replaced the array entry we started with.
+ */
+async function stampSeedOnActiveSwipe(messageIndex, assembled) {
+    const context = getContext();
+    const message = context.chat?.[messageIndex];
+    if (!message) {
+        phrasing_debug('stampSeedOnActiveSwipe — message gone at index', messageIndex);
+        return;
+    }
+
+    setPhrasingSeed(message, message.swipe_id, assembled);
+    await context.saveChat();
+}
+
 async function doSwipeMode(messageIndex, options = {}) {
     phrasing_debug('doSwipeMode — starting for message index:', messageIndex);
     const context = getContext();
@@ -4778,7 +4848,6 @@ async function doSwipeMode(messageIndex, options = {}) {
         injectPhrasingPrompt(assembled);
 
         if (!message.extra) message.extra = {};
-        message.extra[PHRASING_SEED_EXTRA_KEY] = assembled;
         message.extra.overswipe_behavior = 'regenerate';
 
         const lastSwipeIndex = message.swipes.length - 1;
@@ -4808,6 +4877,12 @@ async function doSwipeMode(messageIndex, options = {}) {
         const ended = waitForGenerationEnd();
         await context.swipe.right(null, { message });
         const result = await ended;
+
+        // Stamp the seed on the swipe the rephrase just produced. This has to
+        // happen after generation — the swipe doesn't exist until then — and
+        // ST's own post-generation save may already have run, so persist it.
+        await stampSeedOnActiveSwipe(messageIndex, assembled);
+
         phrasing_debug('doSwipeMode — complete, result length:', result.length);
         return result;
     } finally {
@@ -12270,6 +12345,9 @@ function image_prompting_setStatusBar(message) {
 let retry_continue_moduleSettings = null;
 let retry_continue_debug = () => {};
 
+/** @type {{ handlePhrasingSeedReinjection: function, getPhrasingSeed: function, setPhrasingSeed: function }} */
+let retry_continue_phrasingApi = null;
+
 // In-memory retry state (mirrored into chatMetadata.retryContinue).
 let retryState = {
     active: false,
@@ -12291,9 +12369,12 @@ const RETRY_FLAG = 'sseRetryAttempt';
 /**
  * @param {object} options
  * @param {object} options.settings - Shared mutable settings reference.
+ * @param {object} [options.phrasingApi] - { handlePhrasingSeedReinjection(),
+ *   getPhrasingSeed(message, swipeId), setPhrasingSeed(message, swipeId, prompt) }
  */
-function initRetryContinue({ settings }) {
+function initRetryContinue({ settings, phrasingApi: phrasing }) {
     retry_continue_moduleSettings = settings;
+    retry_continue_phrasingApi = phrasing || null;
     retry_continue_debug = createDebugLogger('RETRY-CONTINUE', () => retry_continue_moduleSettings.retryDebugMode);
     retry_continue_debug('Module initialized');
 }
@@ -12528,10 +12609,21 @@ function pushSnapshotSwipe(lastMsg) {
         lastMsg.swipe_id = 0;
         lastMsg.swipe_info = [{}];
     }
+
+    // A retry continues the checkpointed prefix, so it inherits that swipe's
+    // Phrasing seed — without this the fresh swipe carries none and
+    // triggerContinue would have nothing to reinject.
+    const inheritedSeed = retry_continue_phrasingApi?.getPhrasingSeed?.(lastMsg, lastMsg.swipe_id) || null;
+
     lastMsg.swipes.push(retryState.snapshotText);
     lastMsg.swipe_info.push({ [RETRY_FLAG]: true });
     lastMsg.swipe_id = lastMsg.swipes.length - 1;
     lastMsg.mes = retryState.snapshotText;
+
+    if (inheritedSeed) {
+        retry_continue_debug('pushSnapshotSwipe: carrying phrasing seed onto retry swipe', lastMsg.swipe_id);
+        retry_continue_phrasingApi?.setPhrasingSeed?.(lastMsg, lastMsg.swipe_id, inheritedSeed);
+    }
 }
 
 async function createSnapshotSwipeAndContinue(lastMsg, lastMsgIndex) {
@@ -12672,6 +12764,13 @@ function reRenderMessage(messageIndex) {
 
 async function triggerContinue() {
     const context = getContext();
+
+    // Reinject the Phrasing seed for the checkpointed message's active swipe,
+    // if it was produced by a rephrase. Possession's Continue interceptor only
+    // fires on a real click of ST's Continue buttons, so the slash-command path
+    // below has to ask for the reinjection itself. Injecting twice is harmless
+    // (same setExtensionPrompt key), so the button fallback is safe too.
+    retry_continue_phrasingApi?.handlePhrasingSeedReinjection?.();
 
     // Approach 1: Slash command system (most stable)
     if (context.executeSlashCommandsWithOptions) {
@@ -14991,7 +15090,10 @@ jQuery(async () => {
     // creates and seeds the fresh chat, so migrated metadata is re-applied.
     initCompaction({ settings: src_settings, saveSettings, resyncChatState: onChatChanged });
     initImagePrompting({ settings: src_settings, saveSettings });
-    initRetryContinue({ settings: src_settings });
+    initRetryContinue({
+        settings: src_settings,
+        phrasingApi: { handlePhrasingSeedReinjection: handlePhrasingSeedReinjection, getPhrasingSeed: getPhrasingSeed, setPhrasingSeed: setPhrasingSeed },
+    });
     initDirector({ settings: src_settings });
 
     loadPossessionState();

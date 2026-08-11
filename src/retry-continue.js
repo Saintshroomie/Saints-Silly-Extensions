@@ -27,6 +27,9 @@ import {
 let moduleSettings = null;
 let debug = () => {};
 
+/** @type {{ handlePhrasingSeedReinjection: function, getPhrasingSeed: function, setPhrasingSeed: function }} */
+let phrasingApi = null;
+
 // In-memory retry state (mirrored into chatMetadata.retryContinue).
 let retryState = {
     active: false,
@@ -48,9 +51,12 @@ const RETRY_FLAG = 'sseRetryAttempt';
 /**
  * @param {object} options
  * @param {object} options.settings - Shared mutable settings reference.
+ * @param {object} [options.phrasingApi] - { handlePhrasingSeedReinjection(),
+ *   getPhrasingSeed(message, swipeId), setPhrasingSeed(message, swipeId, prompt) }
  */
-export function initRetryContinue({ settings }) {
+export function initRetryContinue({ settings, phrasingApi: phrasing }) {
     moduleSettings = settings;
+    phrasingApi = phrasing || null;
     debug = createDebugLogger('RETRY-CONTINUE', () => moduleSettings.retryDebugMode);
     debug('Module initialized');
 }
@@ -285,10 +291,21 @@ function pushSnapshotSwipe(lastMsg) {
         lastMsg.swipe_id = 0;
         lastMsg.swipe_info = [{}];
     }
+
+    // A retry continues the checkpointed prefix, so it inherits that swipe's
+    // Phrasing seed — without this the fresh swipe carries none and
+    // triggerContinue would have nothing to reinject.
+    const inheritedSeed = phrasingApi?.getPhrasingSeed?.(lastMsg, lastMsg.swipe_id) || null;
+
     lastMsg.swipes.push(retryState.snapshotText);
     lastMsg.swipe_info.push({ [RETRY_FLAG]: true });
     lastMsg.swipe_id = lastMsg.swipes.length - 1;
     lastMsg.mes = retryState.snapshotText;
+
+    if (inheritedSeed) {
+        debug('pushSnapshotSwipe: carrying phrasing seed onto retry swipe', lastMsg.swipe_id);
+        phrasingApi?.setPhrasingSeed?.(lastMsg, lastMsg.swipe_id, inheritedSeed);
+    }
 }
 
 async function createSnapshotSwipeAndContinue(lastMsg, lastMsgIndex) {
@@ -429,6 +446,13 @@ function reRenderMessage(messageIndex) {
 
 async function triggerContinue() {
     const context = getContext();
+
+    // Reinject the Phrasing seed for the checkpointed message's active swipe,
+    // if it was produced by a rephrase. Possession's Continue interceptor only
+    // fires on a real click of ST's Continue buttons, so the slash-command path
+    // below has to ask for the reinjection itself. Injecting twice is harmless
+    // (same setExtensionPrompt key), so the button fallback is safe too.
+    phrasingApi?.handlePhrasingSeedReinjection?.();
 
     // Approach 1: Slash command system (most stable)
     if (context.executeSlashCommandsWithOptions) {

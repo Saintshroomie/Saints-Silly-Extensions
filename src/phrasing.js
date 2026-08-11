@@ -129,9 +129,62 @@ export function clearPhrasingInjection() {
     setExtensionPrompt(PHRASING_INJECTION_KEY, '', extension_prompt_types.NONE, 0);
 }
 
+// ─── Seed Storage (per swipe) ───
+
 /**
- * Called from the continue interceptor — reinjects the phrasing seed prompt
- * if the last message was rephrased.
+ * Read the stored rephrase prompt for one swipe of a message.
+ *
+ * The seed is keyed per swipe (`swipe_info[id].phrasing_seed`) because only the
+ * swipe a rephrase actually produced was written against that prompt — swiping
+ * away from it must not carry the instruction along.
+ *
+ * Chats written before per-swipe keying stored a single seed on the message
+ * itself. That value is only unambiguous when the message has no swipe history,
+ * so it is used as a fallback in that case alone; on a legacy rephrased message
+ * (always 2+ swipes) it is deliberately ignored rather than guessed at.
+ *
+ * @param {object} message - Chat message object.
+ * @param {number} [swipeId] - Swipe to read; defaults to the active swipe.
+ * @returns {string|null} The stored prompt, or null when this swipe has none.
+ */
+export function getPhrasingSeed(message, swipeId) {
+    if (!message) return null;
+
+    const id = swipeId ?? message.swipe_id ?? 0;
+    const info = Array.isArray(message.swipe_info) ? message.swipe_info[id] : null;
+    if (info?.[PHRASING_SEED_EXTRA_KEY]) return info[PHRASING_SEED_EXTRA_KEY];
+
+    if (!Array.isArray(message.swipes) || message.swipes.length <= 1) {
+        return message.extra?.[PHRASING_SEED_EXTRA_KEY] || null;
+    }
+    return null;
+}
+
+/**
+ * Store the rephrase prompt against one swipe of a message. Pads `swipe_info`
+ * so it stays parallel with `swipes` (ST and other tools index the two together).
+ *
+ * @param {object} message - Chat message object.
+ * @param {number} [swipeId] - Swipe to stamp; defaults to the active swipe.
+ * @param {string} assembledPrompt - The assembled prompt to store.
+ */
+export function setPhrasingSeed(message, swipeId, assembledPrompt) {
+    if (!message || !assembledPrompt) return;
+
+    const id = swipeId ?? message.swipe_id ?? 0;
+    if (!Array.isArray(message.swipe_info)) message.swipe_info = [];
+    const needed = Math.max(Array.isArray(message.swipes) ? message.swipes.length : 0, id + 1);
+    while (message.swipe_info.length < needed) message.swipe_info.push({});
+    if (!message.swipe_info[id]) message.swipe_info[id] = {};
+
+    message.swipe_info[id][PHRASING_SEED_EXTRA_KEY] = assembledPrompt;
+    debug('setPhrasingSeed — stored seed on swipe', id, '| length:', assembledPrompt.length);
+}
+
+/**
+ * Called from the continue interceptors (native Continue, Retry Continue) —
+ * reinjects the phrasing seed prompt if the last message's active swipe was
+ * produced by a rephrase.
  */
 export function handlePhrasingSeedReinjection() {
     if (!ctx.settings.phrasingEnabled) return;
@@ -141,10 +194,10 @@ export function handlePhrasingSeedReinjection() {
     if (lastIndex < 0) return;
 
     const message = context.chat[lastIndex];
-    const storedPrompt = message?.extra?.[PHRASING_SEED_EXTRA_KEY];
+    const storedPrompt = getPhrasingSeed(message);
     if (!storedPrompt) return;
 
-    debug('Reinjecting phrasing seed for continue on message', lastIndex);
+    debug('Reinjecting phrasing seed for continue on message', lastIndex, 'swipe', message.swipe_id ?? 0);
     injectPhrasingPrompt(storedPrompt);
 }
 
@@ -235,6 +288,23 @@ async function doPrimaryFlow(seedText, options = {}) {
 
 // ─── Swipe Mode ───
 
+/**
+ * Persist the assembled rephrase prompt against the message's active swipe.
+ * Re-resolves the message from the live chat: the swipe generation may have
+ * replaced the array entry we started with.
+ */
+async function stampSeedOnActiveSwipe(messageIndex, assembled) {
+    const context = getContext();
+    const message = context.chat?.[messageIndex];
+    if (!message) {
+        debug('stampSeedOnActiveSwipe — message gone at index', messageIndex);
+        return;
+    }
+
+    setPhrasingSeed(message, message.swipe_id, assembled);
+    await context.saveChat();
+}
+
 async function doSwipeMode(messageIndex, options = {}) {
     debug('doSwipeMode — starting for message index:', messageIndex);
     const context = getContext();
@@ -284,7 +354,6 @@ async function doSwipeMode(messageIndex, options = {}) {
         injectPhrasingPrompt(assembled);
 
         if (!message.extra) message.extra = {};
-        message.extra[PHRASING_SEED_EXTRA_KEY] = assembled;
         message.extra.overswipe_behavior = 'regenerate';
 
         const lastSwipeIndex = message.swipes.length - 1;
@@ -314,6 +383,12 @@ async function doSwipeMode(messageIndex, options = {}) {
         const ended = waitForGenerationEnd();
         await context.swipe.right(null, { message });
         const result = await ended;
+
+        // Stamp the seed on the swipe the rephrase just produced. This has to
+        // happen after generation — the swipe doesn't exist until then — and
+        // ST's own post-generation save may already have run, so persist it.
+        await stampSeedOnActiveSwipe(messageIndex, assembled);
+
         debug('doSwipeMode — complete, result length:', result.length);
         return result;
     } finally {

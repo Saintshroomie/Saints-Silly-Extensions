@@ -98,6 +98,24 @@ released version. When cutting a release, move these notes into a new
   unwinding and re-resolves the chosen character (by avatar, which is stable)
   before triggering, so an early pick behaves exactly like a confirmed one.
 
+- **Phrasing — the seed was not reinjected on a Retry Continue.** Reinjection was
+  wired to a real click of SillyTavern's Continue buttons, so it only ever fired
+  for a native Continue. Retry Continue drives `/continue` through the slash
+  command system, which meant the Retry button, `/retry`, and Phrase Ban's
+  checkpoint-driven retries all regenerated *unguided* — the rephrase seed was
+  silently dropped. Retry Continue now asks for the reinjection itself, and a
+  retry swipe inherits the seed of the swipe it was checkpointed from, so every
+  attempt in a retry chain stays guided.
+
+- **Phrasing — a rephrase seed leaked onto swipes it did not belong to.** The
+  seed was stored once per *message*, so after rephrasing a message, swiping to a
+  different variation and continuing still reinjected the rephrase instruction
+  from the swipe you had swiped away from. Seeds are now keyed **per swipe**
+  (`swipe_info[].phrasing_seed`) and only the swipe a rephrase actually produced
+  carries one. Seeds saved by earlier versions are still honored on messages
+  with no swipe history; on an already-swiped message the ambiguous old value is
+  ignored rather than guessed at.
+
 ## [1.3.0] - 2026-08-08
 
 ### Added
