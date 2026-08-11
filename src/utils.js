@@ -778,6 +778,21 @@ export async function estimateChatTokens() {
 }
 
 /**
+ * Cut a chat off at an anchor message (inclusive), so everything downstream sees
+ * the story as it stood at that moment. Both the World Info activation and the
+ * chat packing use it, so an anchored caller never picks up later-story content.
+ *
+ * @param {object[]} chat - The full chat array.
+ * @param {number|null} endAtMessageIndex - Anchor index, or null/invalid for no cut.
+ * @returns {object[]} The anchored slice (the input array when there's no anchor).
+ */
+function anchorChat(chat, endAtMessageIndex) {
+    return (Number.isFinite(endAtMessageIndex) && endAtMessageIndex >= 0)
+        ? chat.slice(0, endAtMessageIndex + 1)
+        : chat;
+}
+
+/**
  * Pack as many recent chat lines as the token budget allows, newest first,
  * but return them in chronological order. Returns '' if nothing fits.
  */
@@ -810,7 +825,8 @@ async function packRecentChatLines(chat, ctx, chatBudget) {
  *
  * @param {object} opts
  * @param {boolean} [opts.includeChat=false] - Include character card, persona, and recent chat messages.
- * @param {string[]} [opts.loreBookNames=[]] - Names of lore books whose enabled entries to include.
+ * @param {string[]} [opts.loreBookNames=[]] - Names of lore books whose enabled entries to include. Additive to any auto-activated World Info.
+ * @param {boolean} [opts.autoWorldInfo=true] - When `includeChat` is on, also auto-activate the chat's bound World Info (keyword-matched against the recent chat + character/persona, exactly as a real turn would) and fold the relevant entries in. Additive to `loreBookNames`. Set false to opt out.
  * @param {number}  [opts.responseLength=0] - Tokens reserved for the model's response; subtracted from the budget.
  * @param {number}  [opts.maxContextOverride=0] - If > 0, use this as the max-context size instead of `getMaxPromptTokens()`. Lets callers cap how much chat history they pull in independently of the model's real window.
  * @param {number}  [opts.excludeRecentCount=0] - Drop this many of the most recent messages before packing the chat. Compaction uses it so `{{context}}` is the chat *minus* the verbatim tail it carries over.
@@ -820,6 +836,7 @@ async function packRecentChatLines(chat, ctx, chatBudget) {
 export async function buildContextPreamble({
     includeChat = false,
     loreBookNames = [],
+    autoWorldInfo = true,
     responseLength = 0,
     maxContextOverride = 0,
     excludeRecentCount = 0,
@@ -870,14 +887,39 @@ export async function buildContextPreamble({
         }
     }
 
+    // Auto-activate the chat's bound World Info the same way a real turn does:
+    // keyword-match the recent chat (+ character/persona) and fold in the entries
+    // that fire. This gives the relevant lore "for free" so the user needn't hand-
+    // pick books in the dropdown — it's additive to any `loreBookNames` above. A
+    // dry run, so it never emits WORLD_INFO_ACTIVATED or perturbs sticky/timed
+    // state on the live chat. Added before chat packing so it's counted in budget.
+    if (includeChat && autoWorldInfo && typeof ctx.getWorldInfoPrompt === 'function') {
+        try {
+            const includeNames = ctx.powerUserSettings?.world_info_include_names ?? true;
+            // Respect the caller's anchor: matching against messages *after* the
+            // anchored moment would activate lore the story hasn't reached yet.
+            // (`excludeRecentCount` is deliberately not applied — that tail is
+            // still part of the same moment, just carried verbatim elsewhere.)
+            const chatForWI = anchorChat(Array.isArray(ctx.chat) ? ctx.chat : [], endAtMessageIndex)
+                .filter(m => m && !m.is_system)
+                .map(m => (includeNames && m.name) ? `${m.name}: ${m.mes ?? ''}` : String(m.mes ?? ''))
+                .reverse();
+            const overrideValid = Number.isFinite(maxContextOverride) && maxContextOverride > 0;
+            const wiMaxContext = overrideValid ? maxContextOverride : getMaxPromptTokens();
+            const wi = await ctx.getWorldInfoPrompt(chatForWI, wiMaxContext, true);
+            const wiText = (wi?.worldInfoString || '').trim();
+            if (wiText) sections.push(`[World Info]\n${wiText}`);
+        } catch (err) {
+            console.error('Saints-Silly-Extensions: auto World Info activation failed.', err);
+        }
+    }
+
     // Pack recent chat into whatever budget remains.
     if (includeChat) {
         const fullChat = Array.isArray(ctx.chat) ? ctx.chat : [];
         // Optionally anchor the tail at a specific message (inclusive), so
         // the packed chat ends at an earlier moment of the story.
-        const anchoredChat = (Number.isFinite(endAtMessageIndex) && endAtMessageIndex >= 0)
-            ? fullChat.slice(0, endAtMessageIndex + 1)
-            : fullChat;
+        const anchoredChat = anchorChat(fullChat, endAtMessageIndex);
         // Optionally drop the most-recent N messages (the verbatim tail a
         // caller is carrying over elsewhere) so they aren't double-counted.
         const chat = (Number.isFinite(excludeRecentCount) && excludeRecentCount > 0)

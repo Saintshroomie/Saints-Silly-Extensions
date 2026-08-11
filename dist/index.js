@@ -10,7 +10,7 @@ import { generateNovelWithStreaming as __WEBPACK_EXTERNAL_MODULE__nai_settings_j
 import { SlashCommandParser as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandParser_js_42c8b851_SlashCommandParser__ } from "../../../../slash-commands/SlashCommandParser.js";
 import { SlashCommand as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommand_js_1b0d5616_SlashCommand__ } from "../../../../slash-commands/SlashCommand.js";
 import { ARGUMENT_TYPE as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandArgument_js_a42b9371_ARGUMENT_TYPE__, SlashCommandArgument as __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandArgument_js_a42b9371_SlashCommandArgument__ } from "../../../../slash-commands/SlashCommandArgument.js";
-import { createNewGroupChat as __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_createNewGroupChat__, is_group_generating as __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_is_group_generating__ } from "../../../../group-chats.js";
+import { createNewGroupChat as __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_createNewGroupChat__, editGroup as __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_editGroup__, group_activation_strategy as __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_group_activation_strategy__, is_group_generating as __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_is_group_generating__ } from "../../../../group-chats.js";
 import { removeReasoningFromString as __WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__ } from "../../../../reasoning.js";
 /******/ var __webpack_modules__ = ({
 
@@ -1733,7 +1733,50 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Saint's Silly Extensions — Combin
     padding: 2px 6px !important;
     font-size: 0.9em !important;
 }
-`, "",{"version":3,"sources":["webpack://./src/style.css"],"names":[],"mappings":"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","sourcesContent":["/* Saint's Silly Extensions — Combined Styles */\n\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SHARED: LORE BOOK PICKER\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Applied to every lore book picker (ACC / WIA / NG / Compaction) via the shared\n   factory. The picker text is pure UI and must not be selectable: tapping a\n   selectable lore book name engages Android Chrome's text-selection/magnifier\n   subsystem, which can crash the renderer (\"Aw, Snap\"). Disabling selection +\n   the touch callout/highlight keeps taps lightweight. user-select inherits, so\n   one rule on the root covers the summary and every list item. */\n.sse-lorebook-picker,\n.sse-lorebook-picker * {\n    -webkit-user-select: none;\n    user-select: none;\n    -webkit-touch-callout: none;\n    -webkit-tap-highlight-color: transparent;\n}\n\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SHARED: BANNERS & STATUS BARS\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* One readable surface for every modal banner / status bar (ACC, Compaction,\n   Image Prompting). ST's --SmartThemeBodyColor is the *text* colour, not a\n   background — painting a bar with it renders the block in the same colour as\n   the text on top of it, which is what made these unreadable (a white bar with\n   near-white text on light themes). The surface is a translucent black wash\n   instead: it darkens whatever the theme's own background is, so body-coloured\n   text keeps its contrast on both light and dark themes. */\n.acc-status-bar,\n.cc-status-bar,\n.ip-status-bar,\n.ip-anchor-bar,\n.cc-usage-banner {\n    background-color: rgba(0, 0, 0, 0.2);\n    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));\n    border-radius: 4px;\n    color: var(--SmartThemeBodyColor, #ddd);\n}\n\n/* The accent lives on the icon, never on the message text: a theme accent\n   (gold, etc.) can fall below readable contrast on a light background, the\n   body colour can't. */\n.acc-status-bar > .fa-solid,\n.cc-status-bar > .fa-solid,\n.ip-status-bar > .fa-solid,\n.ip-anchor-bar > .fa-solid {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   POSSESSION STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Group Chat: Radio Button Toggle ── */\n\n.possession_radio_wrapper {\n    display: inline-flex;\n    align-items: center;\n    margin-left: 4px;\n    cursor: pointer;\n}\n\n.possession_radio {\n    width: 16px;\n    height: 16px;\n    border-radius: 50%;\n    border: 2px solid var(--SmartThemeBorderColor, #555);\n    background: transparent;\n    cursor: pointer;\n    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;\n    position: relative;\n    flex-shrink: 0;\n}\n\n.possession_radio:hover {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.possession_radio.possession_active {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n    background: var(--SmartThemeQuoteColor, #e8a23a);\n    box-shadow: inset 0 0 0 3px var(--SmartThemeBlurTintColor, #1a1a2e);\n}\n\n/* ── Solo Chat: Possess Toggle Button ── */\n\n#possession_solo_btn {\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    cursor: pointer;\n    position: relative;\n}\n\n#possession_solo_btn:hover {\n    opacity: 1;\n}\n\n#possession_solo_btn.possession_active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n#possession_solo_btn.possession_active::after {\n    content: '';\n    position: absolute;\n    bottom: -2px;\n    left: 50%;\n    transform: translateX(-50%);\n    width: 6px;\n    height: 6px;\n    border-radius: 50%;\n    background-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Group member highlight when possessed ── */\n\n.group_member.possession_possessed {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n/* ── Possession Impersonate Button (Character Avatar) ── */\n\n#possession_impersonate_btn {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease;\n    padding: 2px;\n}\n\n#possession_impersonate_btn:hover {\n    opacity: 1;\n}\n\n.possession_impersonate_avatar {\n    width: 26px;\n    height: 26px;\n    border-radius: 50%;\n    object-fit: cover;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    transition: border-color 0.15s ease;\n}\n\n#possession_impersonate_btn:hover .possession_impersonate_avatar {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hide controls when extension is disabled ── */\n\n.possession_hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PHRASING STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Input Area Button (next to Send) ── */\n\n#phrasing_send_button {\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    padding: 3px;\n    font-size: 1.2em;\n}\n\n#phrasing_send_button:hover {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hamburger Menu Item ── */\n\n#phrasing_menu_button {\n    cursor: pointer;\n}\n\n#phrasing_menu_button .fa-solid {\n    margin-right: 5px;\n    width: 1em;\n    text-align: center;\n}\n\n/* ── Hide buttons during generation ── */\n\n.phrasing-hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SETTINGS PANEL STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .inline-drawer-content {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n    padding: 8px 0;\n}\n\n/* Nested drawers (template fields inside each tool's panel) — slightly\n   indented and with a smaller, dimmer header so they read as a sub-section\n   rather than a peer of the top-level tool drawer. */\n#saints_silly_settings .saints_nested_drawer {\n    margin: 4px 0 4px 4px;\n    border-left: 2px solid var(--SmartThemeBorderColor, #555);\n    padding-left: 8px;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-toggle {\n    font-size: 0.95em;\n    opacity: 0.85;\n    padding: 2px 0;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-toggle:hover {\n    opacity: 1;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-content {\n    padding: 4px 0 4px 0;\n}\n\n#saints_silly_settings .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_section_header {\n    margin: 4px 0 2px 0;\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_divider {\n    border: none;\n    border-top: 1px solid var(--SmartThemeBorderColor, #555);\n    margin: 8px 0;\n}\n\n#saints_silly_settings .phrasing_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #phrasing_prompt_textarea {\n    width: 100%;\n    min-height: 120px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .acc_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #acc_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC MODAL STYLES (rendered inside ST's Popup; chrome is provided by Popup)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n.acc-modal-body {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n    text-align: left;\n}\n\n.acc-brief-section {\n    margin-bottom: 12px;\n}\n\n.acc-brief-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.acc-action-row {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    margin-bottom: 8px;\n}\n\n.acc-tokens-row {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 6px;\n    margin-bottom: 12px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.acc-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.acc-tokens-input {\n    width: 80px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n.acc-action-btn {\n    flex: 1 1 0;\n    min-width: 110px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n.acc-action-btn.acc-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.acc-generate-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* Surface/colour come from the shared banner rule at the top of this file. */\n.acc-status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    font-size: 0.9em;\n}\n\n.acc-description-section {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.acc-description-section label {\n    margin-bottom: 4px;\n}\n\n.acc-description-output {\n    width: 100%;\n    flex: 1 1 0%;\n    min-height: 200px;\n    resize: vertical;\n}\n\n.acc-description-output[disabled] {\n    opacity: 0.5;\n    cursor: not-allowed;\n}\n\n.acc-hidden {\n    display: none !important;\n}\n\n/* ACC Launch button in character creator */\n#acc_launch_btn {\n    display: flex;\n    align-items: center;\n    gap: 4px;\n}\n\n/* Field header row: label on the left, Clear button on the right. */\n.acc-modal-body .acc-field-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin-bottom: 4px;\n}\n\n.acc-modal-body .acc-clear-btn {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.acc-modal-body .acc-clear-btn:hover {\n    opacity: 1;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   WORLD INFO ASSIST STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Settings panel */\n#saints_silly_settings .wia_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #wia_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* Per-entry assist controls injected into each WI entry form */\n.wia-controls {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    flex-wrap: wrap;\n    margin: 6px 0 6px 0;\n}\n\n.wia-controls .wia-btn {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    cursor: pointer;\n    font-size: 0.85em;\n    padding: 4px 8px;\n}\n\n.wia-controls .wia-btn-assist {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.wia-controls .wia-btn-label {\n    font-weight: 500;\n}\n\n.wia-controls .wia-spinner {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 1em;\n    display: inline-flex;\n    align-items: center;\n    padding: 4px 6px;\n}\n\n.wia-controls .wia-hidden {\n    display: none !important;\n}\n\n/* Use Chat Context checkbox */\n.wia-controls .wia-context-toggle {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    font-size: 0.85em;\n    cursor: pointer;\n    opacity: 0.85;\n    user-select: none;\n}\n\n.wia-controls .wia-context-toggle:hover {\n    opacity: 1;\n}\n\n/* Lore book multi-select picker (per-entry) */\n.wia-controls .wia-lorebook-picker {\n    position: relative;\n    font-size: 0.85em;\n}\n\n.wia-controls .wia-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.wia-controls .wia-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.wia-controls .wia-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.wia-controls .wia-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 50;\n    min-width: 220px;\n    max-height: 240px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);\n}\n\n.wia-controls .wia-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.wia-controls .wia-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Inline Clear-content button on the WIA controls row */\n/* Content-clear row — sits directly above the entry's content textarea so\n   it's unambiguous which field the button clears. */\n.wia-content-clear-row {\n    display: flex;\n    justify-content: flex-end;\n    margin: 2px 0 4px 0;\n}\n\n.wia-content-clear-row .wia-btn-clear-content {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.wia-content-clear-row .wia-btn-clear-content:hover {\n    opacity: 1;\n}\n\n/* Per-entry guidance section — sits between the controls and the entry's\n   content textarea so it's clearly the user's *input* to the assist. */\n.wia-guidance-block {\n    margin: 0 0 8px 0;\n}\n\n.wia-guidance-block .wia-guidance-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin: 0 0 4px 0;\n}\n\n.wia-guidance-block .wia-guidance-label {\n    font-size: 0.9em;\n    font-weight: 500;\n    opacity: 0.9;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n}\n\n.wia-guidance-block .wia-btn-clear-guidance {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.wia-guidance-block .wia-btn-clear-guidance:hover {\n    opacity: 1;\n}\n\n.wia-guidance-block .wia-guidance-textarea {\n    width: 100%;\n    resize: vertical;\n    min-height: 60px;\n    font-size: 0.9em;\n}\n\n/* Per-entry token limit row */\n.wia-controls .wia-tokens-row {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.85em;\n    opacity: 0.85;\n    margin-left: auto;\n}\n\n.wia-controls .wia-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.wia-controls .wia-tokens-input {\n    width: 72px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n/* ── ACC modal: context preamble controls ── */\n\n.acc-context-section {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: wrap;\n    margin-bottom: 12px;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.acc-context-section .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.9em;\n    cursor: pointer;\n}\n\n.acc-lorebook-picker {\n    position: relative;\n    font-size: 0.9em;\n}\n\n.acc-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.acc-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.acc-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.acc-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 10002;\n    min-width: 240px;\n    max-height: 260px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\n}\n\n.acc-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.acc-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   COMPACTION MODAL STYLES (rendered inside ST's Popup; mirror the ACC flex chain)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n.cc-modal-body {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n    text-align: left;\n}\n\n/* Surface/colour come from the shared banner rule at the top of this file. */\n.cc-usage-banner {\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    font-size: 0.9em;\n}\n\n/* The alarm is carried by the tinted surface, the accent border and the weight\n   — not by recolouring the text, which is the readable part. */\n.cc-usage-banner.cc-usage-high {\n    background-color: rgba(232, 162, 58, 0.18);\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-weight: 600;\n}\n\n.cc-context-section {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: wrap;\n    margin-bottom: 12px;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.cc-context-hint {\n    opacity: 0.7;\n}\n\n.cc-guidance-section {\n    margin-bottom: 12px;\n}\n\n.cc-guidance-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.cc-action-row {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    margin-bottom: 8px;\n}\n\n.cc-action-btn {\n    flex: 1 1 0;\n    min-width: 130px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n.cc-action-btn.cc-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.cc-generate-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.cc-tokens-row {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 6px;\n    margin-bottom: 12px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.cc-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.cc-tokens-input {\n    width: 90px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n/* Surface/colour come from the shared banner rule at the top of this file. */\n.cc-status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    font-size: 0.9em;\n}\n\n.cc-summary-section {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.cc-summary-section label {\n    margin-bottom: 4px;\n}\n\n.cc-summary-output {\n    width: 100%;\n    flex: 1 1 0%;\n    min-height: 200px;\n    resize: vertical;\n}\n\n.cc-hidden {\n    display: none !important;\n}\n\n.cc-modal-body .cc-field-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin-bottom: 4px;\n}\n\n.cc-modal-body .cc-clear-btn {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.cc-modal-body .cc-clear-btn:hover {\n    opacity: 1;\n}\n\n.cc-confirm .cc-dont-ask {\n    margin-top: 10px;\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n/* Compaction lore-book picker (shares the ACC picker shape) */\n.cc-lorebook-picker {\n    position: relative;\n    font-size: 0.9em;\n}\n\n.cc-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.cc-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.cc-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.cc-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 10002;\n    min-width: 240px;\n    max-height: 260px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\n}\n\n.cc-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.cc-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Compaction launch item in the hamburger menu */\n#compaction_menu_button {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n/* The seeded \"Story so far\" recap message. The class is applied to the .mes\n   node by tagCompactionSummaries() (extra.sse_summary alone has no DOM hook). */\n#chat .mes.cc-summary-message {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n#chat .mes.cc-summary-message .ch_name .name_text {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-style: italic;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   IMAGE PROMPTING MODAL STYLES (rendered inside ST's Popup; mirror the ACC flex chain)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n.ip-modal-body {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n    text-align: left;\n}\n\n.ip-context-section {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: wrap;\n    margin-bottom: 12px;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.ip-context-section .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.9em;\n    cursor: pointer;\n}\n\n.ip-guidance-section {\n    margin-bottom: 12px;\n}\n\n.ip-guidance-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.ip-action-row {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    margin-bottom: 8px;\n}\n\n.ip-action-btn {\n    flex: 1 1 0;\n    min-width: 130px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n.ip-action-btn.ip-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.ip-generate-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.ip-tokens-row {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 6px;\n    margin-bottom: 12px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.ip-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.ip-tokens-input {\n    width: 90px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n/* Surface/colour come from the shared banner rule at the top of this file. */\n.ip-status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    font-size: 0.9em;\n}\n\n/* Context-anchor bar — shown when the modal was opened from a per-message\n   button, so the packed chat context ends at that message. */\n.ip-anchor-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 6px 12px;\n    margin-bottom: 8px;\n    font-size: 0.9em;\n}\n\n.ip-anchor-text {\n    flex: 1 1 0%;\n    min-width: 0;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n    opacity: 0.9;\n}\n\n.ip-output-section {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.ip-output-section label {\n    margin-bottom: 4px;\n}\n\n.ip-prompt-output {\n    width: 100%;\n    flex: 1 1 0%;\n    min-height: 180px;\n    resize: vertical;\n}\n\n.ip-hidden {\n    display: none !important;\n}\n\n.ip-modal-body .ip-field-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin-bottom: 4px;\n}\n\n.ip-modal-body .ip-field-header-buttons {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n.ip-modal-body .ip-clear-btn {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.ip-modal-body .ip-clear-btn:hover {\n    opacity: 1;\n}\n\n/* Image Prompting lore-book picker (shares the ACC picker shape) */\n.ip-lorebook-picker {\n    position: relative;\n    font-size: 0.9em;\n}\n\n.ip-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.ip-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.ip-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.ip-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 10002;\n    min-width: 240px;\n    max-height: 260px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\n}\n\n.ip-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.ip-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Image Prompting saved-prompt store (per-chat) */\n.ip-saved-section {\n    margin-top: 8px;\n}\n\n.ip-saved-picker {\n    font-size: 0.9em;\n}\n\n.ip-saved-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.ip-saved-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.ip-saved-picker > summary:hover {\n    opacity: 1;\n}\n\n.ip-saved-list {\n    margin-top: 4px;\n    max-height: 220px;\n    overflow-y: auto;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n}\n\n.ip-saved-item {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 4px 6px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.ip-saved-item-info {\n    flex: 1;\n    min-width: 0;\n}\n\n.ip-saved-item-head {\n    display: flex;\n    align-items: baseline;\n    justify-content: space-between;\n    gap: 8px;\n}\n\n.ip-saved-item-title {\n    font-weight: bold;\n    white-space: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n\n.ip-saved-item-untitled {\n    font-weight: normal;\n    font-style: italic;\n    opacity: 0.7;\n}\n\n.ip-saved-item-date {\n    font-size: 0.85em;\n    opacity: 0.7;\n    flex-shrink: 0;\n}\n\n.ip-saved-item-preview {\n    white-space: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n\n.ip-saved-item-buttons {\n    display: flex;\n    gap: 4px;\n    flex-shrink: 0;\n}\n\n.ip-saved-item-btn {\n    font-size: 0.85em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.ip-saved-item-btn:hover {\n    opacity: 1;\n}\n\n.ip-saved-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Image Prompting launch item in the hamburger menu */\n#image_prompt_menu_button {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   NARRATIVE GUIDANCE SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_subsection_header {\n    margin: 12px 0 4px 0;\n    opacity: 0.85;\n}\n\n#saints_silly_settings .ng_field_header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n}\n\n#saints_silly_settings .ng_clear_guidance_button {\n    font-size: 0.85em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n#saints_silly_settings .ng_clear_guidance_button:hover {\n    opacity: 1;\n}\n\n#saints_silly_settings .ng_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings .ng_prompt_section textarea {\n    width: 100%;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .ng_inline_row {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin: 6px 0;\n}\n\n#saints_silly_settings .ng_number_input {\n    width: 5em;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng_select_input {\n    width: auto;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng-lorebook-picker {\n    margin: 8px 0;\n}\n\n#saints_silly_settings .ng-lorebook-list {\n    margin-top: 4px;\n    padding: 6px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n}\n\n#saints_silly_settings .ng-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n#saints_silly_settings .ng-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n#saints_silly_settings [id$=\"_regenerate_now\"].disabled,\n#saints_silly_settings [id$=\"_continue_now\"].disabled,\n#saints_silly_settings [id$=\"_retry_now\"].disabled {\n    opacity: 0.6;\n    pointer-events: none;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PROMPT TEMPLATE CONTROLS (shared, one row per prompt)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_template_controls {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin-top: 6px;\n}\n\n#saints_silly_settings .saints_template_select {\n    width: 100%;\n}\n\n#saints_silly_settings .saints_template_buttons {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button {\n    flex: 1 1 0;\n    min-width: 100px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button.disabled {\n    opacity: 0.5;\n    pointer-events: none;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   TOOL PRESET BLOCK & PROMPT PREVIEW\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_preset_block {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin: 8px 0;\n    padding: 8px;\n    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));\n    border-radius: 6px;\n}\n\n#saints_silly_settings .saints_preview_btn {\n    align-self: flex-start;\n    white-space: nowrap;\n}\n\n.sse-prompt-preview {\n    text-align: left;\n}\n\n.sse-prompt-preview h3 {\n    margin: 0 0 10px 0;\n}\n\n.sse-preview-section {\n    margin-bottom: 12px;\n}\n\n.sse-preview-label {\n    font-weight: bold;\n    opacity: 0.8;\n    margin-bottom: 4px;\n}\n\n.sse-preview-text {\n    white-space: pre-wrap;\n    word-break: break-word;\n    text-align: left;\n    font-size: calc(var(--mainFontSize, 14px) * 0.85);\n    background-color: rgba(0, 0, 0, 0.2);\n    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));\n    border-radius: 6px;\n    padding: 8px;\n    margin: 0;\n    max-height: 40vh;\n    overflow-y: auto;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   REFORMATTING\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Engine-specific option blocks; toggled by the Engine dropdown. */\n#saints_silly_settings .reformatting_section {\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    margin-top: 6px;\n}\n\n#saints_silly_settings .reformatting-hidden {\n    display: none;\n}\n\n/* Mutually-exclusive asterisk-handling choice. */\n#saints_silly_settings .reformatting_radio_group {\n    display: flex;\n    flex-direction: column;\n    gap: 2px;\n    margin: 2px 0 4px 12px;\n}\n\n/* Per-message reformat button — inherits ST's .mes_button sizing; this just\n   gives it a subtle hover tint consistent with the other quick buttons. */\n.sse-reformat-button {\n    cursor: pointer;\n}\n\n.sse-reformat-button:hover {\n    color: var(--SmartThemeQuoteColor, #6bf);\n}\n\n/* Image Prompting per-message button (same shape as the reformat button) */\n.sse-image-prompt-button {\n    cursor: pointer;\n}\n\n.sse-image-prompt-button:hover {\n    color: var(--SmartThemeQuoteColor, #6bf);\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PHRASE BAN\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .phrase_ban_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings .phrase_ban_section textarea {\n    width: 100%;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n/* Live pattern-list validation readout under the patterns textarea. */\n#saints_silly_settings #phrase_ban_pattern_status {\n    display: block;\n    margin-top: 4px;\n    opacity: 0.8;\n}\n\n/* Same reasoning as the Compaction usage banner: warning colour goes on the\n   rule and the tint, the text stays at the theme's readable body colour. */\n#saints_silly_settings #phrase_ban_pattern_status.phrase-ban-status-error {\n    color: var(--SmartThemeBodyColor, #ddd);\n    background-color: rgba(232, 162, 58, 0.18);\n    border-left: 3px solid var(--warning, #e8a23a);\n    border-radius: 3px;\n    padding: 2px 6px;\n    opacity: 1;\n}\n\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   RETRY CONTINUE\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Retry Continue button (hamburger menu item) */\n#option_retry_continue {\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n}\n\n#option_retry_continue:hover {\n    opacity: 1;\n}\n\n/* Active state — checkpoint is set */\n#option_retry_continue.retry-active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* Retry Continue quick-action button */\n#quick_retry_continue {\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    font-size: 1.1em;\n    padding: 2px 5px;\n    position: relative;\n}\n\n#quick_retry_continue:hover {\n    opacity: 1;\n}\n\n#quick_retry_continue.retry-active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n#quick_retry_continue.retry-active::after {\n    content: '';\n    position: absolute;\n    bottom: -2px;\n    left: 50%;\n    transform: translateX(-50%);\n    width: 6px;\n    height: 6px;\n    border-radius: 50%;\n    background-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* Message indicator: colored left border */\n.mes.retry-checkpoint-border {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n/* Message indicator: bookmark icon */\n.retry-checkpoint-indicator {\n    margin-left: 6px;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 0.85em;\n    vertical-align: middle;\n}\n\n/* Settings: spacing for the Clear Checkpoint button */\n#saints_silly_settings #retry_continue_clear {\n    margin-top: 10px;\n}\n\n/* ─── Point-of-use Preset Selectors ─── */\n\n/* Shared base for the compact preset dropdowns mounted at each tool's\n   working surface (modals, WIA entry rows). */\n.saints_preset_select {\n    flex: 0 1 auto;\n    width: auto !important;\n    min-width: 120px;\n    max-width: 260px;\n}\n\n.acc-preset-row,\n.ip-preset-row,\n.cc-preset-row {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    margin-bottom: 8px;\n    font-size: 0.9em;\n}\n\n.acc-preset-label,\n.ip-preset-label,\n.cc-preset-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n    opacity: 0.85;\n}\n\n.wia-controls .wia-preset-row {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.wia-controls .wia-preset-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.wia-controls .wia-preset-select {\n    max-width: 160px;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n}\n"],"sourceRoot":""}]);
+
+/* ─── Group Director ─── */
+
+.sse-director-dialog {
+    text-align: left;
+}
+
+.sse-director-heading {
+    font-size: 1.05em;
+    margin-bottom: 4px;
+}
+
+.sse-director-heading strong {
+    color: var(--SmartThemeQuoteColor, #e8a23a);
+}
+
+.sse-director-hint {
+    opacity: 0.75;
+    font-size: 0.9em;
+    margin-bottom: 10px;
+}
+
+.sse-director-choices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.sse-director-choice {
+    cursor: pointer;
+}
+
+.sse-director-choice.sse-director-suggested {
+    color: var(--SmartThemeQuoteColor, #e8a23a);
+    border-color: var(--SmartThemeQuoteColor, #e8a23a);
+}
+
+/* Walk-on choices read as guests — dashed border to distinguish from members. */
+.sse-director-choice.sse-director-walkon {
+    border-style: dashed;
+    opacity: 0.92;
+}
+`, "",{"version":3,"sources":["webpack://./src/style.css"],"names":[],"mappings":"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","sourcesContent":["/* Saint's Silly Extensions — Combined Styles */\n\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SHARED: LORE BOOK PICKER\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Applied to every lore book picker (ACC / WIA / NG / Compaction) via the shared\n   factory. The picker text is pure UI and must not be selectable: tapping a\n   selectable lore book name engages Android Chrome's text-selection/magnifier\n   subsystem, which can crash the renderer (\"Aw, Snap\"). Disabling selection +\n   the touch callout/highlight keeps taps lightweight. user-select inherits, so\n   one rule on the root covers the summary and every list item. */\n.sse-lorebook-picker,\n.sse-lorebook-picker * {\n    -webkit-user-select: none;\n    user-select: none;\n    -webkit-touch-callout: none;\n    -webkit-tap-highlight-color: transparent;\n}\n\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SHARED: BANNERS & STATUS BARS\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* One readable surface for every modal banner / status bar (ACC, Compaction,\n   Image Prompting). ST's --SmartThemeBodyColor is the *text* colour, not a\n   background — painting a bar with it renders the block in the same colour as\n   the text on top of it, which is what made these unreadable (a white bar with\n   near-white text on light themes). The surface is a translucent black wash\n   instead: it darkens whatever the theme's own background is, so body-coloured\n   text keeps its contrast on both light and dark themes. */\n.acc-status-bar,\n.cc-status-bar,\n.ip-status-bar,\n.ip-anchor-bar,\n.cc-usage-banner {\n    background-color: rgba(0, 0, 0, 0.2);\n    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));\n    border-radius: 4px;\n    color: var(--SmartThemeBodyColor, #ddd);\n}\n\n/* The accent lives on the icon, never on the message text: a theme accent\n   (gold, etc.) can fall below readable contrast on a light background, the\n   body colour can't. */\n.acc-status-bar > .fa-solid,\n.cc-status-bar > .fa-solid,\n.ip-status-bar > .fa-solid,\n.ip-anchor-bar > .fa-solid {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   POSSESSION STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Group Chat: Radio Button Toggle ── */\n\n.possession_radio_wrapper {\n    display: inline-flex;\n    align-items: center;\n    margin-left: 4px;\n    cursor: pointer;\n}\n\n.possession_radio {\n    width: 16px;\n    height: 16px;\n    border-radius: 50%;\n    border: 2px solid var(--SmartThemeBorderColor, #555);\n    background: transparent;\n    cursor: pointer;\n    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;\n    position: relative;\n    flex-shrink: 0;\n}\n\n.possession_radio:hover {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.possession_radio.possession_active {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n    background: var(--SmartThemeQuoteColor, #e8a23a);\n    box-shadow: inset 0 0 0 3px var(--SmartThemeBlurTintColor, #1a1a2e);\n}\n\n/* ── Solo Chat: Possess Toggle Button ── */\n\n#possession_solo_btn {\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    cursor: pointer;\n    position: relative;\n}\n\n#possession_solo_btn:hover {\n    opacity: 1;\n}\n\n#possession_solo_btn.possession_active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n#possession_solo_btn.possession_active::after {\n    content: '';\n    position: absolute;\n    bottom: -2px;\n    left: 50%;\n    transform: translateX(-50%);\n    width: 6px;\n    height: 6px;\n    border-radius: 50%;\n    background-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Group member highlight when possessed ── */\n\n.group_member.possession_possessed {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n/* ── Possession Impersonate Button (Character Avatar) ── */\n\n#possession_impersonate_btn {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease;\n    padding: 2px;\n}\n\n#possession_impersonate_btn:hover {\n    opacity: 1;\n}\n\n.possession_impersonate_avatar {\n    width: 26px;\n    height: 26px;\n    border-radius: 50%;\n    object-fit: cover;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    transition: border-color 0.15s ease;\n}\n\n#possession_impersonate_btn:hover .possession_impersonate_avatar {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hide controls when extension is disabled ── */\n\n.possession_hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PHRASING STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Input Area Button (next to Send) ── */\n\n#phrasing_send_button {\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    padding: 3px;\n    font-size: 1.2em;\n}\n\n#phrasing_send_button:hover {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hamburger Menu Item ── */\n\n#phrasing_menu_button {\n    cursor: pointer;\n}\n\n#phrasing_menu_button .fa-solid {\n    margin-right: 5px;\n    width: 1em;\n    text-align: center;\n}\n\n/* ── Hide buttons during generation ── */\n\n.phrasing-hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SETTINGS PANEL STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .inline-drawer-content {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n    padding: 8px 0;\n}\n\n/* Nested drawers (template fields inside each tool's panel) — slightly\n   indented and with a smaller, dimmer header so they read as a sub-section\n   rather than a peer of the top-level tool drawer. */\n#saints_silly_settings .saints_nested_drawer {\n    margin: 4px 0 4px 4px;\n    border-left: 2px solid var(--SmartThemeBorderColor, #555);\n    padding-left: 8px;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-toggle {\n    font-size: 0.95em;\n    opacity: 0.85;\n    padding: 2px 0;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-toggle:hover {\n    opacity: 1;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-content {\n    padding: 4px 0 4px 0;\n}\n\n#saints_silly_settings .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_section_header {\n    margin: 4px 0 2px 0;\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_divider {\n    border: none;\n    border-top: 1px solid var(--SmartThemeBorderColor, #555);\n    margin: 8px 0;\n}\n\n#saints_silly_settings .phrasing_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #phrasing_prompt_textarea {\n    width: 100%;\n    min-height: 120px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .acc_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #acc_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC MODAL STYLES (rendered inside ST's Popup; chrome is provided by Popup)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n.acc-modal-body {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n    text-align: left;\n}\n\n.acc-brief-section {\n    margin-bottom: 12px;\n}\n\n.acc-brief-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.acc-action-row {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    margin-bottom: 8px;\n}\n\n.acc-tokens-row {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 6px;\n    margin-bottom: 12px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.acc-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.acc-tokens-input {\n    width: 80px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n.acc-action-btn {\n    flex: 1 1 0;\n    min-width: 110px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n.acc-action-btn.acc-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.acc-generate-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* Surface/colour come from the shared banner rule at the top of this file. */\n.acc-status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    font-size: 0.9em;\n}\n\n.acc-description-section {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.acc-description-section label {\n    margin-bottom: 4px;\n}\n\n.acc-description-output {\n    width: 100%;\n    flex: 1 1 0%;\n    min-height: 200px;\n    resize: vertical;\n}\n\n.acc-description-output[disabled] {\n    opacity: 0.5;\n    cursor: not-allowed;\n}\n\n.acc-hidden {\n    display: none !important;\n}\n\n/* ACC Launch button in character creator */\n#acc_launch_btn {\n    display: flex;\n    align-items: center;\n    gap: 4px;\n}\n\n/* Field header row: label on the left, Clear button on the right. */\n.acc-modal-body .acc-field-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin-bottom: 4px;\n}\n\n.acc-modal-body .acc-clear-btn {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.acc-modal-body .acc-clear-btn:hover {\n    opacity: 1;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   WORLD INFO ASSIST STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Settings panel */\n#saints_silly_settings .wia_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #wia_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* Per-entry assist controls injected into each WI entry form */\n.wia-controls {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    flex-wrap: wrap;\n    margin: 6px 0 6px 0;\n}\n\n.wia-controls .wia-btn {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    cursor: pointer;\n    font-size: 0.85em;\n    padding: 4px 8px;\n}\n\n.wia-controls .wia-btn-assist {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.wia-controls .wia-btn-label {\n    font-weight: 500;\n}\n\n.wia-controls .wia-spinner {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 1em;\n    display: inline-flex;\n    align-items: center;\n    padding: 4px 6px;\n}\n\n.wia-controls .wia-hidden {\n    display: none !important;\n}\n\n/* Use Chat Context checkbox */\n.wia-controls .wia-context-toggle {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    font-size: 0.85em;\n    cursor: pointer;\n    opacity: 0.85;\n    user-select: none;\n}\n\n.wia-controls .wia-context-toggle:hover {\n    opacity: 1;\n}\n\n/* Lore book multi-select picker (per-entry) */\n.wia-controls .wia-lorebook-picker {\n    position: relative;\n    font-size: 0.85em;\n}\n\n.wia-controls .wia-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.wia-controls .wia-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.wia-controls .wia-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.wia-controls .wia-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 50;\n    min-width: 220px;\n    max-height: 240px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);\n}\n\n.wia-controls .wia-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.wia-controls .wia-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Inline Clear-content button on the WIA controls row */\n/* Content-clear row — sits directly above the entry's content textarea so\n   it's unambiguous which field the button clears. */\n.wia-content-clear-row {\n    display: flex;\n    justify-content: flex-end;\n    margin: 2px 0 4px 0;\n}\n\n.wia-content-clear-row .wia-btn-clear-content {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.wia-content-clear-row .wia-btn-clear-content:hover {\n    opacity: 1;\n}\n\n/* Per-entry guidance section — sits between the controls and the entry's\n   content textarea so it's clearly the user's *input* to the assist. */\n.wia-guidance-block {\n    margin: 0 0 8px 0;\n}\n\n.wia-guidance-block .wia-guidance-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin: 0 0 4px 0;\n}\n\n.wia-guidance-block .wia-guidance-label {\n    font-size: 0.9em;\n    font-weight: 500;\n    opacity: 0.9;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n}\n\n.wia-guidance-block .wia-btn-clear-guidance {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.wia-guidance-block .wia-btn-clear-guidance:hover {\n    opacity: 1;\n}\n\n.wia-guidance-block .wia-guidance-textarea {\n    width: 100%;\n    resize: vertical;\n    min-height: 60px;\n    font-size: 0.9em;\n}\n\n/* Per-entry token limit row */\n.wia-controls .wia-tokens-row {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.85em;\n    opacity: 0.85;\n    margin-left: auto;\n}\n\n.wia-controls .wia-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.wia-controls .wia-tokens-input {\n    width: 72px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n/* ── ACC modal: context preamble controls ── */\n\n.acc-context-section {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: wrap;\n    margin-bottom: 12px;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.acc-context-section .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.9em;\n    cursor: pointer;\n}\n\n.acc-lorebook-picker {\n    position: relative;\n    font-size: 0.9em;\n}\n\n.acc-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.acc-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.acc-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.acc-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 10002;\n    min-width: 240px;\n    max-height: 260px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\n}\n\n.acc-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.acc-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   COMPACTION MODAL STYLES (rendered inside ST's Popup; mirror the ACC flex chain)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n.cc-modal-body {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n    text-align: left;\n}\n\n/* Surface/colour come from the shared banner rule at the top of this file. */\n.cc-usage-banner {\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    font-size: 0.9em;\n}\n\n/* The alarm is carried by the tinted surface, the accent border and the weight\n   — not by recolouring the text, which is the readable part. */\n.cc-usage-banner.cc-usage-high {\n    background-color: rgba(232, 162, 58, 0.18);\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-weight: 600;\n}\n\n.cc-context-section {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: wrap;\n    margin-bottom: 12px;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.cc-context-hint {\n    opacity: 0.7;\n}\n\n.cc-guidance-section {\n    margin-bottom: 12px;\n}\n\n.cc-guidance-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.cc-action-row {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    margin-bottom: 8px;\n}\n\n.cc-action-btn {\n    flex: 1 1 0;\n    min-width: 130px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n.cc-action-btn.cc-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.cc-generate-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.cc-tokens-row {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 6px;\n    margin-bottom: 12px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.cc-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.cc-tokens-input {\n    width: 90px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n/* Surface/colour come from the shared banner rule at the top of this file. */\n.cc-status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    font-size: 0.9em;\n}\n\n.cc-summary-section {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.cc-summary-section label {\n    margin-bottom: 4px;\n}\n\n.cc-summary-output {\n    width: 100%;\n    flex: 1 1 0%;\n    min-height: 200px;\n    resize: vertical;\n}\n\n.cc-hidden {\n    display: none !important;\n}\n\n.cc-modal-body .cc-field-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin-bottom: 4px;\n}\n\n.cc-modal-body .cc-clear-btn {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.cc-modal-body .cc-clear-btn:hover {\n    opacity: 1;\n}\n\n.cc-confirm .cc-dont-ask {\n    margin-top: 10px;\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n/* Compaction lore-book picker (shares the ACC picker shape) */\n.cc-lorebook-picker {\n    position: relative;\n    font-size: 0.9em;\n}\n\n.cc-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.cc-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.cc-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.cc-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 10002;\n    min-width: 240px;\n    max-height: 260px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\n}\n\n.cc-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.cc-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Compaction launch item in the hamburger menu */\n#compaction_menu_button {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n/* The seeded \"Story so far\" recap message. The class is applied to the .mes\n   node by tagCompactionSummaries() (extra.sse_summary alone has no DOM hook). */\n#chat .mes.cc-summary-message {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n#chat .mes.cc-summary-message .ch_name .name_text {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-style: italic;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   IMAGE PROMPTING MODAL STYLES (rendered inside ST's Popup; mirror the ACC flex chain)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n.ip-modal-body {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n    text-align: left;\n}\n\n.ip-context-section {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: wrap;\n    margin-bottom: 12px;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.ip-context-section .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.9em;\n    cursor: pointer;\n}\n\n.ip-guidance-section {\n    margin-bottom: 12px;\n}\n\n.ip-guidance-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.ip-action-row {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    margin-bottom: 8px;\n}\n\n.ip-action-btn {\n    flex: 1 1 0;\n    min-width: 130px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n.ip-action-btn.ip-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.ip-generate-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.ip-tokens-row {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 6px;\n    margin-bottom: 12px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.ip-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.ip-tokens-input {\n    width: 90px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n/* Surface/colour come from the shared banner rule at the top of this file. */\n.ip-status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    font-size: 0.9em;\n}\n\n/* Context-anchor bar — shown when the modal was opened from a per-message\n   button, so the packed chat context ends at that message. */\n.ip-anchor-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 6px 12px;\n    margin-bottom: 8px;\n    font-size: 0.9em;\n}\n\n.ip-anchor-text {\n    flex: 1 1 0%;\n    min-width: 0;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n    opacity: 0.9;\n}\n\n.ip-output-section {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.ip-output-section label {\n    margin-bottom: 4px;\n}\n\n.ip-prompt-output {\n    width: 100%;\n    flex: 1 1 0%;\n    min-height: 180px;\n    resize: vertical;\n}\n\n.ip-hidden {\n    display: none !important;\n}\n\n.ip-modal-body .ip-field-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin-bottom: 4px;\n}\n\n.ip-modal-body .ip-field-header-buttons {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n.ip-modal-body .ip-clear-btn {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.ip-modal-body .ip-clear-btn:hover {\n    opacity: 1;\n}\n\n/* Image Prompting lore-book picker (shares the ACC picker shape) */\n.ip-lorebook-picker {\n    position: relative;\n    font-size: 0.9em;\n}\n\n.ip-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.ip-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.ip-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.ip-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 10002;\n    min-width: 240px;\n    max-height: 260px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\n}\n\n.ip-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.ip-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Image Prompting saved-prompt store (per-chat) */\n.ip-saved-section {\n    margin-top: 8px;\n}\n\n.ip-saved-picker {\n    font-size: 0.9em;\n}\n\n.ip-saved-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.ip-saved-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.ip-saved-picker > summary:hover {\n    opacity: 1;\n}\n\n.ip-saved-list {\n    margin-top: 4px;\n    max-height: 220px;\n    overflow-y: auto;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n}\n\n.ip-saved-item {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 4px 6px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.ip-saved-item-info {\n    flex: 1;\n    min-width: 0;\n}\n\n.ip-saved-item-head {\n    display: flex;\n    align-items: baseline;\n    justify-content: space-between;\n    gap: 8px;\n}\n\n.ip-saved-item-title {\n    font-weight: bold;\n    white-space: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n\n.ip-saved-item-untitled {\n    font-weight: normal;\n    font-style: italic;\n    opacity: 0.7;\n}\n\n.ip-saved-item-date {\n    font-size: 0.85em;\n    opacity: 0.7;\n    flex-shrink: 0;\n}\n\n.ip-saved-item-preview {\n    white-space: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n\n.ip-saved-item-buttons {\n    display: flex;\n    gap: 4px;\n    flex-shrink: 0;\n}\n\n.ip-saved-item-btn {\n    font-size: 0.85em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.ip-saved-item-btn:hover {\n    opacity: 1;\n}\n\n.ip-saved-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Image Prompting launch item in the hamburger menu */\n#image_prompt_menu_button {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   NARRATIVE GUIDANCE SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_subsection_header {\n    margin: 12px 0 4px 0;\n    opacity: 0.85;\n}\n\n#saints_silly_settings .ng_field_header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n}\n\n#saints_silly_settings .ng_clear_guidance_button {\n    font-size: 0.85em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n#saints_silly_settings .ng_clear_guidance_button:hover {\n    opacity: 1;\n}\n\n#saints_silly_settings .ng_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings .ng_prompt_section textarea {\n    width: 100%;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .ng_inline_row {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin: 6px 0;\n}\n\n#saints_silly_settings .ng_number_input {\n    width: 5em;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng_select_input {\n    width: auto;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng-lorebook-picker {\n    margin: 8px 0;\n}\n\n#saints_silly_settings .ng-lorebook-list {\n    margin-top: 4px;\n    padding: 6px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n}\n\n#saints_silly_settings .ng-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n#saints_silly_settings .ng-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n#saints_silly_settings [id$=\"_regenerate_now\"].disabled,\n#saints_silly_settings [id$=\"_continue_now\"].disabled,\n#saints_silly_settings [id$=\"_retry_now\"].disabled {\n    opacity: 0.6;\n    pointer-events: none;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PROMPT TEMPLATE CONTROLS (shared, one row per prompt)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_template_controls {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin-top: 6px;\n}\n\n#saints_silly_settings .saints_template_select {\n    width: 100%;\n}\n\n#saints_silly_settings .saints_template_buttons {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button {\n    flex: 1 1 0;\n    min-width: 100px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button.disabled {\n    opacity: 0.5;\n    pointer-events: none;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   TOOL PRESET BLOCK & PROMPT PREVIEW\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_preset_block {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin: 8px 0;\n    padding: 8px;\n    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));\n    border-radius: 6px;\n}\n\n#saints_silly_settings .saints_preview_btn {\n    align-self: flex-start;\n    white-space: nowrap;\n}\n\n.sse-prompt-preview {\n    text-align: left;\n}\n\n.sse-prompt-preview h3 {\n    margin: 0 0 10px 0;\n}\n\n.sse-preview-section {\n    margin-bottom: 12px;\n}\n\n.sse-preview-label {\n    font-weight: bold;\n    opacity: 0.8;\n    margin-bottom: 4px;\n}\n\n.sse-preview-text {\n    white-space: pre-wrap;\n    word-break: break-word;\n    text-align: left;\n    font-size: calc(var(--mainFontSize, 14px) * 0.85);\n    background-color: rgba(0, 0, 0, 0.2);\n    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));\n    border-radius: 6px;\n    padding: 8px;\n    margin: 0;\n    max-height: 40vh;\n    overflow-y: auto;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   REFORMATTING\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Engine-specific option blocks; toggled by the Engine dropdown. */\n#saints_silly_settings .reformatting_section {\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    margin-top: 6px;\n}\n\n#saints_silly_settings .reformatting-hidden {\n    display: none;\n}\n\n/* Mutually-exclusive asterisk-handling choice. */\n#saints_silly_settings .reformatting_radio_group {\n    display: flex;\n    flex-direction: column;\n    gap: 2px;\n    margin: 2px 0 4px 12px;\n}\n\n/* Per-message reformat button — inherits ST's .mes_button sizing; this just\n   gives it a subtle hover tint consistent with the other quick buttons. */\n.sse-reformat-button {\n    cursor: pointer;\n}\n\n.sse-reformat-button:hover {\n    color: var(--SmartThemeQuoteColor, #6bf);\n}\n\n/* Image Prompting per-message button (same shape as the reformat button) */\n.sse-image-prompt-button {\n    cursor: pointer;\n}\n\n.sse-image-prompt-button:hover {\n    color: var(--SmartThemeQuoteColor, #6bf);\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PHRASE BAN\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .phrase_ban_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings .phrase_ban_section textarea {\n    width: 100%;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n/* Live pattern-list validation readout under the patterns textarea. */\n#saints_silly_settings #phrase_ban_pattern_status {\n    display: block;\n    margin-top: 4px;\n    opacity: 0.8;\n}\n\n/* Same reasoning as the Compaction usage banner: warning colour goes on the\n   rule and the tint, the text stays at the theme's readable body colour. */\n#saints_silly_settings #phrase_ban_pattern_status.phrase-ban-status-error {\n    color: var(--SmartThemeBodyColor, #ddd);\n    background-color: rgba(232, 162, 58, 0.18);\n    border-left: 3px solid var(--warning, #e8a23a);\n    border-radius: 3px;\n    padding: 2px 6px;\n    opacity: 1;\n}\n\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   RETRY CONTINUE\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Retry Continue button (hamburger menu item) */\n#option_retry_continue {\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n}\n\n#option_retry_continue:hover {\n    opacity: 1;\n}\n\n/* Active state — checkpoint is set */\n#option_retry_continue.retry-active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* Retry Continue quick-action button */\n#quick_retry_continue {\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    font-size: 1.1em;\n    padding: 2px 5px;\n    position: relative;\n}\n\n#quick_retry_continue:hover {\n    opacity: 1;\n}\n\n#quick_retry_continue.retry-active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n#quick_retry_continue.retry-active::after {\n    content: '';\n    position: absolute;\n    bottom: -2px;\n    left: 50%;\n    transform: translateX(-50%);\n    width: 6px;\n    height: 6px;\n    border-radius: 50%;\n    background-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* Message indicator: colored left border */\n.mes.retry-checkpoint-border {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n/* Message indicator: bookmark icon */\n.retry-checkpoint-indicator {\n    margin-left: 6px;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 0.85em;\n    vertical-align: middle;\n}\n\n/* Settings: spacing for the Clear Checkpoint button */\n#saints_silly_settings #retry_continue_clear {\n    margin-top: 10px;\n}\n\n/* ─── Point-of-use Preset Selectors ─── */\n\n/* Shared base for the compact preset dropdowns mounted at each tool's\n   working surface (modals, WIA entry rows). */\n.saints_preset_select {\n    flex: 0 1 auto;\n    width: auto !important;\n    min-width: 120px;\n    max-width: 260px;\n}\n\n.acc-preset-row,\n.ip-preset-row,\n.cc-preset-row {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    margin-bottom: 8px;\n    font-size: 0.9em;\n}\n\n.acc-preset-label,\n.ip-preset-label,\n.cc-preset-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n    opacity: 0.85;\n}\n\n.wia-controls .wia-preset-row {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.wia-controls .wia-preset-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.wia-controls .wia-preset-select {\n    max-width: 160px;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n}\n\n/* ─── Group Director ─── */\n\n.sse-director-dialog {\n    text-align: left;\n}\n\n.sse-director-heading {\n    font-size: 1.05em;\n    margin-bottom: 4px;\n}\n\n.sse-director-heading strong {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.sse-director-hint {\n    opacity: 0.75;\n    font-size: 0.9em;\n    margin-bottom: 10px;\n}\n\n.sse-director-choices {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    justify-content: center;\n}\n\n.sse-director-choice {\n    cursor: pointer;\n}\n\n.sse-director-choice.sse-director-suggested {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* Walk-on choices read as guests — dashed border to distinguish from members. */\n.sse-director-choice.sse-director-walkon {\n    border-style: dashed;\n    opacity: 0.92;\n}\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -2215,7 +2258,7 @@ var update = injectStylesIntoStyleTag_default()(style/* default */.A, options);
 
 ;// ./src/settings.html
 // Module
-var code = `<div id="saints_silly_settings" class="extension_settings"> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-ghost"></span> SSE Possession</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="possession_enabled" type="checkbox"/> <span>Enable Possession</span> </label> <label class="checkbox_label"> <input id="possession_show_toast" type="checkbox"/> <span>Show Toast on Possess/Unpossess</span> </label> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-pen-fancy"></span> SSE Phrasing!</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="phrasing_enabled" type="checkbox" checked="checked"/> <span>Enable Phrasing!</span> </label> <label class="checkbox_label" title="Rephrase every message you send, without pressing the quill first. Sending runs the rewrite and then sends the result; while possessing, the rewritten message is posted as the possessed character and the reply is triggered. Stop mid-rewrite and nothing is sent."> <input id="phrasing_auto_enabled" type="checkbox"/> <span>Auto Phrasing (rewrite every message on send)</span> </label> <label class="checkbox_label" title="When enabled, rephrasing a message includes every existing swipe in the prompt and asks the model to produce something wildly different."> <input id="phrasing_inverse_guidance" type="checkbox"/> <span>Inverse Guidance</span> </label> <div class="saints_preset_block"> <label title="Save and switch named bundles of every Phrasing prompt field below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="phrasing_presets"></div> <div class="menu_button saints_preview_btn" id="phrasing_preview_btn" title="Show exactly what Phrasing! will inject into the chat prompt, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrasing_prompt_section"> <textarea id="phrasing_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Phrasing! prompt template..."></textarea> <small>Injected into the chat prompt as a system message for the rephrase generation. Placeholder: <code>{{phrasingSeed}}</code> — the speaker-prefixed message being rephrased.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Inverse Guidance Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrasing_prompt_section"> <textarea id="phrasing_inverse_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Inverse Guidance prompt template..."></textarea> <small>Used instead of the standard prompt when Inverse Guidance is on. Placeholders: <code>{{phrasingSeed}}</code>, <code>{{phrasingSwipes}}</code> — the existing swipes to avoid resembling.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-ban"></span> SSE Phrase Ban</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <small>Scans each AI reply against a regex ban list and, on a match, has the model rewrite the reply without the offending phrasing (through the Phrasing! engine). The original is always kept as a swipe. Set Max Rewrite Attempts to 0 to only be notified. Every detected phrase is also collected into a per-chat <b>Learned Phrases</b> list, which (while Phrase Ban is enabled) is appended to your backend's native banned strings on Text Completion. Turn on <b>Proactive Injection</b> to also instruct the model to avoid that list before every reply (useful on Chat Completion APIs, which have no native ban).</small> <label class="checkbox_label"> <input id="phrase_ban_enabled" type="checkbox"/> <span>Enable Phrase Ban</span> </label> <label class="checkbox_label" title="When on, every AI character message is scanned as it arrives. When off, only /phraseban scans."> <input id="phrase_ban_auto" type="checkbox"/> <span>Auto-Scan AI Messages</span> </label> <div class="ng_inline_row"> <label for="phrase_ban_max_retries"><b><span class="fa-solid fa-rotate-right"></span> Max Rewrite Attempts:</b></label> <input id="phrase_ban_max_retries" type="number" min="0" max="5" step="1" class="text_pole ng_number_input" title="How many times to rewrite a reply that still matches the ban list before giving up. 0 = detect and notify only, never rewrite."/> <small>0 = notify only</small> </div> <div class="ng_inline_row"> <small id="phrase_ban_learned_status"></small> <div class="menu_button" id="phrase_ban_clear_learned" title="Forget every phrase learned in the current chat (also removes the proactive injection)."> <span class="fa-solid fa-eraser"></span> Clear Learned Phrases </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Learned Phrases (this chat)</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrase_ban_section"> <textarea id="phrase_ban_learned_textarea" class="text_pole" rows="6" placeholder="Phrases detected in this chat are collected here, one per line.&#10;Edit freely — add your own, or delete ones you don't want used."></textarea> <small>One phrase per line. Detected phrases are collected here automatically as Phrase Ban scans; edit freely to add or remove entries. While Phrase Ban is enabled, this list is also appended to your backend's native banned strings on Text Completion backends (a sampler-level ban; no effect on Chat Completion APIs). Stored with the chat, not globally.</small> </div> </div> </div> <label class="checkbox_label" title="Injects the Learned Phrases list before every AI turn as a 'don't reuse these phrases' instruction, so future replies avoid them up front. Independent of the native sampler-level ban (which is always applied on Text Completion backends while Phrase Ban is enabled); use this for Chat Completion APIs, or as extra reinforcement."> <input id="phrase_ban_proactive" type="checkbox"/> <span>Proactive Injection (avoid learned phrases)</span> </label> <div class="ng_inline_row"> <label for="phrase_ban_injection_depth"><b>Depth:</b></label> <input id="phrase_ban_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the proactive instruction after (0 = bottom)."/> <label for="phrase_ban_injection_role"><b>Role:</b></label> <select id="phrase_ban_injection_role" class="text_pole ng_select_input" title="Role used when injecting the proactive instruction into the prompt."> <option value="system">System</option> <option value="user">User</option> <option value="assistant">Assistant</option> </select> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the pattern list + rewrite prompt below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="phrase_ban_presets"></div> <div class="menu_button saints_preview_btn" id="phrase_ban_preview_btn" title="Show exactly what Phrase Ban will inject into the chat prompt for a rewrite, with sample matches."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Banned Phrase Patterns</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrase_ban_section"> <textarea id="phrase_ban_patterns_textarea" class="text_pole" rows="8" placeholder="One JavaScript regex per line, e.g.&#10;voice was (thick|heavy) with&#10;something (he|she|they) (didn't|couldn't) want to name&#10;/Anger\\? Rage\\?/&#10;# lines starting with # are comments"></textarea> <small>One JavaScript regular expression per line, matched against the raw message text. Case-insensitive by default; wrap a line in <code>/…/flags</code> to set your own flags. Lines starting with <code>#</code> are comments. Invalid patterns are skipped.</small> <small id="phrase_ban_pattern_status"></small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Rewrite Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrase_ban_section"> <textarea id="phrase_ban_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Phrase Ban rewrite prompt template..."></textarea> <small>Injected into the chat prompt as a system message for the rewrite generation. Placeholders: <code>{{phrasingSeed}}</code> — the speaker-prefixed message being rewritten; <code>{{bannedPhrases}}</code> — the list of matched phrases to avoid.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Proactive Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrase_ban_section"> <textarea id="phrase_ban_proactive_prompt_textarea" class="text_pole" rows="6" placeholder="Enter your Phrase Ban proactive injection template..."></textarea> <small>Used only when <b>Proactive Injection</b> is on. Persistently injected before every AI turn while the chat has learned phrases. Placeholder: <code>{{bannedPhrases}}</code> — the running list of phrases learned in this chat.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-wand-magic-sparkles"></span> SSE Assisted Character Creation</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="acc_enabled" type="checkbox"/> <span>Enable Assisted Character Creation</span> </label> <div class="ng_inline_row"> <label for="acc_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="acc_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for ACC generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the ACC prompt + prefill below. The prompt describes the prefill's opening, so they are saved together."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="acc_presets"></div> <div class="menu_button saints_preview_btn" id="acc_preview_btn" title="Show the exact system prompt, assembled user prompt, and prefill ACC will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="acc_prompt_section"> <textarea id="acc_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your ACC prompt template..."></textarea> <small>Sent as the user prompt for each generation. Placeholders: <code>{{context}}</code> (chat/lore preamble, when enabled in the modal), <code>{{brief}}</code> (your Character Brief). If a placeholder is missing, the context is prepended and the brief appended automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="acc_prompt_section"> <textarea id="acc_prefill_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix the model continues. Also prepended to the description on success."></textarea> <small>Sent as an assistant prefix the model continues from, and kept at the top of the final description. If the backend ignores prefills and the model repeats it, the echo is stripped automatically. Keep it in sync with the format the Prompt Template describes.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-book-atlas"></span> SSE World Info Assist</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="wia_enabled" type="checkbox"/> <span>Enable World Info Assist</span> </label> <div class="ng_inline_row"> <label for="wia_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="wia_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for World Info Assist generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="wia_response_length"><b><span class="fa-solid fa-coins"></span> Response Token Limit:</b></label> <input id="wia_response_length" type="number" min="50" max="8192" step="50" class="text_pole ng_number_input" title="Maximum tokens the model may use for each World Info Assist generation."/> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the WIA prompt + both prefills below. The prompt describes the prefill's opening, so they are saved together."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="wia_presets"></div> <div class="menu_button saints_preview_btn" id="wia_preview_btn" title="Show the exact system prompt, assembled user prompt, and prefills WIA will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="wia_prompt_section"> <textarea id="wia_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your World Info Assist prompt template..."></textarea> <small>Sent as the user prompt for each Assist/Continue. Placeholders: <code>{{context}}</code> (chat/lore preamble, when enabled on the entry's Assist row), <code>{{guidance}}</code> (the entry's Assist Guidance text), <code>{{title}}</code> (the entry's title). If context or guidance placeholders are missing, those blocks are added automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template — Titled Entry</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="wia_prompt_section"> <textarea id="wia_prefill_titled_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix used when the entry has a title."></textarea> <small>Sent as an assistant prefix when the entry has a title, and kept at the start of the entry on success. Placeholder: <code>{{title}}</code>. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template — Untitled Entry</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="wia_prompt_section"> <textarea id="wia_prefill_untitled_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix used when the entry has no title yet."></textarea> <small>Sent as an assistant prefix when the entry has no title, and kept at the start of the entry on success. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-compass"></span> SSE Narrative Guidance</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <small>Two independent tiers of story direction. <b>Long-term</b> sets the overarching arc on a slow refresh horizon; <b>Short-term</b> sets the immediate beats on a fast one and is seeded with the active long-term arc so the two stay aligned. Each tier has its own toggle, cadence, prompts, lore books and guidance text.</small> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-mountain-sun"></span> Long-term (the overarching arc)</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="ng_long_enabled" type="checkbox"/> <span>Enable Long-term Guidance</span> </label> <label class="checkbox_label" title="When on, regenerates the long-term arc automatically when its turn counter hits zero. When off, only the Regenerate Now button updates it."> <input id="ng_long_auto_regen" type="checkbox"/> <span>Auto-Regenerate at Zero</span> </label> <div class="ng_inline_row"> <label for="ng_long_default_turn_count"><b>Turns Between Regenerations:</b></label> <input id="ng_long_default_turn_count" type="number" min="1" step="1" class="text_pole ng_number_input"/> </div> <div class="ng_inline_row"> <label for="ng_long_response_length"><b>Response Token Limit:</b></label> <input id="ng_long_response_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="Maximum number of tokens the model may use for each generated guidance paragraph."/> </div> <div class="ng_inline_row"> <label for="ng_long_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="ng_long_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for long-term generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="ng_long_injection_depth"><b>Depth:</b></label> <input id="ng_long_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the guidance after (0 = bottom)."/> <label for="ng_long_injection_role"><b>Role:</b></label> <select id="ng_long_injection_role" class="text_pole ng_select_input" title="Role used when injecting the guidance into the prompt."> <option value="system">System</option> <option value="user">User</option> <option value="assistant">Assistant</option> </select> </div> <div id="ng_long_lorebooks_host"></div> <div class="ng_inline_row"> <span><b>Turns Remaining:</b> <span id="ng_long_remaining_display">0</span></span> <div class="menu_button" id="ng_long_decrement_button" title="Decrement remaining by 1"> <span class="fa-solid fa-minus"></span> </div> <div class="menu_button" id="ng_long_reset_button" title="Reset remaining to default turn count"> <span class="fa-solid fa-rotate-right"></span> Reset </div> <div class="menu_button disabled" id="ng_long_continue_now" title="Continue the current guidance paragraph"> <span class="fa-solid fa-arrow-right"></span> Continue </div> <div class="menu_button disabled" id="ng_long_retry_now" title="Restore previous guidance and regenerate"> <span class="fa-solid fa-rotate-right"></span> Retry </div> <div class="menu_button" id="ng_long_regenerate_now" title="Regenerate guidance now"> <span class="ng-regen-icon fa-solid fa-wand-sparkles"></span> Regenerate Now </div> </div> <div class="ng_prompt_section"> <label for="ng_long_themes_textarea"><b>Themes / Story Arcs:</b></label> <textarea id="ng_long_themes_textarea" class="text_pole" rows="4" placeholder="Optional themes, ideas, or arcs for the AI to consider..."></textarea> </div> <div class="ng_prompt_section"> <div class="ng_field_header"> <label for="ng_long_active_guidance_textarea"><b>Active Guidance:</b></label> <div class="menu_button ng_clear_guidance_button" id="ng_long_clear_guidance_button" title="Clear the active long-term guidance (and its prompt injection)"> <span class="fa-solid fa-eraser"></span> Clear </div> </div> <textarea id="ng_long_active_guidance_textarea" class="text_pole" rows="6" placeholder="The currently active long-term arc. Edit freely; changes apply on the next AI turn."></textarea> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the three long-term prompt fields below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="ng_long_presets"></div> <div class="menu_button saints_preview_btn" id="ng_long_preview_btn" title="Show the exact system prompt, assembled user prompt, prefill, and injection long-term guidance will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Generation Instructions Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_long_user_prompt_textarea" class="text_pole" rows="5" placeholder="Instructions sent as the user prompt for each generation..."></textarea> <small>Sent as the user prompt for each generation. Placeholders: <code>{{context}}</code> (chat/lore preamble), <code>{{themes}}</code> (your Themes / Story Arcs block). If a placeholder is missing, the blocks are prepended automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_long_generation_prompt_textarea" class="text_pole" rows="4" placeholder="Enter the prefill that the LLM will continue..."></textarea> <small>Sent as an assistant prefix the model continues from; the prefill plus the reply becomes the active guidance. If it opens with "[", the brackets are stripped when the guidance is injected into the chat prompt. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Injection Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_long_injection_prompt_textarea" class="text_pole" rows="3" placeholder="Template injected before each AI turn..."></textarea> <small>Added to the chat prompt before each AI turn while guidance is active. Placeholder: <code>{{guidance}}</code> — the active guidance text (outer brackets stripped).</small> </div> </div> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-bolt"></span> Short-term (the immediate beats)</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="ng_short_enabled" type="checkbox"/> <span>Enable Short-term Guidance</span> </label> <label class="checkbox_label" title="When on, regenerates the short-term beats automatically when its turn counter hits zero (and whenever the long-term arc refreshes). When off, only the Regenerate Now button updates it."> <input id="ng_short_auto_regen" type="checkbox"/> <span>Auto-Regenerate at Zero</span> </label> <div class="ng_inline_row"> <label for="ng_short_default_turn_count"><b>Turns Between Regenerations:</b></label> <input id="ng_short_default_turn_count" type="number" min="1" step="1" class="text_pole ng_number_input"/> </div> <div class="ng_inline_row"> <label for="ng_short_response_length"><b>Response Token Limit:</b></label> <input id="ng_short_response_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="Maximum number of tokens the model may use for each generated guidance paragraph."/> </div> <div class="ng_inline_row"> <label for="ng_short_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="ng_short_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for short-term generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="ng_short_injection_depth"><b>Depth:</b></label> <input id="ng_short_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the guidance after (0 = bottom)."/> <label for="ng_short_injection_role"><b>Role:</b></label> <select id="ng_short_injection_role" class="text_pole ng_select_input" title="Role used when injecting the guidance into the prompt."> <option value="system">System</option> <option value="user">User</option> <option value="assistant">Assistant</option> </select> </div> <div id="ng_short_lorebooks_host"></div> <div class="ng_inline_row"> <span><b>Turns Remaining:</b> <span id="ng_short_remaining_display">0</span></span> <div class="menu_button" id="ng_short_decrement_button" title="Decrement remaining by 1"> <span class="fa-solid fa-minus"></span> </div> <div class="menu_button" id="ng_short_reset_button" title="Reset remaining to default turn count"> <span class="fa-solid fa-rotate-right"></span> Reset </div> <div class="menu_button disabled" id="ng_short_continue_now" title="Continue the current guidance paragraph"> <span class="fa-solid fa-arrow-right"></span> Continue </div> <div class="menu_button disabled" id="ng_short_retry_now" title="Restore previous guidance and regenerate"> <span class="fa-solid fa-rotate-right"></span> Retry </div> <div class="menu_button" id="ng_short_regenerate_now" title="Regenerate guidance now"> <span class="ng-regen-icon fa-solid fa-wand-sparkles"></span> Regenerate Now </div> </div> <div class="ng_prompt_section"> <label for="ng_short_themes_textarea"><b>Themes / Story Arcs:</b></label> <textarea id="ng_short_themes_textarea" class="text_pole" rows="4" placeholder="Optional themes, ideas, or arcs for the AI to consider..."></textarea> </div> <div class="ng_prompt_section"> <div class="ng_field_header"> <label for="ng_short_active_guidance_textarea"><b>Active Guidance:</b></label> <div class="menu_button ng_clear_guidance_button" id="ng_short_clear_guidance_button" title="Clear the active short-term guidance (and its prompt injection)"> <span class="fa-solid fa-eraser"></span> Clear </div> </div> <textarea id="ng_short_active_guidance_textarea" class="text_pole" rows="6" placeholder="The currently active short-term beats. Edit freely; changes apply on the next AI turn."></textarea> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the three short-term prompt fields below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="ng_short_presets"></div> <div class="menu_button saints_preview_btn" id="ng_short_preview_btn" title="Show the exact system prompt, assembled user prompt, prefill, and injection short-term guidance will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Generation Instructions Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_short_user_prompt_textarea" class="text_pole" rows="5" placeholder="Instructions sent as the user prompt for each generation..."></textarea> <small>Sent as the user prompt for each generation. Placeholders: <code>{{context}}</code> (chat/lore preamble), <code>{{longGuidance}}</code> (the active long-term arc), <code>{{themes}}</code> (your Themes / Story Arcs block). If a placeholder is missing, the blocks are prepended automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_short_generation_prompt_textarea" class="text_pole" rows="4" placeholder="Enter the prefill that the LLM will continue..."></textarea> <small>Sent as an assistant prefix the model continues from; the prefill plus the reply becomes the active guidance. If it opens with "[", the brackets are stripped when the guidance is injected into the chat prompt. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Injection Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_short_injection_prompt_textarea" class="text_pole" rows="3" placeholder="Template injected before each AI turn..."></textarea> <small>Added to the chat prompt before each AI turn while guidance is active. Placeholder: <code>{{guidance}}</code> — the active guidance text (outer brackets stripped).</small> </div> </div> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-text-slash"></span> SSE Reformatting</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <small>Normalizes the formatting of AI character messages. Reformat a message manually with the <span class="fa-solid fa-text-slash"></span> button on each message, or with <code>/reformat</code> for the last message. The original text is always kept as a swipe, so a reformat is reversible.</small> <label class="checkbox_label"> <input id="reformatting_enabled" type="checkbox"/> <span>Enable Reformatting</span> </label> <div class="ng_inline_row"> <label for="reformatting_engine"><b>Engine:</b></label> <select id="reformatting_engine" class="text_pole ng_select_input" title="Rules — fast, free, deterministic transforms. LLM — send the message to the model with the prompt below."> <option value="rules">Rules (deterministic)</option> <option value="llm">LLM (prompt-based)</option> </select> </div> <div id="reformatting_rules_section" class="reformatting_section"> <label><b>Asterisks:</b></label> <div class="reformatting_radio_group"> <label class="checkbox_label" title="Leave asterisks exactly as the model wrote them."> <input type="radio" name="reformatting_asterisk_mode" value="none"/> <span>Leave as-is</span> </label> <label class="checkbox_label" title="Remove every asterisk (markdown italic / bold emphasis marker). Turns *He danced.* into He danced."> <input type="radio" name="reformatting_asterisk_mode" value="strip"/> <span>Strip asterisks</span> </label> <label class="checkbox_label" title="Wrap narration (everything outside quoted dialogue) in asterisks. Strips existing asterisks first, so the result is consistent. Turns He danced. &quot;Hi.&quot; into *He danced.* &quot;Hi.&quot;"> <input type="radio" name="reformatting_asterisk_mode" value="wrap"/> <span>Wrap narration in asterisks</span> </label> </div> <label class="checkbox_label" title="Collapse runs of 3+ blank lines to one and trim trailing spaces. Applies on top of the asterisk choice above."> <input id="reformatting_collapse_whitespace" type="checkbox"/> <span>Collapse Extra Whitespace</span> </label> </div> <div id="reformatting_llm_section" class="reformatting_section"> <div class="ng_inline_row"> <label for="reformatting_response_length"><b><span class="fa-solid fa-coins"></span> Response Token Limit:</b></label> <input id="reformatting_response_length" type="number" min="50" max="8192" step="50" class="text_pole ng_number_input" title="Maximum tokens the model may use to reformat a message."/> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the Reformatting prompt + prefill below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="reformatting_presets"></div> <div class="menu_button saints_preview_btn" id="reformatting_preview_btn" title="Show the exact system prompt, assembled user prompt, and prefill the LLM engine will send, with a sample message."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>System Prompt</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="reformatting_prompt_section"> <textarea id="reformatting_system_prompt_textarea" class="text_pole" rows="4" placeholder="Enter the system prompt for the LLM reformatter..."></textarea> <small>Sent as the system prompt for each LLM reformat. Sets the model's role and overall instructions.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="reformatting_prompt_section"> <textarea id="reformatting_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your Reformatting prompt template..."></textarea> <small>Sent as the user prompt for each LLM reformat. Placeholder: <code>{{message}}</code> — the message being reformatted. If it's missing, the message is appended automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="reformatting_prompt_section"> <textarea id="reformatting_prefill_textarea" class="text_pole" rows="3" placeholder="Optional assistant prefix the model continues from (leave empty for none)."></textarea> <small>Optional. Sent as an assistant prefix the model continues from, and kept at the start of the result. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-compress"></span> SSE Compaction</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <small>When a chat fills the context window, generation slows to a crawl. Compaction summarizes the chat, starts a fresh chat seeded with that summary plus the recent tail, migrates per-chat extension state, and resumes — resetting the context window. Trigger it from the <span class="fa-solid fa-compress"></span> <b>Compact Chat</b> item in the hamburger menu or with <code>/compact</code>. Every compaction opens a modal where you review and edit the summary first.</small> <label class="checkbox_label" title="Enable Compaction (the launch button, /compact, and the auto-trigger)."> <input id="compaction_enabled" type="checkbox"/> <span>Enable Compaction</span> </label> <label class="checkbox_label" title="When the measured prompt crosses the threshold below, automatically open the Compaction modal after a turn finishes. The modal still requires you to act — nothing is rewritten headlessly."> <input id="compaction_auto_enabled" type="checkbox"/> <span>Auto-open at threshold</span> </label> <label class="checkbox_label" title="Show a confirmation dialog (with a 'Don't ask again' option) before auto-opening the modal."> <input id="compaction_confirm_auto" type="checkbox"/> <span>Confirm before auto-opening</span> </label> <label class="checkbox_label" title="Carry over per-chat extension state (Possession, Narrative Guidance, Phrase Ban, saved Image Prompts) into the compacted chat. World Info Assist guidance travels on the lorebook automatically."> <input id="compaction_migrate_state" type="checkbox"/> <span>Migrate per-chat extension state</span> </label> <div class="ng_inline_row"> <label for="compaction_threshold_percent"><b><span class="fa-solid fa-gauge-high"></span> Auto Threshold (%):</b></label> <input id="compaction_threshold_percent" type="number" min="1" max="100" step="1" class="text_pole ng_number_input" title="Percent of the model's context window (measured outgoing prompt) that triggers the auto-open."/> <small>% of context window</small> </div> <div class="ng_inline_row"> <label for="compaction_tail_length"><b><span class="fa-solid fa-list-ol"></span> Tail Length:</b></label> <input id="compaction_tail_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="How many of the most recent messages are copied into the new chat verbatim (swipes preserved). Older messages are replaced by the summary."/> <small>messages kept verbatim</small> </div> <div class="ng_inline_row"> <label for="compaction_response_length"><b><span class="fa-solid fa-coins"></span> Summary Token Limit:</b></label> <input id="compaction_response_length" type="number" min="50" max="16384" step="50" class="text_pole ng_number_input" title="Maximum tokens for the summary generation."/> </div> <div class="ng_inline_row"> <label for="compaction_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="compaction_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of chat history the summary generation pulls in. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the Compaction summary prompt + prefill below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="compaction_presets"></div> <div class="menu_button saints_preview_btn" id="compaction_preview_btn" title="Show the exact system prompt, assembled user prompt, and prefill the summary generation will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Summary Prompt</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="compaction_prompt_section"> <textarea id="compaction_summary_prompt_textarea" class="text_pole" rows="12" placeholder="Enter your Compaction summary prompt template..."></textarea> <small>Sent as the user prompt for the summary. Placeholders: <code>{{context}}</code> (packed chat history minus the verbatim tail, plus selected lore books), <code>{{guidance}}</code> (your Summary Guidance from the modal). If a placeholder is missing, the context is prepended and the guidance appended last, wrapped emphatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Summary Prefill</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="compaction_prompt_section"> <textarea id="compaction_summary_prefill_textarea" class="text_pole" rows="3" placeholder="Optional assistant prefix the model continues from (leave empty for none)."></textarea> <small>Optional. Sent as an assistant prefix the model continues from, and kept at the start of the summary. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-image"></span> SSE Image Prompting</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <small>Adds an <span class="fa-solid fa-image"></span> <b>Image Prompt</b> item to the hamburger menu (and <code>/imageprompt</code>) that reads the current chat and any selected lore books and silently generates a ready-to-paste prompt for an external image tool (ComfyUI, etc.) depicting the current moment. A per-message <span class="fa-solid fa-image"></span> button (toggleable below) opens the same modal anchored at that message, to depict an earlier moment of the chat. The <b>Default</b> preset targets Krea 2 (natural-language prose); the seeded <b>Anima (Tags + Prose)</b> and <b>Danbooru Tags</b> presets target Anima Base and pure booru-tag models.</small> <label class="checkbox_label"> <input id="image_prompt_enabled" type="checkbox"/> <span>Enable Image Prompting</span> </label> <label class="checkbox_label" title="Add an image button to every chat message that opens the Image Prompt modal anchored at that message — the chat context ends there, so the generated prompt depicts that moment instead of the latest one."> <input id="image_prompt_message_button_enabled" type="checkbox"/> <span>Per-message <span class="fa-solid fa-image"></span> button (prompt an earlier moment)</span> </label> <label class="checkbox_label" title="If enabled, the per-message button starts a Generate as soon as the modal opens. Off by default so there's time to add Guidance or switch presets first."> <input id="image_prompt_message_button_autogenerate" type="checkbox"/> <span>Auto-generate on per-message button</span> </label> <div class="ng_inline_row"> <label for="image_prompt_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="image_prompt_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for image-prompt generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the Image Prompting prompt + prefill below — one preset per diffusion-model family. The prompt describes the prefill's opening, so they are saved together."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="image_prompt_presets"></div> <div class="menu_button saints_preview_btn" id="image_prompt_preview_btn" title="Show the exact system prompt, assembled user prompt, and prefill Image Prompting will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="acc_prompt_section"> <textarea id="image_prompt_prompt_textarea" class="text_pole" rows="12" placeholder="Enter your image-prompt template..."></textarea> <small>Sent as the user prompt for each generation. Placeholders: <code>{{context}}</code> (chat/lore preamble, when enabled in the modal), <code>{{guidance}}</code> (your optional Guidance). If a placeholder is missing, the context is prepended and the guidance appended automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="acc_prompt_section"> <textarea id="image_prompt_prefill_textarea" class="text_pole" rows="2" placeholder="Optional assistant-prefix the model continues (e.g. quality tags). Also kept at the start of the final prompt."></textarea> <small>Optional. Sent as an assistant prefix the model continues from, and kept at the start of the final image prompt (the tag-based presets use it for quality tags like <code>masterpiece, best quality</code>). If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-arrow-rotate-right"></span> SSE Retry Continue</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <small>Adds a <span class="fa-solid fa-arrow-rotate-right"></span> <b>Retry</b> button to the hamburger menu and the quick-action bar. Retry snapshots the last message (or your edited prefix of it) as a checkpoint, saves it as a new swipe, and continues from it — so each attempt becomes a swipe you can browse with the native arrows. Also available as <code>/retry</code> and <code>/retryclear</code>.</small> <label class="checkbox_label" title="After creating the retry swipe, automatically trigger Continue to generate from it. When off, Retry just creates the swipe and waits."> <input id="retry_continue_autocontinue" type="checkbox"/> <span>Auto-Continue (generate after creating retry swipe)</span> </label> <label class="checkbox_label" title="When you use ST's normal Continue button, automatically set a retry checkpoint from the current message first."> <input id="retry_continue_autoset" type="checkbox"/> <span>Auto-set checkpoint on Continue</span> </label> <label class="checkbox_label" title="Show toast notifications for Retry Continue actions."> <input id="retry_continue_show_toasts" type="checkbox"/> <span>Show toast notifications</span> </label> <div class="ng_inline_row"> <label for="retry_continue_indicator_style"><b>Checkpoint indicator:</b></label> <select id="retry_continue_indicator_style" class="text_pole ng_select_input" title="How the checkpointed message is visually marked."> <option value="border">Border</option> <option value="icon">Icon</option> <option value="none">None</option> </select> </div> <div class="menu_button" id="retry_continue_clear" title="Clear the active retry checkpoint."> Clear Retry Checkpoint </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-bolt"></span> SSE Silent Generation</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label" title="Stream ACC, World Info Assist, Narrative Guidance, and LLM Reformatting output into their fields token by token, instead of waiting for the full response."> <input id="silent_generation_streaming" type="checkbox"/> <span>Stream output into fields</span> </label> <small>Live-streams silent generations (ACC, WIA, Narrative Guidance, LLM Reformatting) into their output fields. A fresh generation clears the field as it starts; stopping mid-stream keeps whatever has arrived so you can edit it or continue from it. Supported for Chat Completion, Text Completion, KoboldAI Classic (streaming-capable KoboldCpp), and NovelAI (with its streaming toggle on); other backends — or a stream that fails before the first token — fall back to a single write when the response completes.</small> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-bug"></span> SSE Diagnostics</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label" title="Log detailed Possession events to the browser console."> <input id="possession_debug_mode" type="checkbox"/> <span>Possession Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Phrasing events to the browser console."> <input id="phrasing_debug_mode" type="checkbox"/> <span>Phrasing Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Phrase Ban events (pattern compilation, matches, rewrite attempts) to the browser console."> <input id="phrase_ban_debug_mode" type="checkbox"/> <span>Phrase Ban Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Assisted Character Creation events, prompts, and generations to the browser console."> <input id="acc_debug_mode" type="checkbox"/> <span>ACC Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed World Info Assist events, prompts, and generations to the browser console."> <input id="wia_debug_mode" type="checkbox"/> <span>WI Assist Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Narrative Guidance events to the browser console."> <input id="ng_debug_mode" type="checkbox"/> <span>Narrative Guidance Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Reformatting events (engine, per-message decisions, LLM prompts) to the browser console."> <input id="reformatting_debug_mode" type="checkbox"/> <span>Reformatting Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Compaction events (prompt measurement, auto-trigger checks, summary generation, commit pipeline) to the browser console."> <input id="compaction_debug_mode" type="checkbox"/> <span>Compaction Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Image Prompting events, prompts, and generations to the browser console."> <input id="image_prompt_debug_mode" type="checkbox"/> <span>Image Prompting Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Retry Continue events (checkpoint set/clear, snapshot lock transitions, swipe creation) to the browser console."> <input id="retry_continue_debug_mode" type="checkbox"/> <span>Retry Continue Debug Mode</span> </label> <label class="checkbox_label" title="Log silent-generation lifecycle (job start/abort/completion, stop-listener events, stream token counts) to the browser console. Useful when diagnosing stop-button behavior across backends."> <input id="silent_generation_debug_mode" type="checkbox"/> <span>Silent Generation Debug Mode</span> </label> </div> </div> </div> `;
+var code = `<div id="saints_silly_settings" class="extension_settings"> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-ghost"></span> SSE Possession</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="possession_enabled" type="checkbox"/> <span>Enable Possession</span> </label> <label class="checkbox_label"> <input id="possession_show_toast" type="checkbox"/> <span>Show Toast on Possess/Unpossess</span> </label> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-pen-fancy"></span> SSE Phrasing!</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="phrasing_enabled" type="checkbox" checked="checked"/> <span>Enable Phrasing!</span> </label> <label class="checkbox_label" title="Rephrase every message you send, without pressing the quill first. Sending runs the rewrite and then sends the result; while possessing, the rewritten message is posted as the possessed character and the reply is triggered. Stop mid-rewrite and nothing is sent."> <input id="phrasing_auto_enabled" type="checkbox"/> <span>Auto Phrasing (rewrite every message on send)</span> </label> <label class="checkbox_label" title="When enabled, rephrasing a message includes every existing swipe in the prompt and asks the model to produce something wildly different."> <input id="phrasing_inverse_guidance" type="checkbox"/> <span>Inverse Guidance</span> </label> <div class="saints_preset_block"> <label title="Save and switch named bundles of every Phrasing prompt field below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="phrasing_presets"></div> <div class="menu_button saints_preview_btn" id="phrasing_preview_btn" title="Show exactly what Phrasing! will inject into the chat prompt, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrasing_prompt_section"> <textarea id="phrasing_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Phrasing! prompt template..."></textarea> <small>Injected into the chat prompt as a system message for the rephrase generation. Placeholder: <code>{{phrasingSeed}}</code> — the speaker-prefixed message being rephrased.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Inverse Guidance Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrasing_prompt_section"> <textarea id="phrasing_inverse_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Inverse Guidance prompt template..."></textarea> <small>Used instead of the standard prompt when Inverse Guidance is on. Placeholders: <code>{{phrasingSeed}}</code>, <code>{{phrasingSwipes}}</code> — the existing swipes to avoid resembling.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-ban"></span> SSE Phrase Ban</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <small>Scans each AI reply against a regex ban list and, on a match, has the model rewrite the reply without the offending phrasing (through the Phrasing! engine). The original is always kept as a swipe. Set Max Rewrite Attempts to 0 to only be notified. Every detected phrase is also collected into a per-chat <b>Learned Phrases</b> list, which (while Phrase Ban is enabled) is appended to your backend's native banned strings on Text Completion. Turn on <b>Proactive Injection</b> to also instruct the model to avoid that list before every reply (useful on Chat Completion APIs, which have no native ban).</small> <label class="checkbox_label"> <input id="phrase_ban_enabled" type="checkbox"/> <span>Enable Phrase Ban</span> </label> <label class="checkbox_label" title="When on, every AI character message is scanned as it arrives. When off, only /phraseban scans."> <input id="phrase_ban_auto" type="checkbox"/> <span>Auto-Scan AI Messages</span> </label> <div class="ng_inline_row"> <label for="phrase_ban_max_retries"><b><span class="fa-solid fa-rotate-right"></span> Max Rewrite Attempts:</b></label> <input id="phrase_ban_max_retries" type="number" min="0" max="5" step="1" class="text_pole ng_number_input" title="How many times to rewrite a reply that still matches the ban list before giving up. 0 = detect and notify only, never rewrite."/> <small>0 = notify only</small> </div> <div class="ng_inline_row"> <small id="phrase_ban_learned_status"></small> <div class="menu_button" id="phrase_ban_clear_learned" title="Forget every phrase learned in the current chat (also removes the proactive injection)."> <span class="fa-solid fa-eraser"></span> Clear Learned Phrases </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Learned Phrases (this chat)</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrase_ban_section"> <textarea id="phrase_ban_learned_textarea" class="text_pole" rows="6" placeholder="Phrases detected in this chat are collected here, one per line.&#10;Edit freely — add your own, or delete ones you don't want used."></textarea> <small>One phrase per line. Detected phrases are collected here automatically as Phrase Ban scans; edit freely to add or remove entries. While Phrase Ban is enabled, this list is also appended to your backend's native banned strings on Text Completion backends (a sampler-level ban; no effect on Chat Completion APIs). Stored with the chat, not globally.</small> </div> </div> </div> <label class="checkbox_label" title="Injects the Learned Phrases list before every AI turn as a 'don't reuse these phrases' instruction, so future replies avoid them up front. Independent of the native sampler-level ban (which is always applied on Text Completion backends while Phrase Ban is enabled); use this for Chat Completion APIs, or as extra reinforcement."> <input id="phrase_ban_proactive" type="checkbox"/> <span>Proactive Injection (avoid learned phrases)</span> </label> <div class="ng_inline_row"> <label for="phrase_ban_injection_depth"><b>Depth:</b></label> <input id="phrase_ban_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the proactive instruction after (0 = bottom)."/> <label for="phrase_ban_injection_role"><b>Role:</b></label> <select id="phrase_ban_injection_role" class="text_pole ng_select_input" title="Role used when injecting the proactive instruction into the prompt."> <option value="system">System</option> <option value="user">User</option> <option value="assistant">Assistant</option> </select> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the pattern list + rewrite prompt below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="phrase_ban_presets"></div> <div class="menu_button saints_preview_btn" id="phrase_ban_preview_btn" title="Show exactly what Phrase Ban will inject into the chat prompt for a rewrite, with sample matches."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Banned Phrase Patterns</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrase_ban_section"> <textarea id="phrase_ban_patterns_textarea" class="text_pole" rows="8" placeholder="One JavaScript regex per line, e.g.&#10;voice was (thick|heavy) with&#10;something (he|she|they) (didn't|couldn't) want to name&#10;/Anger\\? Rage\\?/&#10;# lines starting with # are comments"></textarea> <small>One JavaScript regular expression per line, matched against the raw message text. Case-insensitive by default; wrap a line in <code>/…/flags</code> to set your own flags. Lines starting with <code>#</code> are comments. Invalid patterns are skipped.</small> <small id="phrase_ban_pattern_status"></small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Rewrite Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrase_ban_section"> <textarea id="phrase_ban_prompt_textarea" class="text_pole" rows="8" placeholder="Enter your Phrase Ban rewrite prompt template..."></textarea> <small>Injected into the chat prompt as a system message for the rewrite generation. Placeholders: <code>{{phrasingSeed}}</code> — the speaker-prefixed message being rewritten; <code>{{bannedPhrases}}</code> — the list of matched phrases to avoid.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Proactive Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="phrase_ban_section"> <textarea id="phrase_ban_proactive_prompt_textarea" class="text_pole" rows="6" placeholder="Enter your Phrase Ban proactive injection template..."></textarea> <small>Used only when <b>Proactive Injection</b> is on. Persistently injected before every AI turn while the chat has learned phrases. Placeholder: <code>{{bannedPhrases}}</code> — the running list of phrases learned in this chat.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-wand-magic-sparkles"></span> SSE Assisted Character Creation</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="acc_enabled" type="checkbox"/> <span>Enable Assisted Character Creation</span> </label> <div class="ng_inline_row"> <label for="acc_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="acc_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for ACC generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the ACC prompt + prefill below. The prompt describes the prefill's opening, so they are saved together."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="acc_presets"></div> <div class="menu_button saints_preview_btn" id="acc_preview_btn" title="Show the exact system prompt, assembled user prompt, and prefill ACC will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="acc_prompt_section"> <textarea id="acc_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your ACC prompt template..."></textarea> <small>Sent as the user prompt for each generation. Placeholders: <code>{{context}}</code> (chat/lore preamble, when enabled in the modal), <code>{{brief}}</code> (your Character Brief). If a placeholder is missing, the context is prepended and the brief appended automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="acc_prompt_section"> <textarea id="acc_prefill_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix the model continues. Also prepended to the description on success."></textarea> <small>Sent as an assistant prefix the model continues from, and kept at the top of the final description. If the backend ignores prefills and the model repeats it, the echo is stripped automatically. Keep it in sync with the format the Prompt Template describes.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-book-atlas"></span> SSE World Info Assist</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="wia_enabled" type="checkbox"/> <span>Enable World Info Assist</span> </label> <div class="ng_inline_row"> <label for="wia_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="wia_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for World Info Assist generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="wia_response_length"><b><span class="fa-solid fa-coins"></span> Response Token Limit:</b></label> <input id="wia_response_length" type="number" min="50" max="8192" step="50" class="text_pole ng_number_input" title="Maximum tokens the model may use for each World Info Assist generation."/> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the WIA prompt + both prefills below. The prompt describes the prefill's opening, so they are saved together."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="wia_presets"></div> <div class="menu_button saints_preview_btn" id="wia_preview_btn" title="Show the exact system prompt, assembled user prompt, and prefills WIA will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="wia_prompt_section"> <textarea id="wia_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your World Info Assist prompt template..."></textarea> <small>Sent as the user prompt for each Assist/Continue. Placeholders: <code>{{context}}</code> (chat/lore preamble, when enabled on the entry's Assist row), <code>{{guidance}}</code> (the entry's Assist Guidance text), <code>{{title}}</code> (the entry's title). If context or guidance placeholders are missing, those blocks are added automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template — Titled Entry</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="wia_prompt_section"> <textarea id="wia_prefill_titled_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix used when the entry has a title."></textarea> <small>Sent as an assistant prefix when the entry has a title, and kept at the start of the entry on success. Placeholder: <code>{{title}}</code>. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template — Untitled Entry</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="wia_prompt_section"> <textarea id="wia_prefill_untitled_textarea" class="text_pole" rows="3" placeholder="Assistant-prefix used when the entry has no title yet."></textarea> <small>Sent as an assistant prefix when the entry has no title, and kept at the start of the entry on success. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-compass"></span> SSE Narrative Guidance</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <small>Two independent tiers of story direction. <b>Long-term</b> sets the overarching arc on a slow refresh horizon; <b>Short-term</b> sets the immediate beats on a fast one and is seeded with the active long-term arc so the two stay aligned. Each tier has its own toggle, cadence, prompts, lore books and guidance text.</small> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-mountain-sun"></span> Long-term (the overarching arc)</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="ng_long_enabled" type="checkbox"/> <span>Enable Long-term Guidance</span> </label> <label class="checkbox_label" title="When on, regenerates the long-term arc automatically when its turn counter hits zero. When off, only the Regenerate Now button updates it."> <input id="ng_long_auto_regen" type="checkbox"/> <span>Auto-Regenerate at Zero</span> </label> <div class="ng_inline_row"> <label for="ng_long_default_turn_count"><b>Turns Between Regenerations:</b></label> <input id="ng_long_default_turn_count" type="number" min="1" step="1" class="text_pole ng_number_input"/> </div> <div class="ng_inline_row"> <label for="ng_long_response_length"><b>Response Token Limit:</b></label> <input id="ng_long_response_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="Maximum number of tokens the model may use for each generated guidance paragraph."/> </div> <div class="ng_inline_row"> <label for="ng_long_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="ng_long_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for long-term generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="ng_long_injection_depth"><b>Depth:</b></label> <input id="ng_long_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the guidance after (0 = bottom)."/> <label for="ng_long_injection_role"><b>Role:</b></label> <select id="ng_long_injection_role" class="text_pole ng_select_input" title="Role used when injecting the guidance into the prompt."> <option value="system">System</option> <option value="user">User</option> <option value="assistant">Assistant</option> </select> </div> <div id="ng_long_lorebooks_host"></div> <div class="ng_inline_row"> <span><b>Turns Remaining:</b> <span id="ng_long_remaining_display">0</span></span> <div class="menu_button" id="ng_long_decrement_button" title="Decrement remaining by 1"> <span class="fa-solid fa-minus"></span> </div> <div class="menu_button" id="ng_long_reset_button" title="Reset remaining to default turn count"> <span class="fa-solid fa-rotate-right"></span> Reset </div> <div class="menu_button disabled" id="ng_long_continue_now" title="Continue the current guidance paragraph"> <span class="fa-solid fa-arrow-right"></span> Continue </div> <div class="menu_button disabled" id="ng_long_retry_now" title="Restore previous guidance and regenerate"> <span class="fa-solid fa-rotate-right"></span> Retry </div> <div class="menu_button" id="ng_long_regenerate_now" title="Regenerate guidance now"> <span class="ng-regen-icon fa-solid fa-wand-sparkles"></span> Regenerate Now </div> </div> <div class="ng_prompt_section"> <label for="ng_long_themes_textarea"><b>Themes / Story Arcs:</b></label> <textarea id="ng_long_themes_textarea" class="text_pole" rows="4" placeholder="Optional themes, ideas, or arcs for the AI to consider..."></textarea> </div> <div class="ng_prompt_section"> <div class="ng_field_header"> <label for="ng_long_active_guidance_textarea"><b>Active Guidance:</b></label> <div class="menu_button ng_clear_guidance_button" id="ng_long_clear_guidance_button" title="Clear the active long-term guidance (and its prompt injection)"> <span class="fa-solid fa-eraser"></span> Clear </div> </div> <textarea id="ng_long_active_guidance_textarea" class="text_pole" rows="6" placeholder="The currently active long-term arc. Edit freely; changes apply on the next AI turn."></textarea> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the three long-term prompt fields below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="ng_long_presets"></div> <div class="menu_button saints_preview_btn" id="ng_long_preview_btn" title="Show the exact system prompt, assembled user prompt, prefill, and injection long-term guidance will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Generation Instructions Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_long_user_prompt_textarea" class="text_pole" rows="5" placeholder="Instructions sent as the user prompt for each generation..."></textarea> <small>Sent as the user prompt for each generation. Placeholders: <code>{{context}}</code> (chat/lore preamble), <code>{{themes}}</code> (your Themes / Story Arcs block). If a placeholder is missing, the blocks are prepended automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_long_generation_prompt_textarea" class="text_pole" rows="4" placeholder="Enter the prefill that the LLM will continue..."></textarea> <small>Sent as an assistant prefix the model continues from; the prefill plus the reply becomes the active guidance. If it opens with "[", the brackets are stripped when the guidance is injected into the chat prompt. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Injection Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_long_injection_prompt_textarea" class="text_pole" rows="3" placeholder="Template injected before each AI turn..."></textarea> <small>Added to the chat prompt before each AI turn while guidance is active. Placeholder: <code>{{guidance}}</code> — the active guidance text (outer brackets stripped).</small> </div> </div> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-bolt"></span> Short-term (the immediate beats)</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label"> <input id="ng_short_enabled" type="checkbox"/> <span>Enable Short-term Guidance</span> </label> <label class="checkbox_label" title="When on, regenerates the short-term beats automatically when its turn counter hits zero (and whenever the long-term arc refreshes). When off, only the Regenerate Now button updates it."> <input id="ng_short_auto_regen" type="checkbox"/> <span>Auto-Regenerate at Zero</span> </label> <div class="ng_inline_row"> <label for="ng_short_default_turn_count"><b>Turns Between Regenerations:</b></label> <input id="ng_short_default_turn_count" type="number" min="1" step="1" class="text_pole ng_number_input"/> </div> <div class="ng_inline_row"> <label for="ng_short_response_length"><b>Response Token Limit:</b></label> <input id="ng_short_response_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="Maximum number of tokens the model may use for each generated guidance paragraph."/> </div> <div class="ng_inline_row"> <label for="ng_short_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="ng_short_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for short-term generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="ng_inline_row"> <label for="ng_short_injection_depth"><b>Depth:</b></label> <input id="ng_short_injection_depth" type="number" min="0" step="1" class="text_pole ng_number_input" title="Number of recent chat messages to insert the guidance after (0 = bottom)."/> <label for="ng_short_injection_role"><b>Role:</b></label> <select id="ng_short_injection_role" class="text_pole ng_select_input" title="Role used when injecting the guidance into the prompt."> <option value="system">System</option> <option value="user">User</option> <option value="assistant">Assistant</option> </select> </div> <div id="ng_short_lorebooks_host"></div> <div class="ng_inline_row"> <span><b>Turns Remaining:</b> <span id="ng_short_remaining_display">0</span></span> <div class="menu_button" id="ng_short_decrement_button" title="Decrement remaining by 1"> <span class="fa-solid fa-minus"></span> </div> <div class="menu_button" id="ng_short_reset_button" title="Reset remaining to default turn count"> <span class="fa-solid fa-rotate-right"></span> Reset </div> <div class="menu_button disabled" id="ng_short_continue_now" title="Continue the current guidance paragraph"> <span class="fa-solid fa-arrow-right"></span> Continue </div> <div class="menu_button disabled" id="ng_short_retry_now" title="Restore previous guidance and regenerate"> <span class="fa-solid fa-rotate-right"></span> Retry </div> <div class="menu_button" id="ng_short_regenerate_now" title="Regenerate guidance now"> <span class="ng-regen-icon fa-solid fa-wand-sparkles"></span> Regenerate Now </div> </div> <div class="ng_prompt_section"> <label for="ng_short_themes_textarea"><b>Themes / Story Arcs:</b></label> <textarea id="ng_short_themes_textarea" class="text_pole" rows="4" placeholder="Optional themes, ideas, or arcs for the AI to consider..."></textarea> </div> <div class="ng_prompt_section"> <div class="ng_field_header"> <label for="ng_short_active_guidance_textarea"><b>Active Guidance:</b></label> <div class="menu_button ng_clear_guidance_button" id="ng_short_clear_guidance_button" title="Clear the active short-term guidance (and its prompt injection)"> <span class="fa-solid fa-eraser"></span> Clear </div> </div> <textarea id="ng_short_active_guidance_textarea" class="text_pole" rows="6" placeholder="The currently active short-term beats. Edit freely; changes apply on the next AI turn."></textarea> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the three short-term prompt fields below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="ng_short_presets"></div> <div class="menu_button saints_preview_btn" id="ng_short_preview_btn" title="Show the exact system prompt, assembled user prompt, prefill, and injection short-term guidance will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Generation Instructions Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_short_user_prompt_textarea" class="text_pole" rows="5" placeholder="Instructions sent as the user prompt for each generation..."></textarea> <small>Sent as the user prompt for each generation. Placeholders: <code>{{context}}</code> (chat/lore preamble), <code>{{longGuidance}}</code> (the active long-term arc), <code>{{themes}}</code> (your Themes / Story Arcs block). If a placeholder is missing, the blocks are prepended automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_short_generation_prompt_textarea" class="text_pole" rows="4" placeholder="Enter the prefill that the LLM will continue..."></textarea> <small>Sent as an assistant prefix the model continues from; the prefill plus the reply becomes the active guidance. If it opens with "[", the brackets are stripped when the guidance is injected into the chat prompt. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Injection Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="ng_short_injection_prompt_textarea" class="text_pole" rows="3" placeholder="Template injected before each AI turn..."></textarea> <small>Added to the chat prompt before each AI turn while guidance is active. Placeholder: <code>{{guidance}}</code> — the active guidance text (outer brackets stripped).</small> </div> </div> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-text-slash"></span> SSE Reformatting</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <small>Normalizes the formatting of AI character messages. Reformat a message manually with the <span class="fa-solid fa-text-slash"></span> button on each message, or with <code>/reformat</code> for the last message. The original text is always kept as a swipe, so a reformat is reversible.</small> <label class="checkbox_label"> <input id="reformatting_enabled" type="checkbox"/> <span>Enable Reformatting</span> </label> <div class="ng_inline_row"> <label for="reformatting_engine"><b>Engine:</b></label> <select id="reformatting_engine" class="text_pole ng_select_input" title="Rules — fast, free, deterministic transforms. LLM — send the message to the model with the prompt below."> <option value="rules">Rules (deterministic)</option> <option value="llm">LLM (prompt-based)</option> </select> </div> <div id="reformatting_rules_section" class="reformatting_section"> <label><b>Asterisks:</b></label> <div class="reformatting_radio_group"> <label class="checkbox_label" title="Leave asterisks exactly as the model wrote them."> <input type="radio" name="reformatting_asterisk_mode" value="none"/> <span>Leave as-is</span> </label> <label class="checkbox_label" title="Remove every asterisk (markdown italic / bold emphasis marker). Turns *He danced.* into He danced."> <input type="radio" name="reformatting_asterisk_mode" value="strip"/> <span>Strip asterisks</span> </label> <label class="checkbox_label" title="Wrap narration (everything outside quoted dialogue) in asterisks. Strips existing asterisks first, so the result is consistent. Turns He danced. &quot;Hi.&quot; into *He danced.* &quot;Hi.&quot;"> <input type="radio" name="reformatting_asterisk_mode" value="wrap"/> <span>Wrap narration in asterisks</span> </label> </div> <label class="checkbox_label" title="Collapse runs of 3+ blank lines to one and trim trailing spaces. Applies on top of the asterisk choice above."> <input id="reformatting_collapse_whitespace" type="checkbox"/> <span>Collapse Extra Whitespace</span> </label> </div> <div id="reformatting_llm_section" class="reformatting_section"> <div class="ng_inline_row"> <label for="reformatting_response_length"><b><span class="fa-solid fa-coins"></span> Response Token Limit:</b></label> <input id="reformatting_response_length" type="number" min="50" max="8192" step="50" class="text_pole ng_number_input" title="Maximum tokens the model may use to reformat a message."/> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the Reformatting prompt + prefill below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="reformatting_presets"></div> <div class="menu_button saints_preview_btn" id="reformatting_preview_btn" title="Show the exact system prompt, assembled user prompt, and prefill the LLM engine will send, with a sample message."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>System Prompt</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="reformatting_prompt_section"> <textarea id="reformatting_system_prompt_textarea" class="text_pole" rows="4" placeholder="Enter the system prompt for the LLM reformatter..."></textarea> <small>Sent as the system prompt for each LLM reformat. Sets the model's role and overall instructions.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="reformatting_prompt_section"> <textarea id="reformatting_prompt_textarea" class="text_pole" rows="10" placeholder="Enter your Reformatting prompt template..."></textarea> <small>Sent as the user prompt for each LLM reformat. Placeholder: <code>{{message}}</code> — the message being reformatted. If it's missing, the message is appended automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="reformatting_prompt_section"> <textarea id="reformatting_prefill_textarea" class="text_pole" rows="3" placeholder="Optional assistant prefix the model continues from (leave empty for none)."></textarea> <small>Optional. Sent as an assistant prefix the model continues from, and kept at the start of the result. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-compress"></span> SSE Compaction</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <small>When a chat fills the context window, generation slows to a crawl. Compaction summarizes the chat, starts a fresh chat seeded with that summary plus the recent tail, migrates per-chat extension state, and resumes — resetting the context window. Trigger it from the <span class="fa-solid fa-compress"></span> <b>Compact Chat</b> item in the hamburger menu or with <code>/compact</code>. Every compaction opens a modal where you review and edit the summary first.</small> <label class="checkbox_label" title="Enable Compaction (the launch button, /compact, and the auto-trigger)."> <input id="compaction_enabled" type="checkbox"/> <span>Enable Compaction</span> </label> <label class="checkbox_label" title="When the measured prompt crosses the threshold below, automatically open the Compaction modal after a turn finishes. The modal still requires you to act — nothing is rewritten headlessly."> <input id="compaction_auto_enabled" type="checkbox"/> <span>Auto-open at threshold</span> </label> <label class="checkbox_label" title="Show a confirmation dialog (with a 'Don't ask again' option) before auto-opening the modal."> <input id="compaction_confirm_auto" type="checkbox"/> <span>Confirm before auto-opening</span> </label> <label class="checkbox_label" title="Carry over per-chat extension state (Possession, Narrative Guidance, Phrase Ban, saved Image Prompts) into the compacted chat. World Info Assist guidance travels on the lorebook automatically."> <input id="compaction_migrate_state" type="checkbox"/> <span>Migrate per-chat extension state</span> </label> <div class="ng_inline_row"> <label for="compaction_threshold_percent"><b><span class="fa-solid fa-gauge-high"></span> Auto Threshold (%):</b></label> <input id="compaction_threshold_percent" type="number" min="1" max="100" step="1" class="text_pole ng_number_input" title="Percent of the model's context window (measured outgoing prompt) that triggers the auto-open."/> <small>% of context window</small> </div> <div class="ng_inline_row"> <label for="compaction_tail_length"><b><span class="fa-solid fa-list-ol"></span> Tail Length:</b></label> <input id="compaction_tail_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="How many of the most recent messages are copied into the new chat verbatim (swipes preserved). Older messages are replaced by the summary."/> <small>messages kept verbatim</small> </div> <div class="ng_inline_row"> <label for="compaction_response_length"><b><span class="fa-solid fa-coins"></span> Summary Token Limit:</b></label> <input id="compaction_response_length" type="number" min="50" max="16384" step="50" class="text_pole ng_number_input" title="Maximum tokens for the summary generation."/> </div> <div class="ng_inline_row"> <label for="compaction_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="compaction_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of chat history the summary generation pulls in. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the Compaction summary prompt + prefill below."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="compaction_presets"></div> <div class="menu_button saints_preview_btn" id="compaction_preview_btn" title="Show the exact system prompt, assembled user prompt, and prefill the summary generation will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Summary Prompt</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="compaction_prompt_section"> <textarea id="compaction_summary_prompt_textarea" class="text_pole" rows="12" placeholder="Enter your Compaction summary prompt template..."></textarea> <small>Sent as the user prompt for the summary. Placeholders: <code>{{context}}</code> (packed chat history minus the verbatim tail, plus selected lore books), <code>{{guidance}}</code> (your Summary Guidance from the modal). If a placeholder is missing, the context is prepended and the guidance appended last, wrapped emphatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Summary Prefill</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="compaction_prompt_section"> <textarea id="compaction_summary_prefill_textarea" class="text_pole" rows="3" placeholder="Optional assistant prefix the model continues from (leave empty for none)."></textarea> <small>Optional. Sent as an assistant prefix the model continues from, and kept at the start of the summary. If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-image"></span> SSE Image Prompting</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <small>Adds an <span class="fa-solid fa-image"></span> <b>Image Prompt</b> item to the hamburger menu (and <code>/imageprompt</code>) that reads the current chat and any selected lore books and silently generates a ready-to-paste prompt for an external image tool (ComfyUI, etc.) depicting the current moment. A per-message <span class="fa-solid fa-image"></span> button (toggleable below) opens the same modal anchored at that message, to depict an earlier moment of the chat. The <b>Default</b> preset targets Krea 2 (natural-language prose); the seeded <b>Anima (Tags + Prose)</b> and <b>Danbooru Tags</b> presets target Anima Base and pure booru-tag models.</small> <label class="checkbox_label"> <input id="image_prompt_enabled" type="checkbox"/> <span>Enable Image Prompting</span> </label> <label class="checkbox_label" title="Add an image button to every chat message that opens the Image Prompt modal anchored at that message — the chat context ends there, so the generated prompt depicts that moment instead of the latest one."> <input id="image_prompt_message_button_enabled" type="checkbox"/> <span>Per-message <span class="fa-solid fa-image"></span> button (prompt an earlier moment)</span> </label> <label class="checkbox_label" title="If enabled, the per-message button starts a Generate as soon as the modal opens. Off by default so there's time to add Guidance or switch presets first."> <input id="image_prompt_message_button_autogenerate" type="checkbox"/> <span>Auto-generate on per-message button</span> </label> <div class="ng_inline_row"> <label for="image_prompt_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="image_prompt_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for image-prompt generations. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="saints_preset_block"> <label title="Save and switch named bundles of the Image Prompting prompt + prefill below — one preset per diffusion-model family. The prompt describes the prefill's opening, so they are saved together."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="image_prompt_presets"></div> <div class="menu_button saints_preview_btn" id="image_prompt_preview_btn" title="Show the exact system prompt, assembled user prompt, and prefill Image Prompting will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prompt Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="acc_prompt_section"> <textarea id="image_prompt_prompt_textarea" class="text_pole" rows="12" placeholder="Enter your image-prompt template..."></textarea> <small>Sent as the user prompt for each generation. Placeholders: <code>{{context}}</code> (chat/lore preamble, when enabled in the modal), <code>{{guidance}}</code> (your optional Guidance). If a placeholder is missing, the context is prepended and the guidance appended automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Prefill Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="acc_prompt_section"> <textarea id="image_prompt_prefill_textarea" class="text_pole" rows="2" placeholder="Optional assistant-prefix the model continues (e.g. quality tags). Also kept at the start of the final prompt."></textarea> <small>Optional. Sent as an assistant prefix the model continues from, and kept at the start of the final image prompt (the tag-based presets use it for quality tags like <code>masterpiece, best quality</code>). If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-arrow-rotate-right"></span> SSE Retry Continue</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <small>Adds a <span class="fa-solid fa-arrow-rotate-right"></span> <b>Retry</b> button to the hamburger menu and the quick-action bar. Retry snapshots the last message (or your edited prefix of it) as a checkpoint, saves it as a new swipe, and continues from it — so each attempt becomes a swipe you can browse with the native arrows. Also available as <code>/retry</code> and <code>/retryclear</code>.</small> <label class="checkbox_label" title="After creating the retry swipe, automatically trigger Continue to generate from it. When off, Retry just creates the swipe and waits."> <input id="retry_continue_autocontinue" type="checkbox"/> <span>Auto-Continue (generate after creating retry swipe)</span> </label> <label class="checkbox_label" title="When you use ST's normal Continue button, automatically set a retry checkpoint from the current message first."> <input id="retry_continue_autoset" type="checkbox"/> <span>Auto-set checkpoint on Continue</span> </label> <label class="checkbox_label" title="Show toast notifications for Retry Continue actions."> <input id="retry_continue_show_toasts" type="checkbox"/> <span>Show toast notifications</span> </label> <div class="ng_inline_row"> <label for="retry_continue_indicator_style"><b>Checkpoint indicator:</b></label> <select id="retry_continue_indicator_style" class="text_pole ng_select_input" title="How the checkpointed message is visually marked."> <option value="border">Border</option> <option value="icon">Icon</option> <option value="none">None</option> </select> </div> <div class="menu_button" id="retry_continue_clear" title="Clear the active retry checkpoint."> Clear Retry Checkpoint </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-bolt"></span> SSE Silent Generation</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label" title="Stream ACC, World Info Assist, Narrative Guidance, and LLM Reformatting output into their fields token by token, instead of waiting for the full response."> <input id="silent_generation_streaming" type="checkbox"/> <span>Stream output into fields</span> </label> <small>Live-streams silent generations (ACC, WIA, Narrative Guidance, LLM Reformatting) into their output fields. A fresh generation clears the field as it starts; stopping mid-stream keeps whatever has arrived so you can edit it or continue from it. Supported for Chat Completion, Text Completion, KoboldAI Classic (streaming-capable KoboldCpp), and NovelAI (with its streaming toggle on); other backends — or a stream that fails before the first token — fall back to a single write when the response completes.</small> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-clapperboard"></span> SSE Group Director</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <small>In a group chat, lets an LLM "director" read the scene and choose who speaks next. While enabled, the active group is switched to Manual reply order (your previous setting is restored when you disable it). Use <code>/next</code> to roll again for back-to-back speakers.</small> <label class="checkbox_label"> <input id="director_enabled" type="checkbox"/> <span>Enable Group Director</span> </label> <label class="checkbox_label" title="When on, the confirm/override dialog pops up immediately — before the director decides — so you can just pick who replies next, or wait for the director's suggestion to appear. When off, the rolled pick is triggered immediately with a cancellable progress toast."> <input id="director_confirm" type="checkbox"/> <span>Ask Before Generating (confirm / override the speaker)</span> </label> <div class="ng_inline_row"> <label for="director_consecutive_turns"><b>Speakers Per Turn:</b></label> <input id="director_consecutive_turns" type="number" min="1" step="1" class="text_pole ng_number_input" title="How many speakers the director chooses back-to-back after each of your turns. Each gets its own confirm/override dialog; cancelling one stops the chain. 1 = the classic single pick."/> </div> <label class="checkbox_label" title="On: the director's silent generations reuse the real chat prompt (via a quiet generation) and only append the instruction at the end, so the KV cache stays warm — at the cost of sending the full context. Off: a smaller standalone prompt (the {{context}} preamble + Max Context Override), which is leaner but reprocesses the whole prompt each time."> <input id="director_aligned_context" type="checkbox"/> <span>Reuse chat context (KV-cache friendly)</span> </label> <div class="ng_inline_row"> <label for="director_response_length"><b>Response Token Limit:</b></label> <input id="director_response_length" type="number" min="1" step="1" class="text_pole ng_number_input" title="Maximum tokens for the director's choice. The reply is only a name, so this can stay small."/> </div> <div class="ng_inline_row"> <label for="director_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label> <input id="director_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer feeds the director. 0 = use the model's full context size."/> <small>0 = use model default</small> </div> <div class="saints_preset_block"> <label title="Save and switch named versions of the director instructions."><b><span class="fa-solid fa-box-archive"></span> Preset</b></label> <div class="saints_template_controls" id="director_presets"></div> <div class="menu_button saints_preview_btn" id="director_preview_btn" title="Show the exact system prompt and assembled user prompt the director will send, with sample values."> <span class="fa-solid fa-eye"></span> Preview Assembled Prompt </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b>Director Instructions Template</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <div class="ng_prompt_section"> <textarea id="director_prompt_textarea" class="text_pole" rows="6" placeholder="Instructions sent as the user prompt when choosing the next speaker..."></textarea> <small>Sent each time the director picks a speaker. Placeholders: <code>{{roster}}</code> (the numbered list of eligible speakers) and <code>{{context}}</code> (chat/character/lore preamble — only used in the leaner non-"Reuse chat context" mode; in KV-cache-friendly mode the real chat is the context and this is ignored). If a placeholder is missing, the blocks are added automatically.</small> </div> </div> </div> <div class="inline-drawer saints_nested_drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-user-plus"></span> Walk-on Characters</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <small>Tracks ad-hoc "walk-on" characters the story introduces inline as <code>[Name]:</code> speaker lines (in messages you send, possessed posts, AI replies, or edits). Real group members and your persona are ignored. The list is saved per-chat and editable below.</small> <label class="checkbox_label" title="Scan new messages and edits for [Name]: speaker lines and collect the names here."> <input id="director_walkons_enabled" type="checkbox"/> <span>Detect walk-on characters (<code>[Name]:</code> lines)</span> </label> <label class="checkbox_label" title="When an AI reply contains [Name]: lines, automatically split each into its own message posted under that name. User and edited messages use the per-message scissors button instead."> <input id="director_walkon_split_auto" type="checkbox"/> <span>Auto-split walk-on lines into separate messages (AI replies)</span> </label> <label class="checkbox_label" title="Let the director pick walk-on characters as the next speaker (alongside real members). A chosen walk-on's reply is generated by posting a placeholder under their name and running SillyTavern's own swipe-regeneration on it, so formatting and stop strings are handled natively."> <input id="director_include_walkons" type="checkbox"/> <span>Let the director voice walk-on characters</span> </label> <small>A chosen walk-on's reply is generated via SillyTavern's native swipe-regeneration (a placeholder is posted under the name, then regenerated). Each message that contains <code>[Name]:</code> lines also gets a <span class="fa-solid fa-scissors"></span> button to split it on demand.</small> <div class="ng_inline_row"> <span><b>Walk-ons this chat:</b> <span id="director_walkons_count">0</span></span> <div class="menu_button" id="director_walkons_scan" title="Scan every message in the current chat for [Name]: walk-on lines."> <span class="fa-solid fa-magnifying-glass"></span> Scan Chat for Walk-ons </div> </div> <div class="ng_prompt_section"> <textarea id="director_walkons_textarea" class="text_pole" rows="6" placeholder="Walk-on characters detected in this chat are collected here, one per line.&#10;Edit freely — add your own, or delete ones you don't want."></textarea> </div> </div> </div> </div> </div> <div class="inline-drawer"> <div class="inline-drawer-toggle inline-drawer-header"> <b><span class="fa-solid fa-bug"></span> SSE Diagnostics</b> <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div> </div> <div class="inline-drawer-content" style="display:none"> <label class="checkbox_label" title="Log detailed Possession events to the browser console."> <input id="possession_debug_mode" type="checkbox"/> <span>Possession Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Phrasing events to the browser console."> <input id="phrasing_debug_mode" type="checkbox"/> <span>Phrasing Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Phrase Ban events (pattern compilation, matches, rewrite attempts) to the browser console."> <input id="phrase_ban_debug_mode" type="checkbox"/> <span>Phrase Ban Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Assisted Character Creation events, prompts, and generations to the browser console."> <input id="acc_debug_mode" type="checkbox"/> <span>ACC Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed World Info Assist events, prompts, and generations to the browser console."> <input id="wia_debug_mode" type="checkbox"/> <span>WI Assist Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Narrative Guidance events to the browser console."> <input id="ng_debug_mode" type="checkbox"/> <span>Narrative Guidance Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Reformatting events (engine, per-message decisions, LLM prompts) to the browser console."> <input id="reformatting_debug_mode" type="checkbox"/> <span>Reformatting Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Compaction events (prompt measurement, auto-trigger checks, summary generation, commit pipeline) to the browser console."> <input id="compaction_debug_mode" type="checkbox"/> <span>Compaction Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Image Prompting events, prompts, and generations to the browser console."> <input id="image_prompt_debug_mode" type="checkbox"/> <span>Image Prompting Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Retry Continue events (checkpoint set/clear, snapshot lock transitions, swipe creation) to the browser console."> <input id="retry_continue_debug_mode" type="checkbox"/> <span>Retry Continue Debug Mode</span> </label> <label class="checkbox_label" title="Log detailed Group Director events (roster, roll, parsed pick, Manual-mode transitions) to the browser console."> <input id="director_debug_mode" type="checkbox"/> <span>Group Director Debug Mode</span> </label> <label class="checkbox_label" title="Log silent-generation lifecycle (job start/abort/completion, stop-listener events, stream token counts) to the browser console. Useful when diagnosing stop-button behavior across backends."> <input id="silent_generation_debug_mode" type="checkbox"/> <span>Silent Generation Debug Mode</span> </label> </div> </div> </div> `;
 // Exports
 /* harmony default export */ const settings = (code);
 ;// external "../../../../world-info.js"
@@ -3563,6 +3606,21 @@ async function estimateChatTokens() {
 }
 
 /**
+ * Cut a chat off at an anchor message (inclusive), so everything downstream sees
+ * the story as it stood at that moment. Both the World Info activation and the
+ * chat packing use it, so an anchored caller never picks up later-story content.
+ *
+ * @param {object[]} chat - The full chat array.
+ * @param {number|null} endAtMessageIndex - Anchor index, or null/invalid for no cut.
+ * @returns {object[]} The anchored slice (the input array when there's no anchor).
+ */
+function anchorChat(chat, endAtMessageIndex) {
+    return (Number.isFinite(endAtMessageIndex) && endAtMessageIndex >= 0)
+        ? chat.slice(0, endAtMessageIndex + 1)
+        : chat;
+}
+
+/**
  * Pack as many recent chat lines as the token budget allows, newest first,
  * but return them in chronological order. Returns '' if nothing fits.
  */
@@ -3595,7 +3653,8 @@ async function packRecentChatLines(chat, ctx, chatBudget) {
  *
  * @param {object} opts
  * @param {boolean} [opts.includeChat=false] - Include character card, persona, and recent chat messages.
- * @param {string[]} [opts.loreBookNames=[]] - Names of lore books whose enabled entries to include.
+ * @param {string[]} [opts.loreBookNames=[]] - Names of lore books whose enabled entries to include. Additive to any auto-activated World Info.
+ * @param {boolean} [opts.autoWorldInfo=true] - When `includeChat` is on, also auto-activate the chat's bound World Info (keyword-matched against the recent chat + character/persona, exactly as a real turn would) and fold the relevant entries in. Additive to `loreBookNames`. Set false to opt out.
  * @param {number}  [opts.responseLength=0] - Tokens reserved for the model's response; subtracted from the budget.
  * @param {number}  [opts.maxContextOverride=0] - If > 0, use this as the max-context size instead of `getMaxPromptTokens()`. Lets callers cap how much chat history they pull in independently of the model's real window.
  * @param {number}  [opts.excludeRecentCount=0] - Drop this many of the most recent messages before packing the chat. Compaction uses it so `{{context}}` is the chat *minus* the verbatim tail it carries over.
@@ -3605,6 +3664,7 @@ async function packRecentChatLines(chat, ctx, chatBudget) {
 async function buildContextPreamble({
     includeChat = false,
     loreBookNames = [],
+    autoWorldInfo = true,
     responseLength = 0,
     maxContextOverride = 0,
     excludeRecentCount = 0,
@@ -3655,14 +3715,39 @@ async function buildContextPreamble({
         }
     }
 
+    // Auto-activate the chat's bound World Info the same way a real turn does:
+    // keyword-match the recent chat (+ character/persona) and fold in the entries
+    // that fire. This gives the relevant lore "for free" so the user needn't hand-
+    // pick books in the dropdown — it's additive to any `loreBookNames` above. A
+    // dry run, so it never emits WORLD_INFO_ACTIVATED or perturbs sticky/timed
+    // state on the live chat. Added before chat packing so it's counted in budget.
+    if (includeChat && autoWorldInfo && typeof ctx.getWorldInfoPrompt === 'function') {
+        try {
+            const includeNames = ctx.powerUserSettings?.world_info_include_names ?? true;
+            // Respect the caller's anchor: matching against messages *after* the
+            // anchored moment would activate lore the story hasn't reached yet.
+            // (`excludeRecentCount` is deliberately not applied — that tail is
+            // still part of the same moment, just carried verbatim elsewhere.)
+            const chatForWI = anchorChat(Array.isArray(ctx.chat) ? ctx.chat : [], endAtMessageIndex)
+                .filter(m => m && !m.is_system)
+                .map(m => (includeNames && m.name) ? `${m.name}: ${m.mes ?? ''}` : String(m.mes ?? ''))
+                .reverse();
+            const overrideValid = Number.isFinite(maxContextOverride) && maxContextOverride > 0;
+            const wiMaxContext = overrideValid ? maxContextOverride : __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_getMaxPromptTokens__();
+            const wi = await ctx.getWorldInfoPrompt(chatForWI, wiMaxContext, true);
+            const wiText = (wi?.worldInfoString || '').trim();
+            if (wiText) sections.push(`[World Info]\n${wiText}`);
+        } catch (err) {
+            console.error('Saints-Silly-Extensions: auto World Info activation failed.', err);
+        }
+    }
+
     // Pack recent chat into whatever budget remains.
     if (includeChat) {
         const fullChat = Array.isArray(ctx.chat) ? ctx.chat : [];
         // Optionally anchor the tail at a specific message (inclusive), so
         // the packed chat ends at an earlier moment of the story.
-        const anchoredChat = (Number.isFinite(endAtMessageIndex) && endAtMessageIndex >= 0)
-            ? fullChat.slice(0, endAtMessageIndex + 1)
-            : fullChat;
+        const anchoredChat = anchorChat(fullChat, endAtMessageIndex);
         // Optionally drop the most-recent N messages (the verbatim tail a
         // caller is carrying over elsewhere) so they aren't double-counted.
         const chat = (Number.isFinite(excludeRecentCount) && excludeRecentCount > 0)
@@ -6781,7 +6866,7 @@ function buildModalBody() {
     root.className = 'acc-modal-body';
     root.innerHTML = `
         <div class="acc-context-section">
-            <label class="checkbox_label" title="Prepend the current chat / character context to the generation">
+            <label class="checkbox_label" title="Prepend the current chat / character context to the generation, and auto-include the chat's relevant World Info entries. The lore-book dropdown adds extra books on top of that.">
                 <input id="acc_use_chat_context" type="checkbox" />
                 <span>Use Chat Context</span>
             </label>
@@ -7490,7 +7575,7 @@ function injectControls(formEl) {
             <span class="fa-solid fa-wand-magic-sparkles"></span>
             <span class="wia-btn-label">Assist</span>
         </div>
-        <label class="wia-context-toggle checkbox_label" title="Prepend the current chat / character context to the generation prompt">
+        <label class="wia-context-toggle checkbox_label" title="Prepend the current chat / character context to the generation prompt, and auto-include the chat's relevant World Info entries. The lore-book dropdown adds extra books on top of that.">
             <input type="checkbox" class="wia-context-cb" />
             <span>Use Chat Context</span>
         </label>
@@ -12977,9 +13062,1534 @@ function onRetryContinueGenerationEnded() {
     showQuickRetryButton();
 }
 
+;// ./src/director.js
+/**
+ * Group Director module — an LLM-chosen turn order for group chats.
+ *
+ * SillyTavern picks the next speaker in a group via fixed strategies (Manual /
+ * Natural / List / Pooled) and exposes no hook to override that choice. Instead
+ * of fighting that, the Director flips the active group to **Manual** (so ST
+ * posts the user's message without auto-replying) and then, on each user turn,
+ * runs a small "director" generation that reads the scene and names who should
+ * speak next. The chosen member is triggered with ST's own
+ * `Generate('normal', { force_chid })`, which forces one specific member to
+ * reply, bypassing the strategy logic entirely.
+ *
+ * Because *we* author the director prompt and hand it a numbered roster, the
+ * model only ever returns a tiny, controlled choice (a name or index) — there
+ * is no need to parse the in-character reply.
+ *
+ * After each user turn the Director chains several speakers back-to-back
+ * (`directorConsecutiveTurns`, default 2), re-rolling once each reply settles and
+ * stopping the moment the user cancels a turn. With confirm/override enabled the
+ * dialog pops up **immediately** — before the decision is made — so the user can
+ * just pick who replies next, while the roll runs behind it and reveals its
+ * suggestion in place when it lands; a settings flag disables it for hands-off
+ * play (a cancellable progress toast instead).
+ *
+ * The Director always voices its pick, including the possessed character.
+ *
+ * Per-chat state lives under `context.chatMetadata.director` as
+ * `{ previousStrategy }` — the group's activation strategy captured the moment
+ * we flipped it to Manual, so it can be restored when the Director is disabled.
+ */
+
+
+
+
+
+
+
+
+
+// ─── Constants ───
+
+const DIRECTOR_METADATA_KEY = 'director';
+
+const MANUAL_STRATEGY = __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_group_activation_strategy__?.MANUAL ?? 2;
+
+// The director user-prompt template. {{context}} is the packed chat/character/
+// lore preamble; {{roster}} is the numbered list of eligible speakers. When a
+// placeholder is absent the block is prepended/appended, so custom templates
+// that drop one keep working.
+const DEFAULT_DIRECTOR_PROMPT =
+    '{{context}}\n\nThe characters who can speak next are listed below, numbered:\n{{roster}}\n\n' +
+    'Based on the conversation so far, decide which single character should speak ' +
+    'next — choose whoever would most naturally respond or drive the scene forward. ' +
+    'Reply with ONLY the number of that character from the list above — just the ' +
+    'number, nothing else.';
+
+const DIRECTOR_SYSTEM_PROMPT =
+    'You are the turn director for a multi-character roleplay. Your only job is to ' +
+    'choose which one character should speak next from a numbered roster. Respond ' +
+    'with only the number of the chosen character and nothing else — no name, no ' +
+    'punctuation, no explanation.';
+
+const DEFAULT_DIRECTOR_RESPONSE_LENGTH = 32;
+
+// The pre-1.x director default asked the model to reply with the character's
+// *name*; it now hands the model a numbered roster and asks for the roster
+// *number* instead (more robust to parse). Installs that saved the old default
+// verbatim — i.e. never customized the template — still carry the name-based
+// text, which overrides the current default. `migrateDirectorPrompt` upgrades an
+// **exact** match (in settings and in any saved preset) to the current default;
+// any genuine edit won't match and is left untouched.
+const LEGACY_NAME_DIRECTOR_PROMPT =
+    '{{context}}\n\nThe following characters are present in the scene:\n{{roster}}\n\n' +
+    'Based on the conversation so far, decide which single character should speak ' +
+    'next — choose whoever would most naturally respond or drive the scene forward. ' +
+    'Reply with ONLY that character\'s name, exactly as written in the list above. ' +
+    'Output nothing else.';
+
+/**
+ * Upgrade a stale name-based director prompt to the current number-based default.
+ * Idempotent and exact-match only, so user customizations are preserved.
+ *
+ * @param {object} settings - Shared mutable settings reference.
+ * @returns {boolean} `true` if anything changed (caller should save settings).
+ */
+function migrateDirectorPrompt(settings) {
+    if (!settings || typeof settings !== 'object') return false;
+    let changed = false;
+    if (settings.directorPrompt === LEGACY_NAME_DIRECTOR_PROMPT) {
+        settings.directorPrompt = DEFAULT_DIRECTOR_PROMPT;
+        changed = true;
+    }
+    const presets = settings.toolPresets?.director;
+    if (presets && typeof presets === 'object') {
+        for (const preset of Object.values(presets)) {
+            if (preset && preset.directorPrompt === LEGACY_NAME_DIRECTOR_PROMPT) {
+                preset.directorPrompt = DEFAULT_DIRECTOR_PROMPT;
+                changed = true;
+            }
+        }
+    }
+    return changed;
+}
+
+// Speaker-line detection. Two shapes are recognised:
+//   1. Bracketed `[Name]:` — explicit, unambiguous, matched anywhere in the line
+//      (so several walk-ons on one line are all caught).
+//   2. Bare `Name:` at the START of a line — the shape the model actually emits,
+//      because in its context window group speakers only ever appear as `Name:`
+//      (never bracketed). Walk-on names aren't stop strings, so the model happily
+//      tacks `WalkOn: "…"` onto the end of another character's reply; line-anchored
+//      bare matching is what lets us split those back out. To keep false positives
+//      down the bare form must begin a line, start with a capital, be 1–4
+//      name-shaped words, and be followed by `: ` (colon + whitespace/quote).
+// Group 1 = bracketed name, group 2 = bare name.
+const SPEAKER_LINE_RE =
+    /\[([^\]\n]{1,60})\][ \t]*:|^[ \t]*([\p{Lu}][\p{L}\p{N}'’.-]{0,30}(?:[ \t]+[\p{Lu}][\p{L}\p{N}'’.-]{0,30}){0,3})[ \t]*:(?=[\s"'“”‘’])/gmu;
+const MAX_WALKON_NAME_LENGTH = 60;
+const MAX_WALKONS = 50;
+
+// Director chains this many chosen speakers per user turn (back-to-back), unless
+// the user cancels a turn's dialog. Falls back when the setting is unset/invalid.
+const DEFAULT_DIRECTOR_CONSECUTIVE_TURNS = 2;
+
+// Names that look like `[Name]:` / `Name:` but aren't characters — bracketed
+// meta-tags plus common capitalised sentence-openers and labels that the
+// line-anchored bare matcher would otherwise mistake for a speaker.
+const IGNORED_WALKON_TAGS = new Set([
+    'ooc', 'system', 'note', 'notes', 'narrator', 'setting', 'scene', 'continue',
+    'author', 'author\'s note', 'translation', 'time', 'status', 'a/n', 'an',
+    'warning', 'tip', 'example', 'summary', 'step', 'chapter', 'part', 'location',
+    'pov', 'edit', 'update', 'reminder', 'important', 'objective', 'goal', 'mission',
+    'i', 'he', 'she', 'it', 'they', 'we', 'you', 'but', 'and', 'the', 'a', 'then',
+    'so', 'well', 'no', 'yes', 'oh', 'okay', 'ok', 'meanwhile', 'later', 'suddenly',
+    'finally', 'now', 'p.s', 'ps',
+]);
+
+/**
+ * Find every speaker line (`[Name]:` anywhere, or a bare `Name:` at a line start)
+ * in `text`, skipping meta-tags. Returns ordered matches with the name and the
+ * offsets needed to split: `start` (where the speaker label begins) and
+ * `contentStart` (just after the colon).
+ *
+ * @returns {Array<{ name: string, start: number, contentStart: number }>}
+ */
+function matchSpeakerLines(text) {
+    const str = String(text || '');
+    const out = [];
+    SPEAKER_LINE_RE.lastIndex = 0;
+    for (const m of str.matchAll(SPEAKER_LINE_RE)) {
+        const name = ((m[1] ?? m[2]) || '').trim();
+        if (!name || IGNORED_WALKON_TAGS.has(name.toLowerCase())) continue;
+        out.push({ name, start: m.index, contentStart: m.index + m[0].length });
+    }
+    return out;
+}
+
+// ─── Module State ───
+
+let director_moduleSettings = null;
+let director_debug = () => {};
+
+// Guards the decision phase (roll + dialog) so a second pass can't overlap. The
+// triggered native generation is fenced by `is_group_generating` instead.
+let director_busy = false;
+
+// Set on every user MESSAGE_SENT (possession-agnostic — we never read is_user),
+// consumed when the next group wrapper finishes. This is what tells the
+// wrapper-finished handler that the just-completed wrapper followed a *user*
+// turn (vs a director-triggered member reply, which emits no MESSAGE_SENT).
+let userTurnPending = false;
+
+// Debounce timer for the walk-on textarea (write-through is immediate; only the
+// saveMetadata flush is debounced).
+let walkOnSaveTimer = null;
+
+// Set when the user clicks the progress toast to cancel. Aligned-mode generations
+// go through ST's pipeline (generateQuietPrompt), which resolves rather than
+// throwing on stop — so we check this flag after the call instead of relying on
+// an AbortError (the lean/raw path still throws and is caught separately).
+let generationAborted = false;
+
+// ─── Per-chat State ───
+
+function readState() {
+    const context = getContext();
+    const raw = context.chatMetadata?.[DIRECTOR_METADATA_KEY];
+    return {
+        previousStrategy: Number.isFinite(raw?.previousStrategy) ? raw.previousStrategy : null,
+        walkOns: Array.isArray(raw?.walkOns)
+            ? raw.walkOns.filter(n => typeof n === 'string' && n.trim())
+            : [],
+    };
+}
+
+/** Write the per-chat director state into chatMetadata without flushing. */
+function writeState(state) {
+    const context = getContext();
+    context.chatMetadata[DIRECTOR_METADATA_KEY] = {
+        previousStrategy: Number.isFinite(state?.previousStrategy) ? state.previousStrategy : null,
+        walkOns: Array.isArray(state?.walkOns) ? state.walkOns : [],
+    };
+}
+
+function saveState(state) {
+    writeState(state);
+    getContext().saveMetadata();
+}
+
+// ─── Group / Roster Helpers ───
+
+function getActiveGroup(ctx) {
+    if (!ctx.groupId) return null;
+    return (ctx.groups || []).find(g => g.id === ctx.groupId) || null;
+}
+
+/**
+ * Build the speaker roster the director chooses from: every unmuted group member
+ * (`kind: 'member'`, with a `chid` for `force_chid`) plus, when enabled, the
+ * per-chat walk-on characters (`kind: 'walkon'`, name only — the director
+ * generates and posts their reply itself). Muted members live in ST's
+ * `group.disabled_members`. Members are matched by avatar (names collide).
+ *
+ * @returns {Array<{ kind: 'member', chid: number, name: string, avatar: string } | { kind: 'walkon', name: string }>}
+ */
+function buildRoster(ctx, group) {
+    const disabled = new Set(group.disabled_members || []);
+    const roster = [];
+    const seenNames = new Set();
+    for (const avatar of group.members || []) {
+        if (disabled.has(avatar)) continue;
+        const chid = (ctx.characters || []).findIndex(c => c.avatar === avatar);
+        if (chid === -1) continue;
+        const char = ctx.characters[chid];
+        if (!char) continue;
+        roster.push({ kind: 'member', chid, name: char.name, avatar });
+        seenNames.add((char.name || '').toLowerCase());
+    }
+    if (director_moduleSettings?.directorIncludeWalkOns) {
+        for (const name of loadWalkOns()) {
+            const key = name.toLowerCase();
+            if (seenNames.has(key)) continue;
+            seenNames.add(key);
+            roster.push({ kind: 'walkon', name });
+        }
+    }
+    return roster;
+}
+
+/**
+ * The `context.characters` index of the most recent AI speaker, used as the
+ * aligned-mode `forceChId` anchor so the director's quiet generation reuses the
+ * KV cache that the just-generated message left warm. Resolves by avatar first,
+ * then name; returns null if no AI message resolves.
+ */
+function resolveAnchorChid(ctx) {
+    const chat = ctx.chat || [];
+    const chars = ctx.characters || [];
+    for (let i = chat.length - 1; i >= 0; i--) {
+        const m = chat[i];
+        if (!m || m.is_user || m.is_system) continue;
+        const avatar = m.original_avatar
+            || (typeof m.force_avatar === 'string' ? m.force_avatar.replace(/^\/characters\//, '') : null);
+        let chid = avatar ? chars.findIndex(c => c.avatar === avatar) : -1;
+        if (chid === -1 && m.name) {
+            chid = chars.findIndex(c => (c.name || '').toLowerCase() === m.name.toLowerCase());
+        }
+        if (chid !== -1) return chid;
+    }
+    return null;
+}
+
+// ─── Manual-mode Management ───
+
+/**
+ * While the Director is enabled and a group is active, flip the group to Manual
+ * reply order so ST stops auto-generating, capturing the group's previous
+ * strategy (once) so it can be restored later.
+ */
+async function applyManualMode() {
+    if (!director_moduleSettings?.directorEnabled) return;
+    const ctx = getContext();
+    const group = getActiveGroup(ctx);
+    if (!group) return;
+
+    const state = readState();
+    if (state.previousStrategy === null) {
+        const current = Number(group.activation_strategy);
+        state.previousStrategy = Number.isFinite(current) ? current : MANUAL_STRATEGY;
+        saveState(state);
+    }
+
+    if (Number(group.activation_strategy) !== MANUAL_STRATEGY) {
+        group.activation_strategy = MANUAL_STRATEGY;
+        try {
+            await __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_editGroup__(group.id, true, false);
+            director_debug('Flipped group to Manual reply order; previous strategy:', state.previousStrategy);
+        } catch (err) {
+            console.error('Group Director: failed to set Manual reply order:', err);
+        }
+    }
+}
+
+/** Restore the group's pre-Director reply strategy and clear the stored value. */
+async function restoreStrategy() {
+    const ctx = getContext();
+    const state = readState();
+    if (state.previousStrategy === null) return;
+
+    const group = getActiveGroup(ctx);
+    if (group && Number(group.activation_strategy) === MANUAL_STRATEGY) {
+        group.activation_strategy = state.previousStrategy;
+        try {
+            await __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_editGroup__(group.id, true, false);
+            director_debug('Restored group reply order to strategy:', state.previousStrategy);
+        } catch (err) {
+            console.error('Group Director: failed to restore reply order:', err);
+        }
+    }
+    // Preserve walkOns (and anything else) — only clear the captured strategy.
+    state.previousStrategy = null;
+    saveState(state);
+}
+
+// ─── Walk-on Detection ───
+
+/** Names that are real cast (group members + user persona), not walk-ons. */
+function buildExcludedNameSet(ctx) {
+    const set = new Set();
+    if (ctx.name1) set.add(ctx.name1.trim().toLowerCase());
+    const group = getActiveGroup(ctx);
+    if (group) {
+        for (const avatar of group.members || []) {
+            const char = (ctx.characters || []).find(c => c.avatar === avatar);
+            if (char?.name) set.add(char.name.trim().toLowerCase());
+        }
+    }
+    return set;
+}
+
+/** Extract speaker names (`[Name]:` or a bare line-start `Name:`) from a message body. */
+function extractWalkOnNames(text) {
+    const names = [];
+    const seen = new Set();
+    for (const { name } of matchSpeakerLines(text)) {
+        const key = name.toLowerCase();
+        if (seen.has(key)) continue;
+        seen.add(key);
+        names.push(name);
+    }
+    return names;
+}
+
+function loadWalkOns() {
+    return readState().walkOns;
+}
+
+function normalizeWalkOns(names) {
+    const seen = new Set();
+    const out = [];
+    for (const raw of names) {
+        const name = (raw || '').trim().slice(0, MAX_WALKON_NAME_LENGTH).trim();
+        if (!name) continue;
+        const key = name.toLowerCase();
+        if (seen.has(key)) continue;
+        seen.add(key);
+        out.push(name);
+    }
+    return out.slice(-MAX_WALKONS);
+}
+
+function sameList(a, b) {
+    return a.length === b.length && a.every((v, i) => v === b[i]);
+}
+
+/**
+ * Merge newly-detected names into the per-chat list, dropping anything that is a
+ * real cast member or the persona, or already known. Returns the list of names
+ * that were actually newly added (empty if nothing changed).
+ */
+function addWalkOns(names) {
+    const ctx = getContext();
+    const excluded = buildExcludedNameSet(ctx);
+    const state = readState();
+    const known = new Set(state.walkOns.map(n => n.toLowerCase()));
+    const fresh = [];
+    for (const raw of names) {
+        const name = (raw || '').trim();
+        const key = name.toLowerCase();
+        if (!name || excluded.has(key) || known.has(key)) continue;
+        known.add(key);
+        fresh.push(name);
+    }
+    if (!fresh.length) return [];
+
+    const combined = normalizeWalkOns([...state.walkOns, ...fresh]);
+    if (sameList(combined, state.walkOns)) return [];
+
+    state.walkOns = combined;
+    saveState(state);
+    refreshWalkOnPanel();
+    return fresh;
+}
+
+/** Scan one message's text for walk-on speaker lines and learn any new names. */
+function scanMessageForWalkOns(index) {
+    const ctx = getContext();
+    if (!director_moduleSettings?.directorWalkOnsEnabled) return;
+    if (!ctx.groupId) return;
+    const idx = Number.isInteger(index) ? index : ctx.chat.length - 1;
+    const msg = ctx.chat?.[idx];
+    if (!msg || msg.is_system || typeof msg.mes !== 'string' || !msg.mes.trim()) return;
+    const names = extractWalkOnNames(msg.mes);
+    if (!names.length) return;
+    const added = addWalkOns(names);
+    if (added.length) {
+        director_debug('Learned walk-on(s):', added);
+        toast(
+            `Walk-on ${added.length === 1 ? 'character' : 'characters'} detected: ${added.join(', ')}`,
+            'success',
+        );
+    }
+}
+
+/**
+ * Detached scan for a message index. Runs on `MESSAGE_SENT` / `MESSAGE_RECEIVED`
+ * / `MESSAGE_EDITED`; deferred via `setTimeout(0)` so member characters are
+ * fully unshallowed before we build the excluded-names set (same unshallow race
+ * the roster hits mid-pipeline).
+ */
+function onDirectorScanForWalkOns(messageIndex) {
+    if (!director_moduleSettings?.directorWalkOnsEnabled) return;
+    const idx = Number.isInteger(messageIndex) ? messageIndex : undefined;
+    setTimeout(() => {
+        try {
+            scanMessageForWalkOns(idx);
+        } catch (err) {
+            console.error('Group Director walk-on scan failed:', err);
+        }
+    }, 0);
+}
+
+/** Scan every message in the current chat (manual backfill). */
+function scanWholeChatForWalkOns() {
+    const ctx = getContext();
+    if (!ctx.groupId) {
+        toast('Walk-on detection only runs in group chats.', 'warning');
+        return;
+    }
+    const found = [];
+    const seen = new Set();
+    for (const msg of ctx.chat || []) {
+        if (!msg || msg.is_system || typeof msg.mes !== 'string') continue;
+        for (const name of extractWalkOnNames(msg.mes)) {
+            const key = name.toLowerCase();
+            if (seen.has(key)) continue;
+            seen.add(key);
+            found.push(name);
+        }
+    }
+    const added = addWalkOns(found);
+    toast(added.length
+        ? `Found ${added.length} new walk-on${added.length === 1 ? '' : 's'}: ${added.join(', ')}`
+        : 'No new walk-on characters found.', added.length ? 'success' : 'info');
+}
+
+// ─── Walk-on Message Splitting ───
+//
+// Promote `[Name]:` speaker lines embedded in a message into their own messages,
+// posted under each name (with the matching character's avatar when the name is
+// a real character, otherwise a nameplate-only walk-on) — as if ST had posted
+// them. Deterministic (no LLM). The chat array is spliced and re-rendered via
+// `printMessages`, so it works at any position.
+
+let splitBusy = false;
+
+function delayMs(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * Wait until ST has fully settled before mutating the chat or starting a new
+ * generation. Watches `is_group_generating` **and** the host's global generating
+ * flag: an aborted quiet generation (the aligned-mode director roll) is not a
+ * group wrapper, so `is_group_generating` alone reports "settled" while ST is
+ * still tearing the roll down — and re-entering `Generate` in that window is
+ * what made an early speaker pick fail.
+ */
+async function waitForGenerationSettle(timeoutMs = 8000) {
+    const start = Date.now();
+    while (__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_is_group_generating__ || isGenerationInProgress()) {
+        if (Date.now() - start > timeoutMs) return false;
+        await delayMs(100);
+    }
+    await delayMs(50);
+    return true;
+}
+
+/**
+ * Split a message body at its speaker boundaries — `[Name]:` anywhere or a bare
+ * `Name:` at a line start (ignoring meta-tags). Returns `{ head, segments:
+ * [{ name, text }] }`, where `head` is the text before the first speaker line and
+ * each segment's text is the speaker's content with the `Name:` prefix stripped.
+ */
+function parseWalkOnSegments(text) {
+    const str = String(text || '');
+    const boundaries = matchSpeakerLines(str);
+    if (!boundaries.length) return { head: str, segments: [] };
+    const segments = boundaries.map((b, i) => {
+        const end = i + 1 < boundaries.length ? boundaries[i + 1].start : str.length;
+        return { name: b.name, text: str.slice(b.contentStart, end).trim() };
+    });
+    return { head: str.slice(0, boundaries[0].start), segments };
+}
+
+/**
+ * Build a chat message posted under `name` (real character's avatar if known).
+ * `tagSplit` marks split-produced messages so they're never re-split / offered a
+ * split button; generated walk-on replies leave it off (no embedded line anyway).
+ */
+function makeSpeakerMessage(ctx, name, text, original, { tagSplit = true } = {}) {
+    const char = (ctx.characters || []).find(c => (c.name || '').toLowerCase() === name.toLowerCase());
+    const msg = {
+        name: char ? char.name : name,
+        is_user: false,
+        is_system: false,
+        send_date: original?.send_date ?? Date.now(),
+        mes: text,
+        extra: tagSplit ? { sseWalkOnSplit: true } : {},
+    };
+    if (char?.avatar) {
+        msg.force_avatar = `/characters/${char.avatar}`;
+        if (ctx.groupId) msg.original_avatar = char.avatar;
+    }
+    if (ctx.groupId) msg.is_name = true;
+    return msg;
+}
+
+/** Construct the ordered replacement messages for a split. */
+function buildSplitMessages(ctx, original, parsed) {
+    const replacements = [];
+    const headText = parsed.head.trim();
+    if (headText) {
+        // Keep the original message's identity, trimmed to the leading text.
+        // Drop stale swipes (content changed). No split tag — a later edit that
+        // re-introduces a speaker line should still be splittable.
+        const kept = { ...original, mes: headText };
+        delete kept.swipes;
+        delete kept.swipe_id;
+        delete kept.swipe_info;
+        replacements.push(kept);
+    }
+    for (const seg of parsed.segments) {
+        if (!seg.text) continue;
+        replacements.push(makeSpeakerMessage(ctx, seg.name, seg.text, original));
+    }
+    return replacements;
+}
+
+/**
+ * Split the message at `index` into separate named messages. Returns the number
+ * of new messages created (0 = nothing to split).
+ */
+async function splitWalkOnsInMessage(index) {
+    if (splitBusy) return 0;
+    const ctx = getContext();
+    const msg = ctx.chat?.[index];
+    if (!msg || typeof msg.mes !== 'string') return 0;
+    if (msg.extra?.sseWalkOnSplit) return 0;
+
+    const parsed = parseWalkOnSegments(msg.mes);
+    if (!parsed.segments.length) return 0;
+
+    const replacements = buildSplitMessages(ctx, msg, parsed);
+    if (!replacements.length) return 0;
+    const newCount = replacements.length - (parsed.head.trim() ? 1 : 0);
+
+    splitBusy = true;
+    try {
+        ctx.chat.splice(index, 1, ...replacements);
+        await ctx.saveChat();
+        await ctx.printMessages();
+        director_debug('Split walk-on message at', index, '→', replacements.length, 'message(s)');
+        return newCount;
+    } finally {
+        splitBusy = false;
+    }
+}
+
+/**
+ * Auto-split path (AI replies only): after the group turn settles, split the
+ * referenced message if it carries embedded walk-on lines. Tracks the message
+ * by object reference so a shifted index (e.g. the director appended a reply)
+ * still resolves.
+ */
+async function maybeAutoSplit(messageIndex) {
+    if (!director_moduleSettings?.directorWalkOnSplitAuto) return;
+    const ctx = getContext();
+    if (!ctx.groupId) return;
+    const idx = Number.isInteger(messageIndex) ? messageIndex : ctx.chat.length - 1;
+    const msg = ctx.chat?.[idx];
+    if (!msg || msg.extra?.sseWalkOnSplit) return;
+    if (!parseWalkOnSegments(String(msg.mes || '')).segments.length) return;
+
+    await waitForGenerationSettle();
+    const liveIdx = getContext().chat.indexOf(msg);
+    if (liveIdx === -1) return; // message was swiped/deleted while we waited
+    await splitWalkOnsInMessage(liveIdx);
+}
+
+/**
+ * Auto-split a freshly-received AI message (wired to `MESSAGE_RECEIVED` only —
+ * user/edited messages use the per-message button, which avoids reordering
+ * against the director's own triggered reply).
+ */
+function onDirectorMaybeSplit(messageIndex) {
+    if (!director_moduleSettings?.directorWalkOnSplitAuto) return;
+    const idx = Number.isInteger(messageIndex) ? messageIndex : undefined;
+    maybeAutoSplit(idx).catch(err => console.error('Group Director auto-split failed:', err));
+}
+
+// ─── Walk-on Split Button ───
+
+function makeSplitButton() {
+    const btn = document.createElement('div');
+    btn.className = 'mes_button sse-walkon-split-button fa-solid fa-scissors interactable';
+    btn.title = 'Split [Name]: walk-on lines in this message into separate messages';
+    btn.tabIndex = 0;
+    btn.addEventListener('click', onSplitButtonClick);
+    return btn;
+}
+
+function onSplitButtonClick(event) {
+    const mesEl = event.currentTarget.closest('.mes');
+    if (!mesEl) return;
+    const index = parseInt(mesEl.getAttribute('mesid'), 10);
+    if (Number.isNaN(index)) return;
+    if (__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_is_group_generating__) {
+        toast('Wait for the current generation to finish.', 'warning');
+        return;
+    }
+    splitWalkOnsInMessage(index)
+        .then(n => { if (!n) toast('No walk-on lines to split in this message.', 'info'); })
+        .catch(err => console.error('Group Director split failed:', err));
+}
+
+/** Inject (or remove) the split button on a `.mes` based on its content. */
+function injectSplitButtonInto(mesEl) {
+    if (!(mesEl instanceof HTMLElement) || !mesEl.matches?.('.mes')) return;
+    if (mesEl.getAttribute('is_system') === 'true') return;
+    const buttons = mesEl.querySelector('.mes_buttons');
+    if (!buttons) return;
+    const existing = buttons.querySelector('.sse-walkon-split-button');
+
+    const ctx = getContext();
+    const index = parseInt(mesEl.getAttribute('mesid'), 10);
+    const msg = !Number.isNaN(index) ? ctx.chat?.[index] : null;
+    const splittable = !!ctx.groupId && !!msg && !msg.extra?.sseWalkOnSplit
+        && parseWalkOnSegments(String(msg.mes || '')).segments.length > 0;
+
+    if (!splittable) {
+        existing?.remove();
+        return;
+    }
+    if (existing) return;
+    const extra = buttons.querySelector('.extraMesButtons');
+    const btn = makeSplitButton();
+    if (extra) buttons.insertBefore(btn, extra);
+    else buttons.appendChild(btn);
+}
+
+/** (Re)scan every message and inject/refresh split buttons. */
+function rescanSplitButtons() {
+    document.querySelectorAll('#chat .mes').forEach(injectSplitButtonInto);
+}
+
+let splitObserverInstalled = false;
+
+/** Keep the per-message split button present as ST re-renders message nodes. */
+function startDirectorObserver() {
+    if (splitObserverInstalled) return;
+    splitObserverInstalled = true;
+    const chat = document.getElementById('chat');
+    if (!chat) return;
+    const observer = new MutationObserver((mutations) => {
+        for (const m of mutations) {
+            for (const node of m.addedNodes) {
+                if (!(node instanceof HTMLElement)) continue;
+                if (node.matches?.('.mes')) injectSplitButtonInto(node);
+                node.querySelectorAll?.('.mes').forEach(injectSplitButtonInto);
+            }
+        }
+    });
+    observer.observe(chat, { childList: true, subtree: true });
+    rescanSplitButtons();
+    director_debug('Split-button observer installed');
+}
+
+// ─── Prompt Assembly ───
+
+function director_resolveResponseLength() {
+    const n = director_moduleSettings?.directorResponseLength;
+    return Number.isFinite(n) && n > 0 ? n : DEFAULT_DIRECTOR_RESPONSE_LENGTH;
+}
+
+/**
+ * Aligned mode routes the director's silent generations through ST's normal
+ * pipeline (`generateQuietPrompt`) so their prompt prefix matches the chat and
+ * the KV cache is reused — only the instruction tail is reprocessed. Lean mode
+ * keeps the standalone raw path (smaller prompt, but cache-busting).
+ */
+function useAlignedContext(ctx) {
+    return !!director_moduleSettings?.directorAlignedContext
+        && typeof ctx.generateQuietPrompt === 'function';
+}
+
+/**
+ * Assemble the director user prompt from the editable template. {{roster}} and
+ * {{context}} are substituted in place; when a placeholder is absent the block
+ * is appended (roster) / prepended (context) so old templates keep working.
+ */
+function composeDirectorPrompt(rosterBlock, contextBlock) {
+    const configured = director_moduleSettings?.directorPrompt;
+    const tpl = (typeof configured === 'string' && configured.trim())
+        ? configured
+        : DEFAULT_DIRECTOR_PROMPT;
+    const { text, used } = applyTemplateMacros(tpl, {
+        roster: rosterBlock || '',
+        context: contextBlock || '',
+    });
+    let prompt = text;
+    if (!used.has('roster') && rosterBlock) {
+        prompt = `${prompt}\n\nCharacters present:\n${rosterBlock}`;
+    }
+    if (!used.has('context') && contextBlock) {
+        prompt = `${contextBlock}\n\n${prompt}`;
+    }
+    return prompt;
+}
+
+function showDirectorPromptPreview() {
+    const sampleRoster = '1. Susan\n2. Tony (walk-on)';
+    const sampleContext =
+        '(character cards, persona, selected lore books, and recent chat)';
+    showPromptPreview('Group Director — Prompt Preview', [
+        { label: 'Speaker Pick — System Prompt (fixed)', text: DIRECTOR_SYSTEM_PROMPT },
+        { label: 'Speaker Pick — User Prompt (assembled, with sample values)', text: composeDirectorPrompt(sampleRoster, sampleContext) },
+    ]);
+}
+
+// ─── Pick Parsing ───
+
+/**
+ * Deterministic fallback for an unusable reply: the next real member (never a
+ * walk-on) after the last character to speak, wrapping around the roster, and
+ * skipping the last speaker itself. Falls back to the first member, then the
+ * first roster entry, so it always returns something.
+ */
+function fallbackPick(roster, ctx) {
+    const n = roster.length;
+    const lastChid = resolveAnchorChid(ctx);
+    let lastIdx = lastChid !== null
+        ? roster.findIndex(r => r.kind === 'member' && r.chid === lastChid)
+        : -1;
+    for (let step = 1; step <= n; step++) {
+        const idx = (((lastIdx + step) % n) + n) % n;
+        const cand = roster[idx];
+        if (cand.kind !== 'member') continue;
+        if (idx === lastIdx) continue;
+        return cand;
+    }
+    return roster.find(r => r.kind === 'member') || roster[0];
+}
+
+/**
+ * Re-resolve a roster member's `context.characters` index at the moment of use.
+ * Avatar filenames are the stable identity (names collide in groups); the index
+ * is not, because ST rebuilds the array as it unshallows members. Falls back to
+ * the name, then to the captured index only if it still points at that member.
+ *
+ * @returns {number|null} A validated index, or null if the character is gone.
+ */
+function resolveMemberChid(ctx, member) {
+    const chars = ctx.characters || [];
+    if (member.avatar) {
+        const byAvatar = chars.findIndex(c => c?.avatar === member.avatar);
+        if (byAvatar !== -1) return byAvatar;
+    }
+    if (member.name) {
+        const byName = chars.findIndex(c => (c?.name || '').toLowerCase() === member.name.toLowerCase());
+        if (byName !== -1) return byName;
+    }
+    const captured = member.chid;
+    if (Number.isInteger(captured) && chars[captured]) return captured;
+    return null;
+}
+
+/** Stable identity compare for roster entries (members by chid, walk-ons by name). */
+function sameRosterEntry(a, b) {
+    if (!a || !b || a.kind !== b.kind) return false;
+    return a.kind === 'member'
+        ? a.chid === b.chid
+        : a.name.toLowerCase() === b.name.toLowerCase();
+}
+
+/**
+ * Map the director's raw reply to one roster member. Prefers the roster number
+ * (what the prompt asks for), then an exact name, then a contained/partial name.
+ * On an unusable reply, falls back deterministically (`fallbackPick`) to the next
+ * real member after the last speaker so the loop never crashes.
+ */
+function parsePick(text, roster, ctx) {
+    const cleaned = String(text || '').replace(/[*_`"'.,!?:;()[\]{}]/g, ' ').trim();
+    if (!cleaned) return fallbackPick(roster, ctx);
+
+    const numMatch = cleaned.match(/\d+/);
+    if (numMatch) {
+        const idx = parseInt(numMatch[0], 10) - 1;
+        if (idx >= 0 && idx < roster.length) return roster[idx];
+    }
+
+    const lower = cleaned.toLowerCase();
+    let member = roster.find(r => r.name.toLowerCase() === lower);
+    if (member) return member;
+
+    member = roster.find(r => lower.includes(r.name.toLowerCase()));
+    if (member) return member;
+
+    if (lower.length >= 2) {
+        member = roster.find(r => r.name.toLowerCase().includes(lower));
+        if (member) return member;
+    }
+
+    director_debug('No roster match for director reply; using deterministic fallback. Reply was:', text);
+    return fallbackPick(roster, ctx);
+}
+
+// ─── Confirm / Override Dialog ───
+
+/**
+ * Decide the next speaker for one turn.
+ *
+ * With confirm/override on, the dialog opens **immediately** (before any decision)
+ * so the user has the fast path of just picking someone, while the director's roll
+ * runs behind it and reveals its suggestion when it lands. With confirm off, a
+ * cancellable progress toast is shown and the rolled pick is returned directly.
+ *
+ * @returns {Promise<object|null>} The chosen roster entry, or `null` if cancelled.
+ */
+async function decideSpeaker(ctx, roster) {
+    // One eligible speaker — nothing to decide or confirm.
+    if (roster.length === 1) return roster[0];
+
+    if (director_moduleSettings.directorConfirm) {
+        return await chooseWithDialog(ctx, roster);
+    }
+
+    // Hands-off: roll behind a cancellable progress toast and trigger the pick.
+    const dismiss = showRollProgressToast();
+    try {
+        return await rollDirector(ctx, roster);
+    } catch (err) {
+        if (isSilentGenerationAbort(err)) return null;
+        throw err;
+    } finally {
+        dismiss();
+    }
+}
+
+/** Abort an in-flight director roll (the lean path throws; aligned reads the flag). */
+function abortRoll() {
+    generationAborted = true;
+    try { getContext().stopGeneration?.(); } catch { /* ignore */ }
+    abortAllGenerations('director-cancel');
+}
+
+/**
+ * Open the confirm/override dialog right away (carrying the "director is choosing"
+ * status the progress toast used to show), run the roll concurrently, and reveal
+ * the suggestion in-place when it resolves. The user can click any cast member at
+ * any time — that wins immediately and the still-running roll is aborted.
+ *
+ * Resolves to the chosen roster entry, or `null` if the user cancels.
+ */
+async function chooseWithDialog(ctx, roster) {
+    const root = document.createElement('div');
+    root.className = 'sse-director-dialog';
+
+    const heading = document.createElement('div');
+    heading.className = 'sse-director-heading';
+    heading.textContent = 'Director is choosing who speaks next…';
+    root.appendChild(heading);
+
+    const hint = document.createElement('div');
+    hint.className = 'sse-director-hint';
+    hint.textContent = 'Pick who should speak next, or wait for the director’s suggestion:';
+    root.appendChild(hint);
+
+    const choices = document.createElement('div');
+    choices.className = 'sse-director-choices';
+    root.appendChild(choices);
+
+    let picked = null;
+    let settled = false;
+    const popup = new __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_Popup__(root, __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_POPUP_TYPE__.TEXT, '', {
+        okButton: false,
+        cancelButton: 'Cancel',
+    });
+
+    const btnByEntry = new Map();
+    for (const member of roster) {
+        const btn = document.createElement('div');
+        btn.className = 'menu_button sse-director-choice';
+        if (member.kind === 'walkon') btn.classList.add('sse-director-walkon');
+        btn.textContent = member.kind === 'walkon' ? `${member.name} (walk-on)` : member.name;
+        btn.addEventListener('click', () => {
+            picked = member;
+            settled = true;
+            abortRoll(); // user chose — the suggestion is moot
+            popup.completeAffirmative();
+        });
+        choices.appendChild(btn);
+        btnByEntry.set(member, btn);
+    }
+
+    // Roll behind the open dialog; surface the suggestion when it lands.
+    rollDirector(ctx, roster).then((suggested) => {
+        if (settled) return;
+        if (suggested) {
+            heading.innerHTML = 'The director suggests: <strong></strong>';
+            heading.querySelector('strong').textContent = suggested.name;
+            hint.textContent = 'Confirm the suggestion, or choose who should speak next:';
+            const entry = roster.find(r => sameRosterEntry(r, suggested));
+            const btn = entry && btnByEntry.get(entry);
+            if (btn) btn.classList.add('sse-director-suggested');
+        } else {
+            heading.textContent = 'Director cancelled — choose who speaks next:';
+        }
+    }).catch((err) => {
+        if (settled) return;
+        if (!isSilentGenerationAbort(err)) console.error('Group Director roll failed:', err);
+        heading.textContent = 'Choose who should speak next:';
+    });
+
+    const result = await popup.show();
+    settled = true;
+    if (result === __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_POPUP_RESULT__.AFFIRMATIVE && picked) return picked;
+    abortRoll(); // cancelled — stop the roll if it's still running
+    return null;
+}
+
+// ─── Trigger ───
+
+/**
+ * Trigger a member's reply via ST's native `force_chid` generation and await it.
+ * Awaiting is what lets `runDirector` chain the next turn only after this reply
+ * has fully landed (the dialog is already closed by now, so there's no emit to
+ * hold). Generation errors are surfaced but don't abort the chain.
+ */
+async function triggerMember(ctx, member) {
+    // `chid` is an *index* into `context.characters`, captured when the roster
+    // was built. The array is rebuilt as ST unshallows group members, so an
+    // index taken before an in-flight roll (or before an aborted one finished
+    // tearing down) can point at a different slot — or at nothing, which is how
+    // a stale index surfaced as ST failing to read `.avatar` of undefined.
+    // Re-resolve from the avatar, which is stable, and verify before generating.
+    const chid = resolveMemberChid(ctx, member);
+    if (chid === null) {
+        console.error('Group Director: could not resolve character for', member.name, member.avatar);
+        toast(`Failed to trigger ${member.name}: character could not be resolved.`, 'error');
+        return;
+    }
+    director_debug('Triggering member:', member.name, '(chid', chid + ')');
+    try {
+        await ctx.generate('normal', { force_chid: chid });
+    } catch (err) {
+        console.error('Group Director: trigger failed:', err);
+        toast(`Failed to trigger ${member.name}: ${err.message}`, 'error');
+    }
+}
+
+// ─── Director Roll ───
+
+/**
+ * Sticky, click-to-cancel progress toast shown while a silent director
+ * generation runs (it never surfaces ST's own Stop button). Clicking it aborts
+ * via `abortAllGenerations`. Returns a dismiss callback.
+ */
+function cancellableProgressToast(message) {
+    if (typeof toastr === 'undefined' || !toastr.info) return () => {};
+    const $toast = toastr.info(message, undefined, {
+        timeOut: 0,
+        extendedTimeOut: 0,
+        tapToDismiss: false,
+        closeButton: false,
+        onclick: () => {
+            generationAborted = true;
+            // Lean (raw) path: abort the silent job. Aligned path: stop the
+            // pipeline generation. Call both — each is a no-op for the other.
+            try { getContext().stopGeneration?.(); } catch { /* ignore */ }
+            abortAllGenerations('director-cancel');
+        },
+    });
+    let dismissed = false;
+    return () => {
+        if (dismissed) return;
+        dismissed = true;
+        if ($toast) toastr.clear($toast);
+    };
+}
+
+function showRollProgressToast() {
+    return cancellableProgressToast('Director is choosing who speaks next… (click to cancel)');
+}
+
+/**
+ * Run the director generation and parse a pick. Pure — no progress UI of its own
+ * (callers own that: the no-dialog path shows a cancellable toast, the confirm
+ * path shows status in the open dialog). Returns the parsed pick, or `null` if
+ * the generation was cancelled in aligned mode (the lean path throws instead).
+ */
+async function rollDirector(ctx, roster) {
+    const responseLength = director_resolveResponseLength();
+    const rosterBlock = roster
+        .map((m, i) => `${i + 1}. ${m.name}${m.kind === 'walkon' ? ' (walk-on)' : ''}`)
+        .join('\n');
+    let text;
+    if (useAlignedContext(ctx)) {
+        // Aligned: build the *real* chat prompt and append our instruction at
+        // the tail (quiet prompt), so the long prefix matches the chat and the
+        // KV cache stays warm. Pinned to the last speaker's prompt.
+        const quietPrompt = composeDirectorPrompt(rosterBlock, '');
+        const forceChId = resolveAnchorChid(ctx);
+        director_debug('Director roll (aligned) — anchor chid:', forceChId);
+        const raw = await ctx.generateQuietPrompt({ quietPrompt, responseLength, forceChId, skipWIAN: false, removeReasoning: true });
+        if (generationAborted) return null;
+        text = String(raw || '').trim();
+    } else {
+        const contextBlock = await buildContextPreamble({
+            includeChat: true,
+            responseLength,
+            maxContextOverride: director_moduleSettings?.directorMaxContextOverride || 0,
+        });
+        const userPrompt = composeDirectorPrompt(rosterBlock, contextBlock);
+        director_debug('Director roll (lean) — prompt length:', userPrompt.length);
+        // No visible target field is needed; stream into a detached scratch element.
+        const scratch = document.createElement('textarea');
+        const raw = await withSingleLineDisabled(() => streamingGenerate(
+            { prompt: userPrompt, systemPrompt: DIRECTOR_SYSTEM_PROMPT, responseLength },
+            scratch,
+            { append: false },
+        ));
+        text = __WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(raw || '').trim();
+    }
+    director_debug('Director raw reply:', JSON.stringify(text));
+    return parsePick(text, roster, ctx);
+}
+
+// ─── Walk-on Voicing ───
+
+/** Remove the message at `idx` and re-render (used to undo a placeholder that produced nothing). */
+async function removeMessageAt(ctx, idx) {
+    if (idx < 0 || idx >= (ctx.chat?.length || 0)) return;
+    ctx.chat.splice(idx, 1);
+    await ctx.saveChat();
+    if (typeof ctx.printMessages === 'function') await ctx.printMessages();
+}
+
+/** Collapse a multi-swipe message down to just its active swipe (drops the placeholder). */
+function collapseToActiveSwipe(ctx, idx) {
+    const m = ctx.chat?.[idx];
+    if (!m || !Array.isArray(m.swipes) || m.swipes.length <= 1) return;
+    const id = Number(m.swipe_id) || 0;
+    const activeText = m.swipes[id];
+    const activeInfo = Array.isArray(m.swipe_info) ? m.swipe_info[id] : undefined;
+    m.swipes = [activeText];
+    m.swipe_info = [activeInfo || {}];
+    m.swipe_id = 0;
+    m.mes = activeText;
+}
+
+/**
+ * Voice a walk-on the native way: post a thin `…` placeholder under the name, then
+ * drive ST's own swipe-regeneration on it (the same path as pressing the swipe
+ * arrow) so the reply comes from the real pipeline — native formatting, stop
+ * strings, and name handling, with no custom prompt or sanitizing. The throwaway
+ * placeholder swipe is collapsed away afterward. ST shows its own generation
+ * indicator and Stop button, so there's no extension progress toast; if the user
+ * stops it before any text arrives, the placeholder is removed. Walk-ons only
+ * exist in group chats, where `ctx.swipe.right` is always available.
+ */
+async function generateAndPostWalkOn(ctx, name) {
+    if (!ctx.groupId || typeof ctx.swipe?.right !== 'function') {
+        toast('Group Director: walk-ons can only be voiced in a group chat.', 'warning');
+        return;
+    }
+    const placeholder = makeSpeakerMessage(ctx, name, '…', null, { tagSplit: false });
+    ctx.chat.push(placeholder);
+    const idx = ctx.chat.length - 1;
+    if (typeof ctx.addOneMessage === 'function') ctx.addOneMessage(placeholder);
+    await ctx.saveChat();
+    try {
+        // Overswipe → regenerate → Generate('swipe'); awaits the full generation.
+        await ctx.swipe.right();
+        await waitForGenerationSettle();
+        const text = String(ctx.chat?.[idx]?.mes || '').trim();
+        if (!text || text === '…') {
+            await removeMessageAt(ctx, idx);
+            director_debug('Native walk-on swipe produced nothing for', name);
+            return;
+        }
+        collapseToActiveSwipe(ctx, idx);
+        await ctx.saveChat();
+        if (typeof ctx.printMessages === 'function') await ctx.printMessages();
+        director_debug('Voiced walk-on natively for', name, '— length', text.length);
+    } catch (err) {
+        director_debug('Native walk-on swipe threw:', err);
+        await removeMessageAt(ctx, idx);
+    }
+}
+
+/** Route a chosen roster entry: real members via force_chid, walk-ons via generation. Awaits either. */
+async function triggerChoice(ctx, chosen) {
+    if (chosen.kind === 'walkon') {
+        await generateAndPostWalkOn(ctx, chosen.name);
+    } else {
+        await triggerMember(ctx, chosen);
+    }
+}
+
+/** How many speakers the director chains back-to-back per invocation. */
+function resolveConsecutiveTurns() {
+    const n = director_moduleSettings?.directorConsecutiveTurns;
+    return Number.isFinite(n) && n > 0 ? Math.floor(n) : DEFAULT_DIRECTOR_CONSECUTIVE_TURNS;
+}
+
+/**
+ * Run the director: choose a next speaker (confirm/override dialog or hands-off
+ * roll) and trigger that speaker — a real member via `force_chid`, or a walk-on
+ * by generating and posting its reply. Repeats for up to `turns` speakers
+ * back-to-back (default `directorConsecutiveTurns`), re-rolling after each reply
+ * settles, and stops early the moment the user cancels a turn's dialog/roll. The
+ * director always voices its pick — even the possessed character.
+ *
+ * @param {{ manual?: boolean, turns?: number }} [opts] - `manual` surfaces
+ *   "wrong context" toasts that are silent on the automatic path; `turns`
+ *   overrides the configured chain length (e.g. `/next` steps a single speaker).
+ */
+async function runDirector({ manual = false, turns } = {}) {
+    director_debug('runDirector — manual:', manual);
+    if (!director_moduleSettings?.directorEnabled) {
+        director_debug('runDirector skipped — disabled');
+        return;
+    }
+
+    const ctx = getContext();
+    if (!ctx.groupId) {
+        if (manual) toast('Group Director only works in group chats.', 'warning');
+        director_debug('runDirector skipped — not a group chat');
+        return;
+    }
+    if (director_busy) {
+        director_debug('runDirector skipped — already busy');
+        return;
+    }
+    // Only the manual path can race a live generation; the auto path runs after
+    // the group wrapper finishes, so is_group_generating is already false there.
+    if (manual && __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_is_group_generating__) {
+        toast('Wait for the current generation to finish.', 'warning');
+        director_debug('runDirector skipped — generation in progress');
+        return;
+    }
+
+    const total = Number.isFinite(turns) && turns > 0 ? Math.floor(turns) : resolveConsecutiveTurns();
+
+    director_busy = true;
+    try {
+        for (let turn = 0; turn < total; turn++) {
+            // Re-fetch each turn: the previous reply mutated the chat (and roster
+            // membership/unshallow state can shift across a triggered generation).
+            const turnCtx = getContext();
+            if (!turnCtx.groupId) break;
+            const group = getActiveGroup(turnCtx);
+            if (!group) {
+                director_debug('runDirector stopping — no active group object');
+                break;
+            }
+
+            const roster = buildRoster(turnCtx, group);
+            director_debug(`Turn ${turn + 1}/${total} roster:`, roster.map(m => m.name));
+            if (!roster.length) {
+                if (manual && turn === 0) toast('Group Director: no eligible (unmuted) characters to choose from.', 'warning');
+                director_debug('runDirector stopping — empty roster');
+                break;
+            }
+
+            generationAborted = false;
+            let chosen;
+            try {
+                chosen = await decideSpeaker(turnCtx, roster);
+            } catch (err) {
+                if (isSilentGenerationAbort(err)) chosen = null;
+                else throw err;
+            }
+
+            if (!chosen) {
+                director_debug('Director turn cancelled / no pick — stopping chain at turn', turn + 1);
+                if (generationAborted) toast('Director cancelled.', 'info');
+                break;
+            }
+
+            // We have a valid pick; clear any abort flag the dialog set when it
+            // closed its (now-irrelevant) background roll.
+            generationAborted = false;
+            // Picking a speaker before the roll landed aborts a live generation.
+            // Wait for ST to finish unwinding it before starting the next one —
+            // re-entering `Generate` mid-teardown is what made an early pick
+            // fail — then take a fresh context, since the roster's character
+            // indices were captured before all of that.
+            await waitForGenerationSettle();
+            await triggerChoice(getContext(), chosen);
+            await waitForGenerationSettle();
+        }
+    } catch (err) {
+        if (isSilentGenerationAbort(err)) {
+            director_debug('Director roll cancelled by user.');
+            toast('Director cancelled.', 'info');
+        } else {
+            console.error('Group Director error:', err);
+            toast(`Group Director failed: ${err.message}`, 'error');
+        }
+    } finally {
+        director_busy = false;
+    }
+}
+
+// ─── Event Handlers ───
+
+function onDirectorChatChanged() {
+    if (director_moduleSettings?.directorEnabled) {
+        applyManualMode().catch(err => console.error('Group Director: applyManualMode failed:', err));
+    } else if (readState().previousStrategy !== null) {
+        // Self-heal: a chat we left in Manual mode, now that the Director is off.
+        restoreStrategy().catch(err => console.error('Group Director: restoreStrategy failed:', err));
+    }
+    refreshWalkOnPanel();
+}
+
+/**
+ * Mark that a user turn happened. Fires on `MESSAGE_SENT` (a genuine user send —
+ * including a possessed send, which Possession rewrites to a character message,
+ * but the event still fires). A director-triggered member reply emits
+ * `MESSAGE_RECEIVED`, not `MESSAGE_SENT`, so it never sets this flag — which is
+ * how the wrapper-finished handler tells a user turn from a triggered reply.
+ *
+ * Deliberately does NOT roll or build a roster here: `MESSAGE_SENT` fires
+ * mid-pipeline while group members are still being unshallowed, so the roster
+ * would be empty. The roll happens later, on the settled wrapper.
+ */
+function onDirectorMessageSent() {
+    if (!director_moduleSettings?.directorEnabled) return;
+    if (!getContext().groupId) return;
+    userTurnPending = true;
+    director_debug('User turn registered');
+}
+
+/**
+ * Auto-trigger after a group turn settles. Fires on `GROUP_WRAPPER_FINISHED`
+ * (not `MESSAGE_SENT`): by then ST's send pipeline is done, members are fully
+ * loaded (so the roster isn't empty), and `is_group_generating` is false.
+ *
+ * Rolls only when the wrapper followed a user turn (`userTurnPending`, set on
+ * `MESSAGE_SENT`). A director-triggered member reply sets no such flag, so it
+ * never re-rolls — no loop. The flag is consumed on *every* wrapper finish so a
+ * `continue`-with-text turn (which fires `MESSAGE_SENT` then a non-normal
+ * wrapper) can't leak it into a later turn.
+ *
+ * @param {{ selected_group?: string, type?: string }} [data] - Wrapper payload.
+ */
+function onDirectorGroupWrapperFinished(data) {
+    const wasUserTurn = userTurnPending;
+    userTurnPending = false;
+
+    if (!director_moduleSettings?.directorEnabled) return;
+    if (!getContext().groupId) return;
+    if (director_busy) return;
+    if (!wasUserTurn) {
+        director_debug('Group wrapper finished — not a user turn; no roll');
+        return;
+    }
+    // Only react to a normal turn — skip swipe/continue/impersonate/quiet wrappers.
+    const type = data?.type;
+    if (type && type !== 'normal') {
+        director_debug('Group wrapper finished — ignoring type:', type);
+        return;
+    }
+    director_debug('Group wrapper finished on a user turn — scheduling director roll');
+    // Defer so ST's Generate stack fully unwinds (releasing is_send_press) before
+    // we roll and trigger force_chid.
+    setTimeout(() => {
+        runDirector({ manual: false }).catch(err => console.error('Group Director auto-run failed:', err));
+    }, 0);
+}
+
+// ─── Send-button Interceptor ───
+
+/**
+ * Capture-phase handler: when the user presses Send with an **empty** input box
+ * in a group, run the director instead of ST's default (which, in our Manual
+ * reply order, would pick a random member). A normal send with text is left
+ * alone — the `MESSAGE_SENT` → `userTurnPending` path rolls after it.
+ */
+function onSendButtonClickCapture(event) {
+    if (!event.target.closest?.('#send_but')) return;
+    if (!director_moduleSettings?.directorEnabled) return;
+    if (!getContext().groupId) return;
+    const textarea = document.getElementById('send_textarea');
+    if (textarea?.value?.trim()) return; // has input — let ST send it normally
+    if (__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_is_group_generating__) return; // a turn is already running
+
+    event.stopImmediatePropagation();
+    event.preventDefault();
+    if (textarea) {
+        textarea.value = '';
+        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    director_debug('Empty send intercepted — running director');
+    runDirector({ manual: true }).catch(err => console.error('Group Director empty-send failed:', err));
+}
+
+function attachDirectorSendInterceptor() {
+    document.addEventListener('click', onSendButtonClickCapture, { capture: true });
+    director_debug('Attached send interceptor');
+}
+
+// ─── Slash Commands ───
+
+function registerDirectorSlashCommands() {
+    if (typeof __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandParser_js_42c8b851_SlashCommandParser__?.addCommandObject !== 'function') return;
+    __WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommandParser_js_42c8b851_SlashCommandParser__.addCommandObject(__WEBPACK_EXTERNAL_MODULE__slash_commands_SlashCommand_js_1b0d5616_SlashCommand__.fromProps({
+        name: 'next',
+        aliases: ['director'],
+        callback: async () => {
+            // Manual step — a single speaker (the auto path chains several).
+            await runDirector({ manual: true, turns: 1 });
+            return '';
+        },
+        helpString: 'Group Director: roll for (and trigger) the next single speaker in the current group chat.',
+    }));
+}
+
+// ─── Walk-on List Panel ───
+
+/** Write the edited textarea through to chatMetadata, debouncing the flush. */
+function scheduleWalkOnSave(names) {
+    const state = readState();
+    state.walkOns = normalizeWalkOns(names);
+    writeState(state);
+    if (walkOnSaveTimer) clearTimeout(walkOnSaveTimer);
+    walkOnSaveTimer = setTimeout(() => {
+        walkOnSaveTimer = null;
+        getContext().saveMetadata();
+    }, 300);
+}
+
+function updateWalkOnCount() {
+    const el = document.getElementById('director_walkons_count');
+    if (el) el.textContent = String(loadWalkOns().length);
+}
+
+/** Repopulate the textarea from the current chat's list (never clobber typing). */
+function refreshWalkOnPanel() {
+    const textarea = document.getElementById('director_walkons_textarea');
+    if (textarea && document.activeElement !== textarea) {
+        textarea.value = loadWalkOns().join('\n');
+    }
+    updateWalkOnCount();
+}
+
+// ─── Settings Panel ───
+
+function bindDirectorSettings(saveSettings) {
+    const enabledCb = document.getElementById('director_enabled');
+    if (enabledCb) {
+        enabledCb.checked = !!director_moduleSettings.directorEnabled;
+        enabledCb.addEventListener('change', () => {
+            director_moduleSettings.directorEnabled = enabledCb.checked;
+            saveSettings();
+            if (enabledCb.checked) {
+                applyManualMode().catch(err => console.error('Group Director: applyManualMode failed:', err));
+            } else {
+                restoreStrategy().catch(err => console.error('Group Director: restoreStrategy failed:', err));
+            }
+        });
+    }
+
+    const confirmCb = document.getElementById('director_confirm');
+    if (confirmCb) {
+        confirmCb.checked = !!director_moduleSettings.directorConfirm;
+        confirmCb.addEventListener('change', () => {
+            director_moduleSettings.directorConfirm = confirmCb.checked;
+            saveSettings();
+        });
+    }
+
+    const consecutiveInput = document.getElementById('director_consecutive_turns');
+    if (consecutiveInput) {
+        consecutiveInput.value = director_moduleSettings.directorConsecutiveTurns || DEFAULT_DIRECTOR_CONSECUTIVE_TURNS;
+        consecutiveInput.addEventListener('input', () => {
+            const n = parseInt(consecutiveInput.value, 10);
+            if (Number.isFinite(n) && n > 0) {
+                director_moduleSettings.directorConsecutiveTurns = n;
+                saveSettings();
+            }
+        });
+    }
+
+    const alignedCb = document.getElementById('director_aligned_context');
+    if (alignedCb) {
+        alignedCb.checked = !!director_moduleSettings.directorAlignedContext;
+        alignedCb.addEventListener('change', () => {
+            director_moduleSettings.directorAlignedContext = alignedCb.checked;
+            saveSettings();
+        });
+    }
+
+    const responseLengthInput = document.getElementById('director_response_length');
+    if (responseLengthInput) {
+        responseLengthInput.value = director_moduleSettings.directorResponseLength || DEFAULT_DIRECTOR_RESPONSE_LENGTH;
+        responseLengthInput.addEventListener('input', () => {
+            const n = parseInt(responseLengthInput.value, 10);
+            if (Number.isFinite(n) && n > 0) {
+                director_moduleSettings.directorResponseLength = n;
+                saveSettings();
+            }
+        });
+    }
+
+    const maxContextInput = document.getElementById('director_max_context_override');
+    if (maxContextInput) {
+        maxContextInput.value = director_moduleSettings.directorMaxContextOverride || 0;
+        maxContextInput.addEventListener('input', () => {
+            const n = parseInt(maxContextInput.value, 10);
+            director_moduleSettings.directorMaxContextOverride = Number.isFinite(n) && n > 0 ? n : 0;
+            saveSettings();
+        });
+    }
+
+    const promptArea = document.getElementById('director_prompt_textarea');
+    if (promptArea) {
+        promptArea.value = director_moduleSettings.directorPrompt || DEFAULT_DIRECTOR_PROMPT;
+        promptArea.addEventListener('input', () => {
+            director_moduleSettings.directorPrompt = promptArea.value;
+            saveSettings();
+        });
+    }
+
+    document.getElementById('director_preview_btn')
+        ?.addEventListener('click', showDirectorPromptPreview);
+
+    // Walk-on detection
+    const walkOnsCb = document.getElementById('director_walkons_enabled');
+    if (walkOnsCb) {
+        walkOnsCb.checked = !!director_moduleSettings.directorWalkOnsEnabled;
+        walkOnsCb.addEventListener('change', () => {
+            director_moduleSettings.directorWalkOnsEnabled = walkOnsCb.checked;
+            saveSettings();
+        });
+    }
+
+    const splitAutoCb = document.getElementById('director_walkon_split_auto');
+    if (splitAutoCb) {
+        splitAutoCb.checked = !!director_moduleSettings.directorWalkOnSplitAuto;
+        splitAutoCb.addEventListener('change', () => {
+            director_moduleSettings.directorWalkOnSplitAuto = splitAutoCb.checked;
+            saveSettings();
+        });
+    }
+
+    const includeWalkOnsCb = document.getElementById('director_include_walkons');
+    if (includeWalkOnsCb) {
+        includeWalkOnsCb.checked = !!director_moduleSettings.directorIncludeWalkOns;
+        includeWalkOnsCb.addEventListener('change', () => {
+            director_moduleSettings.directorIncludeWalkOns = includeWalkOnsCb.checked;
+            saveSettings();
+        });
+    }
+
+    const walkOnsArea = document.getElementById('director_walkons_textarea');
+    if (walkOnsArea) {
+        walkOnsArea.addEventListener('input', () => {
+            scheduleWalkOnSave(walkOnsArea.value.split('\n'));
+            updateWalkOnCount();
+        });
+    }
+
+    document.getElementById('director_walkons_scan')
+        ?.addEventListener('click', scanWholeChatForWalkOns);
+
+    const debugCb = document.getElementById('director_debug_mode');
+    if (debugCb) {
+        debugCb.checked = !!director_moduleSettings.directorDebugMode;
+        debugCb.addEventListener('change', () => {
+            director_moduleSettings.directorDebugMode = debugCb.checked;
+            saveSettings();
+        });
+    }
+
+    refreshWalkOnPanel();
+}
+
+// ─── Init ───
+
+/**
+ * @param {object} options
+ * @param {object} options.settings - Shared mutable settings reference.
+ */
+function initDirector({ settings }) {
+    director_moduleSettings = settings;
+    director_debug = createDebugLogger('DIRECTOR', () => director_moduleSettings.directorDebugMode);
+    director_debug('Module initialized');
+}
+
 ;// ./src/index.js
 // Saint's Silly Extensions — Possession, Phrasing, and Assisted Character Creation
 // Allows the user to "possess" a character, enrich messages with AI narration, and create characters with LLM assistance.
+
 
 
 
@@ -13093,6 +14703,17 @@ const defaultSettings = {
     retryShowToasts: true,
     retryIndicatorStyle: 'border',
     retryDebugMode: false,
+    directorEnabled: false,
+    directorConfirm: true,
+    directorConsecutiveTurns: 2,
+    directorAlignedContext: true,
+    directorWalkOnsEnabled: true,
+    directorWalkOnSplitAuto: true,
+    directorIncludeWalkOns: true,
+    directorPrompt: DEFAULT_DIRECTOR_PROMPT,
+    directorResponseLength: DEFAULT_DIRECTOR_RESPONSE_LENGTH,
+    directorMaxContextOverride: 0,
+    directorDebugMode: false,
     silentGenerationDebugMode: false,
     silentGenerationStreaming: true,
     // toolPresets / activeToolPreset are intentionally absent here:
@@ -13201,6 +14822,14 @@ const TOOL_PRESET_CONFIG = [
             { key: 'imagePromptPrefill', label: 'Prefill', textareaId: 'image_prompt_prefill_textarea', defaultText: DEFAULT_IMAGE_PROMPT_PREFILL },
         ],
     },
+    {
+        toolKey: 'director',
+        label: 'Group Director',
+        containerId: 'director_presets',
+        fields: [
+            { key: 'directorPrompt', label: 'Instructions', textareaId: 'director_prompt_textarea', defaultText: DEFAULT_DIRECTOR_PROMPT },
+        ],
+    },
 ];
 
 // ─── State ───
@@ -13235,6 +14864,12 @@ function loadSettings() {
         SSEDebug('Seeded built-in Image Prompting presets');
         migrated = true;
     }
+    // Upgrade the stale name-based director prompt to the current number-based
+    // default (exact match only — customized templates are preserved).
+    if (migrateDirectorPrompt(src_settings)) {
+        SSEDebug('Upgraded legacy name-based Group Director prompt to the numbered-roster default');
+        migrated = true;
+    }
     if (migrated) saveSettings();
     SSEDebug('Settings loaded:', JSON.stringify(src_settings));
 }
@@ -13257,6 +14892,7 @@ function injectSettingsPanel() {
     bindCompactionSettings(saveSettings);
     bindImagePromptSettings(saveSettings);
     bindRetryContinueSettings(saveSettings);
+    bindDirectorSettings(saveSettings);
     bindSilentGenerationSettings(saveSettings);
 
     // Preset widgets go last: the module bindings above must attach their
@@ -13308,6 +14944,8 @@ function onChatChanged() {
     rescanImagePromptButtons();
     onCompactionChatChanged();
     onRetryContinueChatChanged();
+    onDirectorChatChanged();
+    rescanSplitButtons();
     SSEDebug('Chat changed, state reloaded');
 }
 
@@ -13321,8 +14959,9 @@ function onCharacterPageLoadedHandler() {
     assisted_character_creation_onCharacterPageLoaded();
 }
 
-function onGroupWrapperFinishedHandler() {
+function onGroupWrapperFinishedHandler(data) {
     onGroupWrapperFinished();
+    onDirectorGroupWrapperFinished(data);
 }
 
 // ─── Initialization ───
@@ -13353,6 +14992,7 @@ jQuery(async () => {
     initCompaction({ settings: src_settings, saveSettings, resyncChatState: onChatChanged });
     initImagePrompting({ settings: src_settings, saveSettings });
     initRetryContinue({ settings: src_settings });
+    initDirector({ settings: src_settings });
 
     loadPossessionState();
     injectSettingsPanel();
@@ -13367,8 +15007,15 @@ jQuery(async () => {
     // buttons (each anchors the modal's context at that message).
     startImagePromptObserver();
 
+    // Watch the chat to keep the Group Director's per-message walk-on split
+    // button present on messages that contain `[Name]:` lines.
+    startDirectorObserver();
+
     // Possession UI
     attachContinueInterceptor();
+
+    // Group Director: empty Send (no input) → director picks the next speaker.
+    attachDirectorSendInterceptor();
 
     // Phrasing UI
     createInputAreaButton();
@@ -13406,6 +15053,8 @@ jQuery(async () => {
     eventSource.on(eventTypes.MESSAGE_SENT, async (idx) => {
         onMessageSent(idx);
         await onNarrativeGuidanceMessageSent(idx);
+        onDirectorMessageSent();
+        onDirectorScanForWalkOns(idx);
     });
     eventSource.on(eventTypes.MESSAGE_RECEIVED, async (idx) => {
         onNarrativeGuidanceMessageReceived(idx);
@@ -13414,6 +15063,8 @@ jQuery(async () => {
         // chain. On a banned-phrase hit it drives a rewrite, or, while a Retry
         // checkpoint is active, a retry-continue from that checkpoint.
         onPhraseBanMessageReceived(idx);
+        onDirectorScanForWalkOns(idx);
+        onDirectorMaybeSplit(idx);
     });
     if (eventTypes.USER_MESSAGE_RENDERED) {
         eventSource.on(eventTypes.USER_MESSAGE_RENDERED, onRetryContinueUserMessageRendered);
@@ -13422,7 +15073,18 @@ jQuery(async () => {
         eventSource.on(eventTypes.CHARACTER_MESSAGE_RENDERED, onRetryContinueCharacterMessageRendered);
     }
     if (eventTypes.MESSAGE_EDITED) {
-        eventSource.on(eventTypes.MESSAGE_EDITED, onRetryContinueMessageEdited);
+        eventSource.on(eventTypes.MESSAGE_EDITED, (id) => {
+            onRetryContinueMessageEdited(id);
+            onDirectorScanForWalkOns(parseInt(id, 10));
+            // An edit changes content in place (no new .mes node), so the
+            // observer won't re-evaluate it — refresh the split buttons here so
+            // one appears/disappears as `[Name]:` lines are added/removed.
+            rescanSplitButtons();
+        });
+    }
+    // Swiping also updates a message's content in place — refresh split buttons.
+    if (eventTypes.MESSAGE_SWIPED) {
+        eventSource.on(eventTypes.MESSAGE_SWIPED, () => rescanSplitButtons());
     }
     // Text Completion only: append Phrase Ban's learned list to the request's
     // sampler-level banned_strings whenever Phrase Ban is enabled.
@@ -13446,6 +15108,7 @@ jQuery(async () => {
     registerCompactionSlashCommand();
     registerImagePromptSlashCommand();
     registerRetryContinueSlashCommands();
+    registerDirectorSlashCommands();
 
     // Initial state
     syncAllPossessionUI();

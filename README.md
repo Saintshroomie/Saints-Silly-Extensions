@@ -18,6 +18,7 @@ See [CHANGELOG.md](CHANGELOG.md) for release notes and version history.
   - [Compaction](#compaction)
   - [Image Prompting](#image-prompting)
   - [Retry Continue](#retry-continue)
+  - [Group Director](#group-director)
 - [Installation](#installation)
   - [Manual Installation](#manual-installation)
 - [Configuration](#configuration)
@@ -31,6 +32,7 @@ See [CHANGELOG.md](CHANGELOG.md) for release notes and version history.
   - [Compaction Settings](#compaction-settings)
   - [Image Prompting Settings](#image-prompting-settings)
   - [Retry Continue Settings](#retry-continue-settings)
+  - [Group Director Settings](#group-director-settings)
   - [Silent Generation](#silent-generation)
   - [Diagnostics](#diagnostics)
   - [Tool Presets & Prompt Preview](#tool-presets--prompt-preview)
@@ -135,7 +137,7 @@ A modal-based character creator that adds an **Assist** button to SillyTavern's 
 - **Checkpoint** — Saves the current textarea state as the Retry restore point. Use it to lock in edits you're happy with before continuing.
 - **Retry** — Restores to the last snapshot (auto-taken before Generate / Continue, or set manually with Checkpoint) and re-runs the last action. Useful when a roll went sideways.
 - **Editable output** — The description appears in a large textarea so you can tweak or rewrite it freely between actions.
-- **Optional context** — Tick **Use Chat Context** or pick lore books to prepend the current chat / character context and selected lore entries to the generation.
+- **Optional context** — Tick **Use Chat Context** to prepend the current chat / character context to the generation. This now also **auto-includes the chat's relevant World Info** — the same lore entries a normal turn would activate — so you usually don't need to pick books by hand. The lore-book dropdown still works as an **additive override** for extra books that wouldn't keyword-match the current scene.
 - **Stop mid-generation** — Click the active button again while generating to stop and discard the result.
 - **Apply on Done** — Clicking Done copies the textarea contents into SillyTavern's description field. Cancel discards.
 - **Modal contents persist** — The brief, generated description, Use Chat Context toggle, selected lore books, and token count are all remembered the next time you open the modal — even after clicking Done or Cancel. Use the per-field **Clear** buttons to wipe the brief or description when you want to start fresh.
@@ -187,7 +189,7 @@ Enable either tier on its own or both together. Each tier is fully self-containe
 - **Editable everything** — Per tier: the generation instructions (the user prompt, with `{{context}}` / `{{themes}}` placeholders, plus `{{longGuidance}}` for short-term), the prefill the model continues from, the injection template (with `{{guidance}}` placeholder), and the live guidance paragraph itself are all directly editable. Edits to the active guidance apply on the next AI turn.
 - **Themes / arcs input** — Each tier has a per-chat textarea where you can offer themes, ideas, or general arcs for the model to weave into the next round of guidance.
 - **Injection controls** — Per tier: Depth and Role inputs (mirroring SillyTavern's Author's Note) control where in the prompt the guidance is inserted and which role it speaks as.
-- **Lore book picker** — Per tier: pick which lore books to feed into the guidance generation's context preamble. The selection is **per-chat** — it resets to empty on a new chat and reloads when you switch chats. If a selected lore book is later deleted or renamed, it's silently dropped from the selection (with a one-time notice) the next time that chat's picker is opened or guidance is generated.
+- **Lore book picker** — The chat's relevant World Info is **auto-included** in each tier's guidance context (keyword-matched against the recent chat), so the picker is now an **additive override** — use it only to fold in *extra* books that wouldn't otherwise activate. The selection is **per-chat** — it resets to empty on a new chat and reloads when you switch chats. If a selected lore book is later deleted or renamed, it's silently dropped from the selection (with a one-time notice) the next time that chat's picker is opened or guidance is generated.
 - **Configurable token limits** — Per tier: set the response token limit for the generation, and optionally cap how much chat history feeds into the context preamble.
 
 **How to use**
@@ -286,6 +288,29 @@ Automates the "edit the message to keep the good part, delete the bad part, hit 
 4. The extension saves your text as a checkpoint, creates a new swipe, and continues from it.
 5. Not satisfied? Click **Retry** again — each attempt becomes a new swipe.
 6. Use the native **swipe arrows** to browse all retry results and pick the best one. `/retryclear` (or the **Clear Retry Checkpoint** button) drops the checkpoint.
+
+### Group Director
+
+Lets an LLM decide **who speaks next** in a group chat instead of SillyTavern's fixed reply-order strategies (Manual / Natural / List / Pooled).
+
+- **Intelligent turn order** — While enabled, the active group is switched to **Manual** reply order so ST stops auto-picking a speaker (your previous strategy is saved and restored when you disable the Director). On each of your turns, a small "director" generation reads the scene and chooses who should reply next; that member is then triggered through ST's own group generation, so the reply is a normal, full-card message.
+- **Several speakers per turn** — after each of your turns the director chains a configurable number of speakers back-to-back (**default 2**), re-deciding after each reply lands, so a single message of yours can play out a short multi-character exchange. Cancelling any turn's dialog stops the chain. Set **Speakers Per Turn** to 1 for the classic single pick. (`/next` always steps one speaker at a time.)
+- **Confirm / override (pick instantly)** — By default the dialog pops up **immediately**, before the director has decided, with a button for every cast member — so you can just click who should reply next without waiting. The director's roll runs in the background and highlights its suggestion when it's ready (the old "director is choosing…" toast now lives in the dialog). Turn the dialog off in settings to have the rolled pick fire immediately with a cancellable progress toast instead.
+- **Reliable by design** — The director is given a numbered roster and asked to reply with just the number. If the reply can't be matched, it falls back deterministically to the next cast member (never a walk-on) after the last character to speak, so a turn is never skipped or randomly assigned.
+- **Respects mutes; always casts a speaker** — **Muted** group members are never selectable. The director always voices its pick — including the character you're currently **possessing** (it no longer yields the turn).
+- **`/next`** — Roll again for a back-to-back speaker without typing (useful for letting two characters exchange lines).
+- **Empty Send advances the scene** — press Send with the input box empty and the director picks the next speaker (same as `/next`), instead of SillyTavern's default random pick.
+- **Walk-on character detection** — when the story introduces an ad-hoc character inline as a speaker line, its name is collected into a per-chat, editable list (real group members and your persona are ignored), with a toast on each new detection. Both an explicit `[Name]:` (anywhere) and a bare `Name:` at the **start of a line** are recognised — the latter matters because the model, which only ever sees `Name:` in its context (never bracketed), tends to tack extra `Walk-on: "..."` lines onto the end of another character's reply. A **Scan Chat for Walk-ons** button backfills names from earlier messages.
+- **Walk-on line splitting** — a `[Name]: "..."` (or bare line-start `Name: "..."`) line embedded in a message can be pulled out into its own message, posted under that name (using the matching character's avatar if it's a real member, otherwise a nameplate-only walk-on), as if SillyTavern had posted it. This is what cleanly separates those slipped-in walk-on replies. Happens automatically for AI replies (toggle) or on demand via a per-message <span title="scissors icon">✂</span> button on any message containing speaker lines. (Heads-up: with auto-split on, script-style cards that write real members' dialogue as `Name: "..."` lines will be split too.)
+- **Voicing walk-ons** — when enabled, detected walk-on characters join the director's speaker roster and the confirm/override dialog alongside real members (walk-ons shown with a dashed border). If the director picks (or you override to) a walk-on, its reply is generated through **SillyTavern's native swipe-regeneration**: a placeholder is posted under the walk-on's name and ST's own pipeline fills it in, so formatting and stop strings are handled natively (SillyTavern shows its usual generation indicator and Stop button while it runs).
+- Editable director instructions (`{{context}}` / `{{roster}}` macros), preset support, and a prompt preview.
+
+**How to use**
+
+1. Open a **group chat** and enable **Group Director** in the extension settings.
+2. Send a message as usual. The director picks who replies next.
+3. In the confirm dialog, click **the suggested name** (or any other member) to let them speak — or press a different member to override the suggestion.
+4. Want another character to chime in before you reply? Run `/next` (or `/director`).
 
 ## Installation
 
@@ -452,6 +477,23 @@ The drawer holds two self-contained tiers — **Long-term** (the overarching arc
 | Clear Retry Checkpoint | Button that drops the active checkpoint (same as `/retryclear`) |
 | Retry Continue Debug Mode | Log detailed Retry Continue events (checkpoint set/clear, snapshot lock transitions, swipe creation) to the browser console (in the Diagnostics drawer) |
 
+### Group Director Settings
+
+| Setting | Description |
+|---------|-------------|
+| Enable Group Director | Toggle the Director on/off. While on, the active group is switched to Manual reply order; turning it off restores your previous strategy (default off) |
+| Ask Before Generating | Pop up the confirm/override dialog immediately (before the director decides) with a button per cast member, so you can pick instantly or wait for the highlighted suggestion. Off = trigger the rolled pick immediately with a cancellable progress toast (default on) |
+| Speakers Per Turn | How many speakers the director chains back-to-back after each of your turns; each gets its own dialog and cancelling one stops the chain. 1 = classic single pick (default 2) |
+| Reuse chat context (KV-cache friendly) | Route the director's silent generations through ST's normal pipeline (a quiet generation anchored to the last speaker) so their prompt prefix matches the chat and the KV cache stays warm — only the instruction tail is reprocessed. Off = a leaner standalone prompt (uses `{{context}}` / Max Context Override) that reprocesses the whole prompt each time (default on) |
+| Response Token Limit | Maximum tokens for the director's choice — the reply is only a name, so this can stay small (default 32) |
+| Max Context Override | Cap the tokens of chat context fed to the director; 0 = use the model's full context size (default 0) |
+| Director Instructions Template | The user prompt sent when choosing the next speaker. Macros: `{{context}}` (chat/character/lore preamble), `{{roster}}` (numbered list of eligible speakers) |
+| Detect walk-on characters | Scan new messages and edits for speaker lines — `[Name]:` anywhere or a bare `Name:` at the start of a line — and collect ad-hoc character names into the per-chat list below (default on) |
+| Auto-split walk-on lines | When an AI reply contains speaker lines (`[Name]:` or a bare line-start `Name:`), automatically split each into its own posted message. User/edited messages use the per-message scissors button instead (default on) |
+| Let the director voice walk-ons | Include detected walk-ons in the speaker roster/dialog; if chosen, their reply is generated via SillyTavern's native swipe-regeneration (a placeholder is posted under the name, then regenerated) and posted under that name (default on) |
+| Walk-on Characters list | Per-chat, editable list of detected walk-on names (one per line). **Scan Chat for Walk-ons** backfills names from existing messages |
+| Group Director Debug Mode | Log detailed Director events (roster, roll, parsed pick, Manual-mode transitions, learned walk-ons) to the browser console (in the Diagnostics drawer) |
+
 ### Silent Generation
 
 | Setting | Description |
@@ -510,6 +552,7 @@ Generation templates support tool-specific placeholders, substituted in place. I
 | `/imageprompt` | Open the Image Prompting modal to generate a diffusion-model prompt depicting the current moment of the chat |
 | `/retry` | Retry the continuation from the saved checkpoint, creating a new swipe. If no checkpoint exists, sets one from the current message and continues |
 | `/retryclear` | Clear the active retry checkpoint |
+| `/next` (alias `/director`) | Group Director: roll for (and trigger) the next single speaker in the current group chat |
 
 ## License
 

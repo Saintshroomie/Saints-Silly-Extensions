@@ -12,6 +12,92 @@ _Changes that have landed on the development branch but are not yet part of a
 released version. When cutting a release, move these notes into a new
 `## [X.Y.Z]` section and run `npm version`._
 
+### Added
+- **Automatic World Info in AI-assisted context** — whenever **Use Chat Context**
+  is on (Assisted Character Creation, World Info Assist, Narrative Guidance,
+  Compaction, Image Prompting, and the Group Director's leaner non-cache mode),
+  the extension now auto-activates the chat's bound World Info — keyword-matching
+  the recent chat and character/persona exactly as a real turn would — and folds
+  the relevant entries into the generation context. You no longer have to
+  hand-pick lore books for the AI tools to "know" the current scene's lore; the
+  lore-book dropdown becomes an **additive override** for extra books that
+  wouldn't otherwise match.
+  Activation is a side-effect-free dry run (it never disturbs the live chat's
+  World Info state) and is counted against each tool's context budget. When a
+  tool anchors its context at an earlier message (Image Prompting's per-message
+  button), World Info is matched only against the chat up to that anchor, so an
+  anchored prompt never picks up lore the story hasn't reached yet.
+
+- **Group Director** — an LLM-chosen turn order for group chats. While enabled,
+  the active group is switched to **Manual** reply order (your previous strategy
+  is restored when you disable it) so SillyTavern stops auto-picking; on each of
+  your turns a small "director" generation reads the scene and chooses who
+  should speak next, and that member is triggered via ST's native `force_chid`
+  group generation. A confirm/override dialog (toggleable) shows the rolled pick
+  with a button per cast member so you can accept or redirect it; the `/next`
+  (alias `/director`) slash command rolls again for back-to-back speakers. The
+  roster is numbered and the director is asked to reply with just the number;
+  an unparseable reply falls back deterministically to the next cast member
+  (never a walk-on) after the last speaker, so a turn is never skipped or
+  randomly assigned. **Muted members** (`disabled_members`) are never
+  selectable; the director always voices its pick — including the character you
+  are currently **possessing** (it no longer yields the turn). Editable director
+  instructions (with `{{context}}` / `{{roster}}` macros), preset support, a
+  prompt preview, and per-tool response-length / max-context controls. While the
+  director is choosing, a click-to-cancel progress toast is shown (the silent
+  roll has no native Stop button). Pressing **Send** with an empty input box
+  advances the scene — the director picks the next speaker (same as `/next`).
+  Also detects ad-hoc **walk-on characters** the story introduces inline as
+  `[Name]:` speaker lines (in your sends, possessed posts, AI replies, or edits),
+  including several in one message, with a toast on each new detection. Real
+  members, your persona, and common meta-tags (`[OOC]:`, `[System]:`, …) are
+  ignored, and a per-chat editable list is kept (with a "Scan Chat for Walk-ons"
+  backfill button). Walk-on lines can also be **split into their own messages**,
+  posted under each name (with the matching character's avatar when it's a real
+  member) as if natively posted: automatically for AI replies (toggle), or on
+  demand via a per-message scissors button. The **director can voice walk-ons**:
+  when enabled they join the speaker roster and the confirm/override dialog
+  alongside real members, and choosing one posts a reply in that walk-on's
+  voice under their name. The reply is generated via **SillyTavern's native
+  swipe-regeneration** — a placeholder is posted under the name and ST's own
+  pipeline fills it in, so formatting and stop strings are handled natively (with
+  ST's usual generation indicator and Stop button). A **"Reuse chat
+  context (KV-cache friendly)"** toggle (default on) routes the director's silent
+  generations through ST's normal pipeline (a quiet generation anchored to the
+  last speaker) so their prompt prefix matches the chat and the KV cache stays
+  warm — only the instruction tail is reprocessed — instead of the leaner
+  standalone prompt that busts the cache.
+- **Group Director — multiple speakers per turn.** After each of your turns the
+  director chains several speakers back-to-back (new **Speakers Per Turn**
+  setting, default 2), re-deciding after each reply settles, so one message can
+  play out a short multi-character exchange. Cancelling any turn's dialog stops
+  the chain; `/next` still steps a single speaker.
+- **Group Director — pick instantly.** With confirm/override on, the dialog now
+  opens *immediately*, before the director decides, so you can just click who
+  replies next. The roll runs in the background and highlights its suggestion
+  when ready; the "director is choosing…" status moved from the toast into the
+  dialog.
+
+### Changed
+- **Group Director — walk-on detection now catches bare `Name:` lines.** In
+  addition to explicit `[Name]:` markers, the director recognises a bare `Name:`
+  at the start of a line as a speaker line (line-anchored and name-shaped to
+  limit false positives). This catches the walk-on replies the model slips onto
+  the end of another character's message — it only ever sees `Name:` in its
+  context (never bracketed) and walk-on names aren't stop strings — for both
+  detection and line-splitting. (With auto-split on, script-style cards that
+  write real members' dialogue as `Name: "..."` lines will be split too.)
+
+### Fixed
+- **Group Director — picking a speaker before the director finished choosing.**
+  Clicking a cast member in the confirm/override dialog while the roll was still
+  running failed with a "Failed to trigger …" error and no reply. Choosing early
+  cancels the in-flight roll, and the speaker was then triggered while
+  SillyTavern was still tearing that generation down, using character indices
+  captured before it. The director now waits for the cancelled roll to finish
+  unwinding and re-resolves the chosen character (by avatar, which is stable)
+  before triggering, so an early pick behaves exactly like a confirmed one.
+
 ## [1.3.0] - 2026-08-08
 
 ### Added

@@ -153,6 +153,22 @@ import {
     onRetryContinueGenerationEnded,
 } from './retry-continue.js';
 import {
+    initDirector,
+    bindDirectorSettings,
+    registerDirectorSlashCommands,
+    onDirectorChatChanged,
+    onDirectorMessageSent,
+    onDirectorGroupWrapperFinished,
+    onDirectorScanForWalkOns,
+    onDirectorMaybeSplit,
+    attachDirectorSendInterceptor,
+    startDirectorObserver,
+    rescanSplitButtons,
+    DEFAULT_DIRECTOR_PROMPT,
+    DEFAULT_DIRECTOR_RESPONSE_LENGTH,
+    migrateDirectorPrompt,
+} from './director.js';
+import {
     setupToolPresets,
     migrateLegacyToolPresets,
 } from './prompt-templates.js';
@@ -253,6 +269,17 @@ const defaultSettings = {
     retryShowToasts: true,
     retryIndicatorStyle: 'border',
     retryDebugMode: false,
+    directorEnabled: false,
+    directorConfirm: true,
+    directorConsecutiveTurns: 2,
+    directorAlignedContext: true,
+    directorWalkOnsEnabled: true,
+    directorWalkOnSplitAuto: true,
+    directorIncludeWalkOns: true,
+    directorPrompt: DEFAULT_DIRECTOR_PROMPT,
+    directorResponseLength: DEFAULT_DIRECTOR_RESPONSE_LENGTH,
+    directorMaxContextOverride: 0,
+    directorDebugMode: false,
     silentGenerationDebugMode: false,
     silentGenerationStreaming: true,
     // toolPresets / activeToolPreset are intentionally absent here:
@@ -361,6 +388,14 @@ const TOOL_PRESET_CONFIG = [
             { key: 'imagePromptPrefill', label: 'Prefill', textareaId: 'image_prompt_prefill_textarea', defaultText: DEFAULT_IMAGE_PROMPT_PREFILL },
         ],
     },
+    {
+        toolKey: 'director',
+        label: 'Group Director',
+        containerId: 'director_presets',
+        fields: [
+            { key: 'directorPrompt', label: 'Instructions', textareaId: 'director_prompt_textarea', defaultText: DEFAULT_DIRECTOR_PROMPT },
+        ],
+    },
 ];
 
 // ─── State ───
@@ -395,6 +430,12 @@ function loadSettings() {
         SSEDebug('Seeded built-in Image Prompting presets');
         migrated = true;
     }
+    // Upgrade the stale name-based director prompt to the current number-based
+    // default (exact match only — customized templates are preserved).
+    if (migrateDirectorPrompt(settings)) {
+        SSEDebug('Upgraded legacy name-based Group Director prompt to the numbered-roster default');
+        migrated = true;
+    }
     if (migrated) saveSettings();
     SSEDebug('Settings loaded:', JSON.stringify(settings));
 }
@@ -417,6 +458,7 @@ function injectSettingsPanel() {
     bindCompactionSettings(saveSettings);
     bindImagePromptSettings(saveSettings);
     bindRetryContinueSettings(saveSettings);
+    bindDirectorSettings(saveSettings);
     bindSilentGenerationSettings(saveSettings);
 
     // Preset widgets go last: the module bindings above must attach their
@@ -468,6 +510,8 @@ function onChatChanged() {
     rescanImagePromptButtons();
     onCompactionChatChanged();
     onRetryContinueChatChanged();
+    onDirectorChatChanged();
+    rescanSplitButtons();
     SSEDebug('Chat changed, state reloaded');
 }
 
@@ -481,8 +525,9 @@ function onCharacterPageLoadedHandler() {
     accOnCharacterPageLoaded();
 }
 
-function onGroupWrapperFinishedHandler() {
+function onGroupWrapperFinishedHandler(data) {
     onGroupWrapperFinished();
+    onDirectorGroupWrapperFinished(data);
 }
 
 // ─── Initialization ───
@@ -513,6 +558,7 @@ jQuery(async () => {
     initCompaction({ settings, saveSettings, resyncChatState: onChatChanged });
     initImagePrompting({ settings, saveSettings });
     initRetryContinue({ settings });
+    initDirector({ settings });
 
     loadPossessionState();
     injectSettingsPanel();
@@ -527,8 +573,15 @@ jQuery(async () => {
     // buttons (each anchors the modal's context at that message).
     startImagePromptObserver();
 
+    // Watch the chat to keep the Group Director's per-message walk-on split
+    // button present on messages that contain `[Name]:` lines.
+    startDirectorObserver();
+
     // Possession UI
     attachContinueInterceptor();
+
+    // Group Director: empty Send (no input) → director picks the next speaker.
+    attachDirectorSendInterceptor();
 
     // Phrasing UI
     createInputAreaButton();
@@ -566,6 +619,8 @@ jQuery(async () => {
     eventSource.on(eventTypes.MESSAGE_SENT, async (idx) => {
         onMessageSent(idx);
         await onNarrativeGuidanceMessageSent(idx);
+        onDirectorMessageSent();
+        onDirectorScanForWalkOns(idx);
     });
     eventSource.on(eventTypes.MESSAGE_RECEIVED, async (idx) => {
         onNarrativeGuidanceMessageReceived(idx);
@@ -574,6 +629,8 @@ jQuery(async () => {
         // chain. On a banned-phrase hit it drives a rewrite, or, while a Retry
         // checkpoint is active, a retry-continue from that checkpoint.
         onPhraseBanMessageReceived(idx);
+        onDirectorScanForWalkOns(idx);
+        onDirectorMaybeSplit(idx);
     });
     if (eventTypes.USER_MESSAGE_RENDERED) {
         eventSource.on(eventTypes.USER_MESSAGE_RENDERED, onRetryContinueUserMessageRendered);
@@ -582,7 +639,18 @@ jQuery(async () => {
         eventSource.on(eventTypes.CHARACTER_MESSAGE_RENDERED, onRetryContinueCharacterMessageRendered);
     }
     if (eventTypes.MESSAGE_EDITED) {
-        eventSource.on(eventTypes.MESSAGE_EDITED, onRetryContinueMessageEdited);
+        eventSource.on(eventTypes.MESSAGE_EDITED, (id) => {
+            onRetryContinueMessageEdited(id);
+            onDirectorScanForWalkOns(parseInt(id, 10));
+            // An edit changes content in place (no new .mes node), so the
+            // observer won't re-evaluate it — refresh the split buttons here so
+            // one appears/disappears as `[Name]:` lines are added/removed.
+            rescanSplitButtons();
+        });
+    }
+    // Swiping also updates a message's content in place — refresh split buttons.
+    if (eventTypes.MESSAGE_SWIPED) {
+        eventSource.on(eventTypes.MESSAGE_SWIPED, () => rescanSplitButtons());
     }
     // Text Completion only: append Phrase Ban's learned list to the request's
     // sampler-level banned_strings whenever Phrase Ban is enabled.
@@ -606,6 +674,7 @@ jQuery(async () => {
     registerCompactionSlashCommand();
     registerImagePromptSlashCommand();
     registerRetryContinueSlashCommands();
+    registerDirectorSlashCommands();
 
     // Initial state
     syncAllPossessionUI();
