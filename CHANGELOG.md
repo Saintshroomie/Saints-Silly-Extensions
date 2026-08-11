@@ -116,6 +116,21 @@ released version. When cutting a release, move these notes into a new
   with no swipe history; on an already-swiped message the ambiguous old value is
   ignored rather than guessed at.
 
+- **Phrasing — the seed was reinjected when continuing with text in the input
+  box.** Clicking Continue with something typed posts that text and continues
+  *it*, so the rephrased message above it was no longer the target — but its
+  seed was reinjected anyway, guiding the new generation with an instruction
+  meant for a different message. Reinjection on the Continue buttons now only
+  happens when the input box is empty. (Retry Continue is unaffected: it drives
+  the slash command, which never posts the box.)
+
+- **Phrase Ban — a ban rewrite overwrote the Phrasing seed.** A rewrite stored
+  its own "avoid these phrases" instruction as the message's seed, so continuing
+  a ban-rewritten message reinjected the ban prompt instead of your rephrase
+  guidance. A ban rewrite now inherits the seed of the swipe it rewrote, so an
+  earlier rephrase survives the rewrite and the ban instruction never leaks into
+  a later Continue.
+
 ## [1.3.0] - 2026-08-08
 
 ### Added

@@ -289,11 +289,16 @@ async function doPrimaryFlow(seedText, options = {}) {
 // ─── Swipe Mode ───
 
 /**
- * Persist the assembled rephrase prompt against the message's active swipe.
- * Re-resolves the message from the live chat: the swipe generation may have
- * replaced the array entry we started with.
+ * Persist a rephrase prompt against the message's active swipe. Re-resolves the
+ * message from the live chat: the swipe generation may have replaced the array
+ * entry we started with. A null/empty seed is a no-op (nothing to persist).
  */
-async function stampSeedOnActiveSwipe(messageIndex, assembled) {
+async function stampSeedOnActiveSwipe(messageIndex, seed) {
+    if (!seed) {
+        debug('stampSeedOnActiveSwipe — no seed to stamp, skipping');
+        return;
+    }
+
     const context = getContext();
     const message = context.chat?.[messageIndex];
     if (!message) {
@@ -301,7 +306,7 @@ async function stampSeedOnActiveSwipe(messageIndex, assembled) {
         return;
     }
 
-    setPhrasingSeed(message, message.swipe_id, assembled);
+    setPhrasingSeed(message, message.swipe_id, seed);
     await context.saveChat();
 }
 
@@ -329,6 +334,13 @@ async function doSwipeMode(messageIndex, options = {}) {
 
     const seedText = formatSeedWithSpeaker(rawSeedText, message.is_user, message.name);
     debug('doSwipeMode — seed length:', seedText.length, '| speaker:', message.name);
+
+    // Provenance of the text we're rephrasing, captured before the jump to the
+    // last swipe below reassigns swipe_id (rawSeedText was read from the swipe
+    // active on entry). A caller-supplied template inherits this swipe's seed
+    // rather than storing its own — see the stamp after generation.
+    const sourceSwipeId = message.swipe_id ?? 0;
+    const inheritedSeed = getPhrasingSeed(message, sourceSwipeId);
 
     const wasAlreadyActive = phrasingActive;
     phrasingActive = true;
@@ -384,10 +396,17 @@ async function doSwipeMode(messageIndex, options = {}) {
         await context.swipe.right(null, { message });
         const result = await ended;
 
-        // Stamp the seed on the swipe the rephrase just produced. This has to
-        // happen after generation — the swipe doesn't exist until then — and
-        // ST's own post-generation save may already have run, so persist it.
-        await stampSeedOnActiveSwipe(messageIndex, assembled);
+        // Stamp the seed on the swipe this run just produced. This has to happen
+        // after generation — the swipe doesn't exist until then — and ST's own
+        // post-generation save may already have run, so persist it.
+        //
+        // A caller-supplied template (Phrase Ban's ban-rewrite) is not the
+        // user's rephrase guidance and must never become the seed a later
+        // Continue reinjects. The produced swipe inherits the source swipe's
+        // seed instead, so an earlier rephrase survives a ban rewrite — and a
+        // ban rewrite of a never-rephrased message stamps nothing.
+        const seedForSwipe = options.promptTemplate ? inheritedSeed : assembled;
+        await stampSeedOnActiveSwipe(messageIndex, seedForSwipe);
 
         debug('doSwipeMode — complete, result length:', result.length);
         return result;
