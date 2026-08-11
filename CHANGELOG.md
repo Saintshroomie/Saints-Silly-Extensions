@@ -88,6 +88,16 @@ released version. When cutting a release, move these notes into a new
   detection and line-splitting. (With auto-split on, script-style cards that
   write real members' dialogue as `Name: "..."` lines will be split too.)
 
+### Fixed
+- **Group Director — picking a speaker before the director finished choosing.**
+  Clicking a cast member in the confirm/override dialog while the roll was still
+  running failed with a "Failed to trigger …" error and no reply. Choosing early
+  cancels the in-flight roll, and the speaker was then triggered while
+  SillyTavern was still tearing that generation down, using character indices
+  captured before it. The director now waits for the cancelled roll to finish
+  unwinding and re-resolves the chosen character (by avatar, which is stable)
+  before triggering, so an early pick behaves exactly like a confirmed one.
+
 ## [1.3.0] - 2026-08-08
 
 ### Added

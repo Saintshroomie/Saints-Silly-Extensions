@@ -13543,10 +13543,17 @@ function delayMs(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-/** Wait until the group turn has fully settled before mutating the chat. */
-async function waitForGroupSettle(timeoutMs = 8000) {
+/**
+ * Wait until ST has fully settled before mutating the chat or starting a new
+ * generation. Watches `is_group_generating` **and** the host's global generating
+ * flag: an aborted quiet generation (the aligned-mode director roll) is not a
+ * group wrapper, so `is_group_generating` alone reports "settled" while ST is
+ * still tearing the roll down — and re-entering `Generate` in that window is
+ * what made an early speaker pick fail.
+ */
+async function waitForGenerationSettle(timeoutMs = 8000) {
     const start = Date.now();
-    while (__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_is_group_generating__) {
+    while (__WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_is_group_generating__ || isGenerationInProgress()) {
         if (Date.now() - start > timeoutMs) return false;
         await delayMs(100);
     }
@@ -13660,7 +13667,7 @@ async function maybeAutoSplit(messageIndex) {
     if (!msg || msg.extra?.sseWalkOnSplit) return;
     if (!parseWalkOnSegments(String(msg.mes || '')).segments.length) return;
 
-    await waitForGroupSettle();
+    await waitForGenerationSettle();
     const liveIdx = getContext().chat.indexOf(msg);
     if (liveIdx === -1) return; // message was swiped/deleted while we waited
     await splitWalkOnsInMessage(liveIdx);
@@ -13830,6 +13837,29 @@ function fallbackPick(roster, ctx) {
     return roster.find(r => r.kind === 'member') || roster[0];
 }
 
+/**
+ * Re-resolve a roster member's `context.characters` index at the moment of use.
+ * Avatar filenames are the stable identity (names collide in groups); the index
+ * is not, because ST rebuilds the array as it unshallows members. Falls back to
+ * the name, then to the captured index only if it still points at that member.
+ *
+ * @returns {number|null} A validated index, or null if the character is gone.
+ */
+function resolveMemberChid(ctx, member) {
+    const chars = ctx.characters || [];
+    if (member.avatar) {
+        const byAvatar = chars.findIndex(c => c?.avatar === member.avatar);
+        if (byAvatar !== -1) return byAvatar;
+    }
+    if (member.name) {
+        const byName = chars.findIndex(c => (c?.name || '').toLowerCase() === member.name.toLowerCase());
+        if (byName !== -1) return byName;
+    }
+    const captured = member.chid;
+    if (Number.isInteger(captured) && chars[captured]) return captured;
+    return null;
+}
+
 /** Stable identity compare for roster entries (members by chid, walk-ons by name). */
 function sameRosterEntry(a, b) {
     if (!a || !b || a.kind !== b.kind) return false;
@@ -13993,9 +14023,21 @@ async function chooseWithDialog(ctx, roster) {
  * hold). Generation errors are surfaced but don't abort the chain.
  */
 async function triggerMember(ctx, member) {
-    director_debug('Triggering member:', member.name, '(chid', member.chid + ')');
+    // `chid` is an *index* into `context.characters`, captured when the roster
+    // was built. The array is rebuilt as ST unshallows group members, so an
+    // index taken before an in-flight roll (or before an aborted one finished
+    // tearing down) can point at a different slot — or at nothing, which is how
+    // a stale index surfaced as ST failing to read `.avatar` of undefined.
+    // Re-resolve from the avatar, which is stable, and verify before generating.
+    const chid = resolveMemberChid(ctx, member);
+    if (chid === null) {
+        console.error('Group Director: could not resolve character for', member.name, member.avatar);
+        toast(`Failed to trigger ${member.name}: character could not be resolved.`, 'error');
+        return;
+    }
+    director_debug('Triggering member:', member.name, '(chid', chid + ')');
     try {
-        await ctx.generate('normal', { force_chid: member.chid });
+        await ctx.generate('normal', { force_chid: chid });
     } catch (err) {
         console.error('Group Director: trigger failed:', err);
         toast(`Failed to trigger ${member.name}: ${err.message}`, 'error');
@@ -14125,7 +14167,7 @@ async function generateAndPostWalkOn(ctx, name) {
     try {
         // Overswipe → regenerate → Generate('swipe'); awaits the full generation.
         await ctx.swipe.right();
-        await waitForGroupSettle();
+        await waitForGenerationSettle();
         const text = String(ctx.chat?.[idx]?.mes || '').trim();
         if (!text || text === '…') {
             await removeMessageAt(ctx, idx);
@@ -14233,11 +14275,16 @@ async function runDirector({ manual = false, turns } = {}) {
             }
 
             // We have a valid pick; clear any abort flag the dialog set when it
-            // closed its (now-irrelevant) background roll, then voice the speaker
-            // and wait for the reply to settle before the next turn rolls.
+            // closed its (now-irrelevant) background roll.
             generationAborted = false;
-            await triggerChoice(turnCtx, chosen);
-            await waitForGroupSettle();
+            // Picking a speaker before the roll landed aborts a live generation.
+            // Wait for ST to finish unwinding it before starting the next one —
+            // re-entering `Generate` mid-teardown is what made an early pick
+            // fail — then take a fresh context, since the roster's character
+            // indices were captured before all of that.
+            await waitForGenerationSettle();
+            await triggerChoice(getContext(), chosen);
+            await waitForGenerationSettle();
         }
     } catch (err) {
         if (isSilentGenerationAbort(err)) {
