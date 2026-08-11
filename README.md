@@ -68,7 +68,7 @@ Enrich your messages with LLM-generated narration, actions, and detail that stay
   - **Editing a message** — Confirms the edit, then rephrases that message
   - **Text in input** — Enriches your typed text
 - **Auto Phrasing** — Optional mode that runs the rephrase on *every* message you send, so you never have to press the quill first. Sending (button, Enter, or Ctrl+Enter) rewrites your text and then sends the result; while possessing a character, the rewritten message is posted as that character and the reply is triggered, exactly as a normal send would. Stopping mid-rewrite sends nothing — whatever was generated stays in the chat box for you to edit and send by hand.
-- **Seed text reinjection** — Rephrased messages remember their original seed prompt, so if you Continue a rephrased message the seed is reinjected to guide the continue generation
+- **Seed text reinjection** — Rephrased messages remember their original seed prompt, so if you Continue a rephrased message the seed is reinjected to guide the continue generation. This covers SillyTavern's native Continue buttons *and* **Retry Continue** (the Retry button, `/retry`, and Phrase Ban's checkpoint-driven retries) — a retry attempt inherits the seed of the swipe it was checkpointed from, so every attempt stays guided. The seed is remembered **per swipe**: only the swipe a rephrase actually produced carries it, so swiping to a different variation and continuing is no longer guided by a rephrase you swiped away from. Continuing with text typed in the input box doesn't reinject — that posts your text and continues *that*, which the earlier seed has nothing to do with. A Phrase Ban rewrite carries the seed forward rather than replacing it, so a rephrase survives a ban rewrite.
 - **Custom prompts** — Customize the phrasing prompt and save any number of named preset variants (see Tool Presets & Prompt Preview below)
 - **Inverse Guidance** — Optional mode that feeds every existing swipe of the target message into the prompt and asks the model to produce a swipe that is wildly different in tone, pacing, and approach. Comes with its own editable prompt template (with `{{phrasingSwipes}}` and `{{phrasingSeed}}` placeholders).
 - **Possession-aware** — When possessing a character, phrasing generates in that character's voice; otherwise it uses the standard ST impersonate feature
@@ -84,7 +84,7 @@ Love the gist, but not the phrasing of a generation? Wish you could easily guide
 **Paraphrasing for {{char}}:**
 1. Press the quill button on the most recent message (must be a character message) and Phrasing will guide a swipe generation with that message.
 2. Didn't like the phrasing? Just activate the swipe you want for the seed (or edit it to paraphrase something else) and click the quill for another guided swipe.
-3. Wish the guided message was longer? Click the continue button and Phrasing will make sure the seed continues to guide the Continue generation.
+3. Wish the guided message was longer? Click the continue button and Phrasing will make sure the seed continues to guide the Continue generation. Retry Continue's Retry button works the same way — it carries the seed onto each retry swipe.
 
 ### Using Possession and Phrasing Together
 

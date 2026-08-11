@@ -258,8 +258,17 @@ export function attachContinueInterceptor() {
     document.addEventListener('click', (event) => {
         if (!event.target.closest('#option_continue') && !event.target.closest('#mes_continue')) return;
 
-        // Reinject phrasing seed if the last message was rephrased
-        phrasingApi?.handlePhrasingSeedReinjection();
+        // Reinject the phrasing seed if the last message's active swipe was
+        // rephrased — but only when the input box is empty. Clicking Continue
+        // with text pending posts that text and continues *it*, so the current
+        // last message isn't the target and its seed would be wrong guidance.
+        // (The possessed branch below does the same thing by hand.) Retry
+        // Continue's slash-command path never posts the box, so it reinjects
+        // unconditionally from its own call site.
+        const pendingInput = document.getElementById('send_textarea')?.value?.trim();
+        if (!pendingInput) {
+            phrasingApi?.handlePhrasingSeedReinjection();
+        }
 
         handleContinueIntercept(event);
     }, { capture: true });

@@ -35,6 +35,8 @@ import {
     initPhrasing,
     isPhrasing,
     handlePhrasingSeedReinjection,
+    getPhrasingSeed,
+    setPhrasingSeed,
     applyPhrasingEnabledState,
     createInputAreaButton,
     createHamburgerMenuItem,
@@ -557,7 +559,10 @@ jQuery(async () => {
     // creates and seeds the fresh chat, so migrated metadata is re-applied.
     initCompaction({ settings, saveSettings, resyncChatState: onChatChanged });
     initImagePrompting({ settings, saveSettings });
-    initRetryContinue({ settings });
+    initRetryContinue({
+        settings,
+        phrasingApi: { handlePhrasingSeedReinjection, getPhrasingSeed, setPhrasingSeed },
+    });
     initDirector({ settings });
 
     loadPossessionState();

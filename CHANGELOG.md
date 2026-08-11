@@ -98,6 +98,39 @@ released version. When cutting a release, move these notes into a new
   unwinding and re-resolves the chosen character (by avatar, which is stable)
   before triggering, so an early pick behaves exactly like a confirmed one.
 
+- **Phrasing — the seed was not reinjected on a Retry Continue.** Reinjection was
+  wired to a real click of SillyTavern's Continue buttons, so it only ever fired
+  for a native Continue. Retry Continue drives `/continue` through the slash
+  command system, which meant the Retry button, `/retry`, and Phrase Ban's
+  checkpoint-driven retries all regenerated *unguided* — the rephrase seed was
+  silently dropped. Retry Continue now asks for the reinjection itself, and a
+  retry swipe inherits the seed of the swipe it was checkpointed from, so every
+  attempt in a retry chain stays guided.
+
+- **Phrasing — a rephrase seed leaked onto swipes it did not belong to.** The
+  seed was stored once per *message*, so after rephrasing a message, swiping to a
+  different variation and continuing still reinjected the rephrase instruction
+  from the swipe you had swiped away from. Seeds are now keyed **per swipe**
+  (`swipe_info[].phrasing_seed`) and only the swipe a rephrase actually produced
+  carries one. Seeds saved by earlier versions are still honored on messages
+  with no swipe history; on an already-swiped message the ambiguous old value is
+  ignored rather than guessed at.
+
+- **Phrasing — the seed was reinjected when continuing with text in the input
+  box.** Clicking Continue with something typed posts that text and continues
+  *it*, so the rephrased message above it was no longer the target — but its
+  seed was reinjected anyway, guiding the new generation with an instruction
+  meant for a different message. Reinjection on the Continue buttons now only
+  happens when the input box is empty. (Retry Continue is unaffected: it drives
+  the slash command, which never posts the box.)
+
+- **Phrase Ban — a ban rewrite overwrote the Phrasing seed.** A rewrite stored
+  its own "avoid these phrases" instruction as the message's seed, so continuing
+  a ban-rewritten message reinjected the ban prompt instead of your rephrase
+  guidance. A ban rewrite now inherits the seed of the swipe it rewrote, so an
+  earlier rephrase survives the rewrite and the ban instruction never leaks into
+  a later Continue.
+
 ## [1.3.0] - 2026-08-08
 
 ### Added
