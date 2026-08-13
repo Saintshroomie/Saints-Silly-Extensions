@@ -13,6 +13,14 @@ released version. When cutting a release, move these notes into a new
 `## [X.Y.Z]` section and run `npm version`._
 
 ### Added
+- **Lore book entry Copy button** — every World Info / lore book entry now gets a
+  **Copy** button directly above its content field, next to Clear Content, that
+  puts the entry's content on the clipboard in one click (with a fallback for
+  SillyTavern served over plain http, where the browser clipboard API is
+  unavailable). It has its own **Entry Copy button** toggle in the World Info
+  Assist settings drawer (on by default) and is independent of the Assist
+  controls, so it stays available with World Info Assist switched off.
+
 - **Automatic World Info in AI-assisted context** — whenever **Use Chat Context**
   is on (Assisted Character Creation, World Info Assist, Narrative Guidance,
   Compaction, Image Prompting, and the Group Director's leaner non-cache mode),

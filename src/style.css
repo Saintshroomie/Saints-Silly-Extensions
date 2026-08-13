@@ -587,22 +587,24 @@
     font-style: italic;
 }
 
-/* Inline Clear-content button on the WIA controls row */
-/* Content-clear row — sits directly above the entry's content textarea so
-   it's unambiguous which field the button clears. */
-.wia-content-clear-row {
+/* Content-actions row — sits directly above the entry's content textarea so
+   it's unambiguous which field the buttons act on. Holds Clear Content (with
+   the Assist controls) and Copy (independently toggleable). */
+.wia-content-actions-row {
     display: flex;
     justify-content: flex-end;
+    gap: 4px;
     margin: 2px 0 4px 0;
 }
 
-.wia-content-clear-row .wia-btn-clear-content {
+.wia-content-actions-row .wia-btn {
     font-size: 0.8em;
     padding: 2px 8px;
     opacity: 0.85;
+    cursor: pointer;
 }
 
-.wia-content-clear-row .wia-btn-clear-content:hover {
+.wia-content-actions-row .wia-btn:hover {
     opacity: 1;
 }
 

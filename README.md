@@ -161,6 +161,7 @@ Adds an **Assist** button to every World Info / lore book entry, letting you dra
 - **Dedicated Assist Guidance field** — A separate guidance textarea sits between the Assist button row and the entry's content textarea. Type a rough idea, tone, canon notes, or anything else you want the model to consider — it's used as the seed for every Assist / Retry / Continue on that entry. The guidance is saved on the entry itself (in its `extensions` field) so it persists across page reloads and travels with the lorebook on export.
 - **Continue / Retry** — After a generation, the Assist button is replaced by Continue (extends the current entry) and Retry (re-runs Assist with your saved guidance, replacing the content).
 - **Clear buttons** — Each field has its own labeled button directly above it: **Clear Guidance** in the Assist Guidance header, and **Clear Content** just above the entry's content textarea.
+- **Copy button** — A **Copy** button sits next to Clear Content, above every entry's content field, and puts that entry's content on the clipboard in one click. It is independent of the Assist controls: it has its own toggle (**Entry Copy button**, on by default) and stays available even with World Info Assist switched off, so you can use it purely as a convenience.
 - **Editable prompt template** — The default prompt instructs the model to emit a `[ Subject: Description ]` world lore artifact with no commentary. You can edit it freely in the settings panel (with `{{context}}` / `{{guidance}}` / `{{title}}` placeholders); save the prompt + prefills together as named presets and preview the assembled prompt (see Tool Presets & Prompt Preview below). A **Preset** dropdown on each entry's Assist row switches between your saved presets right where you're drafting — so you can pick what type of entry gets produced per generation.
 - **No schema** — Unlike Assisted Character Creation, World Info Assist has no schema. The prompt itself defines the desired output format.
 
@@ -390,6 +391,7 @@ Open **Extensions** > **Saint's Silly Extensions** in SillyTavern's settings pan
 | Setting | Description |
 |---------|-------------|
 | Enable World Info Assist | Toggle the WI Assist feature and inject/remove its per-entry Assist buttons |
+| Entry Copy button | Add a **Copy** button above every lore book entry's content field that copies the entry's content to the clipboard. Independent of the toggle above — it works with World Info Assist off. Default: on. |
 | WI Assist Debug Mode | Log detailed WI Assist events, prompts, and generations to the browser console |
 | Max Context Override | If > 0, caps how many tokens of chat context the preamble packer uses for WIA generations. 0 = use the model's full context size. |
 | Preset / Preview Assembled Prompt | Save named bundles of the WIA prompt + both prefills and preview exactly what gets sent (see Tool Presets & Prompt Preview below) |

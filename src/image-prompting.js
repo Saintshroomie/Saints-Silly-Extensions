@@ -34,6 +34,7 @@ import {
     applyTemplateMacros,
     stripPrefillEcho,
     showPromptPreview,
+    copyTextToClipboard,
 } from './utils.js';
 import {
     abortAllGenerations,
@@ -970,30 +971,11 @@ function refreshAnchorBar() {
 }
 
 async function copyToClipboard(text) {
-    try {
-        await navigator.clipboard.writeText(text);
-        toast('Image prompt copied to clipboard!', 'success');
-        return;
-    } catch (err) {
-        debug('navigator.clipboard failed, falling back to execCommand:', err);
-    }
-    // Fallback for insecure contexts (e.g. ST served over plain http).
-    try {
-        const helper = document.createElement('textarea');
-        helper.value = text;
-        helper.style.position = 'fixed';
-        helper.style.opacity = '0';
-        document.body.appendChild(helper);
-        helper.focus();
-        helper.select();
-        const ok = document.execCommand('copy');
-        helper.remove();
-        if (!ok) throw new Error('execCommand copy returned false');
-        toast('Image prompt copied to clipboard!', 'success');
-    } catch (err) {
-        console.error('Image Prompting: clipboard copy failed:', err);
-        toast('Could not copy to the clipboard — select the text and copy it manually.', 'error');
-    }
+    await copyTextToClipboard(text, {
+        successMessage: 'Image prompt copied to clipboard!',
+        logPrefix: 'Image Prompting',
+        debug,
+    });
 }
 
 // ─── Actions ───

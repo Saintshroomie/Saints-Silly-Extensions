@@ -21,6 +21,7 @@ import {
     applyTemplateMacros,
     stripPrefillEcho,
     showPromptPreview,
+    copyTextToClipboard,
     getCurrentWorldEditorName,
     getEntryUidFromForm,
     readWIAEntryGuidance,
@@ -150,22 +151,18 @@ export function startWIAObserver() {
     if (listenersInstalled) return;
     listenersInstalled = true;
 
-    const rescan = () => {
-        if (!moduleSettings?.wiaEnabled) return;
-        document.querySelectorAll('.world_entry_edit').forEach(injectControls);
-    };
+    const rescan = () => rescanAllForms();
 
     const attachObserver = () => {
         if (observer) return;
         const container = document.getElementById('world_popup_entries_list');
         if (!container) return;
         observer = new MutationObserver((mutations) => {
-            if (!moduleSettings?.wiaEnabled) return;
             for (const m of mutations) {
                 for (const node of m.addedNodes) {
                     if (!(node instanceof HTMLElement)) continue;
-                    if (node.matches?.('.world_entry_edit')) injectControls(node);
-                    node.querySelectorAll?.('.world_entry_edit').forEach(injectControls);
+                    if (node.matches?.('.world_entry_edit')) injectEntryControls(node);
+                    node.querySelectorAll?.('.world_entry_edit').forEach(injectEntryControls);
                 }
             }
         });
@@ -185,31 +182,115 @@ export function startWIAObserver() {
 }
 
 /**
- * Re-scan all currently visible WI forms (used after enable toggle).
+ * Re-scan all currently visible WI forms (used after either enable toggle).
  */
 export function rescanAllForms() {
-    if (!moduleSettings?.wiaEnabled) return;
-    document.querySelectorAll('.world_entry_edit').forEach(injectControls);
+    document.querySelectorAll('.world_entry_edit').forEach(injectEntryControls);
 }
 
 /**
- * Remove all injected controls (used when the feature is disabled). Must
- * cover every element injectControls creates — the controls row, the
- * guidance block, and the content-clear row — or a disable/enable cycle
- * leaves orphans behind and then injects duplicates next to them.
+ * Inject everything this module contributes to a single entry form. The Assist
+ * controls and the Copy button are independently toggleable, so each injector
+ * owns its own gate and this stays the one place the observer has to call.
+ *
+ * Skips the hidden template element that SillyTavern clones entries from —
+ * otherwise the template ends up with baked-in markup that clones inherit
+ * without their click handlers, permanently blocking injection on every live
+ * entry.
+ */
+function injectEntryControls(formEl) {
+    if (formEl.closest('#entry_edit_template')) return;
+    injectCopyButton(formEl);
+    injectControls(formEl);
+}
+
+/**
+ * Remove the Assist controls (used when the feature is disabled). Must cover
+ * every element `injectControls` creates — the controls row, the guidance
+ * block, and its button in the shared content-actions row — or a disable/enable
+ * cycle leaves orphans behind and then injects duplicates next to them. The row
+ * itself is shared with the Copy button, so it only goes when it's empty.
  */
 export function removeAllControls() {
-    document.querySelectorAll('.wia-controls, .wia-guidance-block, .wia-content-clear-row')
+    document.querySelectorAll('.wia-controls, .wia-guidance-block, .wia-btn-clear-content')
         .forEach(el => el.remove());
+    pruneEmptyContentActionRows();
+}
+
+/**
+ * Remove the standalone Copy buttons (used when that toggle is turned off).
+ */
+export function removeCopyButtons() {
+    document.querySelectorAll('.wia-btn-copy-content').forEach(el => el.remove());
+    pruneEmptyContentActionRows();
+}
+
+/** Drop any content-actions row left with no buttons in it. */
+function pruneEmptyContentActionRows() {
+    document.querySelectorAll('.wia-content-actions-row').forEach(row => {
+        if (!row.children.length) row.remove();
+    });
+}
+
+/**
+ * The button row that sits directly above an entry's content textarea, so it's
+ * unambiguous which field the buttons act on. Shared by the Assist controls'
+ * Clear Content button and the standalone Copy button — whichever is injected
+ * first creates it.
+ *
+ * @param {HTMLElement} formEl - The `.world_entry_edit` form.
+ * @param {HTMLTextAreaElement} contentTextarea - The entry's content field.
+ * @returns {HTMLElement} The row element.
+ */
+function ensureContentActionsRow(formEl, contentTextarea) {
+    const existing = formEl.querySelector('.wia-content-actions-row');
+    if (existing) return existing;
+
+    const row = document.createElement('div');
+    row.className = 'wia-content-actions-row';
+    contentTextarea.insertAdjacentElement('beforebegin', row);
+    return row;
+}
+
+/**
+ * Add a Copy button that puts the entry's content on the clipboard. Independent
+ * of the Assist controls (own setting, own gate) so it stays available to people
+ * who only want the convenience, not the LLM tooling.
+ */
+function injectCopyButton(formEl) {
+    if (!moduleSettings?.wiaCopyButtonEnabled) return;
+    if (formEl.querySelector('.wia-btn-copy-content')) return;
+
+    const contentTextarea = formEl.querySelector('textarea[name="content"]');
+    if (!contentTextarea) return;
+
+    const btn = document.createElement('div');
+    btn.className = 'wia-btn wia-btn-copy-content menu_button interactable';
+    btn.title = 'Copy this entry\'s content to the clipboard';
+    btn.innerHTML = '<span class="fa-solid fa-copy"></span> Copy';
+    btn.addEventListener('click', () => onCopyEntryContent(formEl));
+
+    // Appended (Clear Content is prepended), so the order is stable no matter
+    // which injector created the row.
+    ensureContentActionsRow(formEl, contentTextarea).appendChild(btn);
+}
+
+async function onCopyEntryContent(formEl) {
+    const text = getContentTextarea(formEl)?.value || '';
+    if (!text.trim()) {
+        toast('This entry has no content to copy.', 'warning');
+        return;
+    }
+    await copyTextToClipboard(text, {
+        successMessage: 'Entry content copied to clipboard!',
+        logPrefix: 'World Info Assist',
+        debug,
+    });
+    debug('Copied entry content, length:', text.length);
 }
 
 function injectControls(formEl) {
     if (!moduleSettings?.wiaEnabled) return;
-    // Skip the hidden template element that SillyTavern clones from —
-    // otherwise the template ends up with baked-in .wia-controls markup
-    // that clones inherit without their click handlers, permanently
-    // blocking injection on every live entry.
-    if (formEl.closest('#entry_edit_template')) return;
     if (formEl.querySelector('.wia-controls')) return;
 
     const contentTextarea = formEl.querySelector('textarea[name="content"]');
@@ -280,21 +361,18 @@ function injectControls(formEl) {
     // The content-clear button sits directly above the entry's content
     // textarea (not in the top controls row) so it's unambiguous which
     // field it clears — the guidance field has its own Clear in its header.
-    const contentClearRow = document.createElement('div');
-    contentClearRow.className = 'wia-content-clear-row';
-    contentClearRow.innerHTML = `
-        <div class="wia-btn wia-btn-clear-content menu_button interactable" title="Clear this entry's content (the field below)">
-            <span class="fa-solid fa-eraser"></span> Clear Content
-        </div>
-    `;
-    contentTextarea.insertAdjacentElement('beforebegin', contentClearRow);
+    const contentActionsRow = ensureContentActionsRow(formEl, contentTextarea);
+    const clearContentBtn = document.createElement('div');
+    clearContentBtn.className = 'wia-btn wia-btn-clear-content menu_button interactable';
+    clearContentBtn.title = 'Clear this entry\'s content (the field below)';
+    clearContentBtn.innerHTML = '<span class="fa-solid fa-eraser"></span> Clear Content';
+    contentActionsRow.prepend(clearContentBtn);
 
     const guidanceTextarea = guidanceBlock.querySelector('.wia-guidance-textarea');
     const clearGuidanceBtn = guidanceBlock.querySelector('.wia-btn-clear-guidance');
     const assistBtn = controls.querySelector('.wia-btn-assist');
     const continueBtn = controls.querySelector('.wia-btn-continue');
     const retryBtn = controls.querySelector('.wia-btn-retry');
-    const clearContentBtn = contentClearRow.querySelector('.wia-btn-clear-content');
     const tokensInput = controls.querySelector('.wia-tokens-input');
 
     // Wire up persistence for the guidance field — read on mount, save on
@@ -674,6 +752,19 @@ export function bindWIASettings(saveSettings) {
                 rescanAllForms();
             } else {
                 removeAllControls();
+            }
+        });
+    }
+    const copyBtnCb = document.getElementById('wia_copy_button_enabled');
+    if (copyBtnCb) {
+        copyBtnCb.checked = !!moduleSettings.wiaCopyButtonEnabled;
+        copyBtnCb.addEventListener('change', () => {
+            moduleSettings.wiaCopyButtonEnabled = copyBtnCb.checked;
+            saveSettings();
+            if (moduleSettings.wiaCopyButtonEnabled) {
+                rescanAllForms();
+            } else {
+                removeCopyButtons();
             }
         });
     }

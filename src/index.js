@@ -207,6 +207,7 @@ const defaultSettings = {
     accResponseLength: DEFAULT_ACC_RESPONSE_LENGTH,
     accMaxContextOverride: 0,
     wiaEnabled: true,
+    wiaCopyButtonEnabled: true,
     wiaDebugMode: false,
     wiaPrompt: DEFAULT_WIA_PROMPT,
     wiaPrefillTitled: DEFAULT_WIA_PREFILL_TITLED,
@@ -573,7 +574,8 @@ jQuery(async () => {
     loadPossessionState();
     injectSettingsPanel();
 
-    // Watch the DOM for World Info entry forms and inject assist controls.
+    // Watch the DOM for World Info entry forms and inject the assist controls
+    // and the entry Copy button (each gated on its own setting).
     startWIAObserver();
 
     // Watch the chat for messages and inject per-message reformat buttons.
