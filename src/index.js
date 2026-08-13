@@ -163,6 +163,7 @@ import {
     onDirectorGroupWrapperFinished,
     onDirectorScanForWalkOns,
     onDirectorMaybeSplit,
+    runDirectorTurn,
     attachDirectorSendInterceptor,
     startDirectorObserver,
     rescanSplitButtons,
@@ -545,6 +546,10 @@ jQuery(async () => {
     initPhrasing({
         settings,
         possessionApi: { isPossessing, getPossessedCharName, postPossessedMessage },
+        // Auto Phrasing's possessed send posts the message itself, so the
+        // Director's MESSAGE_SENT path never fires — it asks for the turn here
+        // instead of letting ST pick the next speaker.
+        directorApi: { runDirectorTurn },
     });
     initPhraseBan({
         settings,

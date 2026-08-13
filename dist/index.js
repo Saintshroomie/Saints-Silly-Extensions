@@ -4561,6 +4561,9 @@ let phrasing_ctx = null;
 /** @type {{ isPossessing: function, getPossessedCharName: function, postPossessedMessage: function }} */
 let possessionApi = null;
 
+/** @type {{ runDirectorTurn: function }} */
+let directorApi = null;
+
 let phrasing_debug = () => {};
 
 // ─── Public Getters ───
@@ -5138,6 +5141,17 @@ function submitCurrentInput() {
  * reply the user expected from pressing Send.
  */
 async function triggerReplyGeneration() {
+    // In a group with the Director on, the next speaker is its call. `/trigger`
+    // clears the input box and runs a plain group generation, so ST's Manual
+    // reply order (which the Director puts the group in) picks a random member
+    // silently — no roll, no confirm dialog. The possessed message was pushed
+    // straight into the chat, so no MESSAGE_SENT fired and the Director's own
+    // user-turn path never sees this turn; hand it over explicitly.
+    if (await directorApi?.runDirectorTurn?.()) {
+        phrasing_debug('triggerReplyGeneration — turn handed to the Group Director');
+        return;
+    }
+
     const context = getContext();
     phrasing_debug('triggerReplyGeneration — triggering the reply');
     await context.executeSlashCommandsWithOptions('/trigger');
@@ -5374,9 +5388,10 @@ function registerPhrasingSlashCommand() {
  * @param {object} options.settings       - Shared mutable settings reference.
  * @param {object} options.possessionApi  - { isPossessing(), getPossessedCharName(), postPossessedMessage(text) }
  */
-function initPhrasing({ settings, possessionApi: pApi }) {
+function initPhrasing({ settings, possessionApi: pApi, directorApi: dApi }) {
     phrasing_ctx = { settings };
     possessionApi = pApi;
+    directorApi = dApi;
     phrasing_debug = createDebugLogger('PHRASING', () => settings.phrasingDebugMode);
 }
 
@@ -14428,6 +14443,39 @@ async function runDirector({ manual = false, turns } = {}) {
 
 // ─── Event Handlers ───
 
+/**
+ * Whether the Director owns speaker selection right now — enabled *and* in a
+ * group chat. Callers that would otherwise trigger a reply natively use this to
+ * decide who picks the speaker.
+ *
+ * @returns {boolean}
+ */
+function isDirectorActive() {
+    return !!director_moduleSettings?.directorEnabled && !!getContext().groupId;
+}
+
+/**
+ * Run a director turn on behalf of another module that posted a message into the
+ * chat itself and now needs the reply it would have triggered natively (Auto
+ * Phrasing's possessed send). Those messages are pushed straight into `chat`, so
+ * no `MESSAGE_SENT` fires and the `userTurnPending` → wrapper-finished path never
+ * rolls; without this the caller's `/trigger` would hand the pick to ST, which in
+ * our Manual reply order picks a random member with no dialog and no toast.
+ *
+ * Waits for the caller's own generation (the rephrase swipe) to unwind first, so
+ * the roll doesn't race it, then chains the configured number of speakers exactly
+ * like a genuine user turn.
+ *
+ * @returns {Promise<boolean>} `true` if the Director took the turn.
+ */
+async function runDirectorTurn() {
+    if (!isDirectorActive()) return false;
+    director_debug('External turn handed to the director');
+    await waitForGenerationSettle();
+    await runDirector({ manual: false });
+    return true;
+}
+
 function onDirectorChatChanged() {
     if (director_moduleSettings?.directorEnabled) {
         applyManualMode().catch(err => console.error('Group Director: applyManualMode failed:', err));
@@ -15104,6 +15152,10 @@ jQuery(async () => {
     initPhrasing({
         settings: src_settings,
         possessionApi: { isPossessing: isPossessing, getPossessedCharName: getPossessedCharName, postPossessedMessage: postPossessedMessage },
+        // Auto Phrasing's possessed send posts the message itself, so the
+        // Director's MESSAGE_SENT path never fires — it asks for the turn here
+        // instead of letting ST pick the next speaker.
+        directorApi: { runDirectorTurn: runDirectorTurn },
     });
     initPhraseBan({
         settings: src_settings,

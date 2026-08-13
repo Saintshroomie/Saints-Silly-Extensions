@@ -58,6 +58,9 @@ let ctx = null;
 /** @type {{ isPossessing: function, getPossessedCharName: function, postPossessedMessage: function }} */
 let possessionApi = null;
 
+/** @type {{ runDirectorTurn: function }} */
+let directorApi = null;
+
 let debug = () => {};
 
 // ─── Public Getters ───
@@ -635,6 +638,17 @@ function submitCurrentInput() {
  * reply the user expected from pressing Send.
  */
 async function triggerReplyGeneration() {
+    // In a group with the Director on, the next speaker is its call. `/trigger`
+    // clears the input box and runs a plain group generation, so ST's Manual
+    // reply order (which the Director puts the group in) picks a random member
+    // silently — no roll, no confirm dialog. The possessed message was pushed
+    // straight into the chat, so no MESSAGE_SENT fired and the Director's own
+    // user-turn path never sees this turn; hand it over explicitly.
+    if (await directorApi?.runDirectorTurn?.()) {
+        debug('triggerReplyGeneration — turn handed to the Group Director');
+        return;
+    }
+
     const context = getContext();
     debug('triggerReplyGeneration — triggering the reply');
     await context.executeSlashCommandsWithOptions('/trigger');
@@ -871,8 +885,9 @@ export function registerPhrasingSlashCommand() {
  * @param {object} options.settings       - Shared mutable settings reference.
  * @param {object} options.possessionApi  - { isPossessing(), getPossessedCharName(), postPossessedMessage(text) }
  */
-export function initPhrasing({ settings, possessionApi: pApi }) {
+export function initPhrasing({ settings, possessionApi: pApi, directorApi: dApi }) {
     ctx = { settings };
     possessionApi = pApi;
+    directorApi = dApi;
     debug = createDebugLogger('PHRASING', () => settings.phrasingDebugMode);
 }
