@@ -325,6 +325,56 @@ export function stripPrefillEcho(output, prefill) {
     return output;
 }
 
+// ─── Clipboard ───
+
+/**
+ * Copy text to the clipboard, toasting the outcome. `navigator.clipboard` is
+ * unavailable on insecure origins (SillyTavern served over plain http on a LAN
+ * address is the common case), so a hidden-textarea `execCommand` fallback runs
+ * before giving up.
+ *
+ * @param {string} text - The text to place on the clipboard.
+ * @param {object} [opts]
+ * @param {string} [opts.successMessage] - Toast shown once the copy lands.
+ * @param {string} [opts.logPrefix] - Console prefix for the failure path.
+ * @param {function} [opts.debug] - Optional debug logger for the fallback path.
+ * @returns {Promise<boolean>} Whether the text made it to the clipboard.
+ */
+export async function copyTextToClipboard(text, opts = {}) {
+    const {
+        successMessage = 'Copied to clipboard!',
+        logPrefix = 'Saints Silly Extensions',
+        debug = () => {},
+    } = opts;
+
+    try {
+        await navigator.clipboard.writeText(text);
+        toast(successMessage, 'success');
+        return true;
+    } catch (err) {
+        debug('navigator.clipboard failed, falling back to execCommand:', err);
+    }
+
+    try {
+        const helper = document.createElement('textarea');
+        helper.value = text;
+        helper.style.position = 'fixed';
+        helper.style.opacity = '0';
+        document.body.appendChild(helper);
+        helper.focus();
+        helper.select();
+        const ok = document.execCommand('copy');
+        helper.remove();
+        if (!ok) throw new Error('execCommand copy returned false');
+        toast(successMessage, 'success');
+        return true;
+    } catch (err) {
+        console.error(`${logPrefix}: clipboard copy failed:`, err);
+        toast('Could not copy to the clipboard — select the text and copy it manually.', 'error');
+        return false;
+    }
+}
+
 // ─── Prompt Preview Popup ───
 
 /**

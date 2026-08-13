@@ -280,6 +280,11 @@
                 <span>Enable World Info Assist</span>
             </label>
 
+            <label class="checkbox_label" title="Adds a Copy button above every lore book entry's content field that copies the entry's content to the clipboard. Independent of the Assist controls above.">
+                <input id="wia_copy_button_enabled" type="checkbox" />
+                <span>Entry Copy button</span>
+            </label>
+
             <div class="ng_inline_row">
                 <label for="wia_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label>
                 <input id="wia_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for World Info Assist generations. 0 = use the model's full context size." />

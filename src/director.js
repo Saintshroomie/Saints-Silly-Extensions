@@ -1246,6 +1246,39 @@ async function runDirector({ manual = false, turns } = {}) {
 
 // ─── Event Handlers ───
 
+/**
+ * Whether the Director owns speaker selection right now — enabled *and* in a
+ * group chat. Callers that would otherwise trigger a reply natively use this to
+ * decide who picks the speaker.
+ *
+ * @returns {boolean}
+ */
+export function isDirectorActive() {
+    return !!moduleSettings?.directorEnabled && !!getContext().groupId;
+}
+
+/**
+ * Run a director turn on behalf of another module that posted a message into the
+ * chat itself and now needs the reply it would have triggered natively (Auto
+ * Phrasing's possessed send). Those messages are pushed straight into `chat`, so
+ * no `MESSAGE_SENT` fires and the `userTurnPending` → wrapper-finished path never
+ * rolls; without this the caller's `/trigger` would hand the pick to ST, which in
+ * our Manual reply order picks a random member with no dialog and no toast.
+ *
+ * Waits for the caller's own generation (the rephrase swipe) to unwind first, so
+ * the roll doesn't race it, then chains the configured number of speakers exactly
+ * like a genuine user turn.
+ *
+ * @returns {Promise<boolean>} `true` if the Director took the turn.
+ */
+export async function runDirectorTurn() {
+    if (!isDirectorActive()) return false;
+    debug('External turn handed to the director');
+    await waitForGenerationSettle();
+    await runDirector({ manual: false });
+    return true;
+}
+
 export function onDirectorChatChanged() {
     if (moduleSettings?.directorEnabled) {
         applyManualMode().catch(err => console.error('Group Director: applyManualMode failed:', err));

@@ -13,6 +13,14 @@ released version. When cutting a release, move these notes into a new
 `## [X.Y.Z]` section and run `npm version`._
 
 ### Added
+- **Lore book entry Copy button** — every World Info / lore book entry now gets a
+  **Copy** button directly above its content field, next to Clear Content, that
+  puts the entry's content on the clipboard in one click (with a fallback for
+  SillyTavern served over plain http, where the browser clipboard API is
+  unavailable). It has its own **Entry Copy button** toggle in the World Info
+  Assist settings drawer (on by default) and is independent of the Assist
+  controls, so it stays available with World Info Assist switched off.
+
 - **Automatic World Info in AI-assisted context** — whenever **Use Chat Context**
   is on (Assisted Character Creation, World Info Assist, Narrative Guidance,
   Compaction, Image Prompting, and the Group Director's leaner non-cache mode),
@@ -89,6 +97,17 @@ released version. When cutting a release, move these notes into a new
   write real members' dialogue as `Name: "..."` lines will be split too.)
 
 ### Fixed
+- **Group Director — skipped after a possessed Auto Phrasing send.** With Auto
+  Phrasing and Possession both on in a group, submitting a message rephrased it,
+  posted it as the possessed character, and then asked SillyTavern for the reply
+  — which, in the Manual reply order the Director puts the group in, picked a
+  member at random with no roll, no progress toast and no confirm/override
+  dialog. The possessed message is written straight into the chat, so the
+  Director's user-turn path never saw the turn. Auto Phrasing now hands the turn
+  to the Director when it is active in a group, so a possessed send chooses its
+  next speaker exactly like an ordinary one (and still falls back to the native
+  trigger when the Director is off or the chat is solo).
+
 - **Group Director — picking a speaker before the director finished choosing.**
   Clicking a cast member in the confirm/override dialog while the roll was still
   running failed with a "Failed to trigger …" error and no reply. Choosing early
