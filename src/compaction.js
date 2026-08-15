@@ -533,7 +533,7 @@ export function showCompactionPromptPreview() {
 
 // ─── Preamble ───
 
-async function buildSummaryPreamble(loreBookNames) {
+async function buildSummaryPreamble(loreBookNames, diagnostics = null) {
     const tail = getTailLength();
     const preamble = await buildContextPreamble({
         includeChat: true,
@@ -541,10 +541,132 @@ async function buildSummaryPreamble(loreBookNames) {
         responseLength: getResponseLength(),
         maxContextOverride: moduleSettings?.compactionMaxContextOverride || 0,
         excludeRecentCount: tail,
+        diagnostics,
     });
     if (!preamble) return '';
     debug('Summary preamble length:', preamble.length);
     return `Chat history to summarize (the most recent ${tail} messages are carried over verbatim and are NOT included here):\n${preamble}\n\n`;
+}
+
+// ─── Prompt Dump (console diagnostics) ───
+
+/**
+ * Assemble the exact payload Generate Summary would send and write the whole
+ * thing to the console, block by block, with the resolution decisions that
+ * produced it. Nothing is sent to the model.
+ *
+ * This runs the real `buildSummaryPreamble` / `composeSummaryPrompt` path with
+ * a diagnostics sink attached rather than reconstructing it, so what you read
+ * is what would go out. The last dump is also parked on
+ * `window.__ccPromptDump` so you can grep or copy it without re-running.
+ */
+async function dumpCompactionPrompt() {
+    const ctx = getContext();
+    const loreBookNames = readModalLoreBooks();
+    const guidance = document.getElementById('cc_guidance')?.value || '';
+    const responseLength = getResponseLength();
+    const prefill = getPrefill();
+    const diagnostics = {};
+
+    setStatusBar('Dumping prompt to console…');
+    try {
+        const preambleBlock = await buildSummaryPreamble(loreBookNames, diagnostics);
+        const prompt = composeSummaryPrompt(preambleBlock, guidance);
+        const sections = diagnostics.sections || [];
+        const meta = diagnostics.meta || {};
+
+        // Per-section token counts, so an oversized block is obvious at a glance.
+        const sized = [];
+        for (const s of sections) {
+            let tokens = null;
+            try {
+                tokens = await getTokenCountAsync(s.text);
+            } catch { /* token counting is best-effort here */ }
+            sized.push({ ...s, tokens });
+        }
+        const systemTokens = await getTokenCountAsync(COMPACTION_SUMMARY_SYSTEM_PROMPT).catch(() => null);
+        const promptTokens = await getTokenCountAsync(prompt).catch(() => null);
+
+        /* eslint-disable no-console */
+        console.group('%cCompaction — full summary prompt', 'font-weight:bold;font-size:13px');
+
+        console.group('1. Resolution');
+        console.log('groupId:', meta.groupId, '| group:', meta.groupName);
+        console.log('characterId (this_chid):', meta.characterId);
+        console.log('current character avatar (what ST getCharaFilename() sees):', meta.currentCharacterAvatar);
+        if (meta.currentCharacterAvatar === null) {
+            console.warn(
+                'No current character resolves for this call. ST evaluates per-character '
+                + 'World Info filters against getCharaFilename(); with it null, "only for X" '
+                + 'entries are dropped and "everyone except X" entries are kept.',
+            );
+        }
+        if (meta.groupRoster) {
+            console.log('Group roster (inContext = fed to the summarizer):');
+            console.table(meta.groupRoster);
+            const droppedByMute = meta.groupRoster.filter(m => m.muted);
+            if (droppedByMute.length) {
+                console.warn(
+                    'Muted members excluded from context:',
+                    droppedByMute.map(m => `${m.name} (${m.avatar})`).join(', '),
+                );
+            }
+        }
+        console.log('Characters included:', meta.includedCharacters);
+        console.groupEnd();
+
+        console.group('2. Context blocks');
+        console.table(sized.map(s => ({ block: s.label, tokens: s.tokens, chars: s.text.length })));
+        for (const s of sized) {
+            console.groupCollapsed(`${s.label} — ${s.tokens ?? '?'} tokens`);
+            console.log(s.text);
+            console.groupEnd();
+        }
+        if (!sized.length) console.warn('No context blocks were produced.');
+        console.log('Hand-picked lore books:', loreBookNames.length ? loreBookNames : '(none selected)');
+        console.log('World Info scan:', meta.worldInfo ?? '(not run)');
+        console.log('Recent chat packing:', meta.recentChat ?? '(not run)');
+        console.groupEnd();
+
+        console.group('3. Exact payload');
+        console.log('%cSystem prompt:', 'font-weight:bold');
+        console.log(COMPACTION_SUMMARY_SYSTEM_PROMPT);
+        console.log('%cUser prompt:', 'font-weight:bold');
+        console.log(prompt);
+        console.log('%cPrefill (assistant prefix):', 'font-weight:bold');
+        console.log(prefill || '(none)');
+        console.log('responseLength:', responseLength);
+        console.groupEnd();
+
+        console.group('4. Totals');
+        console.log('system:', systemTokens, 'tokens | user prompt:', promptTokens, 'tokens');
+        console.log('sum of context blocks:', sized.reduce((a, s) => a + (s.tokens || 0), 0), 'tokens');
+        console.groupEnd();
+
+        console.log('Parked on window.__ccPromptDump');
+        console.groupEnd();
+        /* eslint-enable no-console */
+
+        window.__ccPromptDump = {
+            systemPrompt: COMPACTION_SUMMARY_SYSTEM_PROMPT,
+            prompt,
+            prefill,
+            responseLength,
+            guidance,
+            loreBookNames,
+            sections: sized,
+            meta,
+            chatLength: Array.isArray(ctx.chat) ? ctx.chat.length : 0,
+            tailLength: getTailLength(),
+            takenAt: new Date().toISOString(),
+        };
+        toast('Prompt dumped to the browser console (also at window.__ccPromptDump).', 'success');
+    } catch (err) {
+        console.error('Compaction prompt dump failed:', err);
+        toast(`Prompt dump failed: ${err.message}`, 'error');
+    } finally {
+        setStatusBar(null);
+    }
 }
 
 // ─── Modal ───
@@ -673,6 +795,9 @@ function buildModalBody() {
             <div id="cc_retry_btn" class="menu_button interactable cc-action-btn" title="Restore to the last snapshot and re-run the last action">
                 <span class="fa-solid fa-rotate-right"></span> Retry
             </div>
+            <div id="cc_dump_btn" class="menu_button interactable cc-action-btn cc-dump-btn" title="Write the exact prompt Generate Summary would send — every context block, plus how characters and World Info resolved — to the browser console. Sends nothing to the model.">
+                <span class="fa-solid fa-bug"></span> Dump Prompt
+            </div>
         </div>
         <div class="cc-tokens-row">
             <label class="cc-tokens-label" for="cc_response_length" title="Maximum tokens for the summary generation">
@@ -728,6 +853,9 @@ function bindModalHandlers() {
     document.getElementById('cc_continue_btn')?.addEventListener('click', handleContinue);
     document.getElementById('cc_checkpoint_btn')?.addEventListener('click', handleCheckpoint);
     document.getElementById('cc_retry_btn')?.addEventListener('click', handleRetry);
+    // Deliberately not in ACTION_BUTTON_IDS: the dump sends nothing to the
+    // model, so it stays available while a generation is running.
+    document.getElementById('cc_dump_btn')?.addEventListener('click', dumpCompactionPrompt);
 
     const output = document.getElementById('cc_summary_output');
     output?.addEventListener('input', refreshActionButtonStates);

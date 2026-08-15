@@ -881,6 +881,7 @@ async function packRecentChatLines(chat, ctx, chatBudget) {
  * @param {number}  [opts.maxContextOverride=0] - If > 0, use this as the max-context size instead of `getMaxPromptTokens()`. Lets callers cap how much chat history they pull in independently of the model's real window.
  * @param {number}  [opts.excludeRecentCount=0] - Drop this many of the most recent messages before packing the chat. Compaction uses it so `{{context}}` is the chat *minus* the verbatim tail it carries over.
  * @param {number|null} [opts.endAtMessageIndex=null] - If a finite index ≥ 0, only chat messages up to and including this index are packed, making the anchored message the tail of the Recent Chat. Image Prompting uses it to depict an earlier moment of the chat. Applied before `excludeRecentCount`.
+ * @param {object|null} [opts.diagnostics=null] - Opt-in inspection sink. When an object is passed it is filled in with `{ sections, meta }` describing every block that went into the preamble and how character / World Info resolution played out. Purely observational — it never changes the returned string.
  * @returns {Promise<string>} The composed preamble, or '' if nothing was included.
  */
 export async function buildContextPreamble({
@@ -891,13 +892,55 @@ export async function buildContextPreamble({
     maxContextOverride = 0,
     excludeRecentCount = 0,
     endAtMessageIndex = null,
+    diagnostics = null,
 } = {}) {
     const sections = [];
     const ctx = getContext();
 
+    // Every block goes through pushSection, so an inspector built on the
+    // diagnostics sink can never drift from what is actually sent.
+    if (diagnostics) {
+        diagnostics.sections = [];
+        diagnostics.meta = {};
+    }
+    const pushSection = (label, text) => {
+        sections.push(text);
+        if (diagnostics) diagnostics.sections.push({ label, text });
+    };
+
     // Non-chat sections first — they're prioritized over chat in the budget.
     if (includeChat) {
         const activeChars = collectActiveCharacters(ctx);
+        if (diagnostics) {
+            const group = ctx.groupId && Array.isArray(ctx.groups)
+                ? ctx.groups.find(g => g.id == ctx.groupId)
+                : null;
+            const disabled = Array.isArray(group?.disabled_members) ? group.disabled_members : [];
+            const chars = Array.isArray(ctx.characters) ? ctx.characters : [];
+            Object.assign(diagnostics.meta, {
+                groupId: ctx.groupId ?? null,
+                groupName: group?.name ?? null,
+                characterId: ctx.characterId ?? null,
+                // What ST's getCharaFilename() resolves to for this call. Null
+                // means per-character World Info filters cannot be evaluated —
+                // see the World Info section below.
+                currentCharacterAvatar: chars[ctx.characterId]?.avatar ?? null,
+                groupRoster: group?.members?.map((avatar) => {
+                    const match = chars.find(c => c.avatar === avatar);
+                    return {
+                        avatar,
+                        name: match?.name ?? null,
+                        resolved: !!match,
+                        muted: disabled.includes(avatar),
+                        inContext: !disabled.includes(avatar) && !!match,
+                    };
+                }) ?? null,
+                includedCharacters: activeChars.map(e => ({
+                    displayName: e.displayName,
+                    avatar: e.char.avatar,
+                })),
+            });
+        }
         for (const { displayName, char } of activeChars) {
             const lines = [];
             if (displayName) lines.push(`Name: ${displayName}`);
@@ -906,12 +949,12 @@ export async function buildContextPreamble({
             if (char.scenario) lines.push(`Scenario: ${char.scenario}`);
             if (lines.length) {
                 const header = displayName ? `[Character — ${displayName}]` : '[Character]';
-                sections.push(`${header}\n${lines.join('\n')}`);
+                pushSection(`Character: ${displayName || '(unnamed)'} (${char.avatar})`, `${header}\n${lines.join('\n')}`);
             }
         }
 
         const persona = ctx.powerUserSettings?.persona_description?.trim();
-        if (persona) sections.push(`[User Persona]\n${persona}`);
+        if (persona) pushSection('User Persona', `[User Persona]\n${persona}`);
     }
 
     if (Array.isArray(loreBookNames) && loreBookNames.length) {
@@ -929,7 +972,7 @@ export async function buildContextPreamble({
                         return label ? `- ${label}: ${content}` : `- ${content}`;
                     });
                 if (entries.length) {
-                    sections.push(`[Lore Book: ${name}]\n${entries.join('\n')}`);
+                    pushSection(`Lore Book (hand-picked): ${name}`, `[Lore Book: ${name}]\n${entries.join('\n')}`);
                 }
             } catch (err) {
                 console.error(`Saints-Silly-Extensions: failed to load lore book "${name}":`, err);
@@ -958,9 +1001,21 @@ export async function buildContextPreamble({
             const wiMaxContext = overrideValid ? maxContextOverride : getMaxPromptTokens();
             const wi = await ctx.getWorldInfoPrompt(chatForWI, wiMaxContext, true);
             const wiText = (wi?.worldInfoString || '').trim();
-            if (wiText) sections.push(`[World Info]\n${wiText}`);
+            if (diagnostics) {
+                diagnostics.meta.worldInfo = {
+                    scannedLines: chatForWI.length,
+                    includeNames,
+                    maxContext: wiMaxContext,
+                    // ST slices this buffer down to its own scan depth setting,
+                    // so only the newest few lines actually match keys.
+                    newestScannedLine: chatForWI[0] ?? null,
+                    activated: !!wiText,
+                };
+            }
+            if (wiText) pushSection('World Info (auto-activated)', `[World Info]\n${wiText}`);
         } catch (err) {
             console.error('Saints-Silly-Extensions: auto World Info activation failed.', err);
+            if (diagnostics) diagnostics.meta.worldInfo = { error: String(err?.message || err) };
         }
     }
 
@@ -992,13 +1047,34 @@ export async function buildContextPreamble({
                     - nonChatTokens - headerTokens;
                 const packed = await packRecentChatLines(chat, ctx, chatBudget);
                 if (packed) recentBlock = `[Recent Chat]\n${packed}`;
+                if (diagnostics) {
+                    diagnostics.meta.recentChat = {
+                        maxContext,
+                        responseLength,
+                        reserve: PREAMBLE_BUDGET_RESERVE,
+                        nonChatTokens,
+                        chatBudget,
+                        candidateMessages: chat.length,
+                        packedLines: packed ? packed.split('\n').length : 0,
+                        excludedTail: excludeRecentCount,
+                    };
+                }
             } catch (err) {
                 console.error('Saints-Silly-Extensions: token-budgeted chat packing failed; falling back to fixed limit.', err);
                 const recent = chat.slice(-PREAMBLE_FALLBACK_MESSAGE_LIMIT);
                 const lines = recent.map(m => formatChatLine(m, ctx)).filter(Boolean);
                 if (lines.length) recentBlock = `[Recent Chat]\n${lines.join('\n')}`;
+                if (diagnostics) {
+                    diagnostics.meta.recentChat = {
+                        fallback: true,
+                        error: String(err?.message || err),
+                        candidateMessages: chat.length,
+                        packedLines: lines.length,
+                        excludedTail: excludeRecentCount,
+                    };
+                }
             }
-            if (recentBlock) sections.push(recentBlock);
+            if (recentBlock) pushSection('Recent Chat', recentBlock);
         }
     }
 

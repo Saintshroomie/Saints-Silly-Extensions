@@ -13,6 +13,23 @@ released version. When cutting a release, move these notes into a new
 `## [X.Y.Z]` section and run `npm version`._
 
 ### Added
+- **Compaction "Dump Prompt" button** — a diagnostic button in the Compaction
+  modal that writes the exact payload Generate Summary would send to the browser
+  console and sends nothing to the model. It reports the system prompt, the full
+  user prompt, the prefill and response length; every context block separately
+  with its token count (each character card, persona, hand-picked lore books,
+  auto-activated World Info, packed recent chat); and the resolution decisions
+  behind them — `this_chid`, the avatar ST's `getCharaFilename()` resolves to,
+  and the group roster showing which members are muted and which actually
+  reached the summarizer. It warns when no current character resolves (which
+  makes ST evaluate per-character World Info filters against a null character)
+  and when muted members were dropped from context. The dump runs the real
+  preamble/prompt path with an inspection sink attached rather than
+  reconstructing it, so it cannot drift from what is actually sent, and the
+  result is parked on `window.__ccPromptDump` for copying. `buildContextPreamble`
+  gained a matching optional `diagnostics` sink, available to every tool that
+  builds context.
+
 - **Lore book entry Copy button** — every World Info / lore book entry now gets a
   **Copy** button directly above its content field, next to Clear Content, that
   puts the entry's content on the clipboard in one click (with a fallback for

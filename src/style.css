@@ -824,6 +824,17 @@
     color: var(--SmartThemeQuoteColor, #e8a23a);
 }
 
+/* Diagnostic, not a story action — sits apart from the generate/continue set. */
+.cc-dump-btn {
+    flex: 0 0 auto;
+    min-width: 0;
+    opacity: 0.75;
+}
+
+.cc-dump-btn:hover {
+    opacity: 1;
+}
+
 .cc-tokens-row {
     display: flex;
     align-items: center;
