@@ -140,6 +140,27 @@ export function activateToolPreset(toolKey, id) {
 }
 
 /**
+ * Subscribe to preset switches for a tool. The listener fires after the new
+ * preset's values have landed in `settings`, so it can read them straight
+ * off the settings object.
+ *
+ * Unlike `createToolPresetSelector` (which self-unsubscribes once its
+ * element leaves the DOM) there is no element to watch here, so the caller
+ * owns the returned unsubscribe function and must call it — e.g. when a
+ * modal closes.
+ *
+ * @param {string} toolKey  Tool id from TOOL_PRESET_CONFIG, e.g. 'image-prompt'.
+ * @param {function} listener  Called with no arguments after each switch.
+ * @returns {function} Unsubscribe function (safe to call more than once).
+ */
+export function onToolPresetChange(toolKey, listener) {
+    const tool = getTool(toolKey);
+    if (!tool || typeof listener !== 'function') return () => {};
+    tool.listeners.add(listener);
+    return () => tool.listeners.delete(listener);
+}
+
+/**
  * Create a compact preset dropdown for mounting at a tool's point of use
  * (a modal, a World Info entry row). It mirrors the settings widget — same
  * preset list, same active selection, same "(modified)" dirty marker, same

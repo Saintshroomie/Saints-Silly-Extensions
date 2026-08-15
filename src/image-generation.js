@@ -155,9 +155,13 @@ export function checkImageGenConfigured() {
  * @param {object} [options]
  * @param {boolean} [options.quiet] When true, generate without posting the
  *   image as a chat message (it still lands in the character gallery).
+ * @param {string} [options.negative] Negative prompt. ST treats this as a
+ *   *prefix*: it is comma-joined in front of the negative prompt configured
+ *   in the Image Generation panel rather than replacing it, so the user's
+ *   own negatives keep applying. Omit or pass '' to send only theirs.
  * @returns {Promise<string>} URL of the generated image, or ''.
  */
-export async function sendPromptToImageGen(prompt, { quiet = false } = {}) {
+export async function sendPromptToImageGen(prompt, { quiet = false, negative = '' } = {}) {
     const text = (prompt || '').trim();
     if (!text) throw new Error('Image prompt is empty.');
 
@@ -168,10 +172,17 @@ export async function sendPromptToImageGen(prompt, { quiet = false } = {}) {
 
     // Named args are passed as strings — ST parses them with its own
     // isTrueBoolean/isFalseBoolean helpers, same as a typed command would.
-    const url = await command.callback({
+    const args = {
         quiet: quiet ? 'true' : 'false',
         extend: 'false',
-    }, text);
+    };
+    // Only set it when non-empty: ST reads `args?.negative || ''`, so an
+    // empty string is equivalent, but leaving the key off keeps the args
+    // identical to what a plain `/imagine` would produce.
+    const negativeText = (negative || '').trim();
+    if (negativeText) args.negative = negativeText;
+
+    const url = await command.callback(args, text);
 
     return typeof url === 'string' ? url : '';
 }

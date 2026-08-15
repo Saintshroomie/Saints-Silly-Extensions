@@ -40,7 +40,7 @@ import {
     abortAllGenerations,
     isSilentGenerationAbort,
 } from './silent-generation.js';
-import { createToolPresetSelector } from './prompt-templates.js';
+import { createToolPresetSelector, onToolPresetChange } from './prompt-templates.js';
 import {
     isImageGenAvailable,
     getImageGenSourceLabel,
@@ -74,6 +74,12 @@ Prompt-writing rules:
 
 export const DEFAULT_IMAGE_PROMPT_PREFILL = '';
 
+// Negative prompt shipped with the Default (Krea 2) preset. Empty on
+// purpose: Krea 2 is a modern flow-matching model that barely responds to
+// the booru-era "bad anatomy, worst quality" negatives, and an unnecessary
+// negative costs quality. Users who want one just type it in.
+export const DEFAULT_IMAGE_PROMPT_NEGATIVE = '';
+
 // Seeded preset — targets Circlestone Labs' Anima (Base), which accepts
 // Danbooru tags, natural language, or both; the mixed style (a tag block
 // followed by a short prose passage) plays to its training. Tag block
@@ -95,6 +101,14 @@ Prompt-writing rules:
 
 export const ANIMA_IMAGE_PROMPT_PREFILL = 'masterpiece, best quality, score_7, ';
 
+// Standard booru-model negative: quality floor + the anatomy/artifact tags
+// these models were captioned with. Sent as a prefix to whatever negative
+// prompt is already configured in ST's Image Generation panel.
+export const ANIMA_IMAGE_PROMPT_NEGATIVE =
+    'lowres, worst quality, low quality, bad anatomy, bad hands, missing fingers, '
+    + 'extra digit, fewer digits, extra limbs, deformed, mutated, blurry, jpeg artifacts, '
+    + 'text, watermark, signature, username, artist name, cropped';
+
 // Seeded preset — pure Danbooru tag list for booru-trained anime models
 // (Illustrious, NoobAI, Pony derivatives, etc.).
 export const DANBOORU_IMAGE_PROMPT_PROMPT = `{{context}}Role:
@@ -112,6 +126,11 @@ Prompt-writing rules:
 - Output only the tag list — no preamble, no commentary, no sentences, no negative prompt.`;
 
 export const DANBOORU_IMAGE_PROMPT_PREFILL = 'masterpiece, best quality, ';
+
+export const DANBOORU_IMAGE_PROMPT_NEGATIVE =
+    'lowres, worst quality, low quality, normal quality, bad anatomy, bad hands, '
+    + 'missing fingers, extra digit, fewer digits, extra limbs, deformed, mutated, '
+    + 'blurry, jpeg artifacts, text, watermark, signature, username, artist name, cropped';
 
 const IP_GENERATE_SYSTEM_PROMPT =
     'You are an image-prompt engineering assistant. Follow the instructions and target '
@@ -136,10 +155,12 @@ const BUILTIN_IMAGE_PROMPT_PRESETS = {
     'Anima (Tags + Prose)': {
         imagePromptPrompt: ANIMA_IMAGE_PROMPT_PROMPT,
         imagePromptPrefill: ANIMA_IMAGE_PROMPT_PREFILL,
+        imagePromptNegative: ANIMA_IMAGE_PROMPT_NEGATIVE,
     },
     'Danbooru Tags': {
         imagePromptPrompt: DANBOORU_IMAGE_PROMPT_PROMPT,
         imagePromptPrefill: DANBOORU_IMAGE_PROMPT_PREFILL,
+        imagePromptNegative: DANBOORU_IMAGE_PROMPT_NEGATIVE,
     },
 };
 
@@ -201,10 +222,22 @@ let messageButtonListenersInstalled = false;
 const persistedModalState = {
     guidance: '',
     output: '',
+    negative: null, // null means "never touched — follow the prompt preset"
     useChatContext: true,
     selectedLoreBooks: [],
     responseLength: null, // null means "use saved setting"
 };
+
+// The negative text the active prompt preset last put into the modal's
+// field. While the field still matches it the user hasn't customized their
+// negative, so switching preset (or reopening the modal) is free to re-seed
+// it; the moment they edit it, their text wins and the preset stops
+// overwriting it. Reset puts the field back under preset control.
+let seededNegative = null;
+
+// Unsubscribe handle for the preset-change listener held while the modal is
+// open — there is no element for the listener to watch, so the modal owns it.
+let presetChangeUnsubscribe = null;
 
 // ─── Saved Prompt Store (per-chat) ───
 
@@ -237,6 +270,9 @@ function readSavedPrompts() {
         if (typeof p.id !== 'string' || !p.id) p.id = makeSavedPromptId();
         if (typeof p.title !== 'string') p.title = '';
         if (typeof p.savedAt !== 'number') p.savedAt = 0;
+        // `negative` is left undefined on entries saved before the field
+        // existed — callers distinguish "saved without one" ('') from
+        // "predates the feature" (undefined), so don't backfill it here.
     }
     return valid;
 }
@@ -280,14 +316,23 @@ function saveOutputToChat() {
         return;
     }
     const prompts = readSavedPrompts();
-    if (prompts.some(p => p.text === text)) {
+    const negative = readNegativePrompt();
+    // Same prompt with a different negative is a different render, so both
+    // halves have to match for it to count as a duplicate.
+    if (prompts.some(p => p.text === text && (p.negative ?? '') === negative)) {
         toast('This image prompt is already saved to this chat.', 'info');
         return;
     }
     // Cancel aborts the save; an emptied field saves the prompt untitled.
     const title = window.prompt('Title for this saved prompt:', suggestPromptTitle(text));
     if (title === null) return;
-    prompts.push({ id: makeSavedPromptId(), title: title.trim(), text, savedAt: Date.now() });
+    prompts.push({
+        id: makeSavedPromptId(),
+        title: title.trim(),
+        text,
+        negative: readNegativePrompt(),
+        savedAt: Date.now(),
+    });
     writeSavedPrompts(prompts);
     renderSavedPrompts();
     toast('Image prompt saved to this chat.', 'success');
@@ -327,6 +372,15 @@ function loadSavedPrompt(id) {
         return;
     }
     output.value = entry.text;
+    // Restore the negative it was saved with. Entries from before the field
+    // existed have none, and leave the current negative alone.
+    if (typeof entry.negative === 'string') {
+        const negative = document.getElementById('ip_negative_prompt');
+        if (negative) {
+            negative.value = entry.negative;
+            persistedModalState.negative = entry.negative;
+        }
+    }
     // Loading replaces the working prompt wholesale, so the old Retry
     // restore point no longer describes anything on screen — drop it,
     // mirroring the Clear button.
@@ -686,6 +740,17 @@ export function bindImagePromptSettings(saveSettings) {
         });
     }
 
+    const negativeArea = document.getElementById('image_prompt_negative_textarea');
+    if (negativeArea) {
+        negativeArea.value = (typeof moduleSettings.imagePromptNegative === 'string')
+            ? moduleSettings.imagePromptNegative
+            : DEFAULT_IMAGE_PROMPT_NEGATIVE;
+        negativeArea.addEventListener('input', () => {
+            moduleSettings.imagePromptNegative = negativeArea.value;
+            saveSettings();
+        });
+    }
+
     document.getElementById('image_prompt_preview_btn')
         ?.addEventListener('click', showImagePromptPreview);
 }
@@ -700,6 +765,12 @@ function showImagePromptPreview() {
         { label: 'System Prompt (fixed)', text: IP_GENERATE_SYSTEM_PROMPT },
         { label: 'User Prompt (template with sample values)', text: prompt },
         { label: 'Prefill (assistant prefix; kept at the start of the final prompt)', text: getPrefill() },
+        {
+            label: 'Negative Prompt (not sent to the LLM — used by Generate Image)',
+            text: currentPresetNegative()
+                || '(empty — Generate Image will send only the negative prompt configured in '
+                    + 'SillyTavern\'s Image Generation panel)',
+        },
         {
             label: 'Note',
             text: 'Continue uses the same template, but the image prompt so far is sent as '
@@ -744,6 +815,7 @@ async function openImagePromptModal({ anchorIndex = null, autoGenerate = false }
             bindModalHandlers();
             refreshAnchorBar();
             refreshActionButtonStates();
+            presetChangeUnsubscribe = onToolPresetChange('image-prompt', onPresetChangedRefreshNegative);
             debug('Modal opened', contextAnchorIndex !== null ? `(anchored at message ${contextAnchorIndex})` : '');
             if (autoGenerate) handleGenerate();
         },
@@ -780,6 +852,8 @@ async function openImagePromptModal({ anchorIndex = null, autoGenerate = false }
         }
     } finally {
         capturePersistedModalState(body);
+        presetChangeUnsubscribe?.();
+        presetChangeUnsubscribe = null;
         activePopup = null;
         activeBody = null;
         isGenerating = false;
@@ -796,6 +870,8 @@ function capturePersistedModalState(body) {
     if (!body) return;
     persistedModalState.guidance = body.querySelector('#ip_guidance')?.value || '';
     persistedModalState.output = body.querySelector('#ip_prompt_output')?.value || '';
+    const negativeEl = body.querySelector('#ip_negative_prompt');
+    if (negativeEl) persistedModalState.negative = negativeEl.value;
     persistedModalState.useChatContext = !!body.querySelector('#ip_use_chat_context')?.checked;
     const picker = body._ipLorebookPicker;
     persistedModalState.selectedLoreBooks = picker ? picker.getSelected() : [];
@@ -879,6 +955,20 @@ function buildModalBody() {
             </div>
             <textarea id="ip_prompt_output" class="text_pole ip-prompt-output" rows="14" placeholder="The generated image prompt will appear here. Edit it freely, then copy it into ComfyUI or your image tool."></textarea>
         </div>
+        <div class="ip-negative-section">
+            <div class="ip-field-header">
+                <label for="ip_negative_prompt" title="Sent as the negative prompt when you click Generate Image. It is added in front of the negative prompt configured in SillyTavern's own Image Generation panel, which still applies."><b>Negative Prompt:</b></label>
+                <div class="ip-field-header-buttons">
+                    <div id="ip_reset_negative_btn" class="menu_button interactable ip-clear-btn" title="Reset to the current prompt preset's negative prompt">
+                        <span class="fa-solid fa-rotate-left"></span> Reset
+                    </div>
+                    <div id="ip_clear_negative_btn" class="menu_button interactable ip-clear-btn" title="Clear the negative prompt">
+                        <span class="fa-solid fa-eraser"></span> Clear
+                    </div>
+                </div>
+            </div>
+            <textarea id="ip_negative_prompt" class="text_pole ip-negative-prompt" rows="3" placeholder="Things to keep out of the image (e.g. lowres, bad anatomy, watermark). Follows the prompt preset unless you edit it. Leave empty to use only SillyTavern's own negative prompt."></textarea>
+        </div>
         <div class="ip-saved-section">
             <details class="ip-saved-picker">
                 <summary title="Image prompts saved to this chat — load, copy, or delete them">
@@ -897,6 +987,8 @@ function buildModalBody() {
     if (outputEl) outputEl.value = persistedModalState.output || '';
     const chatCb = root.querySelector('#ip_use_chat_context');
     if (chatCb) chatCb.checked = !!persistedModalState.useChatContext;
+    const negativeEl = root.querySelector('#ip_negative_prompt');
+    if (negativeEl) negativeEl.value = resolveNegativeForField();
 
     // Initialize the token field from persisted state if available, else
     // from settings.
@@ -977,6 +1069,20 @@ function bindModalHandlers() {
         guidance.value = '';
         guidance.focus();
     });
+    document.getElementById('ip_reset_negative_btn')?.addEventListener('click', () => {
+        if (isGenerating) return;
+        setNegativeFromPreset();
+    });
+    document.getElementById('ip_clear_negative_btn')?.addEventListener('click', () => {
+        if (isGenerating) return;
+        const negative = document.getElementById('ip_negative_prompt');
+        if (!negative) return;
+        negative.value = '';
+        // An emptied field is a deliberate choice, not "unset" — record it so
+        // a preset switch doesn't quietly refill it.
+        persistedModalState.negative = '';
+        negative.focus();
+    });
     document.getElementById('ip_clear_output_btn')?.addEventListener('click', () => {
         if (isGenerating) return;
         const out = document.getElementById('ip_prompt_output');
@@ -1022,6 +1128,56 @@ async function copyToClipboard(text) {
         logPrefix: 'Image Prompting',
         debug,
     });
+}
+
+// ─── Negative Prompt ───
+
+/** The active prompt preset's negative prompt. */
+function currentPresetNegative() {
+    return (typeof moduleSettings?.imagePromptNegative === 'string')
+        ? moduleSettings.imagePromptNegative
+        : DEFAULT_IMAGE_PROMPT_NEGATIVE;
+}
+
+/**
+ * Text the modal's negative field should open with: the preset's negative
+ * while the user hasn't customized it, otherwise whatever they last typed.
+ */
+function resolveNegativeForField() {
+    const preset = currentPresetNegative();
+    const saved = persistedModalState.negative;
+    if (saved === null || saved === seededNegative) {
+        seededNegative = preset;
+        return preset;
+    }
+    return saved;
+}
+
+/** Live value of the modal's negative field (empty when the modal is shut). */
+function readNegativePrompt() {
+    return document.getElementById('ip_negative_prompt')?.value?.trim() || '';
+}
+
+/** Put the field back under preset control. */
+function setNegativeFromPreset() {
+    const field = document.getElementById('ip_negative_prompt');
+    if (!field) return;
+    const preset = currentPresetNegative();
+    field.value = preset;
+    seededNegative = preset;
+    persistedModalState.negative = preset;
+}
+
+/**
+ * Follow a preset switch made while the modal is open — but only while the
+ * field still holds what the previous preset seeded. A negative the user
+ * typed themselves is theirs to keep; Reset is how they opt back in.
+ */
+function onPresetChangedRefreshNegative() {
+    const field = document.getElementById('ip_negative_prompt');
+    if (!field || field.value !== seededNegative) return;
+    setNegativeFromPreset();
+    debug('Negative prompt re-seeded from the newly activated preset');
 }
 
 // ─── Send to ST's Image Generation ───
@@ -1085,7 +1241,7 @@ async function handleSendToImageGen() {
     const label = getImageGenSourceLabel();
     setSendingImageUI(true, label);
     try {
-        await dispatchImageGen(text, label);
+        await dispatchImageGen(text, label, readNegativePrompt());
     } finally {
         setSendingImageUI(false, label);
     }
@@ -1111,7 +1267,12 @@ async function sendSavedPromptToImageGen(id) {
     const label = getImageGenSourceLabel();
     setSendingImageUI(true, label);
     try {
-        await dispatchImageGen(entry.text, label);
+        // A saved prompt carries the negative it was saved with; older
+        // entries predate the field and fall back to the live one.
+        const negative = (typeof entry.negative === 'string')
+            ? entry.negative
+            : readNegativePrompt();
+        await dispatchImageGen(entry.text, label, negative);
     } finally {
         setSendingImageUI(false, label);
     }
@@ -1121,12 +1282,14 @@ async function sendSavedPromptToImageGen(id) {
  * Shared hand-off: send the text, report the outcome. Owns the
  * `isSendingImage` flag so no caller can leave it stuck set.
  */
-async function dispatchImageGen(text, label) {
+async function dispatchImageGen(text, label, negative = '') {
     isSendingImage = true;
-    debug('Sending prompt to image generation:', label, `${text.length} chars`);
+    debug('Sending prompt to image generation:', label, `${text.length} chars`,
+        negative ? `negative: ${negative.length} chars` : 'no negative');
     try {
         const url = await sendPromptToImageGen(text, {
             quiet: !!moduleSettings?.imagePromptImageGenQuiet,
+            negative,
         });
         if (url) {
             toast(`Image generated on ${label}.`, 'success');

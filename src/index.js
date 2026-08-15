@@ -135,6 +135,7 @@ import {
     seedImagePromptPresets,
     DEFAULT_IMAGE_PROMPT_PROMPT,
     DEFAULT_IMAGE_PROMPT_PREFILL,
+    DEFAULT_IMAGE_PROMPT_NEGATIVE,
     DEFAULT_IMAGE_PROMPT_RESPONSE_LENGTH,
 } from './image-prompting.js';
 import {
@@ -268,6 +269,7 @@ const defaultSettings = {
     imagePromptDebugMode: false,
     imagePromptPrompt: DEFAULT_IMAGE_PROMPT_PROMPT,
     imagePromptPrefill: DEFAULT_IMAGE_PROMPT_PREFILL,
+    imagePromptNegative: DEFAULT_IMAGE_PROMPT_NEGATIVE,
     imagePromptResponseLength: DEFAULT_IMAGE_PROMPT_RESPONSE_LENGTH,
     imagePromptMaxContextOverride: 0,
     retryAutoContinue: true,
@@ -392,6 +394,7 @@ const TOOL_PRESET_CONFIG = [
         fields: [
             { key: 'imagePromptPrompt', label: 'Prompt', textareaId: 'image_prompt_prompt_textarea', defaultText: DEFAULT_IMAGE_PROMPT_PROMPT },
             { key: 'imagePromptPrefill', label: 'Prefill', textareaId: 'image_prompt_prefill_textarea', defaultText: DEFAULT_IMAGE_PROMPT_PREFILL },
+            { key: 'imagePromptNegative', label: 'Negative Prompt', textareaId: 'image_prompt_negative_textarea', defaultText: DEFAULT_IMAGE_PROMPT_NEGATIVE },
         ],
     },
     {

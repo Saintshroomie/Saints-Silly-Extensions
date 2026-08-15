@@ -1155,6 +1155,17 @@
     color: var(--SmartThemeQuoteColor, #e8a23a);
 }
 
+.ip-negative-section {
+    margin-top: 10px;
+}
+
+.ip-modal-body .ip-negative-prompt {
+    width: 100%;
+    min-height: 60px;
+    resize: vertical;
+    font-size: 0.9em;
+}
+
 /* Image Prompting lore-book picker (shares the ACC picker shape) */
 .ip-lorebook-picker {
     position: relative;
