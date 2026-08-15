@@ -13,6 +13,39 @@ released version. When cutting a release, move these notes into a new
 `## [X.Y.Z]` section and run `npm version`._
 
 ### Added
+- **Negative prompt for image generation** — the Image Prompt modal gains an
+  editable **Negative Prompt** field, sent alongside the prompt whenever you click
+  **Generate Image**. It belongs to the tool's **prompt presets**, so each
+  diffusion-model family carries the negative that model actually wants: the
+  **Anima (Tags + Prose)** and **Danbooru Tags** presets ship with the usual
+  quality/anatomy tags, while the Krea 2 **Default** ships empty on purpose (modern
+  flow-matching models barely respond to booru-era negatives). The modal's field
+  follows the active preset until you edit it, after which your text stands —
+  **Reset** puts it back under preset control and **Clear** empties it. The negative
+  is added *in front of* the one configured in SillyTavern's own Image Generation
+  panel rather than replacing it, so global negatives keep applying, and saved
+  prompts now remember the negative they were saved with. Existing installs keep
+  their already-seeded Anima/Danbooru presets, which have no negative stored — open
+  the preset's **Negative Prompt** box in settings and paste one in (or re-save the
+  preset) to pick up the new defaults.
+
+- **Generate Image from the Image Prompt modal** — a **Generate Image** button next
+  to the prompt output hands the finished prompt to SillyTavern's own **Image
+  Generation** extension, so it renders on whichever backend that extension is
+  already pointed at (**ComfyUI**, AUTOMATIC1111, SD.Next, DrawThings, NovelAI,
+  Stable Horde, or an online API) and posts the result into the chat — no
+  copy-pasting into another window. The prompt is sent verbatim as a free-mode
+  prompt (never re-written by a second LLM pass, even if ST's "auto-extend free
+  mode prompts" setting is on), with ST's own common prompt prefix and negative
+  prompt applied on top, so existing quality tags, workflow, resolution, and
+  sampler settings continue to apply. Every entry in **Saved Prompts** gets the
+  same button, for re-rendering an old prompt without loading it into the editor.
+  The button labels itself with the configured backend, is hidden when ST's Image
+  Generation extension is disabled, and has its own **Generate Image button**
+  toggle (on by default) plus a **Don't post generated images to the chat**
+  option in the Image Prompting settings drawer. No image settings are duplicated
+  — ComfyUI's URL and workflow stay in SillyTavern's Image Generation panel.
+
 - **Lore book entry Copy button** — every World Info / lore book entry now gets a
   **Copy** button directly above its content field, next to Clear Content, that
   puts the entry's content on the clipboard in one click (with a fallback for

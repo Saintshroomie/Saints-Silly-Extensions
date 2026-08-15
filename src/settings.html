@@ -882,6 +882,21 @@
                 <span>Auto-generate on per-message button</span>
             </label>
 
+            <label class="checkbox_label" title="Adds a Generate Image button to the modal (and to every saved prompt) that renders the prompt on whichever backend SillyTavern's own Image Generation extension is pointed at — ComfyUI, A1111, NovelAI, and so on. The button is hidden when that extension is disabled.">
+                <input id="image_prompt_send_to_imagegen" type="checkbox" />
+                <span><span class="fa-solid fa-paintbrush"></span> Generate Image button (send to ST's image backend)</span>
+            </label>
+
+            <label class="checkbox_label" title="If enabled, generated images are not posted as a chat message. They are still saved to the character gallery. Off by default — posting to chat is what ST's own /imagine does.">
+                <input id="image_prompt_imagegen_quiet" type="checkbox" />
+                <span>Don't post generated images to the chat</span>
+            </label>
+
+            <small>Image backend settings (ComfyUI URL, workflow, resolution, common
+                prompt prefix, negative prompt) live in SillyTavern's own <b>Image Generation</b>
+                extension panel — this button just hands your prompt to it, so there is nothing to
+                configure twice.</small>
+
             <div class="ng_inline_row">
                 <label for="image_prompt_max_context_override"><b><span class="fa-solid fa-coins"></span> Max Context Override:</b></label>
                 <input id="image_prompt_max_context_override" type="number" min="0" step="100" class="text_pole ng_number_input" title="If set above 0, caps how many tokens of context the chat-packer uses for image-prompt generations. 0 = use the model's full context size." />
@@ -920,6 +935,20 @@
                         <textarea id="image_prompt_prefill_textarea" class="text_pole" rows="2"
                             placeholder="Optional assistant-prefix the model continues (e.g. quality tags). Also kept at the start of the final prompt."></textarea>
                         <small>Optional. Sent as an assistant prefix the model continues from, and kept at the start of the final image prompt (the tag-based presets use it for quality tags like <code>masterpiece, best quality</code>). If the backend ignores prefills and the model repeats it, the echo is stripped automatically.</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="inline-drawer saints_nested_drawer">
+                <div class="inline-drawer-toggle inline-drawer-header">
+                    <b>Negative Prompt</b>
+                    <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+                </div>
+                <div class="inline-drawer-content" style="display: none;">
+                    <div class="acc_prompt_section">
+                        <textarea id="image_prompt_negative_textarea" class="text_pole" rows="3"
+                            placeholder="Things to keep out of the image (e.g. lowres, bad anatomy, watermark)."></textarea>
+                        <small>Not sent to the LLM — this is the negative prompt used by <b>Generate Image</b>. It seeds the editable Negative Prompt field in the modal, so each diffusion-model preset carries the negative that model wants (the booru presets ship with quality/anatomy tags; the Krea 2 Default ships empty). It is added <i>in front of</i> the negative prompt configured in SillyTavern's own Image Generation panel, which still applies.</small>
                     </div>
                 </div>
             </div>
