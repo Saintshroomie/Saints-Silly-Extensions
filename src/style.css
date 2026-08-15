@@ -1144,6 +1144,17 @@
     opacity: 1;
 }
 
+.ip-modal-body .ip-clear-btn.ip-disabled {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+/* Hand-off to ST's Image Generation extension — tinted like the primary
+   Generate action, since it's the other "make something" button in the modal. */
+.ip-modal-body .ip-send-btn {
+    color: var(--SmartThemeQuoteColor, #e8a23a);
+}
+
 /* Image Prompting lore-book picker (shares the ACC picker shape) */
 .ip-lorebook-picker {
     position: relative;

@@ -263,6 +263,8 @@ const defaultSettings = {
     imagePromptEnabled: true,
     imagePromptMessageButtonEnabled: true,
     imagePromptMessageButtonAutoGenerate: false,
+    imagePromptSendToImageGenEnabled: true,
+    imagePromptImageGenQuiet: false,
     imagePromptDebugMode: false,
     imagePromptPrompt: DEFAULT_IMAGE_PROMPT_PROMPT,
     imagePromptPrefill: DEFAULT_IMAGE_PROMPT_PREFILL,

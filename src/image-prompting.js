@@ -41,6 +41,12 @@ import {
     isSilentGenerationAbort,
 } from './silent-generation.js';
 import { createToolPresetSelector } from './prompt-templates.js';
+import {
+    isImageGenAvailable,
+    getImageGenSourceLabel,
+    checkImageGenConfigured,
+    sendPromptToImageGen,
+} from './image-generation.js';
 
 // ─── Default Prompts ───
 
@@ -172,6 +178,11 @@ let abortRequested = false;
 let activeAction = null;       // which button initiated the current generation
 let lastAction = null;         // 'generate' | 'continue' — what Retry should redo
 let restorePoint = null;       // textarea snapshot used by Retry
+
+// True while a prompt is being rendered by ST's Image Generation extension.
+// Separate from `isGenerating` (which tracks *our* LLM prompt generation):
+// the two are different backends and the modal disables them independently.
+let isSendingImage = false;
 
 // When set, the chat context packed into {{context}} ends at this message
 // index (inclusive) instead of the live end of the chat — the per-message
@@ -397,6 +408,13 @@ function buildSavedPromptRow(entry) {
     const buttons = document.createElement('div');
     buttons.className = 'ip-saved-item-buttons';
     buttons.appendChild(buildSavedPromptButton('fa-file-import', 'Load this prompt into the editor above', () => loadSavedPrompt(entry.id)));
+    if (imageGenButtonEnabled()) {
+        buttons.appendChild(buildSavedPromptButton(
+            'fa-paintbrush',
+            `Render this saved prompt on ${getImageGenSourceLabel()} without loading it into the editor`,
+            () => sendSavedPromptToImageGen(entry.id),
+        ));
+    }
     buttons.appendChild(buildSavedPromptButton('fa-copy', 'Copy this prompt to the clipboard', () => copyToClipboard(entry.text)));
     buttons.appendChild(buildSavedPromptButton('fa-pen', 'Rename this saved prompt', () => renameSavedPrompt(entry.id)));
     buttons.appendChild(buildSavedPromptButton('fa-trash-can', 'Delete this saved prompt', () => {
@@ -608,6 +626,27 @@ export function bindImagePromptSettings(saveSettings) {
         });
     }
 
+    const sendToImageGenCb = document.getElementById('image_prompt_send_to_imagegen');
+    if (sendToImageGenCb) {
+        sendToImageGenCb.checked = moduleSettings.imagePromptSendToImageGenEnabled !== false;
+        sendToImageGenCb.addEventListener('change', () => {
+            moduleSettings.imagePromptSendToImageGenEnabled = sendToImageGenCb.checked;
+            saveSettings();
+            // The modal may be open behind the settings drawer.
+            refreshImageGenButton();
+            renderSavedPrompts();
+        });
+    }
+
+    const imageGenQuietCb = document.getElementById('image_prompt_imagegen_quiet');
+    if (imageGenQuietCb) {
+        imageGenQuietCb.checked = !!moduleSettings.imagePromptImageGenQuiet;
+        imageGenQuietCb.addEventListener('change', () => {
+            moduleSettings.imagePromptImageGenQuiet = imageGenQuietCb.checked;
+            saveSettings();
+        });
+    }
+
     const debugCb = document.getElementById('image_prompt_debug_mode');
     if (debugCb) {
         debugCb.checked = moduleSettings.imagePromptDebugMode;
@@ -686,6 +725,7 @@ async function openImagePromptModal({ anchorIndex = null, autoGenerate = false }
     isGenerating = false;
     abortRequested = false;
     activeAction = null;
+    isSendingImage = false;
     // lastAction / restorePoint are retry-only state and don't need to
     // persist across modal sessions.
     lastAction = null;
@@ -743,6 +783,7 @@ async function openImagePromptModal({ anchorIndex = null, autoGenerate = false }
         activePopup = null;
         activeBody = null;
         isGenerating = false;
+        isSendingImage = false;
         activeAction = null;
         lastAction = null;
         restorePoint = null;
@@ -822,6 +863,9 @@ function buildModalBody() {
             <div class="ip-field-header">
                 <label for="ip_prompt_output"><b>Image Prompt:</b></label>
                 <div class="ip-field-header-buttons">
+                    <div id="ip_send_imagegen_btn" class="menu_button interactable ip-clear-btn ip-send-btn ip-hidden" title="Render this prompt on the image backend configured in SillyTavern's Image Generation settings">
+                        <span class="fa-solid fa-paintbrush"></span> Generate Image
+                    </div>
                     <div id="ip_save_output_btn" class="menu_button interactable ip-clear-btn" title="Save the image prompt to this chat so it can be retrieved later">
                         <span class="fa-solid fa-floppy-disk"></span> Save
                     </div>
@@ -907,6 +951,8 @@ function bindModalHandlers() {
     });
 
     document.getElementById('ip_save_output_btn')?.addEventListener('click', saveOutputToChat);
+    document.getElementById('ip_send_imagegen_btn')?.addEventListener('click', handleSendToImageGen);
+    refreshImageGenButton();
     renderSavedPrompts();
 
     document.getElementById('ip_copy_output_btn')?.addEventListener('click', () => {
@@ -976,6 +1022,141 @@ async function copyToClipboard(text) {
         logPrefix: 'Image Prompting',
         debug,
     });
+}
+
+// ─── Send to ST's Image Generation ───
+
+/**
+ * Whether the Generate Image affordances should be shown: the user hasn't
+ * switched them off, and ST's own Image Generation extension is actually
+ * loaded (it can be disabled in the Extensions panel).
+ */
+function imageGenButtonEnabled() {
+    return moduleSettings?.imagePromptSendToImageGenEnabled !== false && isImageGenAvailable();
+}
+
+/**
+ * Show/hide the modal's Generate Image button and label it with the backend
+ * ST is currently pointed at, so it's obvious where the prompt is going.
+ */
+function refreshImageGenButton() {
+    const btn = document.getElementById('ip_send_imagegen_btn');
+    if (!btn) return;
+    if (!imageGenButtonEnabled()) {
+        btn.classList.add('ip-hidden');
+        return;
+    }
+    btn.classList.remove('ip-hidden');
+    if (!isSendingImage) {
+        const label = getImageGenSourceLabel();
+        btn.innerHTML = '<span class="fa-solid fa-paintbrush"></span> Generate Image';
+        btn.title = `Render this prompt on ${label}, the backend configured in SillyTavern's `
+            + 'Image Generation settings. The prompt is sent as-is — ST applies its own '
+            + 'common prompt prefix and negative prompt on top.';
+    }
+}
+
+/**
+ * Hand the current image prompt to ST's Image Generation extension.
+ *
+ * The modal deliberately stays open: image generation is slow, ST shows its
+ * own stoppable progress toast, and keeping the modal up lets the user tweak
+ * the prompt and re-send without regenerating it. The result posts into the
+ * chat behind the modal (unless the quiet setting is on).
+ */
+async function handleSendToImageGen() {
+    if (isGenerating || isSendingImage) return;
+    if (!imageGenButtonEnabled()) return;
+
+    const text = document.getElementById('ip_prompt_output')?.value?.trim() || '';
+    if (!text) {
+        toast('Image prompt is empty. Generate one first.', 'warning');
+        return;
+    }
+
+    // Pre-flight the parts of ST's config we can read, so an unset ComfyUI
+    // URL or workflow says exactly that instead of ST's generic warning.
+    const configured = checkImageGenConfigured();
+    if (!configured.ok) {
+        toast(configured.reason, 'warning');
+        return;
+    }
+
+    const label = getImageGenSourceLabel();
+    setSendingImageUI(true, label);
+    try {
+        await dispatchImageGen(text, label);
+    } finally {
+        setSendingImageUI(false, label);
+    }
+}
+
+/**
+ * Render a saved prompt straight from its Saved Prompts row, without
+ * disturbing whatever is in the editor above.
+ */
+async function sendSavedPromptToImageGen(id) {
+    if (isGenerating || isSendingImage) return;
+    if (!imageGenButtonEnabled()) return;
+
+    const entry = readSavedPrompts().find(p => p.id === id);
+    if (!entry) return;
+
+    const configured = checkImageGenConfigured();
+    if (!configured.ok) {
+        toast(configured.reason, 'warning');
+        return;
+    }
+
+    const label = getImageGenSourceLabel();
+    setSendingImageUI(true, label);
+    try {
+        await dispatchImageGen(entry.text, label);
+    } finally {
+        setSendingImageUI(false, label);
+    }
+}
+
+/**
+ * Shared hand-off: send the text, report the outcome. Owns the
+ * `isSendingImage` flag so no caller can leave it stuck set.
+ */
+async function dispatchImageGen(text, label) {
+    isSendingImage = true;
+    debug('Sending prompt to image generation:', label, `${text.length} chars`);
+    try {
+        const url = await sendPromptToImageGen(text, {
+            quiet: !!moduleSettings?.imagePromptImageGenQuiet,
+        });
+        if (url) {
+            toast(`Image generated on ${label}.`, 'success');
+            debug('Image generated:', url);
+        } else {
+            // ST already raised its own toast (backend unreachable, stopped
+            // mid-generation, bad workflow) — don't stack a second one.
+            debug('Image generation returned no URL; ST reported the reason.');
+        }
+    } catch (err) {
+        console.error('SSE Image Prompting: image generation failed', err);
+        toast(err?.message || 'Image generation failed. See the console for details.', 'error');
+    } finally {
+        isSendingImage = false;
+    }
+}
+
+/** Spinner + disabled state for the Generate Image button while in flight. */
+function setSendingImageUI(sending, label) {
+    const btn = document.getElementById('ip_send_imagegen_btn');
+    if (!btn) return;
+    if (sending) {
+        btn.classList.add('ip-disabled');
+        btn.innerHTML = '<span class="fa-solid fa-spinner fa-spin"></span> Generating…';
+        btn.title = `Generating an image on ${label}. Use ST's progress toast to stop it.`;
+    } else {
+        btn.classList.remove('ip-disabled');
+        refreshImageGenButton();
+        refreshActionButtonStates();
+    }
 }
 
 // ─── Actions ───
@@ -1289,6 +1470,9 @@ function setGeneratingUI(generating, action) {
 
     if (generating) {
         guidanceInput?.setAttribute('disabled', 'true');
+        // The prompt is still being written — there's nothing final to render
+        // yet, so the image hand-off is off-limits until the stream settles.
+        setButtonDisabled('ip_send_imagegen_btn', true);
     } else {
         guidanceInput?.removeAttribute('disabled');
         refreshActionButtonStates();
@@ -1303,6 +1487,9 @@ function refreshActionButtonStates() {
     setButtonDisabled('ip_continue_btn', !hasText);
     setButtonDisabled('ip_checkpoint_btn', !hasText);
     setButtonDisabled('ip_retry_btn', !lastAction || restorePoint === null);
+    // Left disabled while an image is already rendering — setSendingImageUI
+    // owns the button in that window.
+    if (!isSendingImage) setButtonDisabled('ip_send_imagegen_btn', !hasText);
 }
 
 function setButtonDisabled(id, disabled) {
