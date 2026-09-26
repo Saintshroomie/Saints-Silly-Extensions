@@ -80,9 +80,11 @@ export const DEFAULT_NG_LONG_INJECTION_PROMPT =
 export const DEFAULT_NG_SHORT_INJECTION_PROMPT =
     '[Guide the story in the following direction over the next few turns: {{guidance}}]';
 
+// Format-neutral: the Generation Instructions template (per preset) decides
+// the shape — a short paragraph by default, a field block for Scenario.
 const NG_GENERATION_SYSTEM_PROMPT =
-    'You are a story-direction assistant. Output only a single short paragraph ' +
-    'of narrative guidance in the requested bracketed format. ' +
+    'You are a story-direction assistant. Output only the narrative guidance, ' +
+    'in exactly the format the instructions request. ' +
     'No commentary, no preamble, no explanations.';
 
 export const DEFAULT_NG_LONG_TURN_COUNT = 40;
@@ -528,10 +530,11 @@ async function continueGuidance(track) {
         // extends from its exact end. It is therefore not embedded in the
         // prompt (that would duplicate it).
         const continuePrompt =
-            'A narrative guidance paragraph is in progress; your reply has been prefilled ' +
-            'with the paragraph so far. Continue it seamlessly from exactly where it stops — ' +
-            'add 1–2 sentences extending the story direction, mood, or complications. ' +
-            'Do not repeat existing text. Output only the continuation — no brackets, no preamble.';
+            'Narrative guidance is in progress; your reply has been prefilled ' +
+            'with the guidance so far. Continue it seamlessly from exactly where it stops, in the same format — ' +
+            'if it stops part-way, finish it; if it is already complete, add 1–2 sentences extending the ' +
+            'story direction, mood, or complications. ' +
+            'Do not repeat existing text. Output only the continuation — no new brackets, no preamble.';
 
         const systemPrompt =
             'You are a story-direction assistant. Output only the continuation of the guidance. ' +

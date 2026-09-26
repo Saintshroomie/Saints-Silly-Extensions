@@ -75,9 +75,11 @@ Example — World Lore:
 Guidance from the user:
 {{guidance}}`;
 
+// Kept format-neutral: presets (e.g. the Scenario ones) define their own
+// output shape, so the fixed framing must not assume the default's.
 const WIA_SYSTEM_PROMPT =
     'You are a world-building assistant. Output only the requested '
-    + 'World Lore Description in the exact bracketed format described. '
+    + 'entry in the exact format described. '
     + 'No commentary, no preamble, no explanations.';
 
 // Prefills are configured as named templates (like prompts). They are passed
@@ -585,11 +587,14 @@ function composeWIAPrompt({ preambleBlock, seed, title, isContinue }) {
         // continuation, like ST's native Continue), so it is not embedded here.
         return `${prompt}\n\nYour reply has been prefilled with the entry so far. ` +
             'Continue seamlessly from exactly where it stops — do not repeat any existing text. ' +
-            'Maintain the bracketed format and close the bracket when the entry is complete.';
+            'Keep to the format above and finish the entry.';
     }
+    // The tail describes the prefill generically: it comes from the active
+    // preset, so it must not assume the default's bracket/tone-anchor shape
+    // (a Scenario entry, for one, continues past its first closing bracket).
     return `${prompt}\n\n` + (title
-        ? `Write the entry for "${title}". The reply has been prefilled with the opening bracket, a tone anchor, and the subject name — continue from where the prefill ends with the factual description, then close the bracket.`
-        : 'No title was provided — invent a fitting subject name. The reply has been prefilled with the opening bracket and a tone anchor — continue from where the prefill ends with the subject name, colon, factual description, then close the bracket.');
+        ? `Write the entry for "${title}". The reply has been prefilled with the start of the entry — continue from exactly where the prefill ends and complete the entry in the format above.`
+        : 'No title was provided — invent a fitting subject name. The reply has been prefilled with the start of the entry — continue from exactly where the prefill ends (with the subject name, if that comes next) and complete the entry in the format above.');
 }
 
 async function onAssist(formEl, id, isContinue) {

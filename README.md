@@ -164,6 +164,7 @@ Adds an **Assist** button to every World Info / lore book entry, letting you dra
 - **Copy button** — A **Copy** button sits next to Clear Content, above every entry's content field, and puts that entry's content on the clipboard in one click. It is independent of the Assist controls: it has its own toggle (**Entry Copy button**, on by default) and stays available even with World Info Assist switched off, so you can use it purely as a convenience.
 - **Editable prompt template** — The default prompt instructs the model to emit a `[ Subject: Description ]` world lore artifact with no commentary. You can edit it freely in the settings panel (with `{{context}}` / `{{guidance}}` / `{{title}}` placeholders); save the prompt + prefills together as named presets and preview the assembled prompt (see Tool Presets & Prompt Preview below). A **Preset** dropdown on each entry's Assist row switches between your saved presets right where you're drafting — so you can pick what type of entry gets produced per generation.
 - **No schema** — Unlike Assisted Character Creation, World Info Assist has no schema. The prompt itself defines the desired output format.
+- **Scenario presets** — Two built-in presets, **Scenario (Cold-open)** and **Scenario (Continuation)**, draft a full st-toolkit-style Scenario Description (fields, override variables, and the per-character Openings block) into an entry. See [Scenario presets](#scenario-presets).
 
 **How to use**
 
@@ -192,6 +193,7 @@ Enable either tier on its own or both together. Each tier is fully self-containe
 - **Injection controls** — Per tier: Depth and Role inputs (mirroring SillyTavern's Author's Note) control where in the prompt the guidance is inserted and which role it speaks as.
 - **Lore book picker** — The chat's relevant World Info is **auto-included** in each tier's guidance context (keyword-matched against the recent chat), so the picker is now an **additive override** — use it only to fold in *extra* books that wouldn't otherwise activate. The selection is **per-chat** — it resets to empty on a new chat and reloads when you switch chats. If a selected lore book is later deleted or renamed, it's silently dropped from the selection (with a one-time notice) the next time that chat's picker is opened or guidance is generated.
 - **Configurable token limits** — Per tier: set the response token limit for the generation, and optionally cap how much chat history feeds into the context preamble.
+- **Scenario presets** — Built-in **Scenario** (short-term) and **Scenario Arc** (long-term) presets write the guidance as an st-toolkit-style Scenario Description, a live scene sheet in place of a prose paragraph. See [Scenario presets](#scenario-presets).
 
 **How to use**
 
@@ -546,6 +548,25 @@ Generation templates support tool-specific placeholders, substituted in place. I
 | Reformatting | `{{message}}` (LLM prompt) |
 | Compaction | `{{context}}`, `{{guidance}}` |
 | Image Prompting | `{{context}}`, `{{guidance}}` |
+
+#### Scenario presets
+
+World Info Assist and both Narrative Guidance tiers ship with built-in presets that write in the **st-toolkit Scenario Description** style: one bracketed block of dense, semicolon-terminated fields (`Scenario Title`, `Context`, `Location`, `Opening Focus`, `Offstage`, …). They're added to each tool's preset list once, alongside **Default**, which stays active until you pick one. If you delete one, it stays deleted.
+
+| Tool | Preset | Writes |
+|------|--------|--------|
+| World Info Assist | **Scenario (Cold-open)** | A fresh scene: `Scenario Title` / `Context` / `Location` / `Opening Focus` / `Offstage`, then `{{.<firstName>ClothingOverride = …}}`, `StatedGoalOverride`, and `TrueGoalOverride` lines for what the scene changes, then the **Openings** block, one opening message per focus character. |
+| World Info Assist | **Scenario (Continuation)** | A mid-story pickup built from the chat: `Story So Far`, `Present`, `<Name>'s Current Clothing` / `Current Aim`, and `Open Threads` as plain fields (no variables), then the same Openings block. Tick **Include chat** on the Assist row so the model has the story to draw from. |
+| Narrative Guidance (short-term) | **Scenario** | The continuation-variant fields as a live scene sheet, regenerated on the tier's clock: the scene as it stands at the latest message, with `Open Threads` for the next few turns. There's no Openings block, since the chat is already running. |
+| Narrative Guidance (long-term) | **Scenario Arc** | `Scenario Title` / `Story So Far` / `Context` / `Open Threads` for the overarching arc. The short-term Scenario is seeded from it. |
+
+Tips:
+
+- **Put the scene in Assist Guidance.** For a Scenario entry, the guidance should say who is in the scene, where, what is going on, and who is on-screen when it opens (the focus characters). With **Include chat** ticked the model sees every group member's card, so it can label each Openings branch with the exact card name and derive override prefixes from first names (`Sable Voss` → `.sableClothingOverride`, `MJ` → `.mjClothingOverride`).
+- **Using a WIA scenario entry.** Configure the entry the way st-toolkit's scenarios book does: **Constant**, position **After Char Defs**, order 50, recursion allowed. Leave it **disabled** until you want to run it, and keep only one scenario enabled at a time. Delete the greeting(s) ST posts in the new chat, enable the entry, and trigger a focus character: whoever replies first opens with their own line. You can paste the content into the chat's Scenario Override instead, but don't use both. If you title the entry, the title becomes the `Scenario Title`.
+- **Raise the response length.** A scenario is longer than a lore entry or a guidance paragraph. Set World Info Assist's response length to about **1200** tokens (each opening message runs 100–200 words), and the short-term tier's to about **800**. If a generation runs out, **Continue** finishes it in the same format.
+- **Requires the Experimental Macro Engine** (User Settings, on by default). The Openings block and override lines use ST's `{{if}}` and variable macros. The templates show that syntax to the model with escaped braces (`\{\{if …\}\}`), so ST doesn't execute the examples while building the prompt. You'll see the backslashes in the prompt field; the model doesn't. Keep them escaped if you edit the template. An unescaped `{{.x = …}}` in a template would set a real chat variable on every generation.
+- **Public-safe by design.** Everything but the cold-open `TrueGoalOverride` line is read by every character, so the templates keep secrets, private feelings, and true aims out of the fields. The scenarios never use `{{user}}` or a persona; they assume a group chat where you play a character.
 
 ## Slash Commands
 
