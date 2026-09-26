@@ -17,13 +17,16 @@ released version. When cutting a release, move these notes into a new
   presets that write in the st-toolkit Scenario Description style: a bracketed
   block of dense, semicolon-terminated fields (`Scenario Title`, `Context`,
   `Location`, `Opening Focus`, `Offstage`, …). World Info Assist gains
-  **Scenario (Cold-open)**, with override-variable lines and a per-character
-  Openings block, and **Scenario (Continuation)**, with plain fields drawn from
-  the chat plus the same Openings block. Narrative Guidance gains **Scenario**
-  (short-term live scene sheet) and **Scenario Arc** (long-term). They're added
-  to each tool's preset list once, with Default still active. The templates
-  escape their `{{…}}` examples so ST's macro engine shows them to the model
-  instead of running them. See **Scenario presets** in the README.
+  **Scenario (Cold-open)**, with override-variable lines, and **Scenario
+  (Continuation)**, with plain fields drawn from the chat. Narrative Guidance
+  gains **Scenario** (short-term live scene sheet) and **Scenario Arc**
+  (long-term). They're added to each tool's preset list once, with Default
+  still active. Unlike st-toolkit's scenarios, they stop at the closing bracket
+  with no per-character opening messages, which local models write poorly. If
+  you already had the earlier World Info Assist versions (which ended with an
+  Openings block), they're upgraded automatically unless you've edited them.
+  The templates escape their `{{…}}` examples so ST's macro engine shows them
+  to the model instead of running them. See **Scenario presets** in the README.
 - **Negative prompt for image generation** — the Image Prompt modal gains an
   editable **Negative Prompt** field, sent alongside the prompt whenever you click
   **Generate Image**. It belongs to the tool's **prompt presets**, so each
@@ -135,7 +138,7 @@ released version. When cutting a release, move these notes into a new
   default output shape.** The fixed system prompts and the "the reply has been
   prefilled…" / Continue instructions that wrap your template used to describe
   the Default preset's format ("a single short paragraph", "close the bracket").
-  With a custom preset like the Scenario ones, that made the model stop early.
+  With a custom preset, that could make the model stop early or pad the output.
   They now tell the model to complete the entry in the format the template
   describes. The Default presets behave as before.
 - **Group Director — walk-on detection now catches bare `Name:` lines.** In
