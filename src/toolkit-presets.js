@@ -1,17 +1,21 @@
 /**
- * Scenario Presets — built-in World Info Assist and Narrative Guidance
- * presets that write in the st-toolkit Scenario Description style: a
- * bracketed block of dense, semicolon-terminated fields (Scenario Title,
- * Context, Location, Opening Focus, Offstage, …), followed — for WIA — by
- * the per-character Openings block driven by ST's variable macros.
+ * Toolkit Presets — built-in presets that write in st-toolkit's formats:
  *
- * Seeded once into the tools' preset lists by `seedScenarioPresets` (like
- * the Image Prompting built-ins), guarded by `scenarioPresetsSeeded` so a
- * deleted preset stays deleted. The Default preset of each tool is left
- * untouched and stays the active one.
+ * - Scenario Description style (World Info Assist, Narrative Guidance,
+ *   Compaction): a bracketed block of dense, semicolon-terminated fields
+ *   (Scenario Title, Context, Location, Opening Focus, Offstage, …). Unlike
+ *   st-toolkit's own scenarios they stop at the closing bracket: there is no
+ *   per-character Openings block, because local models write those opening
+ *   messages poorly.
+ * - Timeline Summary (Compaction): st-toolkit's numbered event timeline.
+ *
+ * `TOOLKIT_PRESETS_SPEC` hands them to `seedBuiltinPresets` (in
+ * prompt-templates.js), which adds them once, upgrades unedited copies when
+ * the text changes, and never switches a tool's active preset. Each preset
+ * carries the response length its output needs.
  *
  * Brace escaping: ST's `createRawPrompt` runs its macro engine over the
- * prompt, so a literal `{{if !lastCharMessage}}` or `{{.x = …}}` in the
+ * prompt, so a literal `{{.x = …}}` or `{{user}}` in the
  * template would be *evaluated* (and an assignment would write a chat
  * variable) instead of being shown to the model as syntax. Every brace in
  * the format descriptions is therefore escaped as `\{` / `\}` — the macro
@@ -40,17 +44,12 @@ const STYLE_RULES = `Style Rules:
 * Never write {{user}}, and never refer to the user, a persona, or "you". Anyone else in the scene is a named character or an unnamed "someone".
 * Name only the places the scene actually uses; say "at headquarters" or "on the boat" rather than naming a place the scene never visits.`;
 
-const OPENINGS_RULES = `Openings Rules:
-* After the closing ] of the main block, write the Openings block exactly as shown: the first line {{if !lastCharMessage}}{{.openingSpeaker = {{char}}}} once, verbatim; then one {{if {{.openingSpeaker == <Card Name>}}}}[Opening: …]{{/if}} branch per focus character; then a final {{/if}} on its own line.
-* <Card Name> is the character's exact card name, as written in the [Character — <name>] header of the character cards above. Match it character for character. Offstage characters get no branch.
-* Each opening message: third-person past tense, prose narration, dialogue in "double quotes", no asterisks, one paragraph of 100–200 words. Only that character's own actions and words, never another focus character's dialogue.
-* Openings are public-safe: no secrets, private feelings, or hidden aims.`;
-
-const OPENINGS_SCHEMA = `{{if !lastCharMessage}}{{.openingSpeaker = {{char}}}}
-{{if {{.openingSpeaker == <Card Name>}}}}[Opening: this is the start of the chat; <Card Name> speaks first and opens the scene with the message below as <his/her> own, adapted to anything already written, then continues normally;
-<opening message>]{{/if}}
-{{if {{.openingSpeaker == <Next Card Name>}}}}[Opening: …same, for the next focus character…]{{/if}}
-{{/if}}`;
+// WIA only. The scenario ends at its closing bracket: no opening messages
+// (local models write them poorly), and nothing else after the block.
+const FORMAT_RULES = `Format Rules:
+* Return only the bracketed Scenario Description and end the reply at its closing ]. Write no opening messages, dialogue, or narration after it.
+* No commentary, no headings, no code fences.
+* Follow the schema verbatim: brackets, colons, semicolons, line breaks, and macro syntax.`;
 
 const COLD_OPEN_EXAMPLE = `[
 Scenario Title: The Warden's Summons;
@@ -61,17 +60,13 @@ Offstage: Warden Ilsara, waiting in the command tent past the gate; she will sen
 {{.sableClothingOverride = Same green coat but clean, hair combed back, scar deliberately left uncovered as a quiet challenge}}
 {{.sableStatedGoalOverride = Hear the wardens out, name her price, and leave with a contract}}
 {{.sableTrueGoalOverride = Learn what the wardens know about the new bloom without revealing the stolen text or the scar's behavior}}
-]
-{{if !lastCharMessage}}{{.openingSpeaker = {{char}}}}
-{{if {{.openingSpeaker == Sable}}}}[Opening: this is the start of the chat; Sable speaks first and opens the scene with the message below as her own, adapted to anything already written, then continues normally;
-Mist still lay in the hollows when Sable reached the gate at Thistlemarch, the white truce flag hanging limp above the palisade and the forest behind her gone quiet the way it only did near the wardens. She had walked through the night and did not look it: coat brushed clean, silver hair combed back, sleeve pushed up so the thorn-vine scar on her forearm showed plainly in the grey light. Patch trotted at her heels, one ear flicking at the guards as two of them stepped out with their hands already on their sword hilts. The taller one held out a gloved hand for her satchel. Sable looked at the hand, then at the flag, then back at him, and unslung the satchel without hurrying. "Search it, then. The salves in the green jar are for burns. Do not open the black one unless you wish to spend the day weeping." She sat down on the fence rail to wait, facing the gate, and ran her thumb once along the scar. "Tell Ilsara I came. She will want to know before I change my mind."]{{/if}}
-{{/if}}`;
+]`;
 
 // ─── World Info Assist: Cold-open ───
 
-const WIA_COLD_OPEN_BODY = `The next reply will be an out-of-story Scenario Description (cold-open variant) for a SillyTavern group roleplay: a scene setup that says exactly where a fresh scene starts, who is on-screen, who is expected, and what each character is after, followed by one opening message per focus character. It is stored as a World Info entry or pasted into a chat's Scenario Override, and every character in the scene reads it.
+const WIA_COLD_OPEN_BODY = `The next reply will be an out-of-story Scenario Description (cold-open variant) for a SillyTavern group roleplay: a scene setup that says exactly where a fresh scene starts, who is on-screen, who is expected, and what each character is after. It is stored as a World Info entry or pasted into a chat's Scenario Override, and every character in the scene reads it.
 
-Write the main block as a scene brief in dense reference fragments, NOT as a story excerpt. Only the opening messages are prose.
+Write it as a scene brief in dense reference fragments, NOT as a story excerpt.
 
 Inputs:
 * Guidance: the scene idea: who is involved, where and when, what is going on, and who is on-screen when it opens (the focus characters). Everyone else involved is anticipated (Offstage).
@@ -88,7 +83,6 @@ Offstage: <each anticipated character: where they are right now, and when or why
 {{.<firstName>StatedGoalOverride = <what they will say they are here for>}}
 {{.<firstName>TrueGoalOverride = <what they are really after in this scene>}}
 ]
-${OPENINGS_SCHEMA}
 
 Field Rules:
 * Opening Focus is never vague: "Mara and Jonah walking up the gala steps toward the atrium doors", not "the pair arrive at some point".
@@ -101,13 +95,9 @@ Override Rules:
 * Set only the variables this scene actually changes; anything unset falls back to the character's card. Anticipated (Offstage) characters can have override lines too.
 * TrueGoal may hold a private aim: it surfaces only in that character's own private lore, which only they see.
 
-${OPENINGS_RULES}
-
 ${STYLE_RULES}
 
-Format Rules:
-* Return only the Scenario Description: the bracketed main block, then the Openings block. No commentary, no headings, no code fences.
-* Follow the schema verbatim: brackets, colons, semicolons, line breaks, and macro syntax.
+${FORMAT_RULES}
 
 Example — Scenario Description (cold-open, one focus character):
 ${COLD_OPEN_EXAMPLE}`;
@@ -117,9 +107,9 @@ export const WIA_SCENARIO_COLD_OPEN_PROMPT =
 
 // ─── World Info Assist: Continuation ───
 
-const WIA_CONTINUATION_BODY = `The next reply will be an out-of-story Scenario Description (continuation variant) for a SillyTavern group roleplay: a scene setup that picks the story up mid-stream, typically to start a fresh chat where a long one left off. It records the story's current state in plain labeled fields, says exactly who is on-screen when play resumes and who is expected, and ends with one opening message per focus character. It is stored as a World Info entry or pasted into a chat's Scenario Override, and every character in the scene reads it.
+const WIA_CONTINUATION_BODY = `The next reply will be an out-of-story Scenario Description (continuation variant) for a SillyTavern group roleplay: a scene setup that picks the story up mid-stream, typically to start a fresh chat where a long one left off. It records the story's current state in plain labeled fields and says exactly who is on-screen when play resumes and who is expected. It is stored as a World Info entry or pasted into a chat's Scenario Override, and every character in the scene reads it.
 
-Write the main block as a scene brief in dense reference fragments, NOT as a story excerpt. Only the opening messages are prose.
+Write it as a scene brief in dense reference fragments, NOT as a story excerpt.
 
 Inputs:
 * Context: the character cards, lore, and chat above. Draw every fact from it. Do not invent events the story has not established.
@@ -138,7 +128,6 @@ Offstage: <each anticipated character: where they are now, and when or why they 
 <First Name>'s Current Aim: <what they are openly pursuing now>;
 Open Threads: <unresolved public tensions or questions the scene can pick up>;
 ]
-${OPENINGS_SCHEMA}
 
 Field Rules:
 * Every field is seen by every character, so all of it is public-safe: no secrets, private feelings, or true goals, not even stated as rumor.
@@ -146,17 +135,13 @@ Field Rules:
 * Opening Focus is never vague: "Mara and Jonah walking up the gala steps toward the atrium doors", not "the pair arrive at some point".
 * Write a Current Clothing or Current Aim line only where that character's current state differs from their card; omit it where the card still holds. The "Current" wording tells the model these supersede the card.
 * Story So Far summarizes; keep it to the beats this scene needs.
-* Plain fields only: no {{.variable = …}} assignment lines in the main block.
-
-${OPENINGS_RULES}
+* Plain fields only: no {{.variable = …}} assignment lines.
 
 ${STYLE_RULES}
 
-Format Rules:
-* Return only the Scenario Description: the bracketed main block, then the Openings block. No commentary, no headings, no code fences.
-* Follow the schema verbatim: brackets, colons, semicolons, line breaks, and macro syntax.
+${FORMAT_RULES}
 
-Style reference — the Openings block and fragment style of a finished cold-open scenario (a continuation uses the plain fields above instead of its override lines):
+Style reference — the fragment style of a finished cold-open scenario (a continuation uses the plain fields above instead of its override lines):
 ${COLD_OPEN_EXAMPLE}`;
 
 export const WIA_SCENARIO_CONTINUATION_PROMPT =
@@ -246,57 +231,145 @@ export const NG_LONG_SCENARIO_INJECTION =
     '[Story arc, the overarching situation and where it is heading; '
     + 'let it shape the story over many turns;\n{{guidance}}]';
 
+// ─── Compaction: Scenario recap ───
+
+// The recap replaces the dropped history and is followed by the verbatim
+// tail, so it describes the moment the summarized history ends. No
+// {{guidance}} placeholder: Compaction appends the user's must-keep details
+// itself, and only when there are any.
+const COMPACTION_SCENARIO_BODY = `Write a Scenario Description (continuation variant) that recaps the roleplay so far. It replaces the chat history above, which is about to be dropped from the model's context: a fresh chat starts with this recap, followed by the most recent messages carried over verbatim. It must hold everything the story needs to carry on, and describe where things stand at the point the history above ends, where the carried-over messages pick up.
+
+Output Format (use exactly as written; <angle-bracket> parts are placeholders):
+[
+Scenario Title: <short, evocative title for the story so far>;
+Story So Far: <the public beats of the whole story, oldest first, one short clause each; as many as it takes for the story to continue without the dropped history>;
+Context: <the situation at the point the history ends: what just happened, what is at stake now>;
+Location: <place, time of day, conditions>;
+Present: <each on-screen character with their visible state: injuries, mood as others read it, what they carry>;
+Opening Focus: <who is on-screen at the point the history ends, exactly where, doing what>;
+Offstage: <each anticipated character: where they are now, and when or why they will enter>;
+<First Name>'s Current Clothing: <what they are wearing now>;
+<First Name>'s Current Aim: <what they are openly pursuing now>;
+Open Threads: <every unresolved public tension or question, most pressing first>;
+]
+
+Field Rules:
+* Draw every fact from the chat history above. Never invent events, and never continue the story.
+* If the history opens with an earlier recap (from a previous compaction), fold all of its beats into Story So Far; nothing from it may be lost.
+* Every field is seen by every character, so all of it is public-safe: no secrets, private feelings, or true goals, not even stated as rumor.
+* Present lists only on-screen characters; anticipated characters go in Offstage. Omit the Offstage line entirely if nobody is anticipated.
+* Write a Current Clothing or Current Aim line only where that character's current state differs from their card; omit it where the card still holds.
+* Plain fields only: no {{…}} macros, no opening messages.
+
+${STYLE_RULES}
+
+Format Rules:
+* The reply has been prefilled with the opening bracket and the Scenario Title label. Continue from there, fill every applicable field, and close the bracket.
+* Return only the bracketed Scenario Description. No commentary, no headings, no code fences.`;
+
+export const COMPACTION_SCENARIO_PROMPT = `{{context}}${escapeMacroBraces(COMPACTION_SCENARIO_BODY)}`;
+export const COMPACTION_SCENARIO_PREFILL = '[\nScenario Title: ';
+
+// ─── Compaction: Timeline Summary ───
+
+// st-toolkit's Timeline Summary (docs/specs/timeline-extractor.md), adapted
+// for Compaction: no code fence (the recap is posted as a chat message), and
+// instead of the spec's append-only "new entries" mode, an earlier timeline
+// at the top of the history is carried over whole, because the history it
+// came from is about to be dropped.
+const COMPACTION_TIMELINE_BODY = `Write a Timeline Summary of the roleplay so far. It replaces the chat history above, which is about to be dropped from the model's context: a fresh chat starts with this timeline, followed by the most recent messages carried over verbatim. It must cover the whole story, in order, up to where the history above ends.
+
+Output Format (use exactly as written; <angle-bracket> parts are placeholders):
+[
+Timeline Summary
+
+**1. <Event Title>** – <single-paragraph summary of the event and its narrative significance>
+
+**2. <Event Title>** – <…>
+]
+
+Entry Rules:
+* Each entry is a numbered, bolded event title, an en dash, then one paragraph of 3–6 sentences: what happened, who was involved, and why it matters to the ongoing story (cause and effect, character development, relationship shifts, reveals, or stakes changes).
+* Collapse minor back-and-forth into the broader event it belongs to; never write an entry per message. If the boundary between two events is unclear, group them under the one they most naturally belong to.
+* Strict chronological order as events occur in the story, not the order messages were sent; note flashbacks and time skips where they matter.
+* If the history opens with an earlier Timeline Summary (from a previous compaction), carry its entries over unchanged, then continue the numbering with the new events. Nothing from it may be dropped.
+* Stay neutral and descriptive; don't editorialize about characters' choices. Use the names, aliases, and titles the characters use.
+* Summarize mature or sensitive content factually, without graphic detail.
+* Leave out OOC messages, meta-discussion, and system or instruction blocks; entries cover in-story events only.
+* Draw every fact from the chat history above. Never invent events, and never continue the story.
+
+Format Rules:
+* The reply has been prefilled with the opening bracket and the Timeline Summary header. Continue with the entries and close the bracket after the last one.
+* Return only the bracketed Timeline Summary. No commentary, no preamble, no code fences.`;
+
+export const COMPACTION_TIMELINE_PROMPT = `{{context}}${escapeMacroBraces(COMPACTION_TIMELINE_BODY)}`;
+export const COMPACTION_TIMELINE_PREFILL = '[\nTimeline Summary\n\n';
+
 // ─── Built-in Presets ───
 
-// toolKey -> { presetName: { fieldKey: text } }. Field keys match each
-// tool's entry in TOOL_PRESET_CONFIG (index.js).
-const BUILTIN_SCENARIO_PRESETS = {
-    wia: {
-        'Scenario (Cold-open)': {
-            wiaPrompt: WIA_SCENARIO_COLD_OPEN_PROMPT,
-            wiaPrefillTitled: WIA_SCENARIO_PREFILL_TITLED,
-            wiaPrefillUntitled: WIA_SCENARIO_PREFILL_UNTITLED,
+// Handed to `seedBuiltinPresets`. Field keys match each tool's entry in
+// TOOL_PRESET_CONFIG (index.js); `responseLength` is what the output needs.
+//
+// History: v1 shipped the WIA and NG Scenario presets without response
+// lengths, and the WIA pair ended with the per-character Openings block
+// (flagged by `scenarioPresetsSeeded`). v2 dropped the Openings, added
+// response lengths, and added the Compaction presets.
+export const TOOLKIT_PRESETS_SPEC = {
+    id: 'toolkit',
+    version: 2,
+    legacyFlag: 'scenarioPresetsSeeded',
+    presets: {
+        wia: {
+            'Scenario (Cold-open)': {
+                wiaPrompt: WIA_SCENARIO_COLD_OPEN_PROMPT,
+                wiaPrefillTitled: WIA_SCENARIO_PREFILL_TITLED,
+                wiaPrefillUntitled: WIA_SCENARIO_PREFILL_UNTITLED,
+                responseLength: 800,
+            },
+            'Scenario (Continuation)': {
+                wiaPrompt: WIA_SCENARIO_CONTINUATION_PROMPT,
+                wiaPrefillTitled: WIA_SCENARIO_PREFILL_TITLED,
+                wiaPrefillUntitled: WIA_SCENARIO_PREFILL_UNTITLED,
+                responseLength: 800,
+            },
         },
-        'Scenario (Continuation)': {
-            wiaPrompt: WIA_SCENARIO_CONTINUATION_PROMPT,
-            wiaPrefillTitled: WIA_SCENARIO_PREFILL_TITLED,
-            wiaPrefillUntitled: WIA_SCENARIO_PREFILL_UNTITLED,
+        'ng-short': {
+            'Scenario': {
+                narrativeGuidanceShortPrompt: NG_SHORT_SCENARIO_PROMPT,
+                narrativeGuidanceShortGenerationPrompt: NG_SHORT_SCENARIO_PREFILL,
+                narrativeGuidanceShortInjectionPrompt: NG_SHORT_SCENARIO_INJECTION,
+                responseLength: 800,
+            },
+        },
+        'ng-long': {
+            'Scenario Arc': {
+                narrativeGuidanceLongPrompt: NG_LONG_SCENARIO_PROMPT,
+                narrativeGuidanceLongGenerationPrompt: NG_LONG_SCENARIO_PREFILL,
+                narrativeGuidanceLongInjectionPrompt: NG_LONG_SCENARIO_INJECTION,
+                responseLength: 600,
+            },
+        },
+        compaction: {
+            'Scenario (Continuation)': {
+                compactionSummaryPrompt: COMPACTION_SCENARIO_PROMPT,
+                compactionSummaryPrefill: COMPACTION_SCENARIO_PREFILL,
+                responseLength: 1500,
+            },
+            'Timeline Summary': {
+                compactionSummaryPrompt: COMPACTION_TIMELINE_PROMPT,
+                compactionSummaryPrefill: COMPACTION_TIMELINE_PREFILL,
+                responseLength: 2500,
+            },
         },
     },
-    'ng-short': {
-        'Scenario': {
-            narrativeGuidanceShortPrompt: NG_SHORT_SCENARIO_PROMPT,
-            narrativeGuidanceShortGenerationPrompt: NG_SHORT_SCENARIO_PREFILL,
-            narrativeGuidanceShortInjectionPrompt: NG_SHORT_SCENARIO_INJECTION,
-        },
+    introduced: {
+        compaction: { 'Scenario (Continuation)': 2, 'Timeline Summary': 2 },
     },
-    'ng-long': {
-        'Scenario Arc': {
-            narrativeGuidanceLongPrompt: NG_LONG_SCENARIO_PROMPT,
-            narrativeGuidanceLongGenerationPrompt: NG_LONG_SCENARIO_PREFILL,
-            narrativeGuidanceLongInjectionPrompt: NG_LONG_SCENARIO_INJECTION,
+    retired: {
+        // v1 texts (ending with the Openings block).
+        wia: {
+            'Scenario (Cold-open)': ['eba40bf9'],
+            'Scenario (Continuation)': ['77579a39'],
         },
     },
 };
-
-/**
- * One-shot seed of the built-in Scenario presets into World Info Assist and
- * both Narrative Guidance tracks. Never overwrites a preset the user already
- * has under the same name, never changes the active preset, and runs once
- * per install (so a deleted preset isn't recreated).
- *
- * @param {object} settings - The extension settings object.
- * @returns {boolean} `true` if settings changed and should be saved.
- */
-export function seedScenarioPresets(settings) {
-    if (settings.scenarioPresetsSeeded) return false;
-    if (!settings.toolPresets || typeof settings.toolPresets !== 'object') settings.toolPresets = {};
-    for (const [toolKey, builtins] of Object.entries(BUILTIN_SCENARIO_PRESETS)) {
-        const presets = settings.toolPresets[toolKey] || (settings.toolPresets[toolKey] = {});
-        for (const [name, preset] of Object.entries(builtins)) {
-            if (presets[name] === undefined) presets[name] = { ...preset };
-        }
-    }
-    settings.scenarioPresetsSeeded = true;
-    return true;
-}

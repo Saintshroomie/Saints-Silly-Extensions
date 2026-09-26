@@ -153,7 +153,6 @@ const persistedModalState = {
     output: '',
     useChatContext: false,
     selectedLoreBooks: [],
-    responseLength: null, // null means "use saved setting"
 };
 
 // ─── Init ───
@@ -350,9 +349,16 @@ function capturePersistedModalState(body) {
     persistedModalState.useChatContext = !!body.querySelector('#acc_use_chat_context')?.checked;
     const picker = body._accLorebookPicker;
     persistedModalState.selectedLoreBooks = picker ? picker.getSelected() : [];
+    // The Max Tokens field is the tool's saved setting (its change listener
+    // writes it through), so keep a typed value that never fired 'change'
+    // there too, rather than as a modal-only copy that would outlive a
+    // preset switch.
     const tokenInput = body.querySelector('#acc_response_length');
     const parsed = tokenInput ? parseInt(tokenInput.value, 10) : NaN;
-    persistedModalState.responseLength = (!isNaN(parsed) && parsed > 0) ? parsed : null;
+    if (!isNaN(parsed) && parsed > 0 && parsed !== moduleSettings.accResponseLength) {
+        moduleSettings.accResponseLength = parsed;
+        saveSettingsFn?.();
+    }
 }
 
 function buildModalBody() {
@@ -422,15 +428,10 @@ function buildModalBody() {
     const chatCb = root.querySelector('#acc_use_chat_context');
     if (chatCb) chatCb.checked = !!persistedModalState.useChatContext;
 
-    // Initialize the token field from persisted state if available, else
-    // from settings.
+    // Initialize the token field from the saved setting (which a preset
+    // switch may have changed since the modal last closed).
     const tokenInput = root.querySelector('#acc_response_length');
-    if (tokenInput) {
-        const persisted = persistedModalState.responseLength;
-        tokenInput.value = String((typeof persisted === 'number' && persisted > 0)
-            ? persisted
-            : getResponseLength());
-    }
+    if (tokenInput) tokenInput.value = String(getSavedResponseLength());
 
     // Mount the shared lore-book picker with previously-selected entries.
     const picker = createLoreBookPicker({
@@ -750,6 +751,10 @@ function getResponseLength() {
         const parsed = parseInt(input.value, 10);
         if (!isNaN(parsed) && parsed > 0) return parsed;
     }
+    return getSavedResponseLength();
+}
+
+function getSavedResponseLength() {
     const setting = moduleSettings?.accResponseLength;
     if (typeof setting === 'number' && setting > 0) return setting;
     return DEFAULT_ACC_RESPONSE_LENGTH;
