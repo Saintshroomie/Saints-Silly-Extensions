@@ -176,6 +176,7 @@ import {
     setupToolPresets,
     migrateLegacyToolPresets,
 } from './prompt-templates.js';
+import { seedScenarioPresets } from './scenario-presets.js';
 
 // ─── Constants ───
 
@@ -437,6 +438,12 @@ function loadSettings() {
     // ready-made Image Prompting presets; the built-in Default covers Krea 2.
     if (seedImagePromptPresets(settings)) {
         SSEDebug('Seeded built-in Image Prompting presets');
+        migrated = true;
+    }
+    // Ship the st-toolkit-style Scenario presets for World Info Assist and
+    // both Narrative Guidance tracks (each tool's Default stays active).
+    if (seedScenarioPresets(settings)) {
+        SSEDebug('Seeded built-in Scenario presets');
         migrated = true;
     }
     // Upgrade the stale name-based director prompt to the current number-based
