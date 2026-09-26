@@ -1,16 +1,18 @@
 /**
- * Scenario Presets — built-in World Info Assist and Narrative Guidance
- * presets that write in the st-toolkit Scenario Description style: a
- * bracketed block of dense, semicolon-terminated fields (Scenario Title,
- * Context, Location, Opening Focus, Offstage, …). Unlike st-toolkit's own
- * scenarios they stop at the closing bracket: there is no per-character
- * Openings block, because local models write those opening messages poorly.
+ * Toolkit Presets — built-in presets that write in st-toolkit's formats:
  *
- * Seeded into the tools' preset lists by `seedScenarioPresets` (like the
- * Image Prompting built-ins), versioned by `scenarioPresetsVersion` so a
- * deleted preset stays deleted and later revisions only replace built-ins
- * the user never edited. The Default preset of each tool is left untouched
- * and stays the active one.
+ * - Scenario Description style (World Info Assist, Narrative Guidance,
+ *   Compaction): a bracketed block of dense, semicolon-terminated fields
+ *   (Scenario Title, Context, Location, Opening Focus, Offstage, …). Unlike
+ *   st-toolkit's own scenarios they stop at the closing bracket: there is no
+ *   per-character Openings block, because local models write those opening
+ *   messages poorly.
+ * - Timeline Summary (Compaction): st-toolkit's numbered event timeline.
+ *
+ * `TOOLKIT_PRESETS_SPEC` hands them to `seedBuiltinPresets` (in
+ * prompt-templates.js), which adds them once, upgrades unedited copies when
+ * the text changes, and never switches a tool's active preset. Each preset
+ * carries the response length its output needs.
  *
  * Brace escaping: ST's `createRawPrompt` runs its macro engine over the
  * prompt, so a literal `{{.x = …}}` or `{{user}}` in the
@@ -229,119 +231,145 @@ export const NG_LONG_SCENARIO_INJECTION =
     '[Story arc, the overarching situation and where it is heading; '
     + 'let it shape the story over many turns;\n{{guidance}}]';
 
+// ─── Compaction: Scenario recap ───
+
+// The recap replaces the dropped history and is followed by the verbatim
+// tail, so it describes the moment the summarized history ends. No
+// {{guidance}} placeholder: Compaction appends the user's must-keep details
+// itself, and only when there are any.
+const COMPACTION_SCENARIO_BODY = `Write a Scenario Description (continuation variant) that recaps the roleplay so far. It replaces the chat history above, which is about to be dropped from the model's context: a fresh chat starts with this recap, followed by the most recent messages carried over verbatim. It must hold everything the story needs to carry on, and describe where things stand at the point the history above ends, where the carried-over messages pick up.
+
+Output Format (use exactly as written; <angle-bracket> parts are placeholders):
+[
+Scenario Title: <short, evocative title for the story so far>;
+Story So Far: <the public beats of the whole story, oldest first, one short clause each; as many as it takes for the story to continue without the dropped history>;
+Context: <the situation at the point the history ends: what just happened, what is at stake now>;
+Location: <place, time of day, conditions>;
+Present: <each on-screen character with their visible state: injuries, mood as others read it, what they carry>;
+Opening Focus: <who is on-screen at the point the history ends, exactly where, doing what>;
+Offstage: <each anticipated character: where they are now, and when or why they will enter>;
+<First Name>'s Current Clothing: <what they are wearing now>;
+<First Name>'s Current Aim: <what they are openly pursuing now>;
+Open Threads: <every unresolved public tension or question, most pressing first>;
+]
+
+Field Rules:
+* Draw every fact from the chat history above. Never invent events, and never continue the story.
+* If the history opens with an earlier recap (from a previous compaction), fold all of its beats into Story So Far; nothing from it may be lost.
+* Every field is seen by every character, so all of it is public-safe: no secrets, private feelings, or true goals, not even stated as rumor.
+* Present lists only on-screen characters; anticipated characters go in Offstage. Omit the Offstage line entirely if nobody is anticipated.
+* Write a Current Clothing or Current Aim line only where that character's current state differs from their card; omit it where the card still holds.
+* Plain fields only: no {{…}} macros, no opening messages.
+
+${STYLE_RULES}
+
+Format Rules:
+* The reply has been prefilled with the opening bracket and the Scenario Title label. Continue from there, fill every applicable field, and close the bracket.
+* Return only the bracketed Scenario Description. No commentary, no headings, no code fences.`;
+
+export const COMPACTION_SCENARIO_PROMPT = `{{context}}${escapeMacroBraces(COMPACTION_SCENARIO_BODY)}`;
+export const COMPACTION_SCENARIO_PREFILL = '[\nScenario Title: ';
+
+// ─── Compaction: Timeline Summary ───
+
+// st-toolkit's Timeline Summary (docs/specs/timeline-extractor.md), adapted
+// for Compaction: no code fence (the recap is posted as a chat message), and
+// instead of the spec's append-only "new entries" mode, an earlier timeline
+// at the top of the history is carried over whole, because the history it
+// came from is about to be dropped.
+const COMPACTION_TIMELINE_BODY = `Write a Timeline Summary of the roleplay so far. It replaces the chat history above, which is about to be dropped from the model's context: a fresh chat starts with this timeline, followed by the most recent messages carried over verbatim. It must cover the whole story, in order, up to where the history above ends.
+
+Output Format (use exactly as written; <angle-bracket> parts are placeholders):
+[
+Timeline Summary
+
+**1. <Event Title>** – <single-paragraph summary of the event and its narrative significance>
+
+**2. <Event Title>** – <…>
+]
+
+Entry Rules:
+* Each entry is a numbered, bolded event title, an en dash, then one paragraph of 3–6 sentences: what happened, who was involved, and why it matters to the ongoing story (cause and effect, character development, relationship shifts, reveals, or stakes changes).
+* Collapse minor back-and-forth into the broader event it belongs to; never write an entry per message. If the boundary between two events is unclear, group them under the one they most naturally belong to.
+* Strict chronological order as events occur in the story, not the order messages were sent; note flashbacks and time skips where they matter.
+* If the history opens with an earlier Timeline Summary (from a previous compaction), carry its entries over unchanged, then continue the numbering with the new events. Nothing from it may be dropped.
+* Stay neutral and descriptive; don't editorialize about characters' choices. Use the names, aliases, and titles the characters use.
+* Summarize mature or sensitive content factually, without graphic detail.
+* Leave out OOC messages, meta-discussion, and system or instruction blocks; entries cover in-story events only.
+* Draw every fact from the chat history above. Never invent events, and never continue the story.
+
+Format Rules:
+* The reply has been prefilled with the opening bracket and the Timeline Summary header. Continue with the entries and close the bracket after the last one.
+* Return only the bracketed Timeline Summary. No commentary, no preamble, no code fences.`;
+
+export const COMPACTION_TIMELINE_PROMPT = `{{context}}${escapeMacroBraces(COMPACTION_TIMELINE_BODY)}`;
+export const COMPACTION_TIMELINE_PREFILL = '[\nTimeline Summary\n\n';
+
 // ─── Built-in Presets ───
 
-// toolKey -> { presetName: { fieldKey: text } }. Field keys match each
-// tool's entry in TOOL_PRESET_CONFIG (index.js).
-const BUILTIN_SCENARIO_PRESETS = {
-    wia: {
-        'Scenario (Cold-open)': {
-            wiaPrompt: WIA_SCENARIO_COLD_OPEN_PROMPT,
-            wiaPrefillTitled: WIA_SCENARIO_PREFILL_TITLED,
-            wiaPrefillUntitled: WIA_SCENARIO_PREFILL_UNTITLED,
+// Handed to `seedBuiltinPresets`. Field keys match each tool's entry in
+// TOOL_PRESET_CONFIG (index.js); `responseLength` is what the output needs.
+//
+// History: v1 shipped the WIA and NG Scenario presets without response
+// lengths, and the WIA pair ended with the per-character Openings block
+// (flagged by `scenarioPresetsSeeded`). v2 dropped the Openings, added
+// response lengths, and added the Compaction presets.
+export const TOOLKIT_PRESETS_SPEC = {
+    id: 'toolkit',
+    version: 2,
+    legacyFlag: 'scenarioPresetsSeeded',
+    presets: {
+        wia: {
+            'Scenario (Cold-open)': {
+                wiaPrompt: WIA_SCENARIO_COLD_OPEN_PROMPT,
+                wiaPrefillTitled: WIA_SCENARIO_PREFILL_TITLED,
+                wiaPrefillUntitled: WIA_SCENARIO_PREFILL_UNTITLED,
+                responseLength: 800,
+            },
+            'Scenario (Continuation)': {
+                wiaPrompt: WIA_SCENARIO_CONTINUATION_PROMPT,
+                wiaPrefillTitled: WIA_SCENARIO_PREFILL_TITLED,
+                wiaPrefillUntitled: WIA_SCENARIO_PREFILL_UNTITLED,
+                responseLength: 800,
+            },
         },
-        'Scenario (Continuation)': {
-            wiaPrompt: WIA_SCENARIO_CONTINUATION_PROMPT,
-            wiaPrefillTitled: WIA_SCENARIO_PREFILL_TITLED,
-            wiaPrefillUntitled: WIA_SCENARIO_PREFILL_UNTITLED,
+        'ng-short': {
+            'Scenario': {
+                narrativeGuidanceShortPrompt: NG_SHORT_SCENARIO_PROMPT,
+                narrativeGuidanceShortGenerationPrompt: NG_SHORT_SCENARIO_PREFILL,
+                narrativeGuidanceShortInjectionPrompt: NG_SHORT_SCENARIO_INJECTION,
+                responseLength: 800,
+            },
+        },
+        'ng-long': {
+            'Scenario Arc': {
+                narrativeGuidanceLongPrompt: NG_LONG_SCENARIO_PROMPT,
+                narrativeGuidanceLongGenerationPrompt: NG_LONG_SCENARIO_PREFILL,
+                narrativeGuidanceLongInjectionPrompt: NG_LONG_SCENARIO_INJECTION,
+                responseLength: 600,
+            },
+        },
+        compaction: {
+            'Scenario (Continuation)': {
+                compactionSummaryPrompt: COMPACTION_SCENARIO_PROMPT,
+                compactionSummaryPrefill: COMPACTION_SCENARIO_PREFILL,
+                responseLength: 1500,
+            },
+            'Timeline Summary': {
+                compactionSummaryPrompt: COMPACTION_TIMELINE_PROMPT,
+                compactionSummaryPrefill: COMPACTION_TIMELINE_PREFILL,
+                responseLength: 2500,
+            },
         },
     },
-    'ng-short': {
-        'Scenario': {
-            narrativeGuidanceShortPrompt: NG_SHORT_SCENARIO_PROMPT,
-            narrativeGuidanceShortGenerationPrompt: NG_SHORT_SCENARIO_PREFILL,
-            narrativeGuidanceShortInjectionPrompt: NG_SHORT_SCENARIO_INJECTION,
-        },
+    introduced: {
+        compaction: { 'Scenario (Continuation)': 2, 'Timeline Summary': 2 },
     },
-    'ng-long': {
-        'Scenario Arc': {
-            narrativeGuidanceLongPrompt: NG_LONG_SCENARIO_PROMPT,
-            narrativeGuidanceLongGenerationPrompt: NG_LONG_SCENARIO_PREFILL,
-            narrativeGuidanceLongInjectionPrompt: NG_LONG_SCENARIO_INJECTION,
+    retired: {
+        // v1 texts (ending with the Openings block).
+        wia: {
+            'Scenario (Cold-open)': ['eba40bf9'],
+            'Scenario (Continuation)': ['77579a39'],
         },
     },
 };
-
-// Bump when a built-in's text changes, and record the retired version's
-// fingerprints below so untouched copies can be upgraded in place.
-const SCENARIO_PRESETS_VERSION = 2;
-
-// toolKey -> presetName -> fingerprint of each earlier built-in version's
-// fields. A stored preset (or the tool's live fields) matching one is an
-// unedited copy and is safe to replace. v1 (WIA) ended with the
-// per-character Openings block.
-const RETIRED_SCENARIO_PRESETS = {
-    wia: {
-        'Scenario (Cold-open)': ['eba40bf9'],
-        'Scenario (Continuation)': ['77579a39'],
-    },
-};
-
-/** FNV-1a fingerprint of a preset's fields (keys taken from `fieldKeys`). */
-function fingerprintPreset(values, fieldKeys) {
-    const text = [...fieldKeys].sort()
-        .map(key => `${key}\u0000${typeof values?.[key] === 'string' ? values[key] : ''}`)
-        .join('\u0001');
-    let hash = 0x811c9dc5;
-    for (let i = 0; i < text.length; i++) {
-        hash ^= text.charCodeAt(i);
-        hash = Math.imul(hash, 0x01000193) >>> 0;
-    }
-    return hash.toString(16).padStart(8, '0');
-}
-
-/**
- * Replace unedited copies of retired built-in texts with the current ones:
- * the stored preset, and — when that preset is active and its fields still
- * hold the retired text — the tool's live fields, so the dropdown doesn't
- * come up "(modified)". Edited or deleted presets are left alone.
- */
-function upgradeRetiredScenarioPresets(settings) {
-    for (const [toolKey, retired] of Object.entries(RETIRED_SCENARIO_PRESETS)) {
-        const presets = settings.toolPresets[toolKey];
-        if (!presets) continue;
-        for (const [name, fingerprints] of Object.entries(retired)) {
-            const current = BUILTIN_SCENARIO_PRESETS[toolKey][name];
-            const fieldKeys = Object.keys(current);
-            const stored = presets[name];
-            if (!stored || !fingerprints.includes(fingerprintPreset(stored, fieldKeys))) continue;
-            presets[name] = { ...current };
-            if (settings.activeToolPreset?.[toolKey] === name
-                && fingerprints.includes(fingerprintPreset(settings, fieldKeys))) {
-                Object.assign(settings, current);
-            }
-        }
-    }
-}
-
-/**
- * Seed the built-in Scenario presets into World Info Assist and both
- * Narrative Guidance tracks, or upgrade an earlier seeding. A fresh install
- * gets every preset (never overwriting a same-named user preset, never
- * changing the active one); an earlier version only has its unedited
- * built-ins replaced, so a deleted preset isn't recreated.
- *
- * @param {object} settings - The extension settings object.
- * @returns {boolean} `true` if settings changed and should be saved.
- */
-export function seedScenarioPresets(settings) {
-    // `scenarioPresetsSeeded` is the v1 flag, from before versioning.
-    const version = Number.isInteger(settings.scenarioPresetsVersion)
-        ? settings.scenarioPresetsVersion
-        : (settings.scenarioPresetsSeeded ? 1 : 0);
-    if (version >= SCENARIO_PRESETS_VERSION) return false;
-    if (!settings.toolPresets || typeof settings.toolPresets !== 'object') settings.toolPresets = {};
-    if (version === 0) {
-        for (const [toolKey, builtins] of Object.entries(BUILTIN_SCENARIO_PRESETS)) {
-            const presets = settings.toolPresets[toolKey] || (settings.toolPresets[toolKey] = {});
-            for (const [name, preset] of Object.entries(builtins)) {
-                if (presets[name] === undefined) presets[name] = { ...preset };
-            }
-        }
-    } else {
-        upgradeRetiredScenarioPresets(settings);
-    }
-    settings.scenarioPresetsSeeded = true;
-    settings.scenarioPresetsVersion = SCENARIO_PRESETS_VERSION;
-    return true;
-}

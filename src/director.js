@@ -46,6 +46,14 @@ import {
     isGenerationInProgress,
 } from './utils.js';
 import { isSilentGenerationAbort, abortAllGenerations } from './silent-generation.js';
+import {
+    matchSpeakerLines,
+    parseWalkOnSegments,
+    resolveAnchorChid,
+    resolveMemberChid,
+    sameRosterEntry,
+    parsePick,
+} from './director-parsing.js';
 
 // ─── Constants ───
 
@@ -112,58 +120,12 @@ export function migrateDirectorPrompt(settings) {
     return changed;
 }
 
-// Speaker-line detection. Two shapes are recognised:
-//   1. Bracketed `[Name]:` — explicit, unambiguous, matched anywhere in the line
-//      (so several walk-ons on one line are all caught).
-//   2. Bare `Name:` at the START of a line — the shape the model actually emits,
-//      because in its context window group speakers only ever appear as `Name:`
-//      (never bracketed). Walk-on names aren't stop strings, so the model happily
-//      tacks `WalkOn: "…"` onto the end of another character's reply; line-anchored
-//      bare matching is what lets us split those back out. To keep false positives
-//      down the bare form must begin a line, start with a capital, be 1–4
-//      name-shaped words, and be followed by `: ` (colon + whitespace/quote).
-// Group 1 = bracketed name, group 2 = bare name.
-const SPEAKER_LINE_RE =
-    /\[([^\]\n]{1,60})\][ \t]*:|^[ \t]*([\p{Lu}][\p{L}\p{N}'’.-]{0,30}(?:[ \t]+[\p{Lu}][\p{L}\p{N}'’.-]{0,30}){0,3})[ \t]*:(?=[\s"'“”‘’])/gmu;
 const MAX_WALKON_NAME_LENGTH = 60;
 const MAX_WALKONS = 50;
 
 // Director chains this many chosen speakers per user turn (back-to-back), unless
 // the user cancels a turn's dialog. Falls back when the setting is unset/invalid.
 const DEFAULT_DIRECTOR_CONSECUTIVE_TURNS = 2;
-
-// Names that look like `[Name]:` / `Name:` but aren't characters — bracketed
-// meta-tags plus common capitalised sentence-openers and labels that the
-// line-anchored bare matcher would otherwise mistake for a speaker.
-const IGNORED_WALKON_TAGS = new Set([
-    'ooc', 'system', 'note', 'notes', 'narrator', 'setting', 'scene', 'continue',
-    'author', 'author\'s note', 'translation', 'time', 'status', 'a/n', 'an',
-    'warning', 'tip', 'example', 'summary', 'step', 'chapter', 'part', 'location',
-    'pov', 'edit', 'update', 'reminder', 'important', 'objective', 'goal', 'mission',
-    'i', 'he', 'she', 'it', 'they', 'we', 'you', 'but', 'and', 'the', 'a', 'then',
-    'so', 'well', 'no', 'yes', 'oh', 'okay', 'ok', 'meanwhile', 'later', 'suddenly',
-    'finally', 'now', 'p.s', 'ps',
-]);
-
-/**
- * Find every speaker line (`[Name]:` anywhere, or a bare `Name:` at a line start)
- * in `text`, skipping meta-tags. Returns ordered matches with the name and the
- * offsets needed to split: `start` (where the speaker label begins) and
- * `contentStart` (just after the colon).
- *
- * @returns {Array<{ name: string, start: number, contentStart: number }>}
- */
-function matchSpeakerLines(text) {
-    const str = String(text || '');
-    const out = [];
-    SPEAKER_LINE_RE.lastIndex = 0;
-    for (const m of str.matchAll(SPEAKER_LINE_RE)) {
-        const name = ((m[1] ?? m[2]) || '').trim();
-        if (!name || IGNORED_WALKON_TAGS.has(name.toLowerCase())) continue;
-        out.push({ name, start: m.index, contentStart: m.index + m[0].length });
-    }
-    return out;
-}
 
 // ─── Module State ───
 
@@ -255,29 +217,6 @@ function buildRoster(ctx, group) {
         }
     }
     return roster;
-}
-
-/**
- * The `context.characters` index of the most recent AI speaker, used as the
- * aligned-mode `forceChId` anchor so the director's quiet generation reuses the
- * KV cache that the just-generated message left warm. Resolves by avatar first,
- * then name; returns null if no AI message resolves.
- */
-function resolveAnchorChid(ctx) {
-    const chat = ctx.chat || [];
-    const chars = ctx.characters || [];
-    for (let i = chat.length - 1; i >= 0; i--) {
-        const m = chat[i];
-        if (!m || m.is_user || m.is_system) continue;
-        const avatar = m.original_avatar
-            || (typeof m.force_avatar === 'string' ? m.force_avatar.replace(/^\/characters\//, '') : null);
-        let chid = avatar ? chars.findIndex(c => c.avatar === avatar) : -1;
-        if (chid === -1 && m.name) {
-            chid = chars.findIndex(c => (c.name || '').toLowerCase() === m.name.toLowerCase());
-        }
-        if (chid !== -1) return chid;
-    }
-    return null;
 }
 
 // ─── Manual-mode Management ───
@@ -504,23 +443,6 @@ async function waitForGenerationSettle(timeoutMs = 8000) {
     }
     await delayMs(50);
     return true;
-}
-
-/**
- * Split a message body at its speaker boundaries — `[Name]:` anywhere or a bare
- * `Name:` at a line start (ignoring meta-tags). Returns `{ head, segments:
- * [{ name, text }] }`, where `head` is the text before the first speaker line and
- * each segment's text is the speaker's content with the `Name:` prefix stripped.
- */
-function parseWalkOnSegments(text) {
-    const str = String(text || '');
-    const boundaries = matchSpeakerLines(str);
-    if (!boundaries.length) return { head: str, segments: [] };
-    const segments = boundaries.map((b, i) => {
-        const end = i + 1 < boundaries.length ? boundaries[i + 1].start : str.length;
-        return { name: b.name, text: str.slice(b.contentStart, end).trim() };
-    });
-    return { head: str.slice(0, boundaries[0].start), segments };
 }
 
 /**
@@ -758,93 +680,6 @@ function showDirectorPromptPreview() {
     ]);
 }
 
-// ─── Pick Parsing ───
-
-/**
- * Deterministic fallback for an unusable reply: the next real member (never a
- * walk-on) after the last character to speak, wrapping around the roster, and
- * skipping the last speaker itself. Falls back to the first member, then the
- * first roster entry, so it always returns something.
- */
-function fallbackPick(roster, ctx) {
-    const n = roster.length;
-    const lastChid = resolveAnchorChid(ctx);
-    let lastIdx = lastChid !== null
-        ? roster.findIndex(r => r.kind === 'member' && r.chid === lastChid)
-        : -1;
-    for (let step = 1; step <= n; step++) {
-        const idx = (((lastIdx + step) % n) + n) % n;
-        const cand = roster[idx];
-        if (cand.kind !== 'member') continue;
-        if (idx === lastIdx) continue;
-        return cand;
-    }
-    return roster.find(r => r.kind === 'member') || roster[0];
-}
-
-/**
- * Re-resolve a roster member's `context.characters` index at the moment of use.
- * Avatar filenames are the stable identity (names collide in groups); the index
- * is not, because ST rebuilds the array as it unshallows members. Falls back to
- * the name, then to the captured index only if it still points at that member.
- *
- * @returns {number|null} A validated index, or null if the character is gone.
- */
-function resolveMemberChid(ctx, member) {
-    const chars = ctx.characters || [];
-    if (member.avatar) {
-        const byAvatar = chars.findIndex(c => c?.avatar === member.avatar);
-        if (byAvatar !== -1) return byAvatar;
-    }
-    if (member.name) {
-        const byName = chars.findIndex(c => (c?.name || '').toLowerCase() === member.name.toLowerCase());
-        if (byName !== -1) return byName;
-    }
-    const captured = member.chid;
-    if (Number.isInteger(captured) && chars[captured]) return captured;
-    return null;
-}
-
-/** Stable identity compare for roster entries (members by chid, walk-ons by name). */
-function sameRosterEntry(a, b) {
-    if (!a || !b || a.kind !== b.kind) return false;
-    return a.kind === 'member'
-        ? a.chid === b.chid
-        : a.name.toLowerCase() === b.name.toLowerCase();
-}
-
-/**
- * Map the director's raw reply to one roster member. Prefers the roster number
- * (what the prompt asks for), then an exact name, then a contained/partial name.
- * On an unusable reply, falls back deterministically (`fallbackPick`) to the next
- * real member after the last speaker so the loop never crashes.
- */
-function parsePick(text, roster, ctx) {
-    const cleaned = String(text || '').replace(/[*_`"'.,!?:;()[\]{}]/g, ' ').trim();
-    if (!cleaned) return fallbackPick(roster, ctx);
-
-    const numMatch = cleaned.match(/\d+/);
-    if (numMatch) {
-        const idx = parseInt(numMatch[0], 10) - 1;
-        if (idx >= 0 && idx < roster.length) return roster[idx];
-    }
-
-    const lower = cleaned.toLowerCase();
-    let member = roster.find(r => r.name.toLowerCase() === lower);
-    if (member) return member;
-
-    member = roster.find(r => lower.includes(r.name.toLowerCase()));
-    if (member) return member;
-
-    if (lower.length >= 2) {
-        member = roster.find(r => r.name.toLowerCase().includes(lower));
-        if (member) return member;
-    }
-
-    debug('No roster match for director reply; using deterministic fallback. Reply was:', text);
-    return fallbackPick(roster, ctx);
-}
-
 // ─── Confirm / Override Dialog ───
 
 /**
@@ -1063,7 +898,8 @@ async function rollDirector(ctx, roster) {
         text = removeReasoningFromString(raw || '').trim();
     }
     debug('Director raw reply:', JSON.stringify(text));
-    return parsePick(text, roster, ctx);
+    return parsePick(text, roster, ctx,
+        reply => debug('No roster match for director reply; using deterministic fallback. Reply was:', reply));
 }
 
 // ─── Walk-on Voicing ───

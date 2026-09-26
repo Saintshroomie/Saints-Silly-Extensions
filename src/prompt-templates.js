@@ -19,6 +19,17 @@
  * compact dropdown (mounted in the ACC / Image Prompting / Compaction
  * modals and on every WIA entry's Assist row) that shares state with the
  * settings widget — changing the selection anywhere updates everywhere.
+ *
+ * Response length: a tool configured with `responseLength: { key,
+ * inputSelector }` also stores its response length (Max Tokens) in each
+ * preset it saves. Loading a preset that carries one sets the setting and
+ * every matching input; a preset without one (Default, or one saved before
+ * this existed) leaves the length alone and never counts it as modified.
+ *
+ * Built-in presets: `seedBuiltinPresets` ships a module's ready-made presets
+ * and upgrades them in later versions, replacing only copies the user never
+ * edited (matched by fingerprint), so revised built-ins reach existing
+ * installs without clobbering anyone's changes.
  */
 
 const DEFAULT_ID = '__default__';
@@ -71,10 +82,50 @@ function getCurrentValues(tool) {
     return values;
 }
 
+function isPositiveLength(n) {
+    return Number.isFinite(n) && n > 0;
+}
+
+/** The response length a preset carries, or null (Default never carries one). */
+function getPresetLength(tool, id) {
+    if (!tool.responseLength || id === DEFAULT_ID) return null;
+    const n = getPresets(tool)[id]?.responseLength;
+    return isPositiveLength(n) ? n : null;
+}
+
+function getCurrentLength(tool) {
+    if (!tool.responseLength) return null;
+    const n = tool.settings[tool.responseLength.key];
+    return isPositiveLength(n) ? n : null;
+}
+
+/** What Save as New / Update store: every prompt field, plus the length. */
+function snapshotCurrentPreset(tool) {
+    const values = getCurrentValues(tool);
+    const length = getCurrentLength(tool);
+    if (length !== null) values.responseLength = length;
+    return values;
+}
+
+/**
+ * Set a tool's response length and show it in every input bound to it (the
+ * settings panel, open modals, WIA entry rows). The inputs' own listeners
+ * would write the same setting, so no events are dispatched.
+ */
+function applyResponseLength(tool, length) {
+    tool.settings[tool.responseLength.key] = length;
+    for (const input of document.querySelectorAll(tool.responseLength.inputSelector)) {
+        input.value = String(length);
+    }
+}
+
 function isDirty(tool) {
+    const active = getActiveId(tool);
     const current = getCurrentValues(tool);
-    const preset = getPresetValues(tool, getActiveId(tool));
-    return tool.fields.some(f => current[f.key] !== preset[f.key]);
+    const preset = getPresetValues(tool, active);
+    if (tool.fields.some(f => current[f.key] !== preset[f.key])) return true;
+    const presetLength = getPresetLength(tool, active);
+    return presetLength !== null && getCurrentLength(tool) !== presetLength;
 }
 
 function loadPresetIntoTextareas(tool, id) {
@@ -90,6 +141,8 @@ function loadPresetIntoTextareas(tool, id) {
             tool.settings[field.key] = values[field.key];
         }
     }
+    const length = getPresetLength(tool, id);
+    if (length !== null) applyResponseLength(tool, length);
 }
 
 function presetOptionLabel(id, activeId, dirty) {
@@ -222,6 +275,135 @@ export function createToolPresetSelector({ toolKey, className = '', title = '' }
     return select;
 }
 
+// Response-length inputs live in the settings panel, in modals, and on every
+// WIA entry row (created later), so their edits are tracked with one
+// document-level listener. It runs in the bubble phase, after the inputs' own
+// listeners have written the setting, and refreshes the "(modified)" marker.
+let lengthDirtyTrackingInstalled = false;
+
+function installLengthDirtyTracking() {
+    if (lengthDirtyTrackingInstalled) return;
+    lengthDirtyTrackingInstalled = true;
+    const onLengthEdit = (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+        for (const tool of toolRegistry.values()) {
+            if (tool.responseLength && target.matches(tool.responseLength.inputSelector)) {
+                notifyPresetChange(tool);
+            }
+        }
+    };
+    document.addEventListener('input', onLengthEdit);
+    document.addEventListener('change', onLengthEdit);
+}
+
+// ─── Built-in Presets ───
+
+/**
+ * Fingerprint (FNV-1a, hex) of a preset's prompt texts. Only the tool's
+ * prompt fields count (never `responseLength`), and a missing field counts
+ * as empty, so the value is stable for a given set of `fieldKeys`. Record
+ * retired fingerprints with the tool's field keys as they were at the time.
+ *
+ * @param {object} values - A preset, or the settings object (live fields).
+ * @param {string[]} fieldKeys - The tool's prompt field keys.
+ * @returns {string}
+ */
+export function fingerprintPreset(values, fieldKeys) {
+    const text = [...fieldKeys].sort()
+        .map(key => `${key}\u0000${typeof values?.[key] === 'string' ? values[key] : ''}`)
+        .join('\u0001');
+    let hash = 0x811c9dc5;
+    for (let i = 0; i < text.length; i++) {
+        hash ^= text.charCodeAt(i);
+        hash = Math.imul(hash, 0x01000193) >>> 0;
+    }
+    return hash.toString(16).padStart(8, '0');
+}
+
+/**
+ * Ship a module's built-in presets, and upgrade them when their text
+ * changes. Versioned per `spec.id` under `settings.builtinPresetVersions`:
+ *
+ * - A preset is added (unless one with its name already exists) when the
+ *   install predates the version that introduced it. Nothing is re-added
+ *   after that, so a deleted built-in stays deleted.
+ * - An existing built-in is replaced with the current version only when
+ *   it's unedited: its prompt texts fingerprint to a retired version (or
+ *   the current one) and it carries no response length of its own that
+ *   differs. When that preset is active and the live fields are unedited
+ *   too, they're upgraded as well (including the preset's response
+ *   length), so the dropdown doesn't come up "(modified)".
+ * - The active preset is never switched.
+ *
+ * To revise a built-in: change its text, bump `spec.version`, and add the
+ * outgoing text's `fingerprintPreset` to `spec.retired`.
+ *
+ * @param {object} settings - Shared mutable settings reference.
+ * @param {Array<{ toolKey: string, fields: Array<{ key: string }>, responseLength?: { key: string } }>} tools
+ *   TOOL_PRESET_CONFIG, for each tool's field keys and length setting.
+ * @param {object} spec
+ * @param {string} spec.id - Stable id for this set of built-ins.
+ * @param {number} spec.version - Current version (starts at 1).
+ * @param {object} spec.presets - toolKey -> presetName -> preset values.
+ * @param {object} [spec.introduced] - toolKey -> presetName -> the version
+ *   that first shipped it (default 1).
+ * @param {object} [spec.retired] - toolKey -> presetName -> fingerprints of
+ *   earlier versions' texts.
+ * @param {string} [spec.legacyFlag] - A settings flag that, from before
+ *   versioning, means version 1 was seeded.
+ * @returns {boolean} `true` if settings changed (caller should save).
+ */
+export function seedBuiltinPresets(settings, tools, spec) {
+    if (!settings.builtinPresetVersions || typeof settings.builtinPresetVersions !== 'object') {
+        settings.builtinPresetVersions = {};
+    }
+    const stored = settings.builtinPresetVersions[spec.id];
+    const installed = Number.isInteger(stored)
+        ? stored
+        : ((spec.legacyFlag && settings[spec.legacyFlag]) ? 1 : 0);
+    if (installed >= spec.version) {
+        if (stored !== installed) {
+            settings.builtinPresetVersions[spec.id] = installed;
+            return true;
+        }
+        return false;
+    }
+
+    if (!settings.toolPresets || typeof settings.toolPresets !== 'object') settings.toolPresets = {};
+    for (const [toolKey, builtins] of Object.entries(spec.presets)) {
+        const tool = tools.find(t => t.toolKey === toolKey);
+        if (!tool) continue;
+        const fieldKeys = tool.fields.map(f => f.key);
+        const presets = settings.toolPresets[toolKey] || (settings.toolPresets[toolKey] = {});
+        for (const [name, current] of Object.entries(builtins)) {
+            const introducedIn = spec.introduced?.[toolKey]?.[name] ?? 1;
+            if (installed < introducedIn) {
+                if (presets[name] === undefined) presets[name] = { ...current };
+                continue;
+            }
+            const existing = presets[name];
+            if (!existing) continue;
+            const known = [...(spec.retired?.[toolKey]?.[name] || []), fingerprintPreset(current, fieldKeys)];
+            const lengthUntouched = existing.responseLength === undefined
+                || existing.responseLength === current.responseLength;
+            if (!lengthUntouched || !known.includes(fingerprintPreset(existing, fieldKeys))) continue;
+            presets[name] = { ...current };
+            if (settings.activeToolPreset?.[toolKey] === name
+                && known.includes(fingerprintPreset(settings, fieldKeys))) {
+                for (const key of fieldKeys) {
+                    if (typeof current[key] === 'string') settings[key] = current[key];
+                }
+                if (tool.responseLength && isPositiveLength(current.responseLength)) {
+                    settings[tool.responseLength.key] = current.responseLength;
+                }
+            }
+        }
+    }
+    settings.builtinPresetVersions[spec.id] = spec.version;
+    return true;
+}
+
 /**
  * One-time migration from the legacy per-field template system
  * (`promptTemplates` / `activePromptTemplate`) to per-tool presets.
@@ -295,10 +477,13 @@ export function migrateLegacyToolPresets(settings, tools) {
  * @param {string}   opts.containerId   Id of the empty <div> to render into (no '#').
  * @param {Array<{ key: string, label: string, textareaId: string, defaultText: string }>} opts.fields
  *                   The settings keys / textareas bundled into this tool's presets.
+ * @param {{ key: string, inputSelector: string }|null} [opts.responseLength]
+ *                   The tool's response-length setting and a selector matching
+ *                   every input bound to it, so presets can carry the length.
  * @param {object}   opts.settings      Shared mutable settings reference.
  * @param {Function} opts.saveSettings  () => void — persists settings.
  */
-export function setupToolPresets({ toolKey, label, containerId, fields, settings, saveSettings }) {
+export function setupToolPresets({ toolKey, label, containerId, fields, responseLength = null, settings, saveSettings }) {
     if (!settings.toolPresets) settings.toolPresets = {};
     if (!settings.activeToolPreset) settings.activeToolPreset = {};
     if (!settings.toolPresets[toolKey]) settings.toolPresets[toolKey] = {};
@@ -307,8 +492,9 @@ export function setupToolPresets({ toolKey, label, containerId, fields, settings
     // Register (or re-register) the tool for the shared activation logic
     // and the point-of-use selectors, even if the settings container is
     // missing — selection elsewhere must still work.
-    const tool = { toolKey, label, fields, settings, saveSettings, listeners: new Set() };
+    const tool = { toolKey, label, fields, responseLength, settings, saveSettings, listeners: new Set() };
     toolRegistry.set(toolKey, tool);
+    installLengthDirtyTracking();
 
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -383,7 +569,7 @@ export function setupToolPresets({ toolKey, label, containerId, fields, settings
             window.alert(result.reason);
             return;
         }
-        getPresets(tool)[result.name] = getCurrentValues(tool);
+        getPresets(tool)[result.name] = snapshotCurrentPreset(tool);
         settings.activeToolPreset[toolKey] = result.name;
         saveSettings();
         notifyPresetChange(tool);
@@ -392,7 +578,7 @@ export function setupToolPresets({ toolKey, label, containerId, fields, settings
     buttons.update.addEventListener('click', () => {
         const active = getActiveId(tool);
         if (active === DEFAULT_ID) return;
-        getPresets(tool)[active] = getCurrentValues(tool);
+        getPresets(tool)[active] = snapshotCurrentPreset(tool);
         saveSettings();
         notifyPresetChange(tool);
     });

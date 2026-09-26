@@ -26,6 +26,17 @@ module.exports = {
             },
         },
         {
+            // Unit tests (node:test) for the modules with no SillyTavern imports.
+            files: ['test/**/*.mjs'],
+            env: {
+                node: true,
+                es2022: true,
+            },
+            parserOptions: {
+                sourceType: 'module',
+            },
+        },
+        {
             files: ['webpack.config.js', '.eslintrc.js', 'scripts/**/*.js'],
             parserOptions: {
             },

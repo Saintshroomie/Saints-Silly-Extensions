@@ -2854,6 +2854,74 @@ async function cancellableStreamingGenerate(params, targetEl, { append = false, 
     }
 }
 
+;// ./src/text-utils.js
+/**
+ * Pure text helpers shared by the generation tools. No SillyTavern imports,
+ * so they can be unit-tested under plain Node (see test/). Re-exported from
+ * utils.js, which is where the modules import them from.
+ */
+
+// ─── Template Macros ───
+
+/**
+ * Replace this extension's own `{{key}}` placeholders in a prompt template.
+ *
+ * Deliberately NOT SillyTavern's macro engine: ST macros run on Phrasing's
+ * injection templates already, but the ACC/WIA templates contain literal
+ * `{{ .fooOverride ?? bar }}` override syntax that must pass through
+ * untouched, so generation prompts only get this narrow substitution.
+ *
+ * @param {string} template - Template text possibly containing `{{key}}` placeholders.
+ * @param {Record<string, string>} macros - key → replacement value.
+ * @returns {{ text: string, used: Set<string> }} The substituted text plus the
+ *          set of macro keys that were actually present. Callers use `used`
+ *          to fall back to appending/prepending a block when its placeholder
+ *          is absent, which keeps old templates working unchanged.
+ */
+function applyTemplateMacros(template, macros) {
+    let text = template || '';
+    const used = new Set();
+    for (const [key, value] of Object.entries(macros)) {
+        const re = new RegExp(`\\{\\{\\s*${key}\\s*\\}\\}`, 'gi');
+        if (re.test(text)) {
+            used.add(key);
+            text = text.replace(new RegExp(re.source, 'gi'), () => value ?? '');
+        }
+    }
+    return { text, used };
+}
+
+// ─── Prefill Echo Stripping ───
+
+/**
+ * Strip a prefill echo from the start of a generation result.
+ *
+ * Backends that support assistant-prefix continuation return only the new
+ * text, so callers prepend the prefill to the result. Chat-completion
+ * backends that ignore the prefix (e.g. OpenAI) often start over and re-emit
+ * the prefill (or its final line), which would produce a doubled opening
+ * once the prefill is prepended. Detects a full-prefill echo or a final-line
+ * echo and removes it. Conservative: requires an exact match of at least a
+ * few characters, so legitimate output is never trimmed.
+ *
+ * @param {string} output  - Cleaned (trimmed) generation result.
+ * @param {string} prefill - The prefill that was sent as the assistant prefix.
+ * @returns {string} The output with any leading prefill echo removed.
+ */
+function stripPrefillEcho(output, prefill) {
+    if (!output || !prefill) return output;
+    const whole = prefill.trim();
+    if (whole.length >= 3 && output.startsWith(whole)) {
+        return output.slice(whole.length).replace(/^\s+/, '');
+    }
+    const lines = prefill.split('\n').map(l => l.trim()).filter(Boolean);
+    const lastLine = lines[lines.length - 1];
+    if (lastLine && lastLine.length >= 4 && output.startsWith(lastLine)) {
+        return output.slice(lastLine.length).replace(/^\s+/, '');
+    }
+    return output;
+}
+
 ;// ./src/utils.js
 /**
  * Shared utilities for SillyTavern extensions.
@@ -3116,66 +3184,11 @@ async function withSingleLineDisabled(fn) {
     }
 }
 
-// ─── Template Macros ───
+// ─── Template Macros & Prefill Echo Stripping ───
 
-/**
- * Replace this extension's own `{{key}}` placeholders in a prompt template.
- *
- * Deliberately NOT SillyTavern's macro engine: ST macros run on Phrasing's
- * injection templates already, but the ACC/WIA templates contain literal
- * `{{ .fooOverride ?? bar }}` override syntax that must pass through
- * untouched, so generation prompts only get this narrow substitution.
- *
- * @param {string} template - Template text possibly containing `{{key}}` placeholders.
- * @param {Record<string, string>} macros - key → replacement value.
- * @returns {{ text: string, used: Set<string> }} The substituted text plus the
- *          set of macro keys that were actually present. Callers use `used`
- *          to fall back to appending/prepending a block when its placeholder
- *          is absent, which keeps old templates working unchanged.
- */
-function applyTemplateMacros(template, macros) {
-    let text = template || '';
-    const used = new Set();
-    for (const [key, value] of Object.entries(macros)) {
-        const re = new RegExp(`\\{\\{\\s*${key}\\s*\\}\\}`, 'gi');
-        if (re.test(text)) {
-            used.add(key);
-            text = text.replace(new RegExp(re.source, 'gi'), () => value ?? '');
-        }
-    }
-    return { text, used };
-}
+// Pure text helpers, kept free of SillyTavern imports so they're unit-tested
+// under plain Node (test/). Re-exported here so callers keep one import site.
 
-// ─── Prefill Echo Stripping ───
-
-/**
- * Strip a prefill echo from the start of a generation result.
- *
- * Backends that support assistant-prefix continuation return only the new
- * text, so callers prepend the prefill to the result. Chat-completion
- * backends that ignore the prefix (e.g. OpenAI) often start over and re-emit
- * the prefill (or its final line), which would produce a doubled opening
- * once the prefill is prepended. Detects a full-prefill echo or a final-line
- * echo and removes it. Conservative: requires an exact match of at least a
- * few characters, so legitimate output is never trimmed.
- *
- * @param {string} output  - Cleaned (trimmed) generation result.
- * @param {string} prefill - The prefill that was sent as the assistant prefix.
- * @returns {string} The output with any leading prefill echo removed.
- */
-function stripPrefillEcho(output, prefill) {
-    if (!output || !prefill) return output;
-    const whole = prefill.trim();
-    if (whole.length >= 3 && output.startsWith(whole)) {
-        return output.slice(whole.length).replace(/^\s+/, '');
-    }
-    const lines = prefill.split('\n').map(l => l.trim()).filter(Boolean);
-    const lastLine = lines[lines.length - 1];
-    if (lastLine && lastLine.length >= 4 && output.startsWith(lastLine)) {
-        return output.slice(lastLine.length).replace(/^\s+/, '');
-    }
-    return output;
-}
 
 // ─── Clipboard ───
 
@@ -6293,6 +6306,17 @@ function registerPhraseBanSlashCommand() {
  * compact dropdown (mounted in the ACC / Image Prompting / Compaction
  * modals and on every WIA entry's Assist row) that shares state with the
  * settings widget — changing the selection anywhere updates everywhere.
+ *
+ * Response length: a tool configured with `responseLength: { key,
+ * inputSelector }` also stores its response length (Max Tokens) in each
+ * preset it saves. Loading a preset that carries one sets the setting and
+ * every matching input; a preset without one (Default, or one saved before
+ * this existed) leaves the length alone and never counts it as modified.
+ *
+ * Built-in presets: `seedBuiltinPresets` ships a module's ready-made presets
+ * and upgrades them in later versions, replacing only copies the user never
+ * edited (matched by fingerprint), so revised built-ins reach existing
+ * installs without clobbering anyone's changes.
  */
 
 const DEFAULT_ID = '__default__';
@@ -6345,10 +6369,50 @@ function getCurrentValues(tool) {
     return values;
 }
 
+function isPositiveLength(n) {
+    return Number.isFinite(n) && n > 0;
+}
+
+/** The response length a preset carries, or null (Default never carries one). */
+function getPresetLength(tool, id) {
+    if (!tool.responseLength || id === DEFAULT_ID) return null;
+    const n = getPresets(tool)[id]?.responseLength;
+    return isPositiveLength(n) ? n : null;
+}
+
+function getCurrentLength(tool) {
+    if (!tool.responseLength) return null;
+    const n = tool.settings[tool.responseLength.key];
+    return isPositiveLength(n) ? n : null;
+}
+
+/** What Save as New / Update store: every prompt field, plus the length. */
+function snapshotCurrentPreset(tool) {
+    const values = getCurrentValues(tool);
+    const length = getCurrentLength(tool);
+    if (length !== null) values.responseLength = length;
+    return values;
+}
+
+/**
+ * Set a tool's response length and show it in every input bound to it (the
+ * settings panel, open modals, WIA entry rows). The inputs' own listeners
+ * would write the same setting, so no events are dispatched.
+ */
+function applyResponseLength(tool, length) {
+    tool.settings[tool.responseLength.key] = length;
+    for (const input of document.querySelectorAll(tool.responseLength.inputSelector)) {
+        input.value = String(length);
+    }
+}
+
 function isDirty(tool) {
+    const active = getActiveId(tool);
     const current = getCurrentValues(tool);
-    const preset = getPresetValues(tool, getActiveId(tool));
-    return tool.fields.some(f => current[f.key] !== preset[f.key]);
+    const preset = getPresetValues(tool, active);
+    if (tool.fields.some(f => current[f.key] !== preset[f.key])) return true;
+    const presetLength = getPresetLength(tool, active);
+    return presetLength !== null && getCurrentLength(tool) !== presetLength;
 }
 
 function loadPresetIntoTextareas(tool, id) {
@@ -6364,6 +6428,8 @@ function loadPresetIntoTextareas(tool, id) {
             tool.settings[field.key] = values[field.key];
         }
     }
+    const length = getPresetLength(tool, id);
+    if (length !== null) applyResponseLength(tool, length);
 }
 
 function presetOptionLabel(id, activeId, dirty) {
@@ -6496,6 +6562,135 @@ function createToolPresetSelector({ toolKey, className = '', title = '' }) {
     return select;
 }
 
+// Response-length inputs live in the settings panel, in modals, and on every
+// WIA entry row (created later), so their edits are tracked with one
+// document-level listener. It runs in the bubble phase, after the inputs' own
+// listeners have written the setting, and refreshes the "(modified)" marker.
+let lengthDirtyTrackingInstalled = false;
+
+function installLengthDirtyTracking() {
+    if (lengthDirtyTrackingInstalled) return;
+    lengthDirtyTrackingInstalled = true;
+    const onLengthEdit = (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+        for (const tool of toolRegistry.values()) {
+            if (tool.responseLength && target.matches(tool.responseLength.inputSelector)) {
+                notifyPresetChange(tool);
+            }
+        }
+    };
+    document.addEventListener('input', onLengthEdit);
+    document.addEventListener('change', onLengthEdit);
+}
+
+// ─── Built-in Presets ───
+
+/**
+ * Fingerprint (FNV-1a, hex) of a preset's prompt texts. Only the tool's
+ * prompt fields count (never `responseLength`), and a missing field counts
+ * as empty, so the value is stable for a given set of `fieldKeys`. Record
+ * retired fingerprints with the tool's field keys as they were at the time.
+ *
+ * @param {object} values - A preset, or the settings object (live fields).
+ * @param {string[]} fieldKeys - The tool's prompt field keys.
+ * @returns {string}
+ */
+function fingerprintPreset(values, fieldKeys) {
+    const text = [...fieldKeys].sort()
+        .map(key => `${key}\u0000${typeof values?.[key] === 'string' ? values[key] : ''}`)
+        .join('\u0001');
+    let hash = 0x811c9dc5;
+    for (let i = 0; i < text.length; i++) {
+        hash ^= text.charCodeAt(i);
+        hash = Math.imul(hash, 0x01000193) >>> 0;
+    }
+    return hash.toString(16).padStart(8, '0');
+}
+
+/**
+ * Ship a module's built-in presets, and upgrade them when their text
+ * changes. Versioned per `spec.id` under `settings.builtinPresetVersions`:
+ *
+ * - A preset is added (unless one with its name already exists) when the
+ *   install predates the version that introduced it. Nothing is re-added
+ *   after that, so a deleted built-in stays deleted.
+ * - An existing built-in is replaced with the current version only when
+ *   it's unedited: its prompt texts fingerprint to a retired version (or
+ *   the current one) and it carries no response length of its own that
+ *   differs. When that preset is active and the live fields are unedited
+ *   too, they're upgraded as well (including the preset's response
+ *   length), so the dropdown doesn't come up "(modified)".
+ * - The active preset is never switched.
+ *
+ * To revise a built-in: change its text, bump `spec.version`, and add the
+ * outgoing text's `fingerprintPreset` to `spec.retired`.
+ *
+ * @param {object} settings - Shared mutable settings reference.
+ * @param {Array<{ toolKey: string, fields: Array<{ key: string }>, responseLength?: { key: string } }>} tools
+ *   TOOL_PRESET_CONFIG, for each tool's field keys and length setting.
+ * @param {object} spec
+ * @param {string} spec.id - Stable id for this set of built-ins.
+ * @param {number} spec.version - Current version (starts at 1).
+ * @param {object} spec.presets - toolKey -> presetName -> preset values.
+ * @param {object} [spec.introduced] - toolKey -> presetName -> the version
+ *   that first shipped it (default 1).
+ * @param {object} [spec.retired] - toolKey -> presetName -> fingerprints of
+ *   earlier versions' texts.
+ * @param {string} [spec.legacyFlag] - A settings flag that, from before
+ *   versioning, means version 1 was seeded.
+ * @returns {boolean} `true` if settings changed (caller should save).
+ */
+function seedBuiltinPresets(settings, tools, spec) {
+    if (!settings.builtinPresetVersions || typeof settings.builtinPresetVersions !== 'object') {
+        settings.builtinPresetVersions = {};
+    }
+    const stored = settings.builtinPresetVersions[spec.id];
+    const installed = Number.isInteger(stored)
+        ? stored
+        : ((spec.legacyFlag && settings[spec.legacyFlag]) ? 1 : 0);
+    if (installed >= spec.version) {
+        if (stored !== installed) {
+            settings.builtinPresetVersions[spec.id] = installed;
+            return true;
+        }
+        return false;
+    }
+
+    if (!settings.toolPresets || typeof settings.toolPresets !== 'object') settings.toolPresets = {};
+    for (const [toolKey, builtins] of Object.entries(spec.presets)) {
+        const tool = tools.find(t => t.toolKey === toolKey);
+        if (!tool) continue;
+        const fieldKeys = tool.fields.map(f => f.key);
+        const presets = settings.toolPresets[toolKey] || (settings.toolPresets[toolKey] = {});
+        for (const [name, current] of Object.entries(builtins)) {
+            const introducedIn = spec.introduced?.[toolKey]?.[name] ?? 1;
+            if (installed < introducedIn) {
+                if (presets[name] === undefined) presets[name] = { ...current };
+                continue;
+            }
+            const existing = presets[name];
+            if (!existing) continue;
+            const known = [...(spec.retired?.[toolKey]?.[name] || []), fingerprintPreset(current, fieldKeys)];
+            const lengthUntouched = existing.responseLength === undefined
+                || existing.responseLength === current.responseLength;
+            if (!lengthUntouched || !known.includes(fingerprintPreset(existing, fieldKeys))) continue;
+            presets[name] = { ...current };
+            if (settings.activeToolPreset?.[toolKey] === name
+                && known.includes(fingerprintPreset(settings, fieldKeys))) {
+                for (const key of fieldKeys) {
+                    if (typeof current[key] === 'string') settings[key] = current[key];
+                }
+                if (tool.responseLength && isPositiveLength(current.responseLength)) {
+                    settings[tool.responseLength.key] = current.responseLength;
+                }
+            }
+        }
+    }
+    settings.builtinPresetVersions[spec.id] = spec.version;
+    return true;
+}
+
 /**
  * One-time migration from the legacy per-field template system
  * (`promptTemplates` / `activePromptTemplate`) to per-tool presets.
@@ -6569,10 +6764,13 @@ function migrateLegacyToolPresets(settings, tools) {
  * @param {string}   opts.containerId   Id of the empty <div> to render into (no '#').
  * @param {Array<{ key: string, label: string, textareaId: string, defaultText: string }>} opts.fields
  *                   The settings keys / textareas bundled into this tool's presets.
+ * @param {{ key: string, inputSelector: string }|null} [opts.responseLength]
+ *                   The tool's response-length setting and a selector matching
+ *                   every input bound to it, so presets can carry the length.
  * @param {object}   opts.settings      Shared mutable settings reference.
  * @param {Function} opts.saveSettings  () => void — persists settings.
  */
-function setupToolPresets({ toolKey, label, containerId, fields, settings, saveSettings }) {
+function setupToolPresets({ toolKey, label, containerId, fields, responseLength = null, settings, saveSettings }) {
     if (!settings.toolPresets) settings.toolPresets = {};
     if (!settings.activeToolPreset) settings.activeToolPreset = {};
     if (!settings.toolPresets[toolKey]) settings.toolPresets[toolKey] = {};
@@ -6581,8 +6779,9 @@ function setupToolPresets({ toolKey, label, containerId, fields, settings, saveS
     // Register (or re-register) the tool for the shared activation logic
     // and the point-of-use selectors, even if the settings container is
     // missing — selection elsewhere must still work.
-    const tool = { toolKey, label, fields, settings, saveSettings, listeners: new Set() };
+    const tool = { toolKey, label, fields, responseLength, settings, saveSettings, listeners: new Set() };
     toolRegistry.set(toolKey, tool);
+    installLengthDirtyTracking();
 
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -6657,7 +6856,7 @@ function setupToolPresets({ toolKey, label, containerId, fields, settings, saveS
             window.alert(result.reason);
             return;
         }
-        getPresets(tool)[result.name] = getCurrentValues(tool);
+        getPresets(tool)[result.name] = snapshotCurrentPreset(tool);
         settings.activeToolPreset[toolKey] = result.name;
         saveSettings();
         notifyPresetChange(tool);
@@ -6666,7 +6865,7 @@ function setupToolPresets({ toolKey, label, containerId, fields, settings, saveS
     buttons.update.addEventListener('click', () => {
         const active = getActiveId(tool);
         if (active === DEFAULT_ID) return;
-        getPresets(tool)[active] = getCurrentValues(tool);
+        getPresets(tool)[active] = snapshotCurrentPreset(tool);
         saveSettings();
         notifyPresetChange(tool);
     });
@@ -6872,7 +7071,6 @@ const persistedModalState = {
     output: '',
     useChatContext: false,
     selectedLoreBooks: [],
-    responseLength: null, // null means "use saved setting"
 };
 
 // ─── Init ───
@@ -7069,9 +7267,16 @@ function capturePersistedModalState(body) {
     persistedModalState.useChatContext = !!body.querySelector('#acc_use_chat_context')?.checked;
     const picker = body._accLorebookPicker;
     persistedModalState.selectedLoreBooks = picker ? picker.getSelected() : [];
+    // The Max Tokens field is the tool's saved setting (its change listener
+    // writes it through), so keep a typed value that never fired 'change'
+    // there too, rather than as a modal-only copy that would outlive a
+    // preset switch.
     const tokenInput = body.querySelector('#acc_response_length');
     const parsed = tokenInput ? parseInt(tokenInput.value, 10) : NaN;
-    persistedModalState.responseLength = (!isNaN(parsed) && parsed > 0) ? parsed : null;
+    if (!isNaN(parsed) && parsed > 0 && parsed !== assisted_character_creation_moduleSettings.accResponseLength) {
+        assisted_character_creation_moduleSettings.accResponseLength = parsed;
+        saveSettingsFn?.();
+    }
 }
 
 function buildModalBody() {
@@ -7141,15 +7346,10 @@ function buildModalBody() {
     const chatCb = root.querySelector('#acc_use_chat_context');
     if (chatCb) chatCb.checked = !!persistedModalState.useChatContext;
 
-    // Initialize the token field from persisted state if available, else
-    // from settings.
+    // Initialize the token field from the saved setting (which a preset
+    // switch may have changed since the modal last closed).
     const tokenInput = root.querySelector('#acc_response_length');
-    if (tokenInput) {
-        const persisted = persistedModalState.responseLength;
-        tokenInput.value = String((typeof persisted === 'number' && persisted > 0)
-            ? persisted
-            : getResponseLength());
-    }
+    if (tokenInput) tokenInput.value = String(getSavedResponseLength());
 
     // Mount the shared lore-book picker with previously-selected entries.
     const picker = createLoreBookPicker({
@@ -7469,6 +7669,10 @@ function getResponseLength() {
         const parsed = parseInt(input.value, 10);
         if (!isNaN(parsed) && parsed > 0) return parsed;
     }
+    return getSavedResponseLength();
+}
+
+function getSavedResponseLength() {
     const setting = assisted_character_creation_moduleSettings?.accResponseLength;
     if (typeof setting === 'number' && setting > 0) return setting;
     return DEFAULT_ACC_RESPONSE_LENGTH;
@@ -11418,32 +11622,13 @@ async function sendPromptToImageGen(prompt, { quiet = false, negative = '' } = {
     return typeof url === 'string' ? url : '';
 }
 
-;// ./src/image-prompting.js
+;// ./src/image-prompt-presets.js
 /**
- * Image Prompting (IP)
- *
- * Modal-based image-prompt generation. Reads the current chat (and any
- * selected lore books) and silently generates a ready-to-paste prompt for an
- * external image-generation tool (ComfyUI, etc.) depicting the current
- * moment in the roleplay. The prompt template is preset-managed so the user
- * can keep one template per diffusion-model family: the Default targets
- * Krea 2 (natural-language prose); seeded presets target Anima
- * (Danbooru tags + prose) and pure Danbooru-tag models.
- *
- * Generated prompts can be saved to a per-chat store
- * (`chatMetadata.imagePrompting.savedPrompts`) and browsed / reloaded /
- * copied / deleted from the Saved Prompts section of the modal, so a good
- * prompt bound to a scene can be retrieved later in that chat.
+ * Image Prompting — default prompt texts and the built-in diffusion-model
+ * presets. No SillyTavern imports, so they're unit-tested under plain Node
+ * (see test/). image-prompting.js imports what it uses and re-exports the
+ * rest for index.js.
  */
-
-
-
-
-
-
-
-
-
 
 // ─── Default Prompts ───
 
@@ -11543,47 +11728,73 @@ const DEFAULT_IMAGE_PROMPT_RESPONSE_LENGTH = 500;
 
 // ─── Built-in Presets ───
 
-// Seeded once into settings.toolPresets['image-prompt'] so the alternate
+// Handed to `seedBuiltinPresets` (prompt-templates.js) so the alternate
 // diffusion-model targets ship ready to select. The Default preset entry
 // (built-in) already covers Krea 2; these add the tag-based styles. Users
-// can edit, rename, or delete them like any saved preset — the seed flag
-// keeps deleted ones from coming back.
-const BUILTIN_IMAGE_PROMPT_PRESETS = {
-    'Anima (Tags + Prose)': {
-        imagePromptPrompt: ANIMA_IMAGE_PROMPT_PROMPT,
-        imagePromptPrefill: ANIMA_IMAGE_PROMPT_PREFILL,
-        imagePromptNegative: ANIMA_IMAGE_PROMPT_NEGATIVE,
+// can edit, rename, or delete them like any saved preset; a deleted one
+// never comes back, and an edited one is never overwritten.
+//
+// History: v1 (flagged by `imagePromptPresetsSeeded`) had no negative
+// prompts; v2 added them, so unedited v1 copies pick them up on upgrade.
+const IMAGE_PROMPT_PRESETS_SPEC = {
+    id: 'image-prompt',
+    version: 2,
+    legacyFlag: 'imagePromptPresetsSeeded',
+    presets: {
+        'image-prompt': {
+            'Anima (Tags + Prose)': {
+                imagePromptPrompt: ANIMA_IMAGE_PROMPT_PROMPT,
+                imagePromptPrefill: ANIMA_IMAGE_PROMPT_PREFILL,
+                imagePromptNegative: ANIMA_IMAGE_PROMPT_NEGATIVE,
+            },
+            'Danbooru Tags': {
+                imagePromptPrompt: DANBOORU_IMAGE_PROMPT_PROMPT,
+                imagePromptPrefill: DANBOORU_IMAGE_PROMPT_PREFILL,
+                imagePromptNegative: DANBOORU_IMAGE_PROMPT_NEGATIVE,
+            },
+        },
     },
-    'Danbooru Tags': {
-        imagePromptPrompt: DANBOORU_IMAGE_PROMPT_PROMPT,
-        imagePromptPrefill: DANBOORU_IMAGE_PROMPT_PREFILL,
-        imagePromptNegative: DANBOORU_IMAGE_PROMPT_NEGATIVE,
+    retired: {
+        'image-prompt': {
+            'Anima (Tags + Prose)': ['45b33951'],
+            'Danbooru Tags': ['13a8e0e4'],
+        },
     },
 };
 
+;// ./src/image-prompting.js
 /**
- * Seed the built-in Anima / Danbooru presets into the tool-preset store.
- * Runs after migrateLegacyToolPresets so `toolPresets` exists. One-shot:
- * a settings flag records the seeding so user deletions stick.
+ * Image Prompting (IP)
  *
- * @param {object} settings - Shared mutable settings reference.
- * @returns {boolean} `true` if anything changed (caller should save settings).
+ * Modal-based image-prompt generation. Reads the current chat (and any
+ * selected lore books) and silently generates a ready-to-paste prompt for an
+ * external image-generation tool (ComfyUI, etc.) depicting the current
+ * moment in the roleplay. The prompt template is preset-managed so the user
+ * can keep one template per diffusion-model family: the Default targets
+ * Krea 2 (natural-language prose); seeded presets target Anima
+ * (Danbooru tags + prose) and pure Danbooru-tag models.
+ *
+ * Generated prompts can be saved to a per-chat store
+ * (`chatMetadata.imagePrompting.savedPrompts`) and browsed / reloaded /
+ * copied / deleted from the Saved Prompts section of the modal, so a good
+ * prompt bound to a scene can be retrieved later in that chat.
  */
-function seedImagePromptPresets(settings) {
-    if (settings.imagePromptPresetsSeeded) return false;
-    if (!settings.toolPresets || typeof settings.toolPresets !== 'object') settings.toolPresets = {};
-    if (!settings.activeToolPreset || typeof settings.activeToolPreset !== 'object') settings.activeToolPreset = {};
-    const presets = settings.toolPresets['image-prompt']
-        || (settings.toolPresets['image-prompt'] = {});
-    for (const [name, preset] of Object.entries(BUILTIN_IMAGE_PROMPT_PRESETS)) {
-        if (presets[name] === undefined) presets[name] = { ...preset };
-    }
-    if (!settings.activeToolPreset['image-prompt']) {
-        settings.activeToolPreset['image-prompt'] = '__default__';
-    }
-    settings.imagePromptPresetsSeeded = true;
-    return true;
-}
+
+
+
+
+
+
+
+
+
+
+
+// ─── Default Prompts & Built-in Presets ───
+
+// The prompt texts and built-in presets live in image-prompt-presets.js (no
+// SillyTavern imports, so they're unit-tested); re-exported for index.js.
+
 
 // ─── Module State ───
 
@@ -11622,7 +11833,6 @@ const image_prompting_persistedModalState = {
     negative: null, // null means "never touched — follow the prompt preset"
     useChatContext: true,
     selectedLoreBooks: [],
-    responseLength: null, // null means "use saved setting"
 };
 
 // The negative text the active prompt preset last put into the modal's
@@ -12272,9 +12482,16 @@ function image_prompting_capturePersistedModalState(body) {
     image_prompting_persistedModalState.useChatContext = !!body.querySelector('#ip_use_chat_context')?.checked;
     const picker = body._ipLorebookPicker;
     image_prompting_persistedModalState.selectedLoreBooks = picker ? picker.getSelected() : [];
+    // The Max Tokens field is the tool's saved setting (its change listener
+    // writes it through), so keep a typed value that never fired 'change'
+    // there too, rather than as a modal-only copy that would outlive a
+    // preset switch.
     const tokenInput = body.querySelector('#ip_response_length');
     const parsed = tokenInput ? parseInt(tokenInput.value, 10) : NaN;
-    image_prompting_persistedModalState.responseLength = (!isNaN(parsed) && parsed > 0) ? parsed : null;
+    if (!isNaN(parsed) && parsed > 0 && parsed !== image_prompting_moduleSettings.imagePromptResponseLength) {
+        image_prompting_moduleSettings.imagePromptResponseLength = parsed;
+        image_prompting_saveSettingsFn?.();
+    }
 }
 
 function image_prompting_buildModalBody() {
@@ -12387,15 +12604,10 @@ function image_prompting_buildModalBody() {
     const negativeEl = root.querySelector('#ip_negative_prompt');
     if (negativeEl) negativeEl.value = resolveNegativeForField();
 
-    // Initialize the token field from persisted state if available, else
-    // from settings.
+    // Initialize the token field from the saved setting (which a preset
+    // switch may have changed since the modal last closed).
     const tokenInput = root.querySelector('#ip_response_length');
-    if (tokenInput) {
-        const persisted = image_prompting_persistedModalState.responseLength;
-        tokenInput.value = String((typeof persisted === 'number' && persisted > 0)
-            ? persisted
-            : image_prompting_getResponseLength());
-    }
+    if (tokenInput) tokenInput.value = String(image_prompting_getSavedResponseLength());
 
     // Mount the shared lore-book picker with previously-selected entries.
     const picker = createLoreBookPicker({
@@ -12957,6 +13169,10 @@ function image_prompting_getResponseLength() {
         const parsed = parseInt(input.value, 10);
         if (!isNaN(parsed) && parsed > 0) return parsed;
     }
+    return image_prompting_getSavedResponseLength();
+}
+
+function image_prompting_getSavedResponseLength() {
     const setting = image_prompting_moduleSettings?.imagePromptResponseLength;
     if (typeof setting === 'number' && setting > 0) return setting;
     return DEFAULT_IMAGE_PROMPT_RESPONSE_LENGTH;
@@ -13913,6 +14129,192 @@ function onRetryContinueGenerationEnded() {
     showQuickRetryButton();
 }
 
+;// ./src/director-parsing.js
+/**
+ * Group Director — pure parsing helpers: speaker-line detection (walk-on
+ * learning and splitting) and mapping the director's reply to a roster
+ * entry. No SillyTavern imports, so they're unit-tested under plain Node
+ * (see test/); `ctx` arguments are plain SillyTavern context objects (only
+ * `chat` and `characters` are read).
+ */
+
+// ─── Speaker Lines ───
+
+// Speaker-line detection. Two shapes are recognised:
+//   1. Bracketed `[Name]:` — explicit, unambiguous, matched anywhere in the line
+//      (so several walk-ons on one line are all caught).
+//   2. Bare `Name:` at the START of a line — the shape the model actually emits,
+//      because in its context window group speakers only ever appear as `Name:`
+//      (never bracketed). Walk-on names aren't stop strings, so the model happily
+//      tacks `WalkOn: "…"` onto the end of another character's reply; line-anchored
+//      bare matching is what lets us split those back out. To keep false positives
+//      down the bare form must begin a line, start with a capital, be 1–4
+//      name-shaped words, and be followed by `: ` (colon + whitespace/quote).
+// Group 1 = bracketed name, group 2 = bare name.
+const SPEAKER_LINE_RE =
+    /\[([^\]\n]{1,60})\][ \t]*:|^[ \t]*([\p{Lu}][\p{L}\p{N}'’.-]{0,30}(?:[ \t]+[\p{Lu}][\p{L}\p{N}'’.-]{0,30}){0,3})[ \t]*:(?=[\s"'“”‘’])/gmu;
+
+// Names that look like `[Name]:` / `Name:` but aren't characters — bracketed
+// meta-tags plus common capitalised sentence-openers and labels that the
+// line-anchored bare matcher would otherwise mistake for a speaker.
+const IGNORED_WALKON_TAGS = new Set([
+    'ooc', 'system', 'note', 'notes', 'narrator', 'setting', 'scene', 'continue',
+    'author', 'author\'s note', 'translation', 'time', 'status', 'a/n', 'an',
+    'warning', 'tip', 'example', 'summary', 'step', 'chapter', 'part', 'location',
+    'pov', 'edit', 'update', 'reminder', 'important', 'objective', 'goal', 'mission',
+    'i', 'he', 'she', 'it', 'they', 'we', 'you', 'but', 'and', 'the', 'a', 'then',
+    'so', 'well', 'no', 'yes', 'oh', 'okay', 'ok', 'meanwhile', 'later', 'suddenly',
+    'finally', 'now', 'p.s', 'ps',
+]);
+
+/**
+ * Find every speaker line (`[Name]:` anywhere, or a bare `Name:` at a line start)
+ * in `text`, skipping meta-tags. Returns ordered matches with the name and the
+ * offsets needed to split: `start` (where the speaker label begins) and
+ * `contentStart` (just after the colon).
+ *
+ * @returns {Array<{ name: string, start: number, contentStart: number }>}
+ */
+function matchSpeakerLines(text) {
+    const str = String(text || '');
+    const out = [];
+    SPEAKER_LINE_RE.lastIndex = 0;
+    for (const m of str.matchAll(SPEAKER_LINE_RE)) {
+        const name = ((m[1] ?? m[2]) || '').trim();
+        if (!name || IGNORED_WALKON_TAGS.has(name.toLowerCase())) continue;
+        out.push({ name, start: m.index, contentStart: m.index + m[0].length });
+    }
+    return out;
+}
+
+/**
+ * Split a message body at its speaker boundaries — `[Name]:` anywhere or a bare
+ * `Name:` at a line start (ignoring meta-tags). Returns `{ head, segments:
+ * [{ name, text }] }`, where `head` is the text before the first speaker line and
+ * each segment's text is the speaker's content with the `Name:` prefix stripped.
+ */
+function parseWalkOnSegments(text) {
+    const str = String(text || '');
+    const boundaries = matchSpeakerLines(str);
+    if (!boundaries.length) return { head: str, segments: [] };
+    const segments = boundaries.map((b, i) => {
+        const end = i + 1 < boundaries.length ? boundaries[i + 1].start : str.length;
+        return { name: b.name, text: str.slice(b.contentStart, end).trim() };
+    });
+    return { head: str.slice(0, boundaries[0].start), segments };
+}
+
+// ─── Roster Picks ───
+
+/**
+ * The `context.characters` index of the most recent AI speaker, used as the
+ * aligned-mode `forceChId` anchor so the director's quiet generation reuses the
+ * KV cache that the just-generated message left warm. Resolves by avatar first,
+ * then name; returns null if no AI message resolves.
+ */
+function resolveAnchorChid(ctx) {
+    const chat = ctx.chat || [];
+    const chars = ctx.characters || [];
+    for (let i = chat.length - 1; i >= 0; i--) {
+        const m = chat[i];
+        if (!m || m.is_user || m.is_system) continue;
+        const avatar = m.original_avatar
+            || (typeof m.force_avatar === 'string' ? m.force_avatar.replace(/^\/characters\//, '') : null);
+        let chid = avatar ? chars.findIndex(c => c.avatar === avatar) : -1;
+        if (chid === -1 && m.name) {
+            chid = chars.findIndex(c => (c.name || '').toLowerCase() === m.name.toLowerCase());
+        }
+        if (chid !== -1) return chid;
+    }
+    return null;
+}
+
+/**
+ * Deterministic fallback for an unusable reply: the next real member (never a
+ * walk-on) after the last character to speak, wrapping around the roster, and
+ * skipping the last speaker itself. Falls back to the first member, then the
+ * first roster entry, so it always returns something.
+ */
+function fallbackPick(roster, ctx) {
+    const n = roster.length;
+    const lastChid = resolveAnchorChid(ctx);
+    let lastIdx = lastChid !== null
+        ? roster.findIndex(r => r.kind === 'member' && r.chid === lastChid)
+        : -1;
+    for (let step = 1; step <= n; step++) {
+        const idx = (((lastIdx + step) % n) + n) % n;
+        const cand = roster[idx];
+        if (cand.kind !== 'member') continue;
+        if (idx === lastIdx) continue;
+        return cand;
+    }
+    return roster.find(r => r.kind === 'member') || roster[0];
+}
+
+/**
+ * Re-resolve a roster member's `context.characters` index at the moment of use.
+ * Avatar filenames are the stable identity (names collide in groups); the index
+ * is not, because ST rebuilds the array as it unshallows members. Falls back to
+ * the name, then to the captured index only if it still points at that member.
+ *
+ * @returns {number|null} A validated index, or null if the character is gone.
+ */
+function resolveMemberChid(ctx, member) {
+    const chars = ctx.characters || [];
+    if (member.avatar) {
+        const byAvatar = chars.findIndex(c => c?.avatar === member.avatar);
+        if (byAvatar !== -1) return byAvatar;
+    }
+    if (member.name) {
+        const byName = chars.findIndex(c => (c?.name || '').toLowerCase() === member.name.toLowerCase());
+        if (byName !== -1) return byName;
+    }
+    const captured = member.chid;
+    if (Number.isInteger(captured) && chars[captured]) return captured;
+    return null;
+}
+
+/** Stable identity compare for roster entries (members by chid, walk-ons by name). */
+function sameRosterEntry(a, b) {
+    if (!a || !b || a.kind !== b.kind) return false;
+    return a.kind === 'member'
+        ? a.chid === b.chid
+        : a.name.toLowerCase() === b.name.toLowerCase();
+}
+
+/**
+ * Map the director's raw reply to one roster member. Prefers the roster number
+ * (what the prompt asks for), then an exact name, then a contained/partial name.
+ * On an unusable reply, falls back deterministically (`fallbackPick`) to the next
+ * real member after the last speaker so the loop never crashes. `onNoMatch`
+ * is called with the raw reply when that fallback kicks in (for logging).
+ */
+function parsePick(text, roster, ctx, onNoMatch = () => {}) {
+    const cleaned = String(text || '').replace(/[*_`"'.,!?:;()[\]{}]/g, ' ').trim();
+    if (!cleaned) return fallbackPick(roster, ctx);
+
+    const numMatch = cleaned.match(/\d+/);
+    if (numMatch) {
+        const idx = parseInt(numMatch[0], 10) - 1;
+        if (idx >= 0 && idx < roster.length) return roster[idx];
+    }
+
+    const lower = cleaned.toLowerCase();
+    let member = roster.find(r => r.name.toLowerCase() === lower);
+    if (member) return member;
+
+    member = roster.find(r => lower.includes(r.name.toLowerCase()));
+    if (member) return member;
+
+    if (lower.length >= 2) {
+        member = roster.find(r => r.name.toLowerCase().includes(lower));
+        if (member) return member;
+    }
+
+    onNoMatch(text);
+    return fallbackPick(roster, ctx);
+}
+
 ;// ./src/director.js
 /**
  * Group Director module — an LLM-chosen turn order for group chats.
@@ -13944,6 +14346,7 @@ function onRetryContinueGenerationEnded() {
  * `{ previousStrategy }` — the group's activation strategy captured the moment
  * we flipped it to Manual, so it can be restored when the Director is disabled.
  */
+
 
 
 
@@ -14018,58 +14421,12 @@ function migrateDirectorPrompt(settings) {
     return changed;
 }
 
-// Speaker-line detection. Two shapes are recognised:
-//   1. Bracketed `[Name]:` — explicit, unambiguous, matched anywhere in the line
-//      (so several walk-ons on one line are all caught).
-//   2. Bare `Name:` at the START of a line — the shape the model actually emits,
-//      because in its context window group speakers only ever appear as `Name:`
-//      (never bracketed). Walk-on names aren't stop strings, so the model happily
-//      tacks `WalkOn: "…"` onto the end of another character's reply; line-anchored
-//      bare matching is what lets us split those back out. To keep false positives
-//      down the bare form must begin a line, start with a capital, be 1–4
-//      name-shaped words, and be followed by `: ` (colon + whitespace/quote).
-// Group 1 = bracketed name, group 2 = bare name.
-const SPEAKER_LINE_RE =
-    /\[([^\]\n]{1,60})\][ \t]*:|^[ \t]*([\p{Lu}][\p{L}\p{N}'’.-]{0,30}(?:[ \t]+[\p{Lu}][\p{L}\p{N}'’.-]{0,30}){0,3})[ \t]*:(?=[\s"'“”‘’])/gmu;
 const MAX_WALKON_NAME_LENGTH = 60;
 const MAX_WALKONS = 50;
 
 // Director chains this many chosen speakers per user turn (back-to-back), unless
 // the user cancels a turn's dialog. Falls back when the setting is unset/invalid.
 const DEFAULT_DIRECTOR_CONSECUTIVE_TURNS = 2;
-
-// Names that look like `[Name]:` / `Name:` but aren't characters — bracketed
-// meta-tags plus common capitalised sentence-openers and labels that the
-// line-anchored bare matcher would otherwise mistake for a speaker.
-const IGNORED_WALKON_TAGS = new Set([
-    'ooc', 'system', 'note', 'notes', 'narrator', 'setting', 'scene', 'continue',
-    'author', 'author\'s note', 'translation', 'time', 'status', 'a/n', 'an',
-    'warning', 'tip', 'example', 'summary', 'step', 'chapter', 'part', 'location',
-    'pov', 'edit', 'update', 'reminder', 'important', 'objective', 'goal', 'mission',
-    'i', 'he', 'she', 'it', 'they', 'we', 'you', 'but', 'and', 'the', 'a', 'then',
-    'so', 'well', 'no', 'yes', 'oh', 'okay', 'ok', 'meanwhile', 'later', 'suddenly',
-    'finally', 'now', 'p.s', 'ps',
-]);
-
-/**
- * Find every speaker line (`[Name]:` anywhere, or a bare `Name:` at a line start)
- * in `text`, skipping meta-tags. Returns ordered matches with the name and the
- * offsets needed to split: `start` (where the speaker label begins) and
- * `contentStart` (just after the colon).
- *
- * @returns {Array<{ name: string, start: number, contentStart: number }>}
- */
-function matchSpeakerLines(text) {
-    const str = String(text || '');
-    const out = [];
-    SPEAKER_LINE_RE.lastIndex = 0;
-    for (const m of str.matchAll(SPEAKER_LINE_RE)) {
-        const name = ((m[1] ?? m[2]) || '').trim();
-        if (!name || IGNORED_WALKON_TAGS.has(name.toLowerCase())) continue;
-        out.push({ name, start: m.index, contentStart: m.index + m[0].length });
-    }
-    return out;
-}
 
 // ─── Module State ───
 
@@ -14161,29 +14518,6 @@ function buildRoster(ctx, group) {
         }
     }
     return roster;
-}
-
-/**
- * The `context.characters` index of the most recent AI speaker, used as the
- * aligned-mode `forceChId` anchor so the director's quiet generation reuses the
- * KV cache that the just-generated message left warm. Resolves by avatar first,
- * then name; returns null if no AI message resolves.
- */
-function resolveAnchorChid(ctx) {
-    const chat = ctx.chat || [];
-    const chars = ctx.characters || [];
-    for (let i = chat.length - 1; i >= 0; i--) {
-        const m = chat[i];
-        if (!m || m.is_user || m.is_system) continue;
-        const avatar = m.original_avatar
-            || (typeof m.force_avatar === 'string' ? m.force_avatar.replace(/^\/characters\//, '') : null);
-        let chid = avatar ? chars.findIndex(c => c.avatar === avatar) : -1;
-        if (chid === -1 && m.name) {
-            chid = chars.findIndex(c => (c.name || '').toLowerCase() === m.name.toLowerCase());
-        }
-        if (chid !== -1) return chid;
-    }
-    return null;
 }
 
 // ─── Manual-mode Management ───
@@ -14410,23 +14744,6 @@ async function waitForGenerationSettle(timeoutMs = 8000) {
     }
     await delayMs(50);
     return true;
-}
-
-/**
- * Split a message body at its speaker boundaries — `[Name]:` anywhere or a bare
- * `Name:` at a line start (ignoring meta-tags). Returns `{ head, segments:
- * [{ name, text }] }`, where `head` is the text before the first speaker line and
- * each segment's text is the speaker's content with the `Name:` prefix stripped.
- */
-function parseWalkOnSegments(text) {
-    const str = String(text || '');
-    const boundaries = matchSpeakerLines(str);
-    if (!boundaries.length) return { head: str, segments: [] };
-    const segments = boundaries.map((b, i) => {
-        const end = i + 1 < boundaries.length ? boundaries[i + 1].start : str.length;
-        return { name: b.name, text: str.slice(b.contentStart, end).trim() };
-    });
-    return { head: str.slice(0, boundaries[0].start), segments };
 }
 
 /**
@@ -14664,93 +14981,6 @@ function showDirectorPromptPreview() {
     ]);
 }
 
-// ─── Pick Parsing ───
-
-/**
- * Deterministic fallback for an unusable reply: the next real member (never a
- * walk-on) after the last character to speak, wrapping around the roster, and
- * skipping the last speaker itself. Falls back to the first member, then the
- * first roster entry, so it always returns something.
- */
-function fallbackPick(roster, ctx) {
-    const n = roster.length;
-    const lastChid = resolveAnchorChid(ctx);
-    let lastIdx = lastChid !== null
-        ? roster.findIndex(r => r.kind === 'member' && r.chid === lastChid)
-        : -1;
-    for (let step = 1; step <= n; step++) {
-        const idx = (((lastIdx + step) % n) + n) % n;
-        const cand = roster[idx];
-        if (cand.kind !== 'member') continue;
-        if (idx === lastIdx) continue;
-        return cand;
-    }
-    return roster.find(r => r.kind === 'member') || roster[0];
-}
-
-/**
- * Re-resolve a roster member's `context.characters` index at the moment of use.
- * Avatar filenames are the stable identity (names collide in groups); the index
- * is not, because ST rebuilds the array as it unshallows members. Falls back to
- * the name, then to the captured index only if it still points at that member.
- *
- * @returns {number|null} A validated index, or null if the character is gone.
- */
-function resolveMemberChid(ctx, member) {
-    const chars = ctx.characters || [];
-    if (member.avatar) {
-        const byAvatar = chars.findIndex(c => c?.avatar === member.avatar);
-        if (byAvatar !== -1) return byAvatar;
-    }
-    if (member.name) {
-        const byName = chars.findIndex(c => (c?.name || '').toLowerCase() === member.name.toLowerCase());
-        if (byName !== -1) return byName;
-    }
-    const captured = member.chid;
-    if (Number.isInteger(captured) && chars[captured]) return captured;
-    return null;
-}
-
-/** Stable identity compare for roster entries (members by chid, walk-ons by name). */
-function sameRosterEntry(a, b) {
-    if (!a || !b || a.kind !== b.kind) return false;
-    return a.kind === 'member'
-        ? a.chid === b.chid
-        : a.name.toLowerCase() === b.name.toLowerCase();
-}
-
-/**
- * Map the director's raw reply to one roster member. Prefers the roster number
- * (what the prompt asks for), then an exact name, then a contained/partial name.
- * On an unusable reply, falls back deterministically (`fallbackPick`) to the next
- * real member after the last speaker so the loop never crashes.
- */
-function parsePick(text, roster, ctx) {
-    const cleaned = String(text || '').replace(/[*_`"'.,!?:;()[\]{}]/g, ' ').trim();
-    if (!cleaned) return fallbackPick(roster, ctx);
-
-    const numMatch = cleaned.match(/\d+/);
-    if (numMatch) {
-        const idx = parseInt(numMatch[0], 10) - 1;
-        if (idx >= 0 && idx < roster.length) return roster[idx];
-    }
-
-    const lower = cleaned.toLowerCase();
-    let member = roster.find(r => r.name.toLowerCase() === lower);
-    if (member) return member;
-
-    member = roster.find(r => lower.includes(r.name.toLowerCase()));
-    if (member) return member;
-
-    if (lower.length >= 2) {
-        member = roster.find(r => r.name.toLowerCase().includes(lower));
-        if (member) return member;
-    }
-
-    director_debug('No roster match for director reply; using deterministic fallback. Reply was:', text);
-    return fallbackPick(roster, ctx);
-}
-
 // ─── Confirm / Override Dialog ───
 
 /**
@@ -14969,7 +15199,8 @@ async function rollDirector(ctx, roster) {
         text = __WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(raw || '').trim();
     }
     director_debug('Director raw reply:', JSON.stringify(text));
-    return parsePick(text, roster, ctx);
+    return parsePick(text, roster, ctx,
+        reply => director_debug('No roster match for director reply; using deterministic fallback. Reply was:', reply));
 }
 
 // ─── Walk-on Voicing ───
@@ -15470,20 +15701,22 @@ function initDirector({ settings }) {
     director_debug('Module initialized');
 }
 
-;// ./src/scenario-presets.js
+;// ./src/toolkit-presets.js
 /**
- * Scenario Presets — built-in World Info Assist and Narrative Guidance
- * presets that write in the st-toolkit Scenario Description style: a
- * bracketed block of dense, semicolon-terminated fields (Scenario Title,
- * Context, Location, Opening Focus, Offstage, …). Unlike st-toolkit's own
- * scenarios they stop at the closing bracket: there is no per-character
- * Openings block, because local models write those opening messages poorly.
+ * Toolkit Presets — built-in presets that write in st-toolkit's formats:
  *
- * Seeded into the tools' preset lists by `seedScenarioPresets` (like the
- * Image Prompting built-ins), versioned by `scenarioPresetsVersion` so a
- * deleted preset stays deleted and later revisions only replace built-ins
- * the user never edited. The Default preset of each tool is left untouched
- * and stays the active one.
+ * - Scenario Description style (World Info Assist, Narrative Guidance,
+ *   Compaction): a bracketed block of dense, semicolon-terminated fields
+ *   (Scenario Title, Context, Location, Opening Focus, Offstage, …). Unlike
+ *   st-toolkit's own scenarios they stop at the closing bracket: there is no
+ *   per-character Openings block, because local models write those opening
+ *   messages poorly.
+ * - Timeline Summary (Compaction): st-toolkit's numbered event timeline.
+ *
+ * `TOOLKIT_PRESETS_SPEC` hands them to `seedBuiltinPresets` (in
+ * prompt-templates.js), which adds them once, upgrades unedited copies when
+ * the text changes, and never switches a tool's active preset. Each preset
+ * carries the response length its output needs.
  *
  * Brace escaping: ST's `createRawPrompt` runs its macro engine over the
  * prompt, so a literal `{{.x = …}}` or `{{user}}` in the
@@ -15702,122 +15935,148 @@ const NG_LONG_SCENARIO_INJECTION =
     '[Story arc, the overarching situation and where it is heading; '
     + 'let it shape the story over many turns;\n{{guidance}}]';
 
+// ─── Compaction: Scenario recap ───
+
+// The recap replaces the dropped history and is followed by the verbatim
+// tail, so it describes the moment the summarized history ends. No
+// {{guidance}} placeholder: Compaction appends the user's must-keep details
+// itself, and only when there are any.
+const COMPACTION_SCENARIO_BODY = `Write a Scenario Description (continuation variant) that recaps the roleplay so far. It replaces the chat history above, which is about to be dropped from the model's context: a fresh chat starts with this recap, followed by the most recent messages carried over verbatim. It must hold everything the story needs to carry on, and describe where things stand at the point the history above ends, where the carried-over messages pick up.
+
+Output Format (use exactly as written; <angle-bracket> parts are placeholders):
+[
+Scenario Title: <short, evocative title for the story so far>;
+Story So Far: <the public beats of the whole story, oldest first, one short clause each; as many as it takes for the story to continue without the dropped history>;
+Context: <the situation at the point the history ends: what just happened, what is at stake now>;
+Location: <place, time of day, conditions>;
+Present: <each on-screen character with their visible state: injuries, mood as others read it, what they carry>;
+Opening Focus: <who is on-screen at the point the history ends, exactly where, doing what>;
+Offstage: <each anticipated character: where they are now, and when or why they will enter>;
+<First Name>'s Current Clothing: <what they are wearing now>;
+<First Name>'s Current Aim: <what they are openly pursuing now>;
+Open Threads: <every unresolved public tension or question, most pressing first>;
+]
+
+Field Rules:
+* Draw every fact from the chat history above. Never invent events, and never continue the story.
+* If the history opens with an earlier recap (from a previous compaction), fold all of its beats into Story So Far; nothing from it may be lost.
+* Every field is seen by every character, so all of it is public-safe: no secrets, private feelings, or true goals, not even stated as rumor.
+* Present lists only on-screen characters; anticipated characters go in Offstage. Omit the Offstage line entirely if nobody is anticipated.
+* Write a Current Clothing or Current Aim line only where that character's current state differs from their card; omit it where the card still holds.
+* Plain fields only: no {{…}} macros, no opening messages.
+
+${STYLE_RULES}
+
+Format Rules:
+* The reply has been prefilled with the opening bracket and the Scenario Title label. Continue from there, fill every applicable field, and close the bracket.
+* Return only the bracketed Scenario Description. No commentary, no headings, no code fences.`;
+
+const COMPACTION_SCENARIO_PROMPT = `{{context}}${escapeMacroBraces(COMPACTION_SCENARIO_BODY)}`;
+const COMPACTION_SCENARIO_PREFILL = '[\nScenario Title: ';
+
+// ─── Compaction: Timeline Summary ───
+
+// st-toolkit's Timeline Summary (docs/specs/timeline-extractor.md), adapted
+// for Compaction: no code fence (the recap is posted as a chat message), and
+// instead of the spec's append-only "new entries" mode, an earlier timeline
+// at the top of the history is carried over whole, because the history it
+// came from is about to be dropped.
+const COMPACTION_TIMELINE_BODY = `Write a Timeline Summary of the roleplay so far. It replaces the chat history above, which is about to be dropped from the model's context: a fresh chat starts with this timeline, followed by the most recent messages carried over verbatim. It must cover the whole story, in order, up to where the history above ends.
+
+Output Format (use exactly as written; <angle-bracket> parts are placeholders):
+[
+Timeline Summary
+
+**1. <Event Title>** – <single-paragraph summary of the event and its narrative significance>
+
+**2. <Event Title>** – <…>
+]
+
+Entry Rules:
+* Each entry is a numbered, bolded event title, an en dash, then one paragraph of 3–6 sentences: what happened, who was involved, and why it matters to the ongoing story (cause and effect, character development, relationship shifts, reveals, or stakes changes).
+* Collapse minor back-and-forth into the broader event it belongs to; never write an entry per message. If the boundary between two events is unclear, group them under the one they most naturally belong to.
+* Strict chronological order as events occur in the story, not the order messages were sent; note flashbacks and time skips where they matter.
+* If the history opens with an earlier Timeline Summary (from a previous compaction), carry its entries over unchanged, then continue the numbering with the new events. Nothing from it may be dropped.
+* Stay neutral and descriptive; don't editorialize about characters' choices. Use the names, aliases, and titles the characters use.
+* Summarize mature or sensitive content factually, without graphic detail.
+* Leave out OOC messages, meta-discussion, and system or instruction blocks; entries cover in-story events only.
+* Draw every fact from the chat history above. Never invent events, and never continue the story.
+
+Format Rules:
+* The reply has been prefilled with the opening bracket and the Timeline Summary header. Continue with the entries and close the bracket after the last one.
+* Return only the bracketed Timeline Summary. No commentary, no preamble, no code fences.`;
+
+const COMPACTION_TIMELINE_PROMPT = `{{context}}${escapeMacroBraces(COMPACTION_TIMELINE_BODY)}`;
+const COMPACTION_TIMELINE_PREFILL = '[\nTimeline Summary\n\n';
+
 // ─── Built-in Presets ───
 
-// toolKey -> { presetName: { fieldKey: text } }. Field keys match each
-// tool's entry in TOOL_PRESET_CONFIG (index.js).
-const BUILTIN_SCENARIO_PRESETS = {
-    wia: {
-        'Scenario (Cold-open)': {
-            wiaPrompt: WIA_SCENARIO_COLD_OPEN_PROMPT,
-            wiaPrefillTitled: WIA_SCENARIO_PREFILL_TITLED,
-            wiaPrefillUntitled: WIA_SCENARIO_PREFILL_UNTITLED,
+// Handed to `seedBuiltinPresets`. Field keys match each tool's entry in
+// TOOL_PRESET_CONFIG (index.js); `responseLength` is what the output needs.
+//
+// History: v1 shipped the WIA and NG Scenario presets without response
+// lengths, and the WIA pair ended with the per-character Openings block
+// (flagged by `scenarioPresetsSeeded`). v2 dropped the Openings, added
+// response lengths, and added the Compaction presets.
+const TOOLKIT_PRESETS_SPEC = {
+    id: 'toolkit',
+    version: 2,
+    legacyFlag: 'scenarioPresetsSeeded',
+    presets: {
+        wia: {
+            'Scenario (Cold-open)': {
+                wiaPrompt: WIA_SCENARIO_COLD_OPEN_PROMPT,
+                wiaPrefillTitled: WIA_SCENARIO_PREFILL_TITLED,
+                wiaPrefillUntitled: WIA_SCENARIO_PREFILL_UNTITLED,
+                responseLength: 800,
+            },
+            'Scenario (Continuation)': {
+                wiaPrompt: WIA_SCENARIO_CONTINUATION_PROMPT,
+                wiaPrefillTitled: WIA_SCENARIO_PREFILL_TITLED,
+                wiaPrefillUntitled: WIA_SCENARIO_PREFILL_UNTITLED,
+                responseLength: 800,
+            },
         },
-        'Scenario (Continuation)': {
-            wiaPrompt: WIA_SCENARIO_CONTINUATION_PROMPT,
-            wiaPrefillTitled: WIA_SCENARIO_PREFILL_TITLED,
-            wiaPrefillUntitled: WIA_SCENARIO_PREFILL_UNTITLED,
+        'ng-short': {
+            'Scenario': {
+                narrativeGuidanceShortPrompt: NG_SHORT_SCENARIO_PROMPT,
+                narrativeGuidanceShortGenerationPrompt: NG_SHORT_SCENARIO_PREFILL,
+                narrativeGuidanceShortInjectionPrompt: NG_SHORT_SCENARIO_INJECTION,
+                responseLength: 800,
+            },
+        },
+        'ng-long': {
+            'Scenario Arc': {
+                narrativeGuidanceLongPrompt: NG_LONG_SCENARIO_PROMPT,
+                narrativeGuidanceLongGenerationPrompt: NG_LONG_SCENARIO_PREFILL,
+                narrativeGuidanceLongInjectionPrompt: NG_LONG_SCENARIO_INJECTION,
+                responseLength: 600,
+            },
+        },
+        compaction: {
+            'Scenario (Continuation)': {
+                compactionSummaryPrompt: COMPACTION_SCENARIO_PROMPT,
+                compactionSummaryPrefill: COMPACTION_SCENARIO_PREFILL,
+                responseLength: 1500,
+            },
+            'Timeline Summary': {
+                compactionSummaryPrompt: COMPACTION_TIMELINE_PROMPT,
+                compactionSummaryPrefill: COMPACTION_TIMELINE_PREFILL,
+                responseLength: 2500,
+            },
         },
     },
-    'ng-short': {
-        'Scenario': {
-            narrativeGuidanceShortPrompt: NG_SHORT_SCENARIO_PROMPT,
-            narrativeGuidanceShortGenerationPrompt: NG_SHORT_SCENARIO_PREFILL,
-            narrativeGuidanceShortInjectionPrompt: NG_SHORT_SCENARIO_INJECTION,
-        },
+    introduced: {
+        compaction: { 'Scenario (Continuation)': 2, 'Timeline Summary': 2 },
     },
-    'ng-long': {
-        'Scenario Arc': {
-            narrativeGuidanceLongPrompt: NG_LONG_SCENARIO_PROMPT,
-            narrativeGuidanceLongGenerationPrompt: NG_LONG_SCENARIO_PREFILL,
-            narrativeGuidanceLongInjectionPrompt: NG_LONG_SCENARIO_INJECTION,
+    retired: {
+        // v1 texts (ending with the Openings block).
+        wia: {
+            'Scenario (Cold-open)': ['eba40bf9'],
+            'Scenario (Continuation)': ['77579a39'],
         },
     },
 };
-
-// Bump when a built-in's text changes, and record the retired version's
-// fingerprints below so untouched copies can be upgraded in place.
-const SCENARIO_PRESETS_VERSION = 2;
-
-// toolKey -> presetName -> fingerprint of each earlier built-in version's
-// fields. A stored preset (or the tool's live fields) matching one is an
-// unedited copy and is safe to replace. v1 (WIA) ended with the
-// per-character Openings block.
-const RETIRED_SCENARIO_PRESETS = {
-    wia: {
-        'Scenario (Cold-open)': ['eba40bf9'],
-        'Scenario (Continuation)': ['77579a39'],
-    },
-};
-
-/** FNV-1a fingerprint of a preset's fields (keys taken from `fieldKeys`). */
-function fingerprintPreset(values, fieldKeys) {
-    const text = [...fieldKeys].sort()
-        .map(key => `${key}\u0000${typeof values?.[key] === 'string' ? values[key] : ''}`)
-        .join('\u0001');
-    let hash = 0x811c9dc5;
-    for (let i = 0; i < text.length; i++) {
-        hash ^= text.charCodeAt(i);
-        hash = Math.imul(hash, 0x01000193) >>> 0;
-    }
-    return hash.toString(16).padStart(8, '0');
-}
-
-/**
- * Replace unedited copies of retired built-in texts with the current ones:
- * the stored preset, and — when that preset is active and its fields still
- * hold the retired text — the tool's live fields, so the dropdown doesn't
- * come up "(modified)". Edited or deleted presets are left alone.
- */
-function upgradeRetiredScenarioPresets(settings) {
-    for (const [toolKey, retired] of Object.entries(RETIRED_SCENARIO_PRESETS)) {
-        const presets = settings.toolPresets[toolKey];
-        if (!presets) continue;
-        for (const [name, fingerprints] of Object.entries(retired)) {
-            const current = BUILTIN_SCENARIO_PRESETS[toolKey][name];
-            const fieldKeys = Object.keys(current);
-            const stored = presets[name];
-            if (!stored || !fingerprints.includes(fingerprintPreset(stored, fieldKeys))) continue;
-            presets[name] = { ...current };
-            if (settings.activeToolPreset?.[toolKey] === name
-                && fingerprints.includes(fingerprintPreset(settings, fieldKeys))) {
-                Object.assign(settings, current);
-            }
-        }
-    }
-}
-
-/**
- * Seed the built-in Scenario presets into World Info Assist and both
- * Narrative Guidance tracks, or upgrade an earlier seeding. A fresh install
- * gets every preset (never overwriting a same-named user preset, never
- * changing the active one); an earlier version only has its unedited
- * built-ins replaced, so a deleted preset isn't recreated.
- *
- * @param {object} settings - The extension settings object.
- * @returns {boolean} `true` if settings changed and should be saved.
- */
-function seedScenarioPresets(settings) {
-    // `scenarioPresetsSeeded` is the v1 flag, from before versioning.
-    const version = Number.isInteger(settings.scenarioPresetsVersion)
-        ? settings.scenarioPresetsVersion
-        : (settings.scenarioPresetsSeeded ? 1 : 0);
-    if (version >= SCENARIO_PRESETS_VERSION) return false;
-    if (!settings.toolPresets || typeof settings.toolPresets !== 'object') settings.toolPresets = {};
-    if (version === 0) {
-        for (const [toolKey, builtins] of Object.entries(BUILTIN_SCENARIO_PRESETS)) {
-            const presets = settings.toolPresets[toolKey] || (settings.toolPresets[toolKey] = {});
-            for (const [name, preset] of Object.entries(builtins)) {
-                if (presets[name] === undefined) presets[name] = { ...preset };
-            }
-        }
-    } else {
-        upgradeRetiredScenarioPresets(settings);
-    }
-    settings.scenarioPresetsSeeded = true;
-    settings.scenarioPresetsVersion = SCENARIO_PRESETS_VERSION;
-    return true;
-}
 
 ;// ./src/index.js
 // Saint's Silly Extensions — Possession, Phrasing, and Assisted Character Creation
@@ -15973,6 +16232,9 @@ const LEGACY_DEFAULT_WIA_PROMPT = DEFAULT_WIA_PROMPT
 
 // Registry of every preset-managed prompt field, grouped per tool. Drives
 // both the legacy-template migration and the per-tool preset widgets.
+// `responseLength` (optional): the tool's response-length setting and a
+// selector matching every input bound to it (settings panel, modals, WIA
+// entry rows). Presets saved for the tool carry that length with them.
 const TOOL_PRESET_CONFIG = [
     {
         toolKey: 'phrasing',
@@ -15997,6 +16259,7 @@ const TOOL_PRESET_CONFIG = [
         toolKey: 'acc',
         label: 'Character Creation',
         containerId: 'acc_presets',
+        responseLength: { key: 'accResponseLength', inputSelector: '#acc_response_length' },
         fields: [
             { key: 'accPrompt', label: 'Prompt', textareaId: 'acc_prompt_textarea', defaultText: DEFAULT_ACC_PROMPT, legacyDefaultText: LEGACY_DEFAULT_ACC_PROMPT },
             { key: 'accPrefill', label: 'Prefill', textareaId: 'acc_prefill_textarea', defaultText: DEFAULT_ACC_PREFILL },
@@ -16006,6 +16269,7 @@ const TOOL_PRESET_CONFIG = [
         toolKey: 'wia',
         label: 'World Info Assist',
         containerId: 'wia_presets',
+        responseLength: { key: 'wiaResponseLength', inputSelector: '#wia_response_length, .wia-tokens-input' },
         fields: [
             { key: 'wiaPrompt', label: 'Prompt', textareaId: 'wia_prompt_textarea', defaultText: DEFAULT_WIA_PROMPT, legacyDefaultText: LEGACY_DEFAULT_WIA_PROMPT },
             { key: 'wiaPrefillTitled', label: 'Prefill Titled', textareaId: 'wia_prefill_titled_textarea', defaultText: DEFAULT_WIA_PREFILL_TITLED },
@@ -16016,6 +16280,7 @@ const TOOL_PRESET_CONFIG = [
         toolKey: 'ng-long',
         label: 'Narrative Guidance (Long-term)',
         containerId: 'ng_long_presets',
+        responseLength: { key: 'narrativeGuidanceLongResponseLength', inputSelector: '#ng_long_response_length' },
         fields: [
             { key: 'narrativeGuidanceLongPrompt', label: 'Instructions', textareaId: 'ng_long_user_prompt_textarea', defaultText: DEFAULT_NG_LONG_USER_PROMPT },
             { key: 'narrativeGuidanceLongGenerationPrompt', label: 'Prefill', textareaId: 'ng_long_generation_prompt_textarea', defaultText: DEFAULT_NG_LONG_GENERATION_PROMPT },
@@ -16026,6 +16291,7 @@ const TOOL_PRESET_CONFIG = [
         toolKey: 'ng-short',
         label: 'Narrative Guidance (Short-term)',
         containerId: 'ng_short_presets',
+        responseLength: { key: 'narrativeGuidanceShortResponseLength', inputSelector: '#ng_short_response_length' },
         fields: [
             { key: 'narrativeGuidanceShortPrompt', label: 'Instructions', textareaId: 'ng_short_user_prompt_textarea', defaultText: DEFAULT_NG_SHORT_USER_PROMPT },
             { key: 'narrativeGuidanceShortGenerationPrompt', label: 'Prefill', textareaId: 'ng_short_generation_prompt_textarea', defaultText: DEFAULT_NG_SHORT_GENERATION_PROMPT },
@@ -16036,6 +16302,7 @@ const TOOL_PRESET_CONFIG = [
         toolKey: 'reformatting',
         label: 'Reformatting',
         containerId: 'reformatting_presets',
+        responseLength: { key: 'reformattingResponseLength', inputSelector: '#reformatting_response_length' },
         fields: [
             { key: 'reformattingSystemPrompt', label: 'System Prompt', textareaId: 'reformatting_system_prompt_textarea', defaultText: DEFAULT_REFORMATTING_SYSTEM_PROMPT },
             { key: 'reformattingPrompt', label: 'Prompt', textareaId: 'reformatting_prompt_textarea', defaultText: DEFAULT_REFORMATTING_PROMPT },
@@ -16046,6 +16313,7 @@ const TOOL_PRESET_CONFIG = [
         toolKey: 'compaction',
         label: 'Compaction',
         containerId: 'compaction_presets',
+        responseLength: { key: 'compactionSummaryResponseLength', inputSelector: '#compaction_response_length, #cc_response_length' },
         fields: [
             { key: 'compactionSummaryPrompt', label: 'Summary Prompt', textareaId: 'compaction_summary_prompt_textarea', defaultText: DEFAULT_COMPACTION_SUMMARY_PROMPT },
             { key: 'compactionSummaryPrefill', label: 'Summary Prefill', textareaId: 'compaction_summary_prefill_textarea', defaultText: DEFAULT_COMPACTION_SUMMARY_PREFILL },
@@ -16055,6 +16323,7 @@ const TOOL_PRESET_CONFIG = [
         toolKey: 'image-prompt',
         label: 'Image Prompting',
         containerId: 'image_prompt_presets',
+        responseLength: { key: 'imagePromptResponseLength', inputSelector: '#ip_response_length' },
         fields: [
             { key: 'imagePromptPrompt', label: 'Prompt', textareaId: 'image_prompt_prompt_textarea', defaultText: DEFAULT_IMAGE_PROMPT_PROMPT },
             { key: 'imagePromptPrefill', label: 'Prefill', textareaId: 'image_prompt_prefill_textarea', defaultText: DEFAULT_IMAGE_PROMPT_PREFILL },
@@ -16065,6 +16334,7 @@ const TOOL_PRESET_CONFIG = [
         toolKey: 'director',
         label: 'Group Director',
         containerId: 'director_presets',
+        responseLength: { key: 'directorResponseLength', inputSelector: '#director_response_length' },
         fields: [
             { key: 'directorPrompt', label: 'Instructions', textareaId: 'director_prompt_textarea', defaultText: DEFAULT_DIRECTOR_PROMPT },
         ],
@@ -16097,17 +16367,16 @@ function loadSettings() {
         SSEDebug('Migrated legacy Narrative Guidance settings to the short-term track');
         migrated = true;
     }
-    // Ship the alternate diffusion-model targets (Anima, pure Danbooru) as
-    // ready-made Image Prompting presets; the built-in Default covers Krea 2.
-    if (seedImagePromptPresets(src_settings)) {
-        SSEDebug('Seeded built-in Image Prompting presets');
-        migrated = true;
-    }
-    // Ship the st-toolkit-style Scenario presets for World Info Assist and
-    // both Narrative Guidance tracks (each tool's Default stays active).
-    if (seedScenarioPresets(src_settings)) {
-        SSEDebug('Seeded built-in Scenario presets');
-        migrated = true;
+    // Ship (and upgrade unedited copies of) the built-in presets: the
+    // alternate diffusion-model targets for Image Prompting (the built-in
+    // Default covers Krea 2), and the st-toolkit-style Scenario / Timeline
+    // presets for WIA, both NG tracks, and Compaction. Each tool's active
+    // preset is left alone.
+    for (const spec of [IMAGE_PROMPT_PRESETS_SPEC, TOOLKIT_PRESETS_SPEC]) {
+        if (seedBuiltinPresets(src_settings, TOOL_PRESET_CONFIG, spec)) {
+            SSEDebug(`Seeded or upgraded built-in presets: ${spec.id}`);
+            migrated = true;
+        }
     }
     // Upgrade the stale name-based director prompt to the current number-based
     // default (exact match only — customized templates are preserved).

@@ -132,7 +132,7 @@ import {
     createImagePromptMenuItem,
     startImagePromptObserver,
     rescanImagePromptButtons,
-    seedImagePromptPresets,
+    IMAGE_PROMPT_PRESETS_SPEC,
     DEFAULT_IMAGE_PROMPT_PROMPT,
     DEFAULT_IMAGE_PROMPT_PREFILL,
     DEFAULT_IMAGE_PROMPT_NEGATIVE,
@@ -175,8 +175,9 @@ import {
 import {
     setupToolPresets,
     migrateLegacyToolPresets,
+    seedBuiltinPresets,
 } from './prompt-templates.js';
-import { seedScenarioPresets } from './scenario-presets.js';
+import { TOOLKIT_PRESETS_SPEC } from './toolkit-presets.js';
 
 // ─── Constants ───
 
@@ -310,6 +311,9 @@ const LEGACY_DEFAULT_WIA_PROMPT = DEFAULT_WIA_PROMPT
 
 // Registry of every preset-managed prompt field, grouped per tool. Drives
 // both the legacy-template migration and the per-tool preset widgets.
+// `responseLength` (optional): the tool's response-length setting and a
+// selector matching every input bound to it (settings panel, modals, WIA
+// entry rows). Presets saved for the tool carry that length with them.
 const TOOL_PRESET_CONFIG = [
     {
         toolKey: 'phrasing',
@@ -334,6 +338,7 @@ const TOOL_PRESET_CONFIG = [
         toolKey: 'acc',
         label: 'Character Creation',
         containerId: 'acc_presets',
+        responseLength: { key: 'accResponseLength', inputSelector: '#acc_response_length' },
         fields: [
             { key: 'accPrompt', label: 'Prompt', textareaId: 'acc_prompt_textarea', defaultText: DEFAULT_ACC_PROMPT, legacyDefaultText: LEGACY_DEFAULT_ACC_PROMPT },
             { key: 'accPrefill', label: 'Prefill', textareaId: 'acc_prefill_textarea', defaultText: DEFAULT_ACC_PREFILL },
@@ -343,6 +348,7 @@ const TOOL_PRESET_CONFIG = [
         toolKey: 'wia',
         label: 'World Info Assist',
         containerId: 'wia_presets',
+        responseLength: { key: 'wiaResponseLength', inputSelector: '#wia_response_length, .wia-tokens-input' },
         fields: [
             { key: 'wiaPrompt', label: 'Prompt', textareaId: 'wia_prompt_textarea', defaultText: DEFAULT_WIA_PROMPT, legacyDefaultText: LEGACY_DEFAULT_WIA_PROMPT },
             { key: 'wiaPrefillTitled', label: 'Prefill Titled', textareaId: 'wia_prefill_titled_textarea', defaultText: DEFAULT_WIA_PREFILL_TITLED },
@@ -353,6 +359,7 @@ const TOOL_PRESET_CONFIG = [
         toolKey: 'ng-long',
         label: 'Narrative Guidance (Long-term)',
         containerId: 'ng_long_presets',
+        responseLength: { key: 'narrativeGuidanceLongResponseLength', inputSelector: '#ng_long_response_length' },
         fields: [
             { key: 'narrativeGuidanceLongPrompt', label: 'Instructions', textareaId: 'ng_long_user_prompt_textarea', defaultText: DEFAULT_NG_LONG_USER_PROMPT },
             { key: 'narrativeGuidanceLongGenerationPrompt', label: 'Prefill', textareaId: 'ng_long_generation_prompt_textarea', defaultText: DEFAULT_NG_LONG_GENERATION_PROMPT },
@@ -363,6 +370,7 @@ const TOOL_PRESET_CONFIG = [
         toolKey: 'ng-short',
         label: 'Narrative Guidance (Short-term)',
         containerId: 'ng_short_presets',
+        responseLength: { key: 'narrativeGuidanceShortResponseLength', inputSelector: '#ng_short_response_length' },
         fields: [
             { key: 'narrativeGuidanceShortPrompt', label: 'Instructions', textareaId: 'ng_short_user_prompt_textarea', defaultText: DEFAULT_NG_SHORT_USER_PROMPT },
             { key: 'narrativeGuidanceShortGenerationPrompt', label: 'Prefill', textareaId: 'ng_short_generation_prompt_textarea', defaultText: DEFAULT_NG_SHORT_GENERATION_PROMPT },
@@ -373,6 +381,7 @@ const TOOL_PRESET_CONFIG = [
         toolKey: 'reformatting',
         label: 'Reformatting',
         containerId: 'reformatting_presets',
+        responseLength: { key: 'reformattingResponseLength', inputSelector: '#reformatting_response_length' },
         fields: [
             { key: 'reformattingSystemPrompt', label: 'System Prompt', textareaId: 'reformatting_system_prompt_textarea', defaultText: DEFAULT_REFORMATTING_SYSTEM_PROMPT },
             { key: 'reformattingPrompt', label: 'Prompt', textareaId: 'reformatting_prompt_textarea', defaultText: DEFAULT_REFORMATTING_PROMPT },
@@ -383,6 +392,7 @@ const TOOL_PRESET_CONFIG = [
         toolKey: 'compaction',
         label: 'Compaction',
         containerId: 'compaction_presets',
+        responseLength: { key: 'compactionSummaryResponseLength', inputSelector: '#compaction_response_length, #cc_response_length' },
         fields: [
             { key: 'compactionSummaryPrompt', label: 'Summary Prompt', textareaId: 'compaction_summary_prompt_textarea', defaultText: DEFAULT_COMPACTION_SUMMARY_PROMPT },
             { key: 'compactionSummaryPrefill', label: 'Summary Prefill', textareaId: 'compaction_summary_prefill_textarea', defaultText: DEFAULT_COMPACTION_SUMMARY_PREFILL },
@@ -392,6 +402,7 @@ const TOOL_PRESET_CONFIG = [
         toolKey: 'image-prompt',
         label: 'Image Prompting',
         containerId: 'image_prompt_presets',
+        responseLength: { key: 'imagePromptResponseLength', inputSelector: '#ip_response_length' },
         fields: [
             { key: 'imagePromptPrompt', label: 'Prompt', textareaId: 'image_prompt_prompt_textarea', defaultText: DEFAULT_IMAGE_PROMPT_PROMPT },
             { key: 'imagePromptPrefill', label: 'Prefill', textareaId: 'image_prompt_prefill_textarea', defaultText: DEFAULT_IMAGE_PROMPT_PREFILL },
@@ -402,6 +413,7 @@ const TOOL_PRESET_CONFIG = [
         toolKey: 'director',
         label: 'Group Director',
         containerId: 'director_presets',
+        responseLength: { key: 'directorResponseLength', inputSelector: '#director_response_length' },
         fields: [
             { key: 'directorPrompt', label: 'Instructions', textareaId: 'director_prompt_textarea', defaultText: DEFAULT_DIRECTOR_PROMPT },
         ],
@@ -434,17 +446,16 @@ function loadSettings() {
         SSEDebug('Migrated legacy Narrative Guidance settings to the short-term track');
         migrated = true;
     }
-    // Ship the alternate diffusion-model targets (Anima, pure Danbooru) as
-    // ready-made Image Prompting presets; the built-in Default covers Krea 2.
-    if (seedImagePromptPresets(settings)) {
-        SSEDebug('Seeded built-in Image Prompting presets');
-        migrated = true;
-    }
-    // Ship the st-toolkit-style Scenario presets for World Info Assist and
-    // both Narrative Guidance tracks (each tool's Default stays active).
-    if (seedScenarioPresets(settings)) {
-        SSEDebug('Seeded built-in Scenario presets');
-        migrated = true;
+    // Ship (and upgrade unedited copies of) the built-in presets: the
+    // alternate diffusion-model targets for Image Prompting (the built-in
+    // Default covers Krea 2), and the st-toolkit-style Scenario / Timeline
+    // presets for WIA, both NG tracks, and Compaction. Each tool's active
+    // preset is left alone.
+    for (const spec of [IMAGE_PROMPT_PRESETS_SPEC, TOOLKIT_PRESETS_SPEC]) {
+        if (seedBuiltinPresets(settings, TOOL_PRESET_CONFIG, spec)) {
+            SSEDebug(`Seeded or upgraded built-in presets: ${spec.id}`);
+            migrated = true;
+        }
     }
     // Upgrade the stale name-based director prompt to the current number-based
     // default (exact match only — customized templates are preserved).

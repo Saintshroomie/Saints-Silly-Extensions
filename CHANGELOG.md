@@ -13,20 +13,35 @@ released version. When cutting a release, move these notes into a new
 `## [X.Y.Z]` section and run `npm version`._
 
 ### Added
-- **Scenario presets for World Info Assist and Narrative Guidance** — built-in
-  presets that write in the st-toolkit Scenario Description style: a bracketed
-  block of dense, semicolon-terminated fields (`Scenario Title`, `Context`,
-  `Location`, `Opening Focus`, `Offstage`, …). World Info Assist gains
-  **Scenario (Cold-open)**, with override-variable lines, and **Scenario
-  (Continuation)**, with plain fields drawn from the chat. Narrative Guidance
-  gains **Scenario** (short-term live scene sheet) and **Scenario Arc**
-  (long-term). They're added to each tool's preset list once, with Default
-  still active. Unlike st-toolkit's scenarios, they stop at the closing bracket
+- **st-toolkit presets for World Info Assist, Narrative Guidance, and
+  Compaction** — built-in presets that write in the st-toolkit Scenario
+  Description style: a bracketed block of dense, semicolon-terminated fields
+  (`Scenario Title`, `Context`, `Location`, `Opening Focus`, `Offstage`, …).
+  World Info Assist gains **Scenario (Cold-open)**, with override-variable
+  lines, and **Scenario (Continuation)**, with plain fields drawn from the chat.
+  Narrative Guidance gains **Scenario** (short-term live scene sheet) and
+  **Scenario Arc** (long-term). Compaction gains **Scenario (Continuation)**, a
+  recap in scenario form, and **Timeline Summary**, st-toolkit's numbered event
+  timeline (an earlier compaction's timeline is carried over and continued).
+  They're added to each tool's preset list once, with Default still active,
+  and each sets the response length its output needs. Unlike st-toolkit's scenarios, they stop at the closing bracket
   with no per-character opening messages, which local models write poorly. If
   you already had the earlier World Info Assist versions (which ended with an
   Openings block), they're upgraded automatically unless you've edited them.
   The templates escape their `{{…}}` examples so ST's macro engine shows them
   to the model instead of running them. See **Scenario presets** in the README.
+- **Presets remember the response length** — Save as New and Update now also
+  store the tool's response length (Max Tokens), and loading a preset that has
+  one applies it in the settings drawer, the tool's modal, and every World Info
+  entry's Assist row. A changed length marks the preset **(modified)**. Default,
+  and presets saved before this, leave your length alone. The Character
+  Creation and Image Prompt modals' Max Tokens field is now the saved setting
+  rather than a separate per-session value, so a preset switch shows up there.
+- **Unit tests** — `npm test` runs a `node:test` suite (Node 22+, no new
+  dependencies) covering the prompt helpers, the Group Director's speaker-line
+  and pick parsing, and the preset system (built-in seeding and upgrades,
+  per-preset response length, and that no shipped template contains a macro
+  SillyTavern would run). The pre-commit hook runs it before building.
 - **Negative prompt for image generation** — the Image Prompt modal gains an
   editable **Negative Prompt** field, sent alongside the prompt whenever you click
   **Generate Image**. It belongs to the tool's **prompt presets**, so each
@@ -38,10 +53,9 @@ released version. When cutting a release, move these notes into a new
   **Reset** puts it back under preset control and **Clear** empties it. The negative
   is added *in front of* the one configured in SillyTavern's own Image Generation
   panel rather than replacing it, so global negatives keep applying, and saved
-  prompts now remember the negative they were saved with. Existing installs keep
-  their already-seeded Anima/Danbooru presets, which have no negative stored — open
-  the preset's **Negative Prompt** box in settings and paste one in (or re-save the
-  preset) to pick up the new defaults.
+  prompts now remember the negative they were saved with. Existing installs'
+  Anima/Danbooru presets pick up the new negatives automatically, unless you've
+  edited them (then paste one into the preset's **Negative Prompt** box yourself).
 
 - **Generate Image from the Image Prompt modal** — a **Generate Image** button next
   to the prompt output hands the finished prompt to SillyTavern's own **Image
@@ -134,6 +148,11 @@ released version. When cutting a release, move these notes into a new
   dialog.
 
 ### Changed
+- **Built-in presets upgrade themselves.** Image Prompting's Anima/Danbooru
+  presets and the st-toolkit presets now share one versioned mechanism: when a
+  release revises a built-in, copies you never edited are replaced with the new
+  text (matched by fingerprint), edited or deleted ones are left alone, and your
+  active preset never changes.
 - **World Info Assist and Narrative Guidance framing no longer assumes the
   default output shape.** The fixed system prompts and the "the reply has been
   prefilled…" / Continue instructions that wrap your template used to describe
