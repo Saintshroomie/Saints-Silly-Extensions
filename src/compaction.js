@@ -97,7 +97,9 @@ const SUMMARY_MESSAGE_NAME = 'Story so far';
 const COMPACTION_METADATA_KEY = 'compaction';
 
 // SSE per-chat metadata keys carried into the fresh chat on compaction.
-const MIGRATED_METADATA_KEYS = ['possession', 'narrativeGuidance', 'phraseBan', 'imagePrompting'];
+// `variables` is the chat's local variables: Character State's values (and
+// anything else set with /setvar), which the story still needs after the cut.
+const MIGRATED_METADATA_KEYS = ['possession', 'narrativeGuidance', 'phraseBan', 'imagePrompting', 'variables'];
 
 // ─── Module State ───
 

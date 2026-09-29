@@ -445,6 +445,178 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════
+   CHARACTER STATE STYLES (pane rendered inside ST's Popup; reuses the ACC
+   action/status/context classes)
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Launch button on each group member row, after Possession's radio. */
+.character_state_btn {
+    opacity: 0.7;
+    transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.character_state_btn:hover {
+    opacity: 1;
+    color: var(--SmartThemeQuoteColor, #e8a23a);
+}
+
+#character_state_solo_btn {
+    display: flex;
+    align-items: center;
+}
+
+.cs-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-align: left;
+}
+
+.cs-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cs-header-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.cs-header-title {
+    margin: 0;
+}
+
+.cs-variable-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.cs-empty {
+    opacity: 0.7;
+    font-style: italic;
+}
+
+.cs-variable {
+    padding: 8px 10px;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-left-width: 3px;
+    border-radius: 4px;
+    transition: border-color 0.15s ease;
+}
+
+.cs-variable.cs-dirty {
+    border-left-color: var(--SmartThemeQuoteColor, #e8a23a);
+}
+
+.cs-variable.cs-proposed {
+    border-color: var(--SmartThemeQuoteColor, #e8a23a);
+}
+
+.cs-variable-head {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px 8px;
+    margin-bottom: 6px;
+}
+
+.cs-variable-name {
+    font-size: 0.8em;
+    opacity: 0.7;
+}
+
+.cs-variable-source {
+    font-size: 0.8em;
+    opacity: 0.7;
+}
+
+/* Status + row buttons sit at the right end of the head row. */
+.cs-variable-status {
+    margin-left: auto;
+    font-size: 0.8em;
+    opacity: 0.85;
+}
+
+.cs-variable.cs-dirty .cs-variable-status {
+    color: var(--SmartThemeQuoteColor, #e8a23a);
+    opacity: 1;
+}
+
+.cs-row-btn {
+    font-size: 0.8em;
+    padding: 2px 8px;
+    margin: 0;
+}
+
+.cs-row-btn.cs-disabled {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.cs-variable-value {
+    width: 100%;
+    resize: vertical;
+    min-height: 3em;
+}
+
+/* Showing the card default (variable unset): dimmed so it reads as a fallback. */
+.cs-variable.cs-default .cs-variable-value {
+    font-style: italic;
+    opacity: 0.7;
+}
+
+.cs-assist-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 10px;
+    border-top: 1px solid var(--SmartThemeBorderColor, #555);
+}
+
+.cs-assist-section .acc-context-section,
+.cs-assist-section .acc-preset-row,
+.cs-assist-section .acc-status-bar {
+    margin-bottom: 0;
+}
+
+.cs-instruction {
+    width: 100%;
+    resize: vertical;
+}
+
+.cs-action-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.cs-action-row .acc-tokens-label {
+    margin-left: auto;
+    font-size: 0.85em;
+    opacity: 0.85;
+}
+
+.cs-reply-details > summary {
+    cursor: pointer;
+    font-size: 0.85em;
+    opacity: 0.8;
+}
+
+.cs-reply {
+    width: 100%;
+    margin-top: 4px;
+    resize: vertical;
+    font-family: var(--monoFontFamily, monospace);
+    font-size: 0.85em;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
    WORLD INFO ASSIST STYLES
    ═══════════════════════════════════════════════════════════════════════════════ */
 

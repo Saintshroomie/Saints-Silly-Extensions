@@ -13,6 +13,33 @@ released version. When cutting a release, move these notes into a new
 `## [X.Y.Z]` section and run `npm version`._
 
 ### Added
+- **Character State** — a new tool for changing a character's state variables
+  as the roleplay unfolds: the chat variables its card and lore read, such as
+  st-toolkit's `{{ .peterClothingOverride ?? default }}` clothing and goal
+  overrides. A sliders button on every group member row (next to Possession's
+  radio) and in the character panel for one-on-one chats, or
+  `/charstate [name]`, opens a pane for that one character. It lists every
+  variable found in the card fields and the character's lore books (linked,
+  embedded, or additional), each with its field label, current value or card
+  default, and where it was read. Edit a value by hand, **Reset** it to the card
+  default, or write an instruction and click **Propose Changes** to have the
+  model rewrite only the variables that need it. Leave the instruction blank and
+  it updates from what the recent chat shows has changed. Proposals are
+  highlighted for review, and nothing is saved until **Apply**. Values are
+  stored in the chat's local variables (the same store as `/setvar`), and the
+  prompt is preset-managed with a preview in the new settings drawer.
+
+### Changed
+- **The Scenario (Cold-open) preset assigns overrides set-once** — its override
+  lines are now `{{if !.var}}{{.var = value}}{{/if}}`. A scenario is re-read
+  every turn, so the old bare `{{.var = value}}` put the scene's value back on
+  every reply and undid any mid-chat change. Unedited copies upgrade
+  automatically; if you edited yours, wrap its override lines the same way.
+- **Compaction carries the chat's variables over** — with **Migrate per-chat
+  extension state** on, the chat's local variables (Character State values and
+  anything set with `/setvar`) move into the compacted chat along with the other
+  per-chat state.
+
 - **st-toolkit presets for World Info Assist, Narrative Guidance, and
   Compaction** — built-in presets that write in the st-toolkit Scenario
   Description style: a bracketed block of dense, semicolon-terminated fields

@@ -1,6 +1,6 @@
 # Saint's Silly Extensions
 
-A [SillyTavern](https://github.com/SillyTavern/SillyTavern) third-party extension that adds ten integrated roleplay tools: **Possession**, **Phrasing**, **Phrase Ban**, **Assisted Character Creation**, **World Info Assist**, **Narrative Guidance**, **Reformatting**, **Compaction**, **Image Prompting**, and **Retry Continue**.
+A [SillyTavern](https://github.com/SillyTavern/SillyTavern) third-party extension that adds twelve integrated roleplay tools: **Possession**, **Phrasing**, **Phrase Ban**, **Assisted Character Creation**, **World Info Assist**, **Character State**, **Narrative Guidance**, **Reformatting**, **Compaction**, **Image Prompting**, **Retry Continue**, and **Group Director**.
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes and version history.
 
@@ -13,6 +13,7 @@ See [CHANGELOG.md](CHANGELOG.md) for release notes and version history.
   - [Phrase Ban](#phrase-ban)
   - [Assisted Character Creation](#assisted-character-creation)
   - [World Info Assist](#world-info-assist)
+  - [Character State](#character-state)
   - [Narrative Guidance](#narrative-guidance)
   - [Reformatting](#reformatting)
   - [Compaction](#compaction)
@@ -27,6 +28,7 @@ See [CHANGELOG.md](CHANGELOG.md) for release notes and version history.
   - [Phrase Ban Settings](#phrase-ban-settings)
   - [Assisted Character Creation Settings](#assisted-character-creation-settings)
   - [World Info Assist Settings](#world-info-assist-settings)
+  - [Character State Settings](#character-state-settings)
   - [Narrative Guidance Settings](#narrative-guidance-settings)
   - [Reformatting Settings](#reformatting-settings)
   - [Compaction Settings](#compaction-settings)
@@ -174,6 +176,27 @@ Adds an **Assist** button to every World Info / lore book entry, letting you dra
 4. Click **Assist** to generate the entry. The result is written into the content textarea and saved automatically.
 5. Click **Continue** to extend the entry, or **Retry** to re-run Assist with your saved guidance (replacing the current content). Use the **Clear** buttons to wipe the guidance or content fields when starting over.
 
+### Character State
+
+View and update a character's **state variables** as the roleplay unfolds: the chat variables its card and lore read, such as clothing, stated goal, and true goal in the st-toolkit style:
+
+```
+Clothing: {{ .peterClothingOverride ?? Worn gray hoodie, dark jeans, scuffed sneakers }};
+```
+
+- **Per-character pane** — A sliders-icon button sits on every group member row (right after Possession's radio), and in the character panel in one-on-one chats. It opens a pane for that one character, so it stays uncluttered however many variables you add.
+- **Found automatically** — The pane lists every variable the character reads with `{{ .name ?? default }}` (also `||`, a bare `{{.name}}`, or `{{getvar::name}}`) in its card fields, character note, linked lore book (where st-toolkit's private layer lives), embedded book, or additional lore books. Each row shows the field label from the card line (`Clothing`, `True Goal`, …), the variable name, where it was found, and its current value, or the card default while it's unset.
+- **Edit by hand** — Type a new value, **Reset** to unset the variable so the card default applies again (emptying a field does the same), or **Undo** back to the chat's current value.
+- **Update with AI** — Write an instruction ("she changes into a swimsuit for the beach") and click **Propose Changes**; the model rewrites only the variables that need it, in the same dense-fragment style. Leave the instruction blank and it reads the recent chat for what has changed (new clothes, a new stated purpose, a shifted aim). Proposals fill the fields and are highlighted; nothing is saved until **Apply**, and you can edit or undo any of them first. **Use Chat Context** gives the model the cards, the chat's relevant World Info, and the recent chat; the lore-book picker adds extra books.
+- **Stored per chat** — Values go into the chat's local variables (`chatMetadata.variables`), the same store `/setvar` uses, so the character's card and lore pick them up on the very next turn. Compaction carries them into the compacted chat.
+- **Scenarios** — A cold-open scenario that assigns these variables must do it set-once, `{{if !.name}}{{.name = value}}{{/if}}`: the scenario is re-read every turn, and a bare `{{.name = value}}` would overwrite your change on the next reply. The built-in **Scenario (Cold-open)** preset writes this form.
+
+**How to use**
+
+1. Open a chat. In a group, click the sliders-icon button on a member's row in the group panel; in a one-on-one chat, open the character panel and click the sliders-icon button there. `/charstate [name]` opens the same pane.
+2. Edit values by hand, or type an instruction (or none) and click **Propose Changes**, then review the highlighted fields.
+3. Click **Apply** to save the changes to this chat.
+
 ### Narrative Guidance
 
 Periodically asks the LLM for a short paragraph of story guidance based on the current chat, character cards, and selected lore books, then injects that paragraph as a system prompt before every AI turn until a per-chat turn counter expires — at which point it auto-regenerates.
@@ -237,7 +260,7 @@ Compaction **summarizes the chat, starts a fresh chat seeded with that summary p
 - **The handoff** — The summary lands in the new chat as a visible, editable **"Story so far"** message, followed by the last *N* messages (default 20) copied over **verbatim with swipes preserved**. The old chat is left intact and selectable from history.
 - **Manual or automatic trigger** — Trigger it from the <span title="compress icon">🗜</span> **Compact Chat** item in the hamburger menu or with `/compact`. With **Auto-open at threshold** on, the modal opens on its own once the *measured* outgoing prompt crosses your % of the context window (with an optional confirmation dialog). The trigger is the **only** automatic part — every compaction still requires you to act in the modal. Nothing is ever rewritten headlessly.
 - **st-toolkit recap formats** — Besides the Default prose recap, the **Prompt Preset** menu offers **Scenario (Continuation)** and **Timeline Summary**, which write the recap in st-toolkit's formats (see [Scenario presets](#scenario-presets)).
-- **State migration** — Possession, Narrative Guidance, Phrase Ban, and saved Image Prompt per-chat state carry over to the new chat (World Info Assist guidance travels on the lorebook automatically). Your Summary Guidance is remembered per-chat across compactions of the same storyline.
+- **State migration** — Possession, Narrative Guidance, Phrase Ban, and saved Image Prompt per-chat state, plus the chat's variables (Character State values, anything set with `/setvar`), carry over to the new chat (World Info Assist guidance travels on the lorebook automatically). Your Summary Guidance is remembered per-chat across compactions of the same storyline.
 
 **How to use**
 
@@ -404,6 +427,18 @@ Open **Extensions** > **Saint's Silly Extensions** in SillyTavern's settings pan
 | Prompt Template | Customize the prompt sent to the LLM for World Info entry generation. Supports `{{context}}`, `{{guidance}}`, and `{{title}}` placeholders; if context/guidance are missing, those blocks are added automatically. |
 | Prefill Templates (Titled / Untitled) | The assistant prefixes used when the entry has / lacks a title, also kept at the start of the entry on success. Titled supports `{{title}}`. Prefill echoes from backends that ignore prefills are stripped automatically. |
 
+### Character State Settings
+
+| Setting | Description |
+|---------|-------------|
+| Enable Character State | Show the Character State buttons (group member rows and the one-on-one character panel) and the `/charstate` command |
+| Character State Debug Mode | Log variable discovery, prompts, parsed proposals, and applied writes to the browser console (in the Diagnostics drawer) |
+| Response Token Limit | Maximum tokens for the model's reply to **Propose Changes** (one line per changed variable). Also settable from the pane's Max Tokens field. |
+| Max Context Override | If > 0, caps how many tokens of chat context the preamble packer uses. 0 = use the model's full context size. |
+| Preset / Preview Assembled Prompt | Save named bundles of the prompt + prefill and preview exactly what gets sent (see Tool Presets & Prompt Preview below) |
+| Prompt Template | The user prompt for **Propose Changes**. Placeholders: `{{context}}`, `{{character}}`, `{{variables}}` (each variable with its current value or card default), and `{{guidance}}` (your instruction, or a request to update from the recent chat). Missing placeholders are added automatically. The reply must be `name: value` lines. |
+| Prefill Template | Optional assistant prefix, empty by default. Echoes from backends that ignore prefills are stripped. |
+
 ### Narrative Guidance Settings
 
 The drawer holds two self-contained tiers — **Long-term** (the overarching arc) and **Short-term** (the immediate beats, seeded with the active long-term arc). Every setting below exists **per tier**, except **Narrative Guidance Debug Mode**, which is shared and lives in the Diagnostics drawer. Defaults differ only in the refresh horizon: long-term **40** turns, short-term **8**.
@@ -449,7 +484,7 @@ The drawer holds two self-contained tiers — **Long-term** (the overarching arc
 | Enable Compaction | Toggle the Compaction feature, its **Compact Chat** menu item, `/compact`, and the auto-trigger |
 | Auto-open at threshold | When on, automatically open the Compaction modal after a turn finishes once the measured prompt crosses the threshold. The modal still requires you to act — nothing is rewritten headlessly |
 | Confirm before auto-opening | Show a confirmation dialog (with a **Don't ask again** option) before auto-opening the modal |
-| Migrate per-chat extension state | Carry Possession, Narrative Guidance, Phrase Ban, and saved Image Prompt per-chat state into the compacted chat (World Info Assist guidance travels on the lorebook automatically) |
+| Migrate per-chat extension state | Carry Possession, Narrative Guidance, Phrase Ban, and saved Image Prompt per-chat state, plus the chat's variables, into the compacted chat (World Info Assist guidance travels on the lorebook automatically) |
 | Auto Threshold (%) | Percent of the model's context window (measured outgoing prompt) that triggers the auto-open (default 90) |
 | Tail Length | How many of the most recent messages are copied into the new chat verbatim, swipes preserved (default 20). Older messages are replaced by the summary |
 | Summary Token Limit | Maximum tokens for the summary generation (default 1200) |
@@ -560,7 +595,7 @@ World Info Assist, both Narrative Guidance tiers, and Compaction ship with built
 
 | Tool | Preset | Writes |
 |------|--------|--------|
-| World Info Assist | **Scenario (Cold-open)** | A fresh scene: `Scenario Title` / `Context` / `Location` / `Opening Focus` / `Offstage`, then `{{.<firstName>ClothingOverride = …}}`, `StatedGoalOverride`, and `TrueGoalOverride` lines for what the scene changes. |
+| World Info Assist | **Scenario (Cold-open)** | A fresh scene: `Scenario Title` / `Context` / `Location` / `Opening Focus` / `Offstage`, then set-once `{{if !.<firstName>ClothingOverride}}{{.<firstName>ClothingOverride = …}}{{/if}}`, `StatedGoalOverride`, and `TrueGoalOverride` lines for what the scene changes (set-once, so [Character State](#character-state) changes aren't overwritten on the next turn). |
 | World Info Assist | **Scenario (Continuation)** | A mid-story pickup built from the chat: `Story So Far`, `Present`, `<Name>'s Current Clothing` / `Current Aim`, and `Open Threads` as plain fields (no variables). Tick **Include chat** on the Assist row so the model has the story to draw from. |
 | Narrative Guidance (short-term) | **Scenario** | The continuation-variant fields as a live scene sheet, regenerated on the tier's clock: the scene as it stands at the latest message, with `Open Threads` for the next few turns. |
 | Narrative Guidance (long-term) | **Scenario Arc** | `Scenario Title` / `Story So Far` / `Context` / `Open Threads` for the overarching arc. The short-term Scenario is seeded from it. |
@@ -585,6 +620,7 @@ Tips:
 | `/phraseban` | Scan the last message against the Phrase Ban regex list and rewrite it (as a new swipe) if banned phrasing is found |
 | `/reformat` | Reformat the last message using the configured engine (keeps the original as a swipe) |
 | `/compact` | Open the Compaction modal to summarize the chat and start a fresh, compacted chat seeded with the summary plus the recent tail |
+| `/charstate [name]` | Open the Character State pane for a character in this chat (the name is required in group chats) |
 | `/imageprompt` | Open the Image Prompting modal to generate a diffusion-model prompt depicting the current moment of the chat |
 | `/retry` | Retry the continuation from the saved checkpoint, creating a new swipe. If no checkpoint exists, sets one from the current message and continues |
 | `/retryclear` | Clear the active retry checkpoint |

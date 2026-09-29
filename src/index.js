@@ -81,6 +81,19 @@ import {
     DEFAULT_WIA_RESPONSE_LENGTH,
 } from './world-info-assist.js';
 import {
+    initCharacterState,
+    bindCharacterStateSettings,
+    startCharacterStateObserver,
+    syncCharacterStateButtons,
+    onCharacterStateChatChanged,
+    onCharacterStateCharacterPageLoaded,
+    onCharacterStateGroupUpdated,
+    registerCharacterStateSlashCommand,
+    DEFAULT_CHARACTER_STATE_PROMPT,
+    DEFAULT_CHARACTER_STATE_PREFILL,
+    DEFAULT_CHARACTER_STATE_RESPONSE_LENGTH,
+} from './character-state.js';
+import {
     initNarrativeGuidance,
     bindNarrativeGuidanceSettings,
     onNarrativeGuidanceChatChanged,
@@ -217,6 +230,12 @@ const defaultSettings = {
     wiaPrefillUntitled: DEFAULT_WIA_PREFILL_UNTITLED,
     wiaResponseLength: DEFAULT_WIA_RESPONSE_LENGTH,
     wiaMaxContextOverride: 0,
+    characterStateEnabled: true,
+    characterStateDebugMode: false,
+    characterStatePrompt: DEFAULT_CHARACTER_STATE_PROMPT,
+    characterStatePrefill: DEFAULT_CHARACTER_STATE_PREFILL,
+    characterStateResponseLength: DEFAULT_CHARACTER_STATE_RESPONSE_LENGTH,
+    characterStateMaxContextOverride: 0,
     narrativeGuidanceDebugMode: false,
     // Long-term track — the overarching arc on a slow refresh horizon.
     narrativeGuidanceLongEnabled: false,
@@ -356,6 +375,16 @@ const TOOL_PRESET_CONFIG = [
         ],
     },
     {
+        toolKey: 'character-state',
+        label: 'Character State',
+        containerId: 'character_state_presets',
+        responseLength: { key: 'characterStateResponseLength', inputSelector: '#character_state_response_length, #cs_response_length' },
+        fields: [
+            { key: 'characterStatePrompt', label: 'Prompt', textareaId: 'character_state_prompt_textarea', defaultText: DEFAULT_CHARACTER_STATE_PROMPT },
+            { key: 'characterStatePrefill', label: 'Prefill', textareaId: 'character_state_prefill_textarea', defaultText: DEFAULT_CHARACTER_STATE_PREFILL },
+        ],
+    },
+    {
         toolKey: 'ng-long',
         label: 'Narrative Guidance (Long-term)',
         containerId: 'ng_long_presets',
@@ -480,6 +509,7 @@ function injectSettingsPanel() {
     bindPhraseBanSettings(saveSettings);
     bindACCSettings(saveSettings);
     bindWIASettings(saveSettings);
+    bindCharacterStateSettings(saveSettings);
     bindNarrativeGuidanceSettings(saveSettings);
     bindReformattingSettings(saveSettings);
     bindCompactionSettings(saveSettings);
@@ -539,17 +569,20 @@ function onChatChanged() {
     onRetryContinueChatChanged();
     onDirectorChatChanged();
     rescanSplitButtons();
+    onCharacterStateChatChanged();
     SSEDebug('Chat changed, state reloaded');
 }
 
 function onGroupUpdatedHandler() {
     onGroupUpdated();
+    onCharacterStateGroupUpdated();
     SSEDebug('Group updated, UI rebuilt');
 }
 
 function onCharacterPageLoadedHandler() {
     onCharacterPageLoaded();
     accOnCharacterPageLoaded();
+    onCharacterStateCharacterPageLoaded();
 }
 
 function onGroupWrapperFinishedHandler(data) {
@@ -582,6 +615,7 @@ jQuery(async () => {
     });
     initACC({ settings, saveSettings });
     initWIA({ settings });
+    initCharacterState({ settings, saveSettings });
     initNarrativeGuidance({ settings });
     initReformatting({ settings });
     // resyncChatState re-runs the per-chat state reload after a compaction
@@ -600,6 +634,10 @@ jQuery(async () => {
     // Watch the DOM for World Info entry forms and inject the assist controls
     // and the entry Copy button (each gated on its own setting).
     startWIAObserver();
+
+    // Keep the Character State button on every group member row (next to
+    // Possession's radio); ST re-renders the member list freely.
+    startCharacterStateObserver();
 
     // Watch the chat for messages and inject per-message reformat buttons.
     startReformattingObserver();
@@ -710,9 +748,11 @@ jQuery(async () => {
     registerImagePromptSlashCommand();
     registerRetryContinueSlashCommands();
     registerDirectorSlashCommands();
+    registerCharacterStateSlashCommand();
 
     // Initial state
     syncAllPossessionUI();
+    syncCharacterStateButtons();
     applyPhrasingEnabledState();
     loadRetryState();
 
