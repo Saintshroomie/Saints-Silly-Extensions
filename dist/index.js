@@ -15761,9 +15761,9 @@ Context: Warden Ilsara has called Sable to Thistlemarch under a flag of truce. A
 Location: The elven border outpost at Thistlemarch, dawn;
 Opening Focus: Sable arriving alone at the outpost gate on foot, Patch at her heels, as the guards step out to search her pack;
 Offstage: Warden Ilsara, waiting in the command tent past the gate; she will send for Sable once the search is done;
-{{.sableClothingOverride = Same green coat but clean, hair combed back, scar deliberately left uncovered as a quiet challenge}}
-{{.sableStatedGoalOverride = Hear the wardens out, name her price, and leave with a contract}}
-{{.sableTrueGoalOverride = Learn what the wardens know about the new bloom without revealing the stolen text or the scar's behavior}}
+{{if !.sableClothingOverride}}{{.sableClothingOverride = Same green coat but clean, hair combed back, scar deliberately left uncovered as a quiet challenge}}{{/if}}
+{{if !.sableStatedGoalOverride}}{{.sableStatedGoalOverride = Hear the wardens out, name her price, and leave with a contract}}{{/if}}
+{{if !.sableTrueGoalOverride}}{{.sableTrueGoalOverride = Learn what the wardens know about the new bloom without revealing the stolen text or the scar's behavior}}{{/if}}
 ]`;
 
 // ─── World Info Assist: Cold-open ───
@@ -15783,9 +15783,9 @@ Context: <the situation as the scene opens: what brought everyone here, what is 
 Location: <specific place, time of day, conditions, concrete setting details>;
 Opening Focus: <who is on-screen at the first moment, exactly where, doing what>;
 Offstage: <each anticipated character: where they are right now, and when or why they will enter>;
-{{.<firstName>ClothingOverride = <scene-specific clothing>}}
-{{.<firstName>StatedGoalOverride = <what they will say they are here for>}}
-{{.<firstName>TrueGoalOverride = <what they are really after in this scene>}}
+{{if !.<firstName>ClothingOverride}}{{.<firstName>ClothingOverride = <scene-specific clothing>}}{{/if}}
+{{if !.<firstName>StatedGoalOverride}}{{.<firstName>StatedGoalOverride = <what they will say they are here for>}}{{/if}}
+{{if !.<firstName>TrueGoalOverride}}{{.<firstName>TrueGoalOverride = <what they are really after in this scene>}}{{/if}}
 ]
 
 Field Rules:
@@ -15795,6 +15795,7 @@ Field Rules:
 
 Override Rules:
 * Override lines go after Opening Focus / Offstage, one per line, with no labels and no trailing semicolons.
+* Every override line is wrapped set-once, exactly as in the format: {{if !.<variable>}}{{.<variable> = <value>}}{{/if}}, with the same variable name in both places. The scenario is re-read every turn, and the wrapper keeps it from overwriting a value changed later in the chat.
 * <firstName> is the character's first name in lower camelCase: "Sable Voss" → sable, "MJ" → mj, "Mary Jane Watson" → maryJane. Use the same prefix for all three variables.
 * Set only the variables this scene actually changes; anything unset falls back to the character's card. Anticipated (Offstage) characters can have override lines too.
 * TrueGoal may hold a private aim: it surfaces only in that character's own private lore, which only they see.
@@ -16017,10 +16018,13 @@ const COMPACTION_TIMELINE_PREFILL = '[\nTimeline Summary\n\n';
 // History: v1 shipped the WIA and NG Scenario presets without response
 // lengths, and the WIA pair ended with the per-character Openings block
 // (flagged by `scenarioPresetsSeeded`). v2 dropped the Openings, added
-// response lengths, and added the Compaction presets.
+// response lengths, and added the Compaction presets. v3 wrapped the
+// Cold-open's override assignments set-once (`{{if !.x}}{{.x = …}}{{/if}}`),
+// matching st-toolkit: a scenario is evaluated every turn, and a bare
+// assignment would undo any mid-chat change (e.g. from Character State).
 const TOOLKIT_PRESETS_SPEC = {
     id: 'toolkit',
-    version: 2,
+    version: 3,
     legacyFlag: 'scenarioPresetsSeeded',
     presets: {
         wia: {
@@ -16070,9 +16074,10 @@ const TOOLKIT_PRESETS_SPEC = {
         compaction: { 'Scenario (Continuation)': 2, 'Timeline Summary': 2 },
     },
     retired: {
-        // v1 texts (ending with the Openings block).
+        // v1 texts (ending with the Openings block); v2 Cold-open (bare
+        // override assignments).
         wia: {
-            'Scenario (Cold-open)': ['eba40bf9'],
+            'Scenario (Cold-open)': ['eba40bf9', 'c97451a3'],
             'Scenario (Continuation)': ['77579a39'],
         },
     },
