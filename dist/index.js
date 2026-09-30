@@ -18025,6 +18025,12 @@ function onGroupWrapperFinishedHandler(data) {
 jQuery(async () => {
     loadSettings();
 
+    // Wire up the global "stop button → abort silent generations" hook
+    // before subscribing any per-module handlers, so a stop event always
+    // unblocks in-flight silent jobs first. (Also before the settings panel
+    // binds, which reads this module's settings.)
+    initSilentGeneration({ settings: src_settings });
+
     // Wire up cross-module dependencies via shared settings reference
     initPossession({
         settings: src_settings,
@@ -18104,11 +18110,6 @@ jQuery(async () => {
     // plus the optional auto-set-on-Continue hook on ST's native Continue.
     createRetryContinueButtons();
     hookRetryAutoContinue();
-
-    // Wire up the global "stop button → abort silent generations" hook
-    // before subscribing any per-module handlers, so a stop event always
-    // unblocks in-flight silent jobs first.
-    initSilentGeneration({ settings: src_settings });
 
     // Subscribe to events
     const { eventSource, eventTypes } = getContext();
