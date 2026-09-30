@@ -99,6 +99,7 @@ import {
     onNarrativeGuidanceChatChanged,
     onNarrativeGuidanceMessageSent,
     onNarrativeGuidanceMessageReceived,
+    refreshNarrativeGuidanceScenarios,
     migrateNarrativeGuidanceSettings,
     DEFAULT_NG_LONG_USER_PROMPT,
     DEFAULT_NG_SHORT_USER_PROMPT,
@@ -248,6 +249,7 @@ const defaultSettings = {
     narrativeGuidanceLongMaxContextOverride: 0,
     narrativeGuidanceLongInjectionDepth: DEFAULT_NG_INJECTION_DEPTH,
     narrativeGuidanceLongInjectionRole: DEFAULT_NG_INJECTION_ROLE,
+    narrativeGuidanceLongScanWorldInfo: true,
     // (Lore-book selection is stored per-chat in chatMetadata, not here.)
     // Short-term track — the immediate beats on a fast refresh horizon,
     // seeded with the active long-term arc.
@@ -261,6 +263,7 @@ const defaultSettings = {
     narrativeGuidanceShortMaxContextOverride: 0,
     narrativeGuidanceShortInjectionDepth: DEFAULT_NG_INJECTION_DEPTH,
     narrativeGuidanceShortInjectionRole: DEFAULT_NG_INJECTION_ROLE,
+    narrativeGuidanceShortScanWorldInfo: true,
     // (Lore-book selection is stored per-chat in chatMetadata, not here.)
     reformattingEnabled: false,
     reformattingEngine: 'rules',
@@ -576,6 +579,8 @@ function onChatChanged() {
 function onGroupUpdatedHandler() {
     onGroupUpdated();
     onCharacterStateGroupUpdated();
+    // Members (and so the chat's tags) may have changed.
+    refreshNarrativeGuidanceScenarios();
     SSEDebug('Group updated, UI rebuilt');
 }
 

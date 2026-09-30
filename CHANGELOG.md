@@ -29,6 +29,20 @@ released version. When cutting a release, move these notes into a new
   stored in the chat's local variables (the same store as `/setvar`), and the
   prompt is preset-managed with a preview in the new settings drawer.
 
+- **Narrative Guidance scenarios from st-toolkit scenario books** — a
+  **Scenario** dropdown at the top of the Narrative Guidance drawer lists the
+  scenarios filtered to this chat's character tag (on the group or its
+  characters), from any lore book. Pick one and click **Long-term** or
+  **Short-term** to make it that tier's guidance, with no scenario-book entries
+  to switch on and off. It's injected exactly as written, so its set-once
+  override variables and opening lines work as they do from the book. The tier's
+  counter restarts, and with Auto-Regenerate on the tier evolves the scene when
+  it runs out.
+- **Narrative Guidance lore books start on the chat's own** — each tier's Lore
+  Books picker now starts on the books SillyTavern applies to the chat (global,
+  chat, persona, and in a one-on-one chat the character's own), remembered per
+  chat once you change it, with a **Chat's books** button to go back.
+
 ### Fixed
 - **Possession finds group members by the attribute current SillyTavern uses** —
   SillyTavern marks group member rows with `data-chid` (older versions used
@@ -39,6 +53,20 @@ released version. When cutting a release, move these notes into a new
   unit-tested for both.
 
 ### Changed
+- **The Scenario and Scenario Arc presets evolve the current guidance** — each
+  refresh now rewrites the tier's active guidance (an applied scenario or the
+  last refresh) to where the story stands, from the chat and lore, instead of
+  starting over. A new `{{currentGuidance}}` placeholder carries it; the Default
+  templates don't use it. Unedited copies upgrade automatically.
+- **Narrative Guidance macros run when each reply is generated** — the guidance
+  is injected as written and SillyTavern substitutes its macros for the
+  character replying, instead of once when it's injected.
+- **Narrative Guidance is scanned by World Info** — places, characters, and lore
+  named in the guidance now activate their entries. Turn **Scan guidance for
+  World Info keywords** off per tier to go back.
+- **Narrative Guidance keeps other characters' secrets out** — guidance reaches
+  every character, so lore-book entries that only some of the chat's characters
+  may see (Character Filter by name or tag) are left out of its context.
 - **The Scenario (Cold-open) preset assigns overrides set-once** — its override
   lines are now `{{if !.var}}{{.var = value}}{{/if}}`. A scenario is re-read
   every turn, so the old bare `{{.var = value}}` put the scene's value back on

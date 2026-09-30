@@ -21,6 +21,7 @@ import { getMaxPromptTokens } from '../../../../../script.js';
 import { getTokenCountAsync } from '../../../../tokenizers.js';
 import { Popup, POPUP_TYPE } from '../../../../popup.js';
 import { cancellableStreamingGenerate } from './silent-generation.js';
+import { entryVisibleToAll } from './scenario-books.js';
 
 // ─── Context ───
 
@@ -268,7 +269,7 @@ export async function withSingleLineDisabled(fn) {
 
 // Pure text helpers, kept free of SillyTavern imports so they're unit-tested
 // under plain Node (test/). Re-exported here so callers keep one import site.
-export { applyTemplateMacros, stripPrefillEcho } from './text-utils.js';
+export { applyTemplateMacros, stripPrefillEcho, stripOuterBrackets } from './text-utils.js';
 
 // ─── Clipboard ───
 
@@ -826,6 +827,7 @@ async function packRecentChatLines(chat, ctx, chatBudget) {
  * @param {number}  [opts.maxContextOverride=0] - If > 0, use this as the max-context size instead of `getMaxPromptTokens()`. Lets callers cap how much chat history they pull in independently of the model's real window.
  * @param {number}  [opts.excludeRecentCount=0] - Drop this many of the most recent messages before packing the chat. Compaction uses it so `{{context}}` is the chat *minus* the verbatim tail it carries over.
  * @param {number|null} [opts.endAtMessageIndex=null] - If a finite index ≥ 0, only chat messages up to and including this index are packed, making the anchored message the tail of the Recent Chat. Image Prompting uses it to depict an earlier moment of the chat. Applied before `excludeRecentCount`.
+ * @param {{ fileName: string, tagIds?: string[]|null }[]|null} [opts.visibleTo=null] - If given, lore-book entries are kept only when every one of these characters passes the entry's Character Filter (see `entryVisibleToAll`). Narrative Guidance uses it: its guidance is injected into every character's prompt, so it must not be built from one character's private or shared-secret entries.
  * @returns {Promise<string>} The composed preamble, or '' if nothing was included.
  */
 export async function buildContextPreamble({
@@ -836,6 +838,7 @@ export async function buildContextPreamble({
     maxContextOverride = 0,
     excludeRecentCount = 0,
     endAtMessageIndex = null,
+    visibleTo = null,
 } = {}) {
     const sections = [];
     const ctx = getContext();
@@ -867,6 +870,7 @@ export async function buildContextPreamble({
                 if (!data?.entries) continue;
                 const entries = Object.values(data.entries)
                     .filter(e => e && !e.disable && (e.content || '').trim())
+                    .filter(e => !visibleTo || entryVisibleToAll(e, visibleTo))
                     .map(e => {
                         const label = (e.comment && e.comment.trim())
                             || (Array.isArray(e.key) ? e.key.join(', ') : '');

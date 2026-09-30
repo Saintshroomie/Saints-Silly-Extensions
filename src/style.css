@@ -1585,6 +1585,55 @@
     margin: 8px 0;
 }
 
+/* Lore-book picker + "Chat's books" reset side by side; the picker's list
+   expands in place, so the row aligns to the top. */
+#saints_silly_settings .ng_lorebooks_row {
+    align-items: flex-start;
+}
+
+#saints_silly_settings .ng_lorebooks_row > div:first-child {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+#saints_silly_settings .ng_lorebooks_row .menu_button {
+    margin-top: 8px;
+    white-space: nowrap;
+}
+
+/* ── Narrative Guidance: Scenario picker ── */
+
+#saints_silly_settings .ng_scenario_section {
+    margin: 10px 0;
+    padding: 8px 10px;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 4px;
+}
+
+#saints_silly_settings .ng_scenario_select {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto;
+}
+
+#saints_silly_settings .ng_scenario_apply_row .menu_button {
+    flex: 1 1 0;
+    min-width: 0;
+    white-space: nowrap;
+    text-align: center;
+}
+
+#saints_silly_settings .ng_scenario_row .menu_button.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+#saints_silly_settings #ng_scenario_hint {
+    display: block;
+    opacity: 0.8;
+    margin-bottom: 4px;
+}
+
 #saints_silly_settings .ng-lorebook-list {
     margin-top: 4px;
     padding: 6px 8px;

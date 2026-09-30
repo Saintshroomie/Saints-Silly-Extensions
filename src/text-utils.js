@@ -64,3 +64,35 @@ export function stripPrefillEcho(output, prefill) {
     }
     return output;
 }
+
+// ─── Outer Bracket Stripping ───
+
+/**
+ * Remove the `[ … ]` that wraps a whole bracketed block, so it can be
+ * substituted into an injection template that brings its own brackets.
+ *
+ * Only a bracket pair that encloses *everything* is removed: text with more
+ * after the block — an st-toolkit scenario's Openings block follows its
+ * closing `]` — comes back unchanged. A block that was never closed (a stopped
+ * generation) loses just its opener, and a stray trailing `]` with no opener
+ * is dropped, as before.
+ *
+ * @param {string} text
+ * @returns {string}
+ */
+export function stripOuterBrackets(text) {
+    const out = (text || '').trim();
+    if (!out.startsWith('[')) {
+        const unmatchedClose = out.endsWith(']') && out.split(']').length > out.split('[').length;
+        return unmatchedClose ? out.slice(0, -1).trimEnd() : out;
+    }
+    let depth = 0;
+    for (let i = 0; i < out.length; i++) {
+        if (out[i] === '[') {
+            depth++;
+        } else if (out[i] === ']' && --depth === 0) {
+            return i === out.length - 1 ? out.slice(1, -1).trim() : out;
+        }
+    }
+    return out.slice(1).trimStart();
+}

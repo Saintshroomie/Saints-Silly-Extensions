@@ -15,19 +15,30 @@
  * a long-term refresh re-aligns short-term.
  *
  * Per-chat state lives under `context.chatMetadata.narrativeGuidance` as
- * `{ long: { guidance, turnsRemaining, themes, loreBookNames }, short: { … } }`.
+ * `{ long: { guidance, turnsRemaining, themes, loreBookNames, loreBooksCustom }, short: { … } }`.
  * Legacy single-track state is mapped onto the short-term track on read. The
- * lore-book selection is per-chat (so a new chat starts with none selected)
- * and is pruned of any books ST no longer knows about on read.
+ * lore-book selection is per-chat: until the user changes it
+ * (`loreBooksCustom`), it follows the books ST currently applies to the chat
+ * (`chatDefaultLoreBooks`); a custom pick is pruned of any books ST no longer
+ * knows about on read.
+ *
+ * Scenarios: st-toolkit scenario books are found by the chat's character tags
+ * (`findTaggedScenarios`), and one can be applied to either track as its
+ * active guidance. It is injected verbatim — the injection inserts guidance
+ * raw and leaves every macro to ST's generation-time substitution — so the
+ * scenario's set-once override assignments and Openings block run exactly as
+ * they would from the scenarios book. With auto-regen on, the track then
+ * evolves it: regeneration sees the current guidance through
+ * `{{currentGuidance}}`.
  */
 
 import {
     setExtensionPrompt,
     extension_prompt_types,
     extension_prompt_roles,
-    substituteParamsExtended,
 } from '../../../../../script.js';
 import { removeReasoningFromString } from '../../../../reasoning.js';
+import { loadWorldInfo, selected_world_info, world_info } from '../../../../world-info.js';
 import {
     getContext,
     createDebugLogger,
@@ -40,8 +51,15 @@ import {
     withSingleLineDisabled,
     applyTemplateMacros,
     stripPrefillEcho,
+    stripOuterBrackets,
     showPromptPreview,
 } from './utils.js';
+import {
+    findTaggedScenarios,
+    characterFileName,
+    characterLoreBooks,
+    defaultChatLoreBooks,
+} from './scenario-books.js';
 import {
     isSilentGenerationAbort,
     abortAllGenerations,
@@ -54,7 +72,9 @@ const NG_METADATA_KEY = 'narrativeGuidance';
 // User-prompt templates for guidance generation. {{context}}, {{themes}} and
 // (short-term only) {{longGuidance}} are replaced by the packed chat/lore
 // preamble, the per-track themes block, and the active long-term arc; if a
-// placeholder is missing the block is prepended instead.
+// placeholder is missing the block is prepended instead. {{currentGuidance}}
+// (the track's own guidance being replaced, e.g. an applied scenario to
+// evolve) is only filled where a template asks for it — the defaults don't.
 export const DEFAULT_NG_LONG_USER_PROMPT =
     '{{context}}{{themes}}Continue the bracketed paragraph below. Output a single short paragraph ' +
     '(2–4 sentences) describing the overarching direction of the story across the next many turns — ' +
@@ -177,12 +197,13 @@ function readContainer() {
     // Empty or legacy single-track shape → map any legacy guidance to short.
     // Lore-book selection is new and per-chat, so legacy state has none.
     return {
-        long: { guidance: '', turnsRemaining: 0, themes: '', loreBookNames: [] },
+        long: { guidance: '', turnsRemaining: 0, themes: '', loreBookNames: [], loreBooksCustom: false },
         short: {
             guidance: typeof raw?.guidance === 'string' ? raw.guidance : '',
             turnsRemaining: Number.isFinite(raw?.turnsRemaining) ? raw.turnsRemaining : 0,
             themes: typeof raw?.themes === 'string' ? raw.themes : '',
             loreBookNames: [],
+            loreBooksCustom: false,
         },
     };
 }
@@ -194,6 +215,12 @@ function loadChatState(track) {
         turnsRemaining: Number.isFinite(raw.turnsRemaining) ? raw.turnsRemaining : 0,
         themes: typeof raw.themes === 'string' ? raw.themes : '',
         loreBookNames: Array.isArray(raw.loreBookNames) ? raw.loreBookNames.slice() : [],
+        // Chats saved before the flag: a non-empty pick was the user's own;
+        // an empty one (always written) means they never chose, so follow
+        // the chat's books.
+        loreBooksCustom: typeof raw.loreBooksCustom === 'boolean'
+            ? raw.loreBooksCustom
+            : (Array.isArray(raw.loreBookNames) && raw.loreBookNames.length > 0),
     };
 }
 
@@ -205,6 +232,7 @@ function writeChatState(track, state) {
         turnsRemaining: Number.isFinite(state.turnsRemaining) ? state.turnsRemaining : 0,
         themes: state.themes || '',
         loreBookNames: Array.isArray(state.loreBookNames) ? state.loreBookNames : [],
+        loreBooksCustom: !!state.loreBooksCustom,
     };
     context.chatMetadata[NG_METADATA_KEY] = container;
 }
@@ -238,9 +266,60 @@ function resolveResponseLength(track) {
     return Number.isFinite(n) && n > 0 ? n : DEFAULT_NG_RESPONSE_LENGTH;
 }
 
+// ─── Chat Characters & Lore ───
+
+/** The characters in the open chat: the group's members, or the solo character. */
+function chatCharacters() {
+    const ctx = getContext();
+    const characters = ctx.characters || [];
+    if (ctx.groupId) {
+        const group = ctx.groups?.find(g => g.id === ctx.groupId);
+        return (group?.members || [])
+            .map(avatar => characters.find(c => c?.avatar === avatar))
+            .filter(Boolean);
+    }
+    const char = characters[ctx.characterId];
+    return char ? [char] : [];
+}
+
+/** Each chat character's Character Filter identity: avatar file name + tag IDs. */
+function chatFilterCharacters() {
+    const tagMap = getContext().tagMap || {};
+    return chatCharacters().map(char => ({
+        fileName: characterFileName(char.avatar),
+        tagIds: Array.isArray(tagMap[char.avatar]) ? tagMap[char.avatar] : null,
+    }));
+}
+
+/** Tag IDs on the open group itself and on every character in the chat. */
+function chatTagIds() {
+    const ctx = getContext();
+    const tagMap = ctx.tagMap || {};
+    const ids = new Set(ctx.groupId ? tagMap[ctx.groupId] || [] : []);
+    for (const char of chatCharacters()) {
+        for (const id of tagMap[char.avatar] || []) ids.add(id);
+    }
+    return [...ids];
+}
+
+/** The lore books ST currently applies to this chat (see defaultChatLoreBooks). */
+function chatDefaultLoreBooks() {
+    const ctx = getContext();
+    const isGroup = !!ctx.groupId;
+    const solo = isGroup ? null : ctx.characters?.[ctx.characterId];
+    return defaultChatLoreBooks({
+        globalBooks: Array.isArray(selected_world_info) ? selected_world_info : [],
+        chatBook: ctx.chatMetadata?.world_info || null,
+        personaBook: ctx.powerUserSettings?.persona_description_lorebook || null,
+        characterBooks: solo ? characterLoreBooks(solo, world_info?.charLore) : [],
+        isGroup,
+        available: getAvailableLoreBookNames(),
+    });
+}
+
 /**
- * Resolve a track's per-chat lore-book selection, dropping any books ST no
- * longer knows about. When `prune` is set and the stored list references
+ * Resolve a track's per-chat lore-book selection: the chat's own books until
+ * the user picks, then their pick, dropping any books ST no longer knows about. When `prune` is set and the stored list references
  * missing books, the cleaned list is persisted back to chat metadata and the
  * user is notified once (subsequent reads then find nothing to prune).
  *
@@ -253,6 +332,7 @@ function resolveResponseLength(track) {
  * @returns {string[]} The selection, missing books removed.
  */
 function resolveChatLoreBookNames(track, { prune = false } = {}) {
+    if (!loadChatState(track).loreBooksCustom) return chatDefaultLoreBooks();
     const stored = loadChatState(track).loreBookNames;
     if (!stored.length) return [];
     const available = getAvailableLoreBookNames();
@@ -294,20 +374,28 @@ function reapplyInjection(track) {
     // state.guidance retains the generation prefill (so the textarea shows
     // it). Strip outer brackets here so {{guidance}} substitutes cleanly
     // into whatever injection template the user has configured.
-    const guidanceForInjection = stripBracketWrap(state.guidance);
-    const body = substituteParamsExtended(tpl, { guidance: guidanceForInjection });
+    const guidanceForInjection = stripOuterBrackets(state.guidance);
+    // Only our own {{guidance}} is filled here. Every ST macro — in the
+    // template and in the guidance — is left for ST, which substitutes the
+    // injection at generation time: an applied scenario's {{char}},
+    // lastCharMessage and set-once assignments must be evaluated for the
+    // character actually replying, not once when this runs.
+    const body = applyTemplateMacros(tpl, { guidance: guidanceForInjection }).text;
     const configuredDepth = getSetting(track, 'InjectionDepth');
     const depth = Number.isFinite(configuredDepth) && configuredDepth >= 0 ? configuredDepth : 0;
     const role = resolveInjectionRole(getSetting(track, 'InjectionRole'));
+    // Scanned by World Info (on by default), so places and lore the guidance
+    // names activate their entries, as a switched-on scenario entry would.
+    const scan = getSetting(track, 'ScanWorldInfo') !== false;
     setExtensionPrompt(
         track.injectionKey,
         body,
         extension_prompt_types.IN_CHAT,
         depth,
-        false,
+        scan,
         role,
     );
-    debug(`[${track.id}] Injected guidance — depth:`, depth, 'role:', getSetting(track, 'InjectionRole'), 'body length:', body.length);
+    debug(`[${track.id}] Injected guidance — depth:`, depth, 'role:', getSetting(track, 'InjectionRole'), 'scan:', scan, 'body length:', body.length);
 }
 
 function resolveInjectionRole(name) {
@@ -321,20 +409,13 @@ function resolveInjectionRole(name) {
 
 // ─── Generation ───
 
-function stripBracketWrap(text) {
-    let out = (text || '').trim();
-    if (out.startsWith('[')) out = out.slice(1).trimStart();
-    if (out.endsWith(']')) out = out.slice(0, -1).trimEnd();
-    return out;
-}
-
 /**
  * Assemble the guidance-generation user prompt from the editable template.
  * {{context}} / {{themes}} / {{longGuidance}} are substituted in place; when a
  * placeholder is absent the corresponding block is prepended (context first,
  * then long-term arc, then themes), matching the pre-template behavior.
  */
-function composeGenerationPrompt(track, preambleBlock, themesBlock, longGuidanceBlock) {
+function composeGenerationPrompt(track, preambleBlock, themesBlock, longGuidanceBlock, currentGuidanceBlock = '') {
     const configured = getSetting(track, 'Prompt');
     const tpl = (typeof configured === 'string' && configured.trim())
         ? configured
@@ -343,6 +424,7 @@ function composeGenerationPrompt(track, preambleBlock, themesBlock, longGuidance
         context: preambleBlock || '',
         themes: themesBlock || '',
         longGuidance: longGuidanceBlock || '',
+        currentGuidance: currentGuidanceBlock || '',
     });
     let prompt = text;
     if (!used.has('themes') && themesBlock) prompt = themesBlock + prompt;
@@ -351,9 +433,21 @@ function composeGenerationPrompt(track, preambleBlock, themesBlock, longGuidance
     return prompt;
 }
 
+/**
+ * The track's own active guidance, for templates that rewrite it rather than
+ * start fresh ({{currentGuidance}}): an applied scenario or the last
+ * generation, to evolve to where the story stands now.
+ */
+function buildCurrentGuidanceBlock(track, guidance) {
+    const text = stripOuterBrackets(guidance || '');
+    return text
+        ? `The current ${track.label.toLowerCase()} guidance, which your reply replaces:\n${text}\n\n`
+        : '';
+}
+
 /** Build the long-term arc block fed into short-term (hierarchical) prompts. */
 function buildLongGuidanceBlock() {
-    const longText = stripBracketWrap(loadChatState(NG_TRACKS.long).guidance || '');
+    const longText = stripOuterBrackets(loadChatState(NG_TRACKS.long).guidance || '');
     return longText
         ? `Long-term story direction to stay consistent with:\n${longText}\n\n`
         : '';
@@ -369,14 +463,16 @@ function showNGPromptPreview(track) {
         : '';
     const prefill = getSetting(track, 'GenerationPrompt') || track.defaultGenerationPrompt;
     const injectionTpl = getSetting(track, 'InjectionPrompt') || track.defaultInjectionPrompt;
-    const injection = substituteParamsExtended(injectionTpl, {
+    const injection = applyTemplateMacros(injectionTpl, {
         guidance: '(the generated guidance text, outer brackets stripped)',
-    });
+    }).text;
+    const sampleCurrent = `The current ${track.label.toLowerCase()} guidance, which your reply replaces:\n`
+        + '(the active guidance being replaced, e.g. an applied scenario; only where the template has {{currentGuidance}})\n\n';
     showPromptPreview(`Narrative Guidance (${track.label}) — Prompt Preview`, [
         { label: 'System Prompt (fixed)', text: NG_GENERATION_SYSTEM_PROMPT },
-        { label: 'User Prompt (Generation Instructions template with sample values)', text: composeGenerationPrompt(track, sampleContext, sampleThemes, sampleLong) },
+        { label: 'User Prompt (Generation Instructions template with sample values)', text: composeGenerationPrompt(track, sampleContext, sampleThemes, sampleLong, sampleCurrent) },
         { label: 'Prefill (assistant prefix; kept at the start of the stored guidance)', text: prefill },
-        { label: 'Injection (added to the chat prompt before each AI turn while guidance is active)', text: injection },
+        { label: 'Injection (added to the chat prompt before each AI turn while guidance is active; ST runs its macros at generation time)', text: injection },
     ]);
 }
 
@@ -426,6 +522,9 @@ async function regenGuidance(track, reason) {
             loreBookNames: resolveChatLoreBookNames(track, { prune: true }),
             responseLength,
             maxContextOverride: getSetting(track, 'MaxContextOverride') || 0,
+            // Guidance reaches every character, so only lore every character
+            // may see: no private layers or shared secrets.
+            visibleTo: chatFilterCharacters(),
         });
 
         const themesBlock = state.themes && state.themes.trim()
@@ -440,7 +539,9 @@ async function regenGuidance(track, reason) {
 
         const prefill = getSetting(track, 'GenerationPrompt') || track.defaultGenerationPrompt;
 
-        const userPrompt = composeGenerationPrompt(track, preambleBlock, themesBlock, longGuidanceBlock);
+        const currentGuidanceBlock = buildCurrentGuidanceBlock(track, state.guidance);
+
+        const userPrompt = composeGenerationPrompt(track, preambleBlock, themesBlock, longGuidanceBlock, currentGuidanceBlock);
         const systemPrompt = NG_GENERATION_SYSTEM_PROMPT;
 
         debug(`[${track.id}] User prompt length:`, userPrompt.length, 'prefill:', prefill);
@@ -586,6 +687,174 @@ async function continueGuidance(track) {
     }
 }
 
+// ─── Scenarios ───
+
+// st-toolkit scenarios found for the open chat, as last scanned, and the
+// dropdown's current pick (by book + uid, so a rescan keeps it).
+let scenarioOptions = [];
+let scenarioScanSeq = 0;
+let scenarioScanTags = [];
+
+function scenarioKey(scenario) {
+    return `${scenario.book}\u0000${scenario.uid}`;
+}
+
+function currentChatId() {
+    const ctx = getContext();
+    return (typeof ctx.getCurrentChatId === 'function' ? ctx.getCurrentChatId() : ctx.chatId) || null;
+}
+
+/** Scan every lore book ST knows for scenario entries tagged for this chat. */
+async function scanChatScenarios(tagIds) {
+    if (!tagIds.length) return [];
+    const books = [];
+    for (const name of getAvailableLoreBookNames()) {
+        try {
+            const data = await loadWorldInfo(name);
+            if (data?.entries) books.push({ name, entries: data.entries });
+        } catch (err) {
+            debug('Scenario scan: failed to load book', name, err);
+        }
+    }
+    return findTaggedScenarios(books, tagIds);
+}
+
+/**
+ * Rescan the chat's scenarios and rebuild the dropdown. Called on chat
+ * change, group edits, and the refresh button; a newer scan always wins.
+ */
+export async function refreshNarrativeGuidanceScenarios() {
+    if (!document.getElementById('ng_scenario_select')) return;
+    const seq = ++scenarioScanSeq;
+    const tagIds = currentChatId() ? chatTagIds() : [];
+    let found = [];
+    try {
+        found = await scanChatScenarios(tagIds);
+    } catch (err) {
+        console.error('Narrative Guidance: scenario scan failed:', err);
+    }
+    if (seq !== scenarioScanSeq) return;
+    scenarioOptions = found;
+    scenarioScanTags = tagIds;
+    renderScenarioSelect();
+    debug('Scenarios for this chat:', found.map(s => `${s.book}: ${s.title}`));
+}
+
+function renderScenarioSelect() {
+    const select = document.getElementById('ng_scenario_select');
+    const hint = document.getElementById('ng_scenario_hint');
+    if (!select) return;
+    const previous = select.selectedOptions[0]?.dataset.key || '';
+
+    select.replaceChildren();
+    if (!scenarioOptions.length) {
+        const empty = document.createElement('option');
+        empty.value = '';
+        empty.textContent = 'No scenarios for this chat';
+        select.appendChild(empty);
+    }
+    let group = null;
+    scenarioOptions.forEach((scenario, index) => {
+        if (!group || group.label !== scenario.book) {
+            group = document.createElement('optgroup');
+            group.label = scenario.book;
+            select.appendChild(group);
+        }
+        const option = document.createElement('option');
+        option.value = String(index);
+        option.dataset.key = scenarioKey(scenario);
+        option.textContent = scenario.title;
+        option.selected = option.dataset.key === previous;
+        group.appendChild(option);
+    });
+    select.disabled = !scenarioOptions.length;
+
+    if (hint) {
+        const books = [...new Set(scenarioOptions.map(s => s.book))];
+        if (!currentChatId()) {
+            hint.textContent = 'Open a chat to see its scenarios.';
+        } else if (!scenarioScanTags.length) {
+            hint.textContent = getContext().groupId
+                ? 'Neither this group nor its members have tags. Scenario books are matched by the world\'s character tag.'
+                : 'This character has no tags. Scenario books are matched by the world\'s character tag.';
+        } else if (!scenarioOptions.length) {
+            hint.textContent = 'No scenario book entries are filtered to this chat\'s tags. Import the world\'s scenarios book to use it here.';
+        } else {
+            hint.textContent = `${scenarioOptions.length} scenario${scenarioOptions.length === 1 ? '' : 's'} from ${books.join(', ')}.`;
+        }
+    }
+    for (const id of ['ng_scenario_apply_long', 'ng_scenario_apply_short']) {
+        document.getElementById(id)?.classList.toggle('disabled', !scenarioOptions.length);
+    }
+}
+
+function selectedScenario() {
+    const select = document.getElementById('ng_scenario_select');
+    const index = parseInt(select?.value ?? '', 10);
+    return Number.isInteger(index) ? scenarioOptions[index] || null : null;
+}
+
+/**
+ * Make the picked scenario a track's active guidance: its full text, macros
+ * and all, injected from the next turn on. The turn counter restarts, so with
+ * auto-regen on the track evolves the scene from it when the counter runs out.
+ */
+async function applyScenario(track) {
+    const picked = selectedScenario();
+    if (!picked) {
+        toast('Pick a scenario first.', 'warning');
+        return;
+    }
+    if (!currentChatId()) {
+        toast('Open a chat first: guidance is stored per chat.', 'warning');
+        return;
+    }
+    if (runtime[track.id].regenInProgress) {
+        toast(`${track.label} guidance is generating. Wait for it or Stop it first.`, 'warning');
+        return;
+    }
+
+    // Re-read the entry so an edit since the last scan is picked up.
+    let content = picked.content;
+    try {
+        const data = await loadWorldInfo(picked.book);
+        const entry = Object.values(data?.entries || {}).find(e => String(e?.uid) === String(picked.uid));
+        if (typeof entry?.content === 'string' && entry.content.trim()) content = entry.content.trim();
+    } catch (err) {
+        debug('Scenario apply: re-read failed, using the scanned text', err);
+    }
+
+    const state = loadChatState(track);
+    const current = (state.guidance || '').trim();
+    if (current && current !== content
+        && !window.confirm(`Replace the active ${track.label.toLowerCase()} guidance with the scenario "${picked.title}"?`)) {
+        return;
+    }
+    state.guidance = content;
+    state.turnsRemaining = resolveTurnCount(track);
+    saveChatState(track, state);
+    refreshPanelFromState(track);
+    reapplyInjection(track);
+    debug(`[${track.id}] Applied scenario`, picked.book, picked.title);
+
+    if (!getSetting(track, 'Enabled')) {
+        toast(`"${picked.title}" is set as ${track.label.toLowerCase()} guidance, but ${track.label} guidance is off, so it isn't injected. Turn it on to use it.`, 'warning');
+    } else {
+        toast(`"${picked.title}" applied as ${track.label.toLowerCase()} guidance.`, 'success');
+    }
+}
+
+function bindScenarioControls() {
+    document.getElementById('ng_scenario_refresh')
+        ?.addEventListener('click', () => refreshNarrativeGuidanceScenarios());
+    document.getElementById('ng_scenario_apply_long')
+        ?.addEventListener('click', () => applyScenario(NG_TRACKS.long));
+    document.getElementById('ng_scenario_apply_short')
+        ?.addEventListener('click', () => applyScenario(NG_TRACKS.short));
+    renderScenarioSelect();
+    refreshNarrativeGuidanceScenarios();
+}
+
 // ─── Event Handlers ───
 
 export function onNarrativeGuidanceChatChanged() {
@@ -596,6 +865,7 @@ export function onNarrativeGuidanceChatChanged() {
         refreshPanelFromState(track);
         reapplyInjection(track);
     }
+    refreshNarrativeGuidanceScenarios();
     debug('Chat changed, state reloaded');
 }
 
@@ -797,22 +1067,32 @@ function populateLoreBookPicker(track) {
     const host = trackEl(track, 'lorebooks_host');
     if (!host) return;
 
-    // Lore-book selection is per-chat (stored in chatMetadata), so a new chat
-    // starts with none selected; prune any books that no longer exist.
+    // Lore-book selection is per-chat (stored in chatMetadata). Until the
+    // user changes it, it shows the books ST applies to this chat; a custom
+    // pick is pruned of books that no longer exist.
+    const custom = loadChatState(track).loreBooksCustom;
     const initial = resolveChatLoreBookNames(track, { prune: true });
 
     const { element } = createLoreBookPicker({
         initialSelection: initial,
         // Shared styling class across both tracks; the element id differs.
         classPrefix: 'ng-lorebook',
+        title: custom ? 'Lore Books' : 'Chat\'s Lore Books',
         onChange: (names) => {
             const state = loadChatState(track);
             state.loreBookNames = names;
+            state.loreBooksCustom = true;
             scheduleChatStateSave(track, state);
+            trackEl(track, 'lorebooks_reset')?.classList.remove('disabled');
+            // The picker labels itself with the title it was built with; now
+            // that the pick is the user's own, say so.
+            const label = element.querySelector('.ng-lorebook-summary-label');
+            if (label) label.textContent = names.length ? `Lore Books (${names.length})` : 'Lore Books';
         },
     });
     element.id = domId(track, 'lorebooks_details');
     host.replaceChildren(element);
+    trackEl(track, 'lorebooks_reset')?.classList.toggle('disabled', !custom);
 }
 
 /** Bind every per-track control in the settings panel for one track. */
@@ -922,6 +1202,26 @@ function bindTrackControls(track, saveSettings) {
             }
         });
     }
+
+    const scanCb = trackEl(track, 'scan_world_info');
+    if (scanCb) {
+        scanCb.checked = getSetting(track, 'ScanWorldInfo') !== false;
+        scanCb.addEventListener('change', () => {
+            moduleSettings[settingKey(track, 'ScanWorldInfo')] = scanCb.checked;
+            saveSettings();
+            reapplyInjection(track);
+        });
+    }
+
+    trackEl(track, 'lorebooks_reset')?.addEventListener('click', () => {
+        const state = loadChatState(track);
+        if (!state.loreBooksCustom) return;
+        state.loreBookNames = [];
+        state.loreBooksCustom = false;
+        saveChatState(track, state);
+        populateLoreBookPicker(track);
+        debug(`[${track.id}] Lore books reset to the chat's own`);
+    });
 
     const roleSelect = trackEl(track, 'injection_role');
     if (roleSelect) {
@@ -1033,6 +1333,7 @@ export function bindNarrativeGuidanceSettings(saveSettings) {
     for (const track of NG_TRACK_LIST) {
         bindTrackControls(track, saveSettings);
     }
+    bindScenarioControls();
 
     // Shared (non per-track) controls.
     const debugCb = document.getElementById('ng_debug_mode');

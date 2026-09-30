@@ -435,6 +435,28 @@
                 arc so the two stay aligned. Each tier has its own toggle, cadence,
                 prompts, lore books and guidance text.</small>
 
+            <!-- ─── Scenario ─── -->
+            <div class="ng_scenario_section">
+                <label for="ng_scenario_select" title="st-toolkit scenario books, found by the character tag on this group or its characters."><b><span class="fa-solid fa-clapperboard"></span> Scenario</b></label>
+                <div class="ng_inline_row ng_scenario_row">
+                    <select id="ng_scenario_select" class="text_pole ng_scenario_select" title="Scenarios from lore books whose entries are filtered to this chat's character tags (an st-toolkit world's scenarios book). The book's entries can stay switched off."></select>
+                    <div class="menu_button" id="ng_scenario_refresh" title="Rescan lore books for this chat's scenarios">
+                        <span class="fa-solid fa-rotate"></span>
+                    </div>
+                </div>
+                <div class="ng_inline_row ng_scenario_row ng_scenario_apply_row">
+                    <span>Apply as:</span>
+                    <div class="menu_button disabled" id="ng_scenario_apply_long" title="Make this scenario the long-term guidance (replaces the current arc and restarts its turn counter)">
+                        <span class="fa-solid fa-mountain-sun"></span> Long-term
+                    </div>
+                    <div class="menu_button disabled" id="ng_scenario_apply_short" title="Make this scenario the short-term guidance (replaces the current scene guidance and restarts its turn counter)">
+                        <span class="fa-solid fa-person-running"></span> Short-term
+                    </div>
+                </div>
+                <small id="ng_scenario_hint"></small>
+                <small>The scenario is injected as that tier's guidance exactly as written, so its override variables and opening lines work as they do from the scenarios book, and you never switch book entries on or off. With Auto-Regenerate on, the tier evolves the scene from it when its counter runs out (the Scenario presets rewrite it from the chat and lore).</small>
+            </div>
+
             <!-- ─── Long-term ─── -->
             <div class="inline-drawer saints_nested_drawer">
                 <div class="inline-drawer-toggle inline-drawer-header">
@@ -480,7 +502,17 @@
                         </select>
                     </div>
 
-                    <div id="ng_long_lorebooks_host"></div>
+                    <label class="checkbox_label" title="Let World Info scan the injected guidance for keywords, so the places, characters and lore it names activate their entries (as a switched-on scenario book entry does).">
+                        <input id="ng_long_scan_world_info" type="checkbox" />
+                        <span>Scan guidance for World Info keywords</span>
+                    </label>
+
+                    <div class="ng_inline_row ng_lorebooks_row">
+                        <div id="ng_long_lorebooks_host"></div>
+                        <div class="menu_button disabled" id="ng_long_lorebooks_reset" title="Go back to this chat's own lore books (the ones SillyTavern currently applies to it)">
+                            <span class="fa-solid fa-rotate-left"></span> Chat's books
+                        </div>
+                    </div>
 
                     <div class="ng_inline_row">
                         <span><b>Turns Remaining:</b> <span id="ng_long_remaining_display">0</span></span>
@@ -616,7 +648,17 @@
                         </select>
                     </div>
 
-                    <div id="ng_short_lorebooks_host"></div>
+                    <label class="checkbox_label" title="Let World Info scan the injected guidance for keywords, so the places, characters and lore it names activate their entries (as a switched-on scenario book entry does).">
+                        <input id="ng_short_scan_world_info" type="checkbox" />
+                        <span>Scan guidance for World Info keywords</span>
+                    </label>
+
+                    <div class="ng_inline_row ng_lorebooks_row">
+                        <div id="ng_short_lorebooks_host"></div>
+                        <div class="menu_button disabled" id="ng_short_lorebooks_reset" title="Go back to this chat's own lore books (the ones SillyTavern currently applies to it)">
+                            <span class="fa-solid fa-rotate-left"></span> Chat's books
+                        </div>
+                    </div>
 
                     <div class="ng_inline_row">
                         <span><b>Turns Remaining:</b> <span id="ng_short_remaining_display">0</span></span>

@@ -51,6 +51,7 @@ import {
     parseStateReply,
 } from './character-state-parsing.js';
 import { resolveGroupMemberRow } from './group-members.js';
+import { characterLoreBooks } from './scenario-books.js';
 
 // ─── Default Prompt ───
 
@@ -152,18 +153,6 @@ function currentChatId() {
 // ─── Variable Discovery ───
 
 /** Lore books tied to a character: its primary (linked) book plus any additional books. */
-function characterBookNames(char) {
-    const names = [];
-    const primary = char?.data?.extensions?.world;
-    if (primary) names.push(primary);
-    const fileName = String(char?.avatar || '').replace(/\.[^/.]+$/, '');
-    const extra = world_info?.charLore?.find(e => e?.name === fileName);
-    for (const name of extra?.extraBooks || []) {
-        if (name && !names.includes(name)) names.push(name);
-    }
-    return names;
-}
-
 function entryTexts(entries) {
     return Object.values(entries || {})
         .filter(e => e && !e.disable && typeof e.content === 'string' && e.content.includes('{{'))
@@ -186,7 +175,7 @@ async function collectCharacterSources(char) {
 
     const primary = char?.data?.extensions?.world || null;
     let primaryLoaded = false;
-    for (const book of characterBookNames(char)) {
+    for (const book of characterLoreBooks(char, world_info?.charLore)) {
         if (Array.isArray(world_names) && !world_names.includes(book)) continue;
         try {
             const data = await loadWorldInfo(book);

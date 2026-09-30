@@ -13,7 +13,7 @@ const readFixture = name => JSON.parse(readFileSync(new URL(`./fixtures/${name}`
 const V1 = readFixture('builtin-presets-v1.json');
 const V2 = readFixture('builtin-presets-v2.json');
 const SPECS = { toolkit: TOOLKIT_PRESETS_SPEC, 'image-prompt': IMAGE_PROMPT_PRESETS_SPEC };
-const EXTENSION_PLACEHOLDERS = ['context', 'guidance', 'title', 'themes', 'longGuidance'];
+const EXTENSION_PLACEHOLDERS = ['context', 'guidance', 'title', 'themes', 'longGuidance', 'currentGuidance'];
 
 function* builtins(spec) {
     for (const [toolKey, presets] of Object.entries(spec.presets)) {
@@ -58,6 +58,21 @@ test('the cold-open scenario assigns every override set-once', () => {
     assert.ok(assignments.length >= 6);
     for (const [line, variable] of assignments) {
         assert.ok(line.startsWith(`{{if !.${variable}}}{{.${variable} = `) && line.endsWith('}}{{/if}}'), line);
+    }
+});
+
+test('the NG scenario presets evolve the current guidance', () => {
+    const { presets } = TOOLKIT_PRESETS_SPEC;
+    for (const [toolKey, name, key] of [
+        ['ng-short', 'Scenario', 'narrativeGuidanceShortPrompt'],
+        ['ng-long', 'Scenario Arc', 'narrativeGuidanceLongPrompt'],
+    ]) {
+        const template = presets[toolKey][name][key];
+        assert.match(template, /\{\{currentGuidance\}\}/, `${name} has a live {{currentGuidance}}`);
+        const sent = asSentToModel(template);
+        assert.match(sent, /Your reply replaces it, so rewrite it; do not start over\./, name);
+        assert.match(sent, /where they disagree, the chat wins/, name);
+        assert.match(sent, /When no current guidance is given, write the \w+ fresh from the context\./, name);
     }
 });
 
@@ -127,4 +142,16 @@ test('an untouched v1 Image Prompting install picks up the negative prompts', ()
         assert.deepEqual(settings.toolPresets['image-prompt'][name], preset, name);
         assert.ok(preset.imagePromptNegative, `${name} ships a negative prompt`);
     }
+});
+
+test('an untouched v3 install picks up the evolving NG Scenario presets', () => {
+    const current = TOOLKIT_PRESETS_SPEC.presets;
+    const toolPresets = clone(current);
+    // NG Scenario texts were unchanged from v1 through v3.
+    toolPresets['ng-short'].Scenario = clone(V1.toolkit['ng-short'].Scenario);
+    toolPresets['ng-long']['Scenario Arc'] = clone(V1.toolkit['ng-long']['Scenario Arc']);
+    const settings = { builtinPresetVersions: { toolkit: 3 }, toolPresets };
+    assert.equal(seedBuiltinPresets(settings, TOOLS, TOOLKIT_PRESETS_SPEC), true);
+    assert.deepEqual(settings.toolPresets['ng-short'].Scenario, current['ng-short'].Scenario);
+    assert.deepEqual(settings.toolPresets['ng-long']['Scenario Arc'], current['ng-long']['Scenario Arc']);
 });
