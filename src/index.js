@@ -176,6 +176,9 @@ import {
     onDirectorChatChanged,
     onDirectorMessageSent,
     onDirectorGroupWrapperFinished,
+    onDirectorGenerationStarted,
+    onDirectorGroupWrapperStarted,
+    onDirectorGroupMemberDrafted,
     onDirectorScanForWalkOns,
     onDirectorMaybeSplit,
     runDirectorTurn,
@@ -530,12 +533,15 @@ function injectSettingsPanel() {
 
 // ─── Merged Event Handlers ───
 
-function onGenerationStarted(_type, _options, dryRun) {
+function onGenerationStarted(type, options, dryRun) {
     // SillyTavern's PromptManager fires GENERATION_STARTED for dry-run
     // probes (token counts, prompt composition) on page load, CHAT_LOADED,
     // CHARACTER_EDITED, etc. Those never emit ENDED/STOPPED, so reacting
     // to them strands any button we hide here.
     if (dryRun) return;
+    // Before the group wrapper resolves who swipes/continues: a walk-on
+    // message needs a host member for ST to accept it.
+    onDirectorGenerationStarted(type, options, dryRun);
     possessionGenStarted();
     phrasingGenStarted();
     onRetryContinueGenerationStarted();
@@ -694,6 +700,13 @@ jQuery(async () => {
     eventSource.on(eventTypes.GENERATION_ENDED, onGenerationEnded);
     eventSource.on(eventTypes.GENERATION_STOPPED, onGenerationStopped);
     eventSource.on(eventTypes.GROUP_WRAPPER_FINISHED, onGroupWrapperFinishedHandler);
+    // Group Director: voice a walk-on through its host member's generation slot.
+    if (eventTypes.GROUP_WRAPPER_STARTED) {
+        eventSource.on(eventTypes.GROUP_WRAPPER_STARTED, onDirectorGroupWrapperStarted);
+    }
+    if (eventTypes.GROUP_MEMBER_DRAFTED) {
+        eventSource.on(eventTypes.GROUP_MEMBER_DRAFTED, onDirectorGroupMemberDrafted);
+    }
     eventSource.on(eventTypes.MESSAGE_SENT, async (idx) => {
         onMessageSent(idx);
         await onNarrativeGuidanceMessageSent(idx);

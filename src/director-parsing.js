@@ -182,3 +182,55 @@ export function parsePick(text, roster, ctx, onNoMatch = () => {}) {
     onNoMatch(text);
     return fallbackPick(roster, ctx);
 }
+
+// ─── Walk-on Voicing ───
+
+// Generation types that regenerate or extend the chat's last message in place
+// (the only ones that can target a walk-on message, which has no card to draft).
+const IN_PLACE_GENERATION_TYPES = new Set(['swipe', 'continue']);
+
+/** Whether a generation `type` works on the last message in place (swipe / continue). */
+export function isInPlaceGeneration(type) {
+    return IN_PLACE_GENERATION_TYPES.has(type);
+}
+
+/**
+ * The walk-on name a message speaks as, or null when it belongs to a real
+ * character (or the user/system). Walk-on messages carry the name in
+ * `extra.sseWalkOn`; split messages made before that tag existed are recognised
+ * by shape — split-produced, no host avatar, and no card by that name.
+ *
+ * @returns {string|null}
+ */
+export function walkOnNameOf(message, characters) {
+    if (!message || message.is_user || message.is_system) return null;
+    const tagged = message.extra?.sseWalkOn;
+    if (typeof tagged === 'string' && tagged.trim()) return tagged.trim();
+    if (message.extra?.sseWalkOnSplit && !message.original_avatar && message.name) {
+        const lower = String(message.name).toLowerCase();
+        const isCharacter = (characters || []).some(c => (c?.name || '').toLowerCase() === lower);
+        if (!isCharacter) return message.name;
+    }
+    return null;
+}
+
+/**
+ * The group member whose generation slot a walk-on borrows. SillyTavern only
+ * swipes/continues a group message it can map to a character (by
+ * `original_avatar`), so a card-less walk-on needs a host: its existing one if
+ * that still resolves, else the last real speaker when they're in the group,
+ * else the first unmuted member, else the first member.
+ *
+ * @returns {string|null} The host's avatar file, or null if the group has none.
+ */
+export function pickWalkOnHostAvatar(ctx, group, message) {
+    const chars = ctx.characters || [];
+    const exists = avatar => !!avatar && chars.some(c => c?.avatar === avatar);
+    if (exists(message?.original_avatar)) return message.original_avatar;
+    const members = (group?.members || []).filter(exists);
+    const anchor = resolveAnchorChid(ctx);
+    const anchorAvatar = anchor !== null ? chars[anchor]?.avatar : null;
+    if (anchorAvatar && members.includes(anchorAvatar)) return anchorAvatar;
+    const disabled = new Set(group?.disabled_members || []);
+    return members.find(a => !disabled.has(a)) || members[0] || null;
+}

@@ -1,5 +1,5 @@
 import { loadWorldInfo as __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_loadWorldInfo__, saveWorldInfo as __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_saveWorldInfo__, selected_world_info as __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_selected_world_info__, setWIOriginalDataValue as __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_setWIOriginalDataValue__, world_info as __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_world_info__, world_names as __WEBPACK_EXTERNAL_MODULE__world_info_js_83198f57_world_names__ } from "../../../../world-info.js";
-import { amount_gen as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_amount_gen__, cleanUpMessage as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_cleanUpMessage__, clearChat as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_clearChat__, createRawPrompt as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_createRawPrompt__, doNewChat as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_doNewChat__, extension_prompt_roles as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_roles__, extension_prompt_types as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_types__, generateRaw as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__, getMaxPromptTokens as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_getMaxPromptTokens__, koboldai_setting_names as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_koboldai_setting_names__, koboldai_settings as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_koboldai_settings__, main_api as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_main_api__, max_context as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_max_context__, novelai_setting_names as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_novelai_setting_names__, novelai_settings as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_novelai_settings__, setExtensionPrompt as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_setExtensionPrompt__, stopGeneration as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_stopGeneration__, substituteParamsExtended as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParamsExtended__ } from "../../../../../script.js";
+import { amount_gen as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_amount_gen__, cleanUpMessage as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_cleanUpMessage__, clearChat as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_clearChat__, createRawPrompt as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_createRawPrompt__, doNewChat as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_doNewChat__, extension_prompt_roles as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_roles__, extension_prompt_types as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_types__, generateRaw as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_generateRaw__, getMaxPromptTokens as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_getMaxPromptTokens__, isSwipingAllowed as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_isSwipingAllowed__, koboldai_setting_names as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_koboldai_setting_names__, koboldai_settings as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_koboldai_settings__, main_api as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_main_api__, max_context as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_max_context__, novelai_setting_names as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_novelai_setting_names__, novelai_settings as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_novelai_settings__, setCharacterName as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_setCharacterName__, setExtensionPrompt as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_setExtensionPrompt__, stopGeneration as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_stopGeneration__, substituteParamsExtended as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParamsExtended__, system_avatar as __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_system_avatar__ } from "../../../../../script.js";
 import { getTokenCountAsync as __WEBPACK_EXTERNAL_MODULE__tokenizers_js_d5863f55_getTokenCountAsync__ } from "../../../../tokenizers.js";
 import { POPUP_RESULT as __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_POPUP_RESULT__, POPUP_TYPE as __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_POPUP_TYPE__, Popup as __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_Popup__ } from "../../../../popup.js";
 import { ChatCompletionService as __WEBPACK_EXTERNAL_MODULE__custom_request_js_38d658d1_ChatCompletionService__, TextCompletionService as __WEBPACK_EXTERNAL_MODULE__custom_request_js_38d658d1_TextCompletionService__ } from "../../../../custom-request.js";
@@ -16321,6 +16321,58 @@ function parsePick(text, roster, ctx, onNoMatch = () => {}) {
     return fallbackPick(roster, ctx);
 }
 
+// ─── Walk-on Voicing ───
+
+// Generation types that regenerate or extend the chat's last message in place
+// (the only ones that can target a walk-on message, which has no card to draft).
+const IN_PLACE_GENERATION_TYPES = new Set(['swipe', 'continue']);
+
+/** Whether a generation `type` works on the last message in place (swipe / continue). */
+function isInPlaceGeneration(type) {
+    return IN_PLACE_GENERATION_TYPES.has(type);
+}
+
+/**
+ * The walk-on name a message speaks as, or null when it belongs to a real
+ * character (or the user/system). Walk-on messages carry the name in
+ * `extra.sseWalkOn`; split messages made before that tag existed are recognised
+ * by shape — split-produced, no host avatar, and no card by that name.
+ *
+ * @returns {string|null}
+ */
+function walkOnNameOf(message, characters) {
+    if (!message || message.is_user || message.is_system) return null;
+    const tagged = message.extra?.sseWalkOn;
+    if (typeof tagged === 'string' && tagged.trim()) return tagged.trim();
+    if (message.extra?.sseWalkOnSplit && !message.original_avatar && message.name) {
+        const lower = String(message.name).toLowerCase();
+        const isCharacter = (characters || []).some(c => (c?.name || '').toLowerCase() === lower);
+        if (!isCharacter) return message.name;
+    }
+    return null;
+}
+
+/**
+ * The group member whose generation slot a walk-on borrows. SillyTavern only
+ * swipes/continues a group message it can map to a character (by
+ * `original_avatar`), so a card-less walk-on needs a host: its existing one if
+ * that still resolves, else the last real speaker when they're in the group,
+ * else the first unmuted member, else the first member.
+ *
+ * @returns {string|null} The host's avatar file, or null if the group has none.
+ */
+function pickWalkOnHostAvatar(ctx, group, message) {
+    const chars = ctx.characters || [];
+    const exists = avatar => !!avatar && chars.some(c => c?.avatar === avatar);
+    if (exists(message?.original_avatar)) return message.original_avatar;
+    const members = (group?.members || []).filter(exists);
+    const anchor = resolveAnchorChid(ctx);
+    const anchorAvatar = anchor !== null ? chars[anchor]?.avatar : null;
+    if (anchorAvatar && members.includes(anchorAvatar)) return anchorAvatar;
+    const disabled = new Set(group?.disabled_members || []);
+    return members.find(a => !disabled.has(a)) || members[0] || null;
+}
+
 ;// ./src/director.js
 /**
  * Group Director module — an LLM-chosen turn order for group chats.
@@ -16362,11 +16414,20 @@ function parsePick(text, roster, ctx, onNoMatch = () => {}) {
 
 
 
+
 // ─── Constants ───
 
 const DIRECTOR_METADATA_KEY = 'director';
 
 const MANUAL_STRATEGY = __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_group_activation_strategy__?.MANUAL ?? 2;
+
+// ST's `group_generation_mode` values: SWAP (only the speaker's card) and APPEND
+// (every member's card, each resolved with its own name).
+const GENERATION_MODE_SWAP = 0;
+const GENERATION_MODE_APPEND = 1;
+
+// The avatar ST shows for a card-less group message (ST's `system_avatar`).
+const WALKON_AVATAR = __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_system_avatar__ || 'img/five.png';
 
 // The director user-prompt template. {{context}} is the packed chat/character/
 // lore preamble; {{roster}} is the numbered list of eligible speakers. When a
@@ -16452,6 +16513,12 @@ let userTurnPending = false;
 // Debounce timer for the walk-on textarea (write-through is immediate; only the
 // saveMetadata flush is debounced).
 let walkOnSaveTimer = null;
+
+// The walk-on the running group wrapper is voicing (a swipe/continue on a walk-on
+// message), and the group generation mode to put back once it finishes. See
+// "Walk-on Voicing".
+let walkOnVoice = null;
+let generationModeRestore = null;
 
 // Set when the user clicks the progress toast to cancel. Aligned-mode generations
 // go through ST's pipeline (generateQuietPrompt), which resolves rather than
@@ -16756,6 +16823,9 @@ async function waitForGenerationSettle(timeoutMs = 8000) {
  * Build a chat message posted under `name` (real character's avatar if known).
  * `tagSplit` marks split-produced messages so they're never re-split / offered a
  * split button; generated walk-on replies leave it off (no embedded line anyway).
+ * A name with no card is a walk-on: tagged `extra.sseWalkOn` so a swipe or
+ * continue on it is voiced as the walk-on (see Walk-on Voicing), with the avatar
+ * pinned so it doesn't take on its host member's while one runs.
  */
 function makeSpeakerMessage(ctx, name, text, original, { tagSplit = true } = {}) {
     const char = (ctx.characters || []).find(c => (c.name || '').toLowerCase() === name.toLowerCase());
@@ -16770,6 +16840,9 @@ function makeSpeakerMessage(ctx, name, text, original, { tagSplit = true } = {})
     if (char?.avatar) {
         msg.force_avatar = `/characters/${char.avatar}`;
         if (ctx.groupId) msg.original_avatar = char.avatar;
+    } else if (!char) {
+        msg.extra.sseWalkOn = name;
+        msg.force_avatar = WALKON_AVATAR;
     }
     if (ctx.groupId) msg.is_name = true;
     return msg;
@@ -17232,19 +17305,103 @@ function collapseToActiveSwipe(ctx, idx) {
     m.mes = activeText;
 }
 
+// A walk-on has no card, and SillyTavern only swipes or continues a group
+// message it can map to a member: `activateSwipe` resolves the message's
+// `original_avatar` (or a member with its name), and with neither it refuses
+// ("Deleted group member swiped") and the swipe reverts. So a walk-on borrows a
+// host member's generation slot, and for that one generation the speaker name is
+// swapped to the walk-on's:
+//   1. GENERATION_STARTED (outer call, before the group wrapper runs
+//      `activateSwipe`): give the walk-on message a host `original_avatar`.
+//   2. GROUP_WRAPPER_STARTED: note that this wrapper swipes/continues a walk-on.
+//   3. GROUP_MEMBER_DRAFTED (emitted after the wrapper sets the host as the
+//      speaker, awaited before it calls Generate): `setCharacterName(walkOn)`,
+//      so the prompt's reply line, group nudge, `{{char}}` and name stop
+//      strings all name the walk-on. A swap-mode group is flipped to append
+//      mode in memory for the call, so the prompt carries every member's card
+//      under its own name rather than the host's card relabelled as the walk-on.
+//   4. GROUP_WRAPPER_FINISHED: put the generation mode back.
+// ST's swipe keeps the message's own name, so the reply lands as the walk-on.
+// This covers the Director's voicing and the user's own swipe/continue on any
+// walk-on message.
+
+/**
+ * GENERATION_STARTED hook: when a swipe or continue targets a walk-on message,
+ * make sure it has a host member ST can resolve (and adopt split walk-ons made
+ * before the tag existed). Only the outer call matters — the wrapper's own
+ * Generate re-emits with `is_group_generating` set, after `activateSwipe` ran.
+ */
+function onDirectorGenerationStarted(type, _options, dryRun) {
+    if (dryRun || __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_is_group_generating__ || !isInPlaceGeneration(type)) return;
+    const ctx = getContext();
+    if (!ctx.groupId) return;
+    const msg = ctx.chat?.[ctx.chat.length - 1];
+    const name = walkOnNameOf(msg, ctx.characters);
+    if (!name) return;
+    const host = pickWalkOnHostAvatar(ctx, getActiveGroup(ctx), msg);
+    if (!host) return;
+    if (!msg.extra || typeof msg.extra !== 'object') msg.extra = {};
+    msg.extra.sseWalkOn = name;
+    msg.original_avatar = host;
+    if (!msg.force_avatar) msg.force_avatar = WALKON_AVATAR;
+    director_debug('Walk-on', name, 'hosted by', host, 'for', type);
+}
+
+/** GROUP_WRAPPER_STARTED hook: remember when this wrapper voices a walk-on. */
+function onDirectorGroupWrapperStarted(data) {
+    walkOnVoice = null;
+    if (!isInPlaceGeneration(data?.type)) return;
+    const ctx = getContext();
+    walkOnVoice = walkOnNameOf(ctx.chat?.[ctx.chat.length - 1], ctx.characters);
+}
+
+/** GROUP_MEMBER_DRAFTED hook: speak as the walk-on instead of its host. */
+function onDirectorGroupMemberDrafted() {
+    if (!walkOnVoice) return;
+    if (typeof __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_setCharacterName__ !== 'function') {
+        console.warn('Group Director: this SillyTavern has no setCharacterName; the walk-on will speak as its host.');
+        return;
+    }
+    __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_setCharacterName__(walkOnVoice);
+    const group = getActiveGroup(getContext());
+    if (group && !generationModeRestore && Number(group.generation_mode || 0) === GENERATION_MODE_SWAP) {
+        generationModeRestore = { group, mode: group.generation_mode };
+        group.generation_mode = GENERATION_MODE_APPEND;
+    }
+    director_debug('Voicing walk-on', walkOnVoice);
+}
+
+/** Undo the drafted-member overrides once the wrapper is done. */
+function endWalkOnVoicing() {
+    walkOnVoice = null;
+    if (generationModeRestore) {
+        generationModeRestore.group.generation_mode = generationModeRestore.mode;
+        generationModeRestore = null;
+    }
+}
+
 /**
  * Voice a walk-on the native way: post a thin `…` placeholder under the name, then
  * drive ST's own swipe-regeneration on it (the same path as pressing the swipe
  * arrow) so the reply comes from the real pipeline — native formatting, stop
- * strings, and name handling, with no custom prompt or sanitizing. The throwaway
- * placeholder swipe is collapsed away afterward. ST shows its own generation
- * indicator and Stop button, so there's no extension progress toast; if the user
- * stops it before any text arrives, the placeholder is removed. Walk-ons only
- * exist in group chats, where `ctx.swipe.right` is always available.
+ * strings, and name handling, with no custom prompt or sanitizing. The hooks
+ * above host it on a member and swap the speaker name to the walk-on's. The
+ * throwaway placeholder swipe is collapsed away afterward. ST shows its own
+ * generation indicator and Stop button, so there's no extension progress toast;
+ * if the swipe yields nothing (stopped before any text, or refused) the
+ * placeholder is removed. Walk-ons only exist in group chats, where
+ * `ctx.swipe.right` is always available.
  */
 async function generateAndPostWalkOn(ctx, name) {
     if (!ctx.groupId || typeof ctx.swipe?.right !== 'function') {
         toast('Group Director: walk-ons can only be voiced in a group chat.', 'warning');
+        return;
+    }
+    // Voicing rides ST's swipe, which refuses silently while swipes are off in
+    // User Settings (or one is already running) — say so rather than flash a
+    // placeholder that vanishes.
+    if (typeof __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_isSwipingAllowed__ === 'function' && !__WEBPACK_EXTERNAL_MODULE__script_js_588e7203_isSwipingAllowed__()) {
+        toast(`Group Director: can't voice ${name} — SillyTavern swipes are disabled or busy.`, 'warning');
         return;
     }
     const placeholder = makeSpeakerMessage(ctx, name, '…', null, { tagSplit: false });
@@ -17464,6 +17621,7 @@ function onDirectorMessageSent() {
  * @param {{ selected_group?: string, type?: string }} [data] - Wrapper payload.
  */
 function onDirectorGroupWrapperFinished(data) {
+    endWalkOnVoicing();
     const wasUserTurn = userTurnPending;
     userTurnPending = false;
 
@@ -18474,12 +18632,15 @@ function injectSettingsPanel() {
 
 // ─── Merged Event Handlers ───
 
-function src_onGenerationStarted(_type, _options, dryRun) {
+function src_onGenerationStarted(type, options, dryRun) {
     // SillyTavern's PromptManager fires GENERATION_STARTED for dry-run
     // probes (token counts, prompt composition) on page load, CHAT_LOADED,
     // CHARACTER_EDITED, etc. Those never emit ENDED/STOPPED, so reacting
     // to them strands any button we hide here.
     if (dryRun) return;
+    // Before the group wrapper resolves who swipes/continues: a walk-on
+    // message needs a host member for ST to accept it.
+    onDirectorGenerationStarted(type, options, dryRun);
     onGenerationStarted();
     phrasing_onGenerationStarted();
     onRetryContinueGenerationStarted();
@@ -18638,6 +18799,13 @@ jQuery(async () => {
     eventSource.on(eventTypes.GENERATION_ENDED, src_onGenerationEnded);
     eventSource.on(eventTypes.GENERATION_STOPPED, src_onGenerationStopped);
     eventSource.on(eventTypes.GROUP_WRAPPER_FINISHED, onGroupWrapperFinishedHandler);
+    // Group Director: voice a walk-on through its host member's generation slot.
+    if (eventTypes.GROUP_WRAPPER_STARTED) {
+        eventSource.on(eventTypes.GROUP_WRAPPER_STARTED, onDirectorGroupWrapperStarted);
+    }
+    if (eventTypes.GROUP_MEMBER_DRAFTED) {
+        eventSource.on(eventTypes.GROUP_MEMBER_DRAFTED, onDirectorGroupMemberDrafted);
+    }
     eventSource.on(eventTypes.MESSAGE_SENT, async (idx) => {
         onMessageSent(idx);
         await onNarrativeGuidanceMessageSent(idx);

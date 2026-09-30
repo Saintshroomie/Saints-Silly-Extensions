@@ -44,6 +44,18 @@ released version. When cutting a release, move these notes into a new
   chat once you change it, with a **Chat's books** button to go back.
 
 ### Fixed
+- **Group Director can voice walk-on characters again** — picking a walk-on
+  never produced a reply: its placeholder appeared and vanished, sometimes with
+  SillyTavern's "Deleted group member swiped" warning. SillyTavern only
+  regenerates a group message it can tie to a group member, and a walk-on has no
+  character card. A walk-on reply now borrows a member's turn (the last member to
+  speak) with the speaker name switched to the walk-on's, so the prompt asks for
+  the walk-on's line and the reply is posted under its name. For that reply a
+  group set to swap character cards includes every member's card, each under its
+  own name, so the host member's card isn't presented as the walk-on's. The same
+  fix makes SillyTavern's own swipe and Continue work on walk-on messages,
+  including ones split out of earlier replies. If SillyTavern's swipes are turned
+  off, the Director now says so instead of failing silently.
 - **Possession finds group members by the attribute current SillyTavern uses** —
   SillyTavern marks group member rows with `data-chid` (older versions used
   `chid`), and Possession only read the old one, so on current versions it fell

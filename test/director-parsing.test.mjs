@@ -8,6 +8,9 @@ import {
     resolveMemberChid,
     sameRosterEntry,
     parsePick,
+    isInPlaceGeneration,
+    walkOnNameOf,
+    pickWalkOnHostAvatar,
 } from '../src/director-parsing.js';
 
 const names = text => matchSpeakerLines(text).map(m => m.name);
@@ -105,4 +108,49 @@ test('parsePick falls back deterministically and reports the unusable reply', ()
     // An out-of-range number with no name match falls back too.
     assert.equal(parsePick('9', roster, ctx).name, 'Harry');
     assert.deepEqual(misses, ['nobody']);
+});
+
+test('isInPlaceGeneration is true only for swipe and continue', () => {
+    assert.equal(isInPlaceGeneration('swipe'), true);
+    assert.equal(isInPlaceGeneration('continue'), true);
+    for (const type of ['normal', 'quiet', 'impersonate', 'regenerate', undefined]) {
+        assert.equal(isInPlaceGeneration(type), false);
+    }
+});
+
+test('walkOnNameOf reads the walk-on tag and recognises untagged split walk-ons', () => {
+    const chars = [{ name: 'Susan', avatar: 'susan.png' }];
+    assert.equal(walkOnNameOf({ name: 'Tony', extra: { sseWalkOn: 'Tony' } }, chars), 'Tony');
+    assert.equal(walkOnNameOf({ name: 'Tony', extra: { sseWalkOnSplit: true } }, chars), 'Tony');
+    // A split line that went to a real character, or one already hosted, isn't a walk-on.
+    assert.equal(walkOnNameOf({ name: 'Susan', extra: { sseWalkOnSplit: true } }, chars), null);
+    assert.equal(walkOnNameOf({ name: 'Tony', original_avatar: 'susan.png', extra: { sseWalkOnSplit: true } }, chars), null);
+    assert.equal(walkOnNameOf({ name: 'Susan', original_avatar: 'susan.png', extra: {} }, chars), null);
+    assert.equal(walkOnNameOf({ name: 'Tony', is_user: true, extra: { sseWalkOn: 'Tony' } }, chars), null);
+    assert.equal(walkOnNameOf(undefined, chars), null);
+});
+
+test('pickWalkOnHostAvatar keeps a valid host, then the last member speaker, then the first unmuted member', () => {
+    const characters = [
+        { name: 'Susan', avatar: 'susan.png' },
+        { name: 'Peter', avatar: 'peter.png' },
+        { name: 'Outsider', avatar: 'out.png' },
+    ];
+    const group = { members: ['susan.png', 'peter.png'], disabled_members: ['susan.png'] };
+    const walkOn = { name: 'Tony', extra: { sseWalkOn: 'Tony' } };
+
+    const hosted = { ...walkOn, original_avatar: 'susan.png' };
+    assert.equal(pickWalkOnHostAvatar({ characters, chat: [hosted] }, group, hosted), 'susan.png');
+
+    const chat = [{ name: 'Susan', original_avatar: 'susan.png' }, walkOn];
+    assert.equal(pickWalkOnHostAvatar({ characters, chat }, group, walkOn), 'susan.png');
+
+    // The last speaker isn't in the group (or nobody spoke): first unmuted member.
+    const outsider = [{ name: 'Outsider', original_avatar: 'out.png' }, walkOn];
+    assert.equal(pickWalkOnHostAvatar({ characters, chat: outsider }, group, walkOn), 'peter.png');
+    const stale = { ...walkOn, original_avatar: 'gone.png' };
+    assert.equal(pickWalkOnHostAvatar({ characters, chat: [stale] }, group, stale), 'peter.png');
+
+    assert.equal(pickWalkOnHostAvatar({ characters, chat: [walkOn] }, { members: ['susan.png'], disabled_members: ['susan.png'] }, walkOn), 'susan.png');
+    assert.equal(pickWalkOnHostAvatar({ characters, chat: [walkOn] }, { members: [] }, walkOn), null);
 });
