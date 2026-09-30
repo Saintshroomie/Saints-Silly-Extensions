@@ -21,6 +21,7 @@ import { SlashCommand } from '../../../../slash-commands/SlashCommand.js';
 import { removeReasoningFromString } from '../../../../reasoning.js';
 import {
     getContext,
+    isGenerationInProgress,
     createDebugLogger,
     toast,
     stickyToast,
@@ -347,7 +348,7 @@ function onReformatButtonClick(event) {
     const mesId = mesEl.getAttribute('mesid');
     const index = mesId !== null ? parseInt(mesId, 10) : -1;
     if (index < 0 || Number.isNaN(index)) return;
-    if (getContext().isGenerating) return;
+    if (isGenerationInProgress()) return;
     reformatMessage(index, { manual: true });
 }
 

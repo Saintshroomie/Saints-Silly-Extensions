@@ -317,7 +317,7 @@ async function doSwipeMode(messageIndex, options = {}) {
     debug('doSwipeMode — starting for message index:', messageIndex);
     const context = getContext();
 
-    if (context.isGenerating) {
+    if (isGenerationInProgress()) {
         debug('doSwipeMode — ABORTED: generation in progress');
         return '';
     }

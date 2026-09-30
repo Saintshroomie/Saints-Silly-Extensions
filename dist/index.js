@@ -4601,8 +4601,7 @@ function onMessageSent(messageIndex) {
 function handleContinueIntercept(event) {
     if (!ctx.settings.possessionEnabled || !isPossessing()) return;
     if (inPossessedContinue) return;
-    const context = getContext();
-    if (context.isGenerating) return;
+    if (isGenerationInProgress()) return;
 
     const textarea = document.getElementById('send_textarea');
     const text = textarea?.value?.trim();
@@ -4842,7 +4841,7 @@ function injectPossessionImpersonateButton() {
 
     btn.addEventListener('click', async () => {
         const context = getContext();
-        if (context.isGenerating) return;
+        if (isGenerationInProgress()) return;
 
         possession_debug('Possession impersonate clicked — triggering generation for', char.name);
 
@@ -5370,7 +5369,7 @@ async function doSwipeMode(messageIndex, options = {}) {
     phrasing_debug('doSwipeMode — starting for message index:', messageIndex);
     const context = getContext();
 
-    if (context.isGenerating) {
+    if (isGenerationInProgress()) {
         phrasing_debug('doSwipeMode — ABORTED: generation in progress');
         return '';
     }
@@ -6348,7 +6347,7 @@ function delay(ms) {
  */
 async function waitUntilGenerationSettles(timeoutMs = SETTLE_TIMEOUT_MS) {
     const start = Date.now();
-    while (getContext().isGenerating || __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_is_group_generating__) {
+    while (isGenerationInProgress() || __WEBPACK_EXTERNAL_MODULE__group_chats_js_678c16bd_is_group_generating__) {
         if (Date.now() - start > timeoutMs) return false;
         await delay(POLL_INTERVAL_MS);
     }
@@ -12066,7 +12065,7 @@ function onReformatButtonClick(event) {
     const mesId = mesEl.getAttribute('mesid');
     const index = mesId !== null ? parseInt(mesId, 10) : -1;
     if (index < 0 || Number.isNaN(index)) return;
-    if (getContext().isGenerating) return;
+    if (isGenerationInProgress()) return;
     reformatMessage(index, { manual: true });
 }
 
@@ -12595,7 +12594,7 @@ async function maybeAutoTrigger() {
     if (!compaction_moduleSettings?.compactionEnabled || !compaction_moduleSettings?.compactionAutoEnabled) return;
     if (compacting || compaction_activePopup) return;
     const ctx = getContext();
-    if (ctx.isGenerating) return;
+    if (isGenerationInProgress()) return;
     if (!hasActiveCharacterOrGroup(ctx)) return;
 
     const usage = await getContextUsage();
@@ -12611,7 +12610,7 @@ async function maybeAutoTrigger() {
     // Re-check guards: the confirm dialog is async and the user may have
     // started a generation, or a compaction may have begun, meanwhile.
     if (compacting || compaction_activePopup) return;
-    if (getContext().isGenerating) return;
+    if (isGenerationInProgress()) return;
     openCompactionModal({ auto: true });
 }
 
@@ -12828,7 +12827,7 @@ async function openCompactionModal({ auto = false } = {}) {
         return;
     }
     const ctx = getContext();
-    if (ctx.isGenerating) {
+    if (isGenerationInProgress()) {
         compaction_debug('open refused — generation in progress');
         if (!auto) toast('Wait for the current generation to finish before compacting.', 'warning');
         return;
@@ -14174,7 +14173,7 @@ function onMessageButtonClick(event) {
     const mesId = mesEl.getAttribute('mesid');
     const index = mesId !== null ? parseInt(mesId, 10) : -1;
     if (index < 0 || Number.isNaN(index)) return;
-    if (getContext().isGenerating) return;
+    if (isGenerationInProgress()) return;
     // Auto-generate is opt-in — by default the modal opens anchored but
     // idle, so there's time to add guidance before pressing Generate.
     openImagePromptModal({
@@ -15433,7 +15432,7 @@ async function doRetry() {
     const context = getContext();
 
     // Guard: no generation in progress
-    if (context.isGenerating) {
+    if (isGenerationInProgress()) {
         retry_continue_debug('doRetry: generation in progress, aborting');
         rcToast('Cannot retry while generation is in progress.', 'warning');
         return;
@@ -15670,7 +15669,10 @@ async function retryFromCheckpoint() {
 
     snapshotLocked = true;
     retry_continue_debug('retryFromCheckpoint: snapshotLocked = true, triggering continue (attempt', retryState.retryCount, ')');
-    await triggerContinue();
+    // `/continue` returns as soon as it has *queued* the generation unless
+    // it's told to await it; Phrase Ban re-scans the message right after this
+    // resolves, so it must not resolve mid-stream.
+    await triggerContinue({ awaitGeneration: true });
     await waitForGenerationToFinish();
     return true;
 }
@@ -15680,7 +15682,7 @@ function waitForGenerationToFinish(timeoutMs = 5 * 60 * 1000) {
     return new Promise((resolve) => {
         const start = Date.now();
         const tick = () => {
-            if (!getContext().isGenerating || Date.now() - start > timeoutMs) {
+            if (!isGenerationInProgress() || Date.now() - start > timeoutMs) {
                 resolve();
                 return;
             }
@@ -15736,7 +15738,7 @@ function reRenderMessage(messageIndex) {
     }
 }
 
-async function triggerContinue() {
+async function triggerContinue({ awaitGeneration = false } = {}) {
     const context = getContext();
 
     // Reinject the Phrasing seed for the checkpointed message's active swipe,
@@ -15749,7 +15751,7 @@ async function triggerContinue() {
     // Approach 1: Slash command system (most stable)
     if (context.executeSlashCommandsWithOptions) {
         retry_continue_debug('triggerContinue: using slash command /continue');
-        await context.executeSlashCommandsWithOptions('/continue');
+        await context.executeSlashCommandsWithOptions(awaitGeneration ? '/continue await=true' : '/continue');
         return;
     }
 
@@ -16083,12 +16085,12 @@ function onRetryContinueCharacterMessageRendered() {
  */
 function onRetryContinueMessageEdited(messageId) {
     const ctx = getContext();
-    retry_continue_debug('event: MESSAGE_EDITED | messageId =', messageId, '| snapshotLocked =', snapshotLocked, '| isGenerating =', ctx.isGenerating);
+    retry_continue_debug('event: MESSAGE_EDITED | messageId =', messageId, '| snapshotLocked =', snapshotLocked, '| isGenerating =', isGenerationInProgress());
     if (snapshotLocked) {
         retry_continue_debug('event: MESSAGE_EDITED — skipping (snapshotLocked)');
         return;
     }
-    if (ctx.isGenerating) {
+    if (isGenerationInProgress()) {
         retry_continue_debug('event: MESSAGE_EDITED — skipping (isGenerating)');
         return;
     }

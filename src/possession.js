@@ -6,7 +6,7 @@
 import { SlashCommandParser } from '../../../../slash-commands/SlashCommandParser.js';
 import { SlashCommand } from '../../../../slash-commands/SlashCommand.js';
 import { ARGUMENT_TYPE, SlashCommandArgument } from '../../../../slash-commands/SlashCommandArgument.js';
-import { getContext, createDebugLogger, toast as showToast } from './utils.js';
+import { getContext, createDebugLogger, isGenerationInProgress, toast as showToast } from './utils.js';
 import { resolveGroupMemberRow } from './group-members.js';
 
 const POSSESSION_METADATA_KEY = 'possession';
@@ -216,8 +216,7 @@ export function onMessageSent(messageIndex) {
 function handleContinueIntercept(event) {
     if (!ctx.settings.possessionEnabled || !isPossessing()) return;
     if (inPossessedContinue) return;
-    const context = getContext();
-    if (context.isGenerating) return;
+    if (isGenerationInProgress()) return;
 
     const textarea = document.getElementById('send_textarea');
     const text = textarea?.value?.trim();
@@ -457,7 +456,7 @@ function injectPossessionImpersonateButton() {
 
     btn.addEventListener('click', async () => {
         const context = getContext();
-        if (context.isGenerating) return;
+        if (isGenerationInProgress()) return;
 
         debug('Possession impersonate clicked — triggering generation for', char.name);
 

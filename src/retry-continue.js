@@ -18,6 +18,7 @@ import { SlashCommandParser } from '../../../../slash-commands/SlashCommandParse
 import { SlashCommand } from '../../../../slash-commands/SlashCommand.js';
 import {
     getContext,
+    isGenerationInProgress,
     createDebugLogger,
     toast,
 } from './utils.js';
@@ -141,7 +142,7 @@ async function doRetry() {
     const context = getContext();
 
     // Guard: no generation in progress
-    if (context.isGenerating) {
+    if (isGenerationInProgress()) {
         debug('doRetry: generation in progress, aborting');
         rcToast('Cannot retry while generation is in progress.', 'warning');
         return;
@@ -378,7 +379,10 @@ export async function retryFromCheckpoint() {
 
     snapshotLocked = true;
     debug('retryFromCheckpoint: snapshotLocked = true, triggering continue (attempt', retryState.retryCount, ')');
-    await triggerContinue();
+    // `/continue` returns as soon as it has *queued* the generation unless
+    // it's told to await it; Phrase Ban re-scans the message right after this
+    // resolves, so it must not resolve mid-stream.
+    await triggerContinue({ awaitGeneration: true });
     await waitForGenerationToFinish();
     return true;
 }
@@ -388,7 +392,7 @@ function waitForGenerationToFinish(timeoutMs = 5 * 60 * 1000) {
     return new Promise((resolve) => {
         const start = Date.now();
         const tick = () => {
-            if (!getContext().isGenerating || Date.now() - start > timeoutMs) {
+            if (!isGenerationInProgress() || Date.now() - start > timeoutMs) {
                 resolve();
                 return;
             }
@@ -444,7 +448,7 @@ function reRenderMessage(messageIndex) {
     }
 }
 
-async function triggerContinue() {
+async function triggerContinue({ awaitGeneration = false } = {}) {
     const context = getContext();
 
     // Reinject the Phrasing seed for the checkpointed message's active swipe,
@@ -457,7 +461,7 @@ async function triggerContinue() {
     // Approach 1: Slash command system (most stable)
     if (context.executeSlashCommandsWithOptions) {
         debug('triggerContinue: using slash command /continue');
-        await context.executeSlashCommandsWithOptions('/continue');
+        await context.executeSlashCommandsWithOptions(awaitGeneration ? '/continue await=true' : '/continue');
         return;
     }
 
@@ -791,12 +795,12 @@ export function onRetryContinueCharacterMessageRendered() {
  */
 export function onRetryContinueMessageEdited(messageId) {
     const ctx = getContext();
-    debug('event: MESSAGE_EDITED | messageId =', messageId, '| snapshotLocked =', snapshotLocked, '| isGenerating =', ctx.isGenerating);
+    debug('event: MESSAGE_EDITED | messageId =', messageId, '| snapshotLocked =', snapshotLocked, '| isGenerating =', isGenerationInProgress());
     if (snapshotLocked) {
         debug('event: MESSAGE_EDITED — skipping (snapshotLocked)');
         return;
     }
-    if (ctx.isGenerating) {
+    if (isGenerationInProgress()) {
         debug('event: MESSAGE_EDITED — skipping (isGenerating)');
         return;
     }

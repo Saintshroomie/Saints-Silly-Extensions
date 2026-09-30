@@ -34,6 +34,7 @@ import {
 } from '../../../../../script.js';
 import {
     getContext,
+    isGenerationInProgress,
     createDebugLogger,
     toast,
     stickyToast,
@@ -409,7 +410,7 @@ function delay(ms) {
  */
 async function waitUntilGenerationSettles(timeoutMs = SETTLE_TIMEOUT_MS) {
     const start = Date.now();
-    while (getContext().isGenerating || is_group_generating) {
+    while (isGenerationInProgress() || is_group_generating) {
         if (Date.now() - start > timeoutMs) return false;
         await delay(POLL_INTERVAL_MS);
     }

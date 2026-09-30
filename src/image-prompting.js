@@ -26,6 +26,7 @@ import { SlashCommand } from '../../../../slash-commands/SlashCommand.js';
 import {
     createDebugLogger,
     getContext,
+    isGenerationInProgress,
     toast,
     buildContextPreamble,
     createLoreBookPicker,
@@ -440,7 +441,7 @@ function onMessageButtonClick(event) {
     const mesId = mesEl.getAttribute('mesid');
     const index = mesId !== null ? parseInt(mesId, 10) : -1;
     if (index < 0 || Number.isNaN(index)) return;
-    if (getContext().isGenerating) return;
+    if (isGenerationInProgress()) return;
     // Auto-generate is opt-in — by default the modal opens anchored but
     // idle, so there's time to add guidance before pressing Generate.
     openImagePromptModal({

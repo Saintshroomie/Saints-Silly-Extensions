@@ -39,6 +39,7 @@ import { SlashCommandParser } from '../../../../slash-commands/SlashCommandParse
 import { SlashCommand } from '../../../../slash-commands/SlashCommand.js';
 import {
     getContext,
+    isGenerationInProgress,
     createDebugLogger,
     toast,
     buildContextPreamble,
@@ -327,7 +328,7 @@ async function maybeAutoTrigger() {
     if (!moduleSettings?.compactionEnabled || !moduleSettings?.compactionAutoEnabled) return;
     if (compacting || activePopup) return;
     const ctx = getContext();
-    if (ctx.isGenerating) return;
+    if (isGenerationInProgress()) return;
     if (!hasActiveCharacterOrGroup(ctx)) return;
 
     const usage = await getContextUsage();
@@ -343,7 +344,7 @@ async function maybeAutoTrigger() {
     // Re-check guards: the confirm dialog is async and the user may have
     // started a generation, or a compaction may have begun, meanwhile.
     if (compacting || activePopup) return;
-    if (getContext().isGenerating) return;
+    if (isGenerationInProgress()) return;
     openCompactionModal({ auto: true });
 }
 
@@ -560,7 +561,7 @@ async function openCompactionModal({ auto = false } = {}) {
         return;
     }
     const ctx = getContext();
-    if (ctx.isGenerating) {
+    if (isGenerationInProgress()) {
         debug('open refused — generation in progress');
         if (!auto) toast('Wait for the current generation to finish before compacting.', 'warning');
         return;
