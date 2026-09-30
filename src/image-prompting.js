@@ -15,7 +15,6 @@
  * prompt bound to a scene can be retrieved later in that chat.
  */
 
-import { removeReasoningFromString } from '../../../../reasoning.js';
 import {
     Popup,
     POPUP_TYPE,
@@ -30,20 +29,24 @@ import {
     toast,
     buildContextPreamble,
     createLoreBookPicker,
-    streamingGenerate,
-    withSingleLineDisabled,
     applyTemplateMacros,
-    stripPrefillEcho,
     showPromptPreview,
     copyTextToClipboard,
     createSettingsBinder,
 } from './utils.js';
-import { templateSetting, textSetting, parsePositiveInt, positiveIntSetting } from './settings-helpers.js';
-import {
-    abortAllGenerations,
-    isSilentGenerationAbort,
-} from './silent-generation.js';
+import { templateSetting, textSetting } from './settings-helpers.js';
 import { createToolPresetSelector, onToolPresetChange } from './prompt-templates.js';
+import {
+    MODAL_LOREBOOK_PREFIX,
+    actionRowHtml,
+    createGenerationActions,
+    setModalButtonDisabled,
+    smallButtonHtml,
+    statusBarHtml,
+    streamContinuation,
+    streamFresh,
+    tokensRowHtml,
+} from './generation-modal.js';
 import {
     isImageGenAvailable,
     getImageGenSourceLabel,
@@ -77,14 +80,8 @@ let moduleSettings = null;
 let saveSettingsFn = null;
 let debug = () => {};
 
-let isGenerating = false;
-let abortRequested = false;
-let activeAction = null;       // which button initiated the current generation
-let lastAction = null;         // 'generate' | 'continue' — what Retry should redo
-let restorePoint = null;       // textarea snapshot used by Retry
-
 // True while a prompt is being rendered by ST's Image Generation extension.
-// Separate from `isGenerating` (which tracks *our* LLM prompt generation):
+// Separate from `actions.isGenerating()` (*our* LLM prompt generation):
 // the two are different backends and the modal disables them independently.
 let isSendingImage = false;
 
@@ -187,7 +184,7 @@ function writeSavedPrompts(list) {
 }
 
 function saveOutputToChat() {
-    if (isGenerating) return;
+    if (actions.isGenerating()) return;
     const text = document.getElementById('ip_prompt_output')?.value?.trim() || '';
     if (!text) {
         toast('Image prompt is empty. Nothing to save.', 'warning');
@@ -222,7 +219,7 @@ function saveOutputToChat() {
 }
 
 function renameSavedPrompt(id) {
-    if (isGenerating) return;
+    if (actions.isGenerating()) return;
     const prompts = readSavedPrompts();
     const entry = prompts.find(p => p.id === id);
     if (!entry) return;
@@ -243,7 +240,7 @@ function deleteSavedPrompt(id) {
 }
 
 function loadSavedPrompt(id) {
-    if (isGenerating) return;
+    if (actions.isGenerating()) return;
     const entry = readSavedPrompts().find(p => p.id === id);
     if (!entry) return;
     const output = document.getElementById('ip_prompt_output');
@@ -266,9 +263,7 @@ function loadSavedPrompt(id) {
     // Loading replaces the working prompt wholesale, so the old Retry
     // restore point no longer describes anything on screen — drop it,
     // mirroring the Clear button.
-    restorePoint = null;
-    lastAction = null;
-    refreshActionButtonStates();
+    actions.dropRestorePoint();
     toast('Saved image prompt loaded.', 'success');
 }
 
@@ -354,7 +349,7 @@ function buildSavedPromptRow(entry) {
     buttons.appendChild(buildSavedPromptButton('fa-copy', 'Copy this prompt to the clipboard', () => copyToClipboard(entry.text)));
     buttons.appendChild(buildSavedPromptButton('fa-pen', 'Rename this saved prompt', () => renameSavedPrompt(entry.id)));
     buttons.appendChild(buildSavedPromptButton('fa-trash-can', 'Delete this saved prompt', () => {
-        if (isGenerating) return;
+        if (actions.isGenerating()) return;
         if (!window.confirm('Delete this saved image prompt?')) return;
         deleteSavedPrompt(entry.id);
     }));
@@ -583,7 +578,39 @@ function showImagePromptPreview() {
 // ─── Modal ───
 
 let activePopup = null;
-let activeBody = null;
+let lorebookPicker = null;
+
+const actions = createGenerationActions({
+    prefix: 'ip',
+    outputId: 'ip_prompt_output',
+    noun: 'image prompt',
+    aNoun: 'an image prompt',
+    statusText: { generate: 'Generating image prompt…', continue: 'Continuing image prompt…' },
+    lockIds: ['ip_guidance'],
+    responseLength: {
+        get settings() { return moduleSettings; },
+        key: 'imagePromptResponseLength',
+        fallback: DEFAULT_IMAGE_PROMPT_RESPONSE_LENGTH,
+        save: () => saveSettingsFn?.(),
+    },
+    getPopup: () => activePopup,
+    canRun: () => {
+        const { includeChat, loreBookNames } = readModalContextOptions();
+        if (includeChat || loreBookNames.length || readGuidance()) return true;
+        toast('Nothing to work from — enable Use Chat Context, select a lore book, or enter Guidance.', 'warning');
+        return false;
+    },
+    run: (action, { existing, outputEl, responseLength }) => (action === 'continue'
+        ? generateContinuation(existing, outputEl, responseLength)
+        : generateImagePrompt(outputEl, responseLength)),
+    // The image hand-off needs a finished prompt: off while ours streams, and
+    // left alone while an image renders (setSendingImageUI owns it then).
+    onRefresh: (generating, hasText) => {
+        if (!isSendingImage) setModalButtonDisabled('ip_send_imagegen_btn', generating || !hasText);
+    },
+    logLabel: 'Image Prompting',
+    debug: (...args) => debug(...args),
+});
 
 async function openImagePromptModal({ anchorIndex = null, autoGenerate = false } = {}) {
     if (activePopup) return;
@@ -592,14 +619,8 @@ async function openImagePromptModal({ anchorIndex = null, autoGenerate = false }
         return;
     }
 
-    isGenerating = false;
-    abortRequested = false;
-    activeAction = null;
+    actions.reset();
     isSendingImage = false;
-    // lastAction / restorePoint are retry-only state and don't need to
-    // persist across modal sessions.
-    lastAction = null;
-    restorePoint = null;
     contextAnchorIndex = (Number.isInteger(anchorIndex) && anchorIndex >= 0) ? anchorIndex : null;
 
     const body = buildModalBody();
@@ -612,16 +633,16 @@ async function openImagePromptModal({ anchorIndex = null, autoGenerate = false }
         allowVerticalScrolling: true,
         onOpen: () => {
             bindModalHandlers();
+            actions.bind();
             refreshAnchorBar();
-            refreshActionButtonStates();
             presetChangeUnsubscribe = onToolPresetChange('image-prompt', onPresetChangedRefreshNegative);
             debug('Modal opened', contextAnchorIndex !== null ? `(anchored at message ${contextAnchorIndex})` : '');
-            if (autoGenerate) handleGenerate();
+            if (autoGenerate) actions.generate();
         },
         onClosing: (p) => {
             if (p.result === POPUP_RESULT.AFFIRMATIVE) {
                 // Copy & Close clicked — refuse to close mid-generation.
-                if (isGenerating) {
+                if (actions.isGenerating()) {
                     toast('Wait for generation to finish before copying.', 'warning');
                     return false;
                 }
@@ -633,15 +654,11 @@ async function openImagePromptModal({ anchorIndex = null, autoGenerate = false }
                 return true;
             }
             // Close / Esc / X — abort any in-flight job, then allow close.
-            if (isGenerating) {
-                abortRequested = true;
-                stopGeneration();
-            }
+            actions.stopIfRunning();
             return true;
         },
     });
     activePopup = popup;
-    activeBody = body;
 
     try {
         const result = await popup.show();
@@ -654,12 +671,9 @@ async function openImagePromptModal({ anchorIndex = null, autoGenerate = false }
         presetChangeUnsubscribe?.();
         presetChangeUnsubscribe = null;
         activePopup = null;
-        activeBody = null;
-        isGenerating = false;
+        lorebookPicker = null;
+        actions.reset();
         isSendingImage = false;
-        activeAction = null;
-        lastAction = null;
-        restorePoint = null;
         contextAnchorIndex = null;
         debug('Modal closed');
     }
@@ -672,105 +686,61 @@ function capturePersistedModalState(body) {
     const negativeEl = body.querySelector('#ip_negative_prompt');
     if (negativeEl) persistedModalState.negative = negativeEl.value;
     persistedModalState.useChatContext = !!body.querySelector('#ip_use_chat_context')?.checked;
-    const picker = body._ipLorebookPicker;
-    persistedModalState.selectedLoreBooks = picker ? picker.getSelected() : [];
-    // The Max Tokens field is the tool's saved setting (its change listener
-    // writes it through), so keep a typed value that never fired 'change'
-    // there too, rather than as a modal-only copy that would outlive a
-    // preset switch.
-    const tokenInput = body.querySelector('#ip_response_length');
-    const parsed = tokenInput ? parseInt(tokenInput.value, 10) : NaN;
-    if (!isNaN(parsed) && parsed > 0 && parsed !== moduleSettings.imagePromptResponseLength) {
-        moduleSettings.imagePromptResponseLength = parsed;
-        saveSettingsFn?.();
-    }
+    persistedModalState.selectedLoreBooks = lorebookPicker?.getSelected() ?? [];
+    actions.commitResponseLength(body);
 }
 
 function buildModalBody() {
     const root = document.createElement('div');
-    root.className = 'ip-modal-body';
+    root.className = 'sse-modal-body';
     root.innerHTML = `
-        <div class="ip-context-section">
+        <div class="sse-modal-context">
             <label class="checkbox_label" title="Read the current chat, character cards, and persona to describe the present moment">
                 <input id="ip_use_chat_context" type="checkbox" />
                 <span>Use Chat Context</span>
             </label>
             <div class="ip-lorebook-host"></div>
         </div>
-        <div id="ip_anchor_bar" class="ip-anchor-bar ip-hidden">
+        <div id="ip_anchor_bar" class="sse-modal-banner ip-anchor-bar sse-modal-hidden">
             <span class="fa-solid fa-anchor"></span>
             <span id="ip_anchor_text" class="ip-anchor-text"></span>
-            <div id="ip_anchor_clear_btn" class="menu_button interactable ip-clear-btn" title="Drop the anchor and use the full chat up to the latest message instead">
-                <span class="fa-solid fa-xmark"></span> Full Chat
-            </div>
+            ${smallButtonHtml('ip_anchor_clear_btn', 'fa-xmark', 'Full Chat', 'Drop the anchor and use the full chat up to the latest message instead')}
         </div>
-        <div class="ip-preset-row">
-            <label class="ip-preset-label"><span class="fa-solid fa-file-pen"></span> Prompt Preset:</label>
+        <div class="sse-modal-preset-row">
+            <label class="sse-modal-preset-label"><span class="fa-solid fa-file-pen"></span> Prompt Preset:</label>
             <div class="ip-preset-host"></div>
         </div>
-        <div class="ip-guidance-section">
-            <div class="ip-field-header">
+        <div class="sse-modal-section">
+            <div class="sse-modal-field-header">
                 <label for="ip_guidance"><b>Guidance (optional):</b></label>
-                <div id="ip_clear_guidance_btn" class="menu_button interactable ip-clear-btn" title="Clear the guidance">
-                    <span class="fa-solid fa-eraser"></span> Clear
-                </div>
+                ${smallButtonHtml('ip_clear_guidance_btn', 'fa-eraser', 'Clear', 'Clear the guidance')}
             </div>
             <textarea id="ip_guidance" class="text_pole" rows="3" placeholder="Optional extra direction: what to focus on, camera angle, art style, details to emphasize..."></textarea>
         </div>
-        <div class="ip-action-row">
-            <div id="ip_generate_btn" class="menu_button interactable ip-action-btn ip-generate-btn" title="Generate a fresh image prompt from the scene (replaces the textarea)">
-                <span class="fa-solid fa-wand-magic-sparkles"></span> Generate
-            </div>
-            <div id="ip_continue_btn" class="menu_button interactable ip-action-btn" title="Continue from where the image prompt leaves off">
-                <span class="fa-solid fa-arrow-right"></span> Continue
-            </div>
-            <div id="ip_checkpoint_btn" class="menu_button interactable ip-action-btn" title="Save the current image prompt as the Retry restore point">
-                <span class="fa-solid fa-flag"></span> Checkpoint
-            </div>
-            <div id="ip_retry_btn" class="menu_button interactable ip-action-btn" title="Restore to the last snapshot and re-run the last action">
-                <span class="fa-solid fa-rotate-right"></span> Retry
-            </div>
-        </div>
-        <div class="ip-tokens-row">
-            <label class="ip-tokens-label" for="ip_response_length" title="Maximum tokens for each generation">
-                <span class="fa-solid fa-coins"></span> Max Tokens:
-            </label>
-            <input id="ip_response_length" type="number" class="text_pole ip-tokens-input" min="50" max="8192" step="50" />
-        </div>
-        <div class="ip-status-bar ip-hidden" id="ip_status_bar">
-            <span class="fa-solid fa-spinner fa-spin"></span>
-            <span id="ip_status_text"></span>
-        </div>
-        <div class="ip-output-section">
-            <div class="ip-field-header">
+        ${actionRowHtml('ip', {
+        noun: 'image prompt',
+        generateTitle: 'Generate a fresh image prompt from the scene (replaces the textarea)',
+    })}
+        ${tokensRowHtml('ip')}
+        ${statusBarHtml('ip')}
+        <div class="sse-modal-output-section">
+            <div class="sse-modal-field-header">
                 <label for="ip_prompt_output"><b>Image Prompt:</b></label>
-                <div class="ip-field-header-buttons">
-                    <div id="ip_send_imagegen_btn" class="menu_button interactable ip-clear-btn ip-send-btn ip-hidden" title="Render this prompt on the image backend configured in SillyTavern's Image Generation settings">
-                        <span class="fa-solid fa-paintbrush"></span> Generate Image
-                    </div>
-                    <div id="ip_save_output_btn" class="menu_button interactable ip-clear-btn" title="Save the image prompt to this chat so it can be retrieved later">
-                        <span class="fa-solid fa-floppy-disk"></span> Save
-                    </div>
-                    <div id="ip_copy_output_btn" class="menu_button interactable ip-clear-btn" title="Copy the image prompt to the clipboard">
-                        <span class="fa-solid fa-copy"></span> Copy
-                    </div>
-                    <div id="ip_clear_output_btn" class="menu_button interactable ip-clear-btn" title="Clear the generated image prompt">
-                        <span class="fa-solid fa-eraser"></span> Clear
-                    </div>
+                <div class="sse-modal-field-header-buttons">
+                    ${smallButtonHtml('ip_send_imagegen_btn', 'fa-paintbrush', 'Generate Image', 'Render this prompt on the image backend configured in SillyTavern\'s Image Generation settings', 'sse-modal-primary sse-modal-hidden')}
+                    ${smallButtonHtml('ip_save_output_btn', 'fa-floppy-disk', 'Save', 'Save the image prompt to this chat so it can be retrieved later')}
+                    ${smallButtonHtml('ip_copy_output_btn', 'fa-copy', 'Copy', 'Copy the image prompt to the clipboard')}
+                    ${smallButtonHtml('ip_clear_output_btn', 'fa-eraser', 'Clear', 'Clear the generated image prompt')}
                 </div>
             </div>
-            <textarea id="ip_prompt_output" class="text_pole ip-prompt-output" rows="14" placeholder="The generated image prompt will appear here. Edit it freely, then copy it into ComfyUI or your image tool."></textarea>
+            <textarea id="ip_prompt_output" class="text_pole sse-modal-output ip-prompt-output" rows="14" placeholder="The generated image prompt will appear here. Edit it freely, then copy it into ComfyUI or your image tool."></textarea>
         </div>
         <div class="ip-negative-section">
-            <div class="ip-field-header">
+            <div class="sse-modal-field-header">
                 <label for="ip_negative_prompt" title="Sent as the negative prompt when you click Generate Image. It is added in front of the negative prompt configured in SillyTavern's own Image Generation panel, which still applies."><b>Negative Prompt:</b></label>
-                <div class="ip-field-header-buttons">
-                    <div id="ip_reset_negative_btn" class="menu_button interactable ip-clear-btn" title="Reset to the current prompt preset's negative prompt">
-                        <span class="fa-solid fa-rotate-left"></span> Reset
-                    </div>
-                    <div id="ip_clear_negative_btn" class="menu_button interactable ip-clear-btn" title="Clear the negative prompt">
-                        <span class="fa-solid fa-eraser"></span> Clear
-                    </div>
+                <div class="sse-modal-field-header-buttons">
+                    ${smallButtonHtml('ip_reset_negative_btn', 'fa-rotate-left', 'Reset', 'Reset to the current prompt preset\'s negative prompt')}
+                    ${smallButtonHtml('ip_clear_negative_btn', 'fa-eraser', 'Clear', 'Clear the negative prompt')}
                 </div>
             </div>
             <textarea id="ip_negative_prompt" class="text_pole ip-negative-prompt" rows="3" placeholder="Things to keep out of the image (e.g. lowres, bad anatomy, watermark). Follows the prompt preset unless you edit it. Leave empty to use only SillyTavern's own negative prompt."></textarea>
@@ -796,27 +766,20 @@ function buildModalBody() {
     const negativeEl = root.querySelector('#ip_negative_prompt');
     if (negativeEl) negativeEl.value = resolveNegativeForField();
 
-    // Initialize the token field from the saved setting (which a preset
-    // switch may have changed since the modal last closed).
-    const tokenInput = root.querySelector('#ip_response_length');
-    if (tokenInput) tokenInput.value = String(getSavedResponseLength());
+    actions.fillResponseLength(root);
 
     // Mount the shared lore-book picker with previously-selected entries.
-    const picker = createLoreBookPicker({
-        classPrefix: 'ip-lorebook',
-        initialSelection: Array.isArray(persistedModalState.selectedLoreBooks)
-            ? persistedModalState.selectedLoreBooks.slice()
-            : [],
+    lorebookPicker = createLoreBookPicker({
+        classPrefix: MODAL_LOREBOOK_PREFIX,
+        initialSelection: persistedModalState.selectedLoreBooks.slice(),
     });
-    root.querySelector('.ip-lorebook-host').replaceWith(picker.element);
-    root._ipLorebookPicker = picker;
+    root.querySelector('.ip-lorebook-host').replaceWith(lorebookPicker.element);
 
     // Point-of-use preset selection — one preset per diffusion-model family
     // (Default targets Krea 2; Anima / Danbooru Tags ship seeded), synced
     // with the settings widget (which also manages presets).
     root.querySelector('.ip-preset-host').replaceWith(createToolPresetSelector({
         toolKey: 'image-prompt',
-        className: 'ip-preset-select',
         title: 'Prompt preset used for Generate — pick the template for your target diffusion model '
             + '(e.g. Default for Krea 2, Anima, Danbooru Tags). Save and edit presets in the '
             + 'extension settings.',
@@ -826,30 +789,13 @@ function buildModalBody() {
 }
 
 function bindModalHandlers() {
-    document.getElementById('ip_generate_btn')?.addEventListener('click', handleGenerate);
-    document.getElementById('ip_continue_btn')?.addEventListener('click', handleContinue);
-    document.getElementById('ip_checkpoint_btn')?.addEventListener('click', handleCheckpoint);
-    document.getElementById('ip_retry_btn')?.addEventListener('click', handleRetry);
-
-    const output = document.getElementById('ip_prompt_output');
-    output?.addEventListener('input', refreshActionButtonStates);
-
-    const tokenInput = document.getElementById('ip_response_length');
-    tokenInput?.addEventListener('change', () => {
-        const parsed = parseInt(tokenInput.value, 10);
-        if (!isNaN(parsed) && parsed > 0) {
-            moduleSettings.imagePromptResponseLength = parsed;
-            saveSettingsFn?.();
-        }
-    });
-
     document.getElementById('ip_save_output_btn')?.addEventListener('click', saveOutputToChat);
     document.getElementById('ip_send_imagegen_btn')?.addEventListener('click', handleSendToImageGen);
     refreshImageGenButton();
     renderSavedPrompts();
 
     document.getElementById('ip_copy_output_btn')?.addEventListener('click', () => {
-        if (isGenerating) return;
+        if (actions.isGenerating()) return;
         const out = document.getElementById('ip_prompt_output');
         const text = out?.value?.trim() || '';
         if (!text) {
@@ -859,23 +805,23 @@ function bindModalHandlers() {
         copyToClipboard(text);
     });
     document.getElementById('ip_anchor_clear_btn')?.addEventListener('click', () => {
-        if (isGenerating) return;
+        if (actions.isGenerating()) return;
         contextAnchorIndex = null;
         refreshAnchorBar();
     });
     document.getElementById('ip_clear_guidance_btn')?.addEventListener('click', () => {
-        if (isGenerating) return;
+        if (actions.isGenerating()) return;
         const guidance = document.getElementById('ip_guidance');
         if (!guidance) return;
         guidance.value = '';
         guidance.focus();
     });
     document.getElementById('ip_reset_negative_btn')?.addEventListener('click', () => {
-        if (isGenerating) return;
+        if (actions.isGenerating()) return;
         setNegativeFromPreset();
     });
     document.getElementById('ip_clear_negative_btn')?.addEventListener('click', () => {
-        if (isGenerating) return;
+        if (actions.isGenerating()) return;
         const negative = document.getElementById('ip_negative_prompt');
         if (!negative) return;
         negative.value = '';
@@ -883,18 +829,6 @@ function bindModalHandlers() {
         // a preset switch doesn't quietly refill it.
         persistedModalState.negative = '';
         negative.focus();
-    });
-    document.getElementById('ip_clear_output_btn')?.addEventListener('click', () => {
-        if (isGenerating) return;
-        const out = document.getElementById('ip_prompt_output');
-        if (!out) return;
-        out.value = '';
-        // Clearing the output invalidates the existing Retry restore point
-        // so the user doesn't accidentally restore an unrelated prompt.
-        restorePoint = null;
-        lastAction = null;
-        out.focus();
-        refreshActionButtonStates();
     });
 }
 
@@ -912,7 +846,7 @@ function refreshAnchorBar() {
     const msg = (contextAnchorIndex !== null) ? getContext().chat?.[contextAnchorIndex] : null;
     if (!msg) {
         contextAnchorIndex = null;
-        bar.classList.add('ip-hidden');
+        bar.classList.add('sse-modal-hidden');
         return;
     }
 
@@ -920,7 +854,7 @@ function refreshAnchorBar() {
     const preview = snippet.length > 80 ? `${snippet.slice(0, 80)}…` : snippet;
     const who = msg.name ? ` — ${msg.name}` : '';
     label.textContent = `Context ends at message #${contextAnchorIndex}${who}: ${preview}`;
-    bar.classList.remove('ip-hidden');
+    bar.classList.remove('sse-modal-hidden');
 }
 
 async function copyToClipboard(text) {
@@ -1000,10 +934,10 @@ function refreshImageGenButton() {
     const btn = document.getElementById('ip_send_imagegen_btn');
     if (!btn) return;
     if (!imageGenButtonEnabled()) {
-        btn.classList.add('ip-hidden');
+        btn.classList.add('sse-modal-hidden');
         return;
     }
-    btn.classList.remove('ip-hidden');
+    btn.classList.remove('sse-modal-hidden');
     if (!isSendingImage) {
         const label = getImageGenSourceLabel();
         btn.innerHTML = '<span class="fa-solid fa-paintbrush"></span> Generate Image';
@@ -1022,7 +956,7 @@ function refreshImageGenButton() {
  * chat behind the modal (unless the quiet setting is on).
  */
 async function handleSendToImageGen() {
-    if (isGenerating || isSendingImage) return;
+    if (actions.isGenerating() || isSendingImage) return;
     if (!imageGenButtonEnabled()) return;
 
     const text = document.getElementById('ip_prompt_output')?.value?.trim() || '';
@@ -1053,7 +987,7 @@ async function handleSendToImageGen() {
  * disturbing whatever is in the editor above.
  */
 async function sendSavedPromptToImageGen(id) {
-    if (isGenerating || isSendingImage) return;
+    if (actions.isGenerating() || isSendingImage) return;
     if (!imageGenButtonEnabled()) return;
 
     const entry = readSavedPrompts().find(p => p.id === id);
@@ -1113,158 +1047,27 @@ function setSendingImageUI(sending, label) {
     const btn = document.getElementById('ip_send_imagegen_btn');
     if (!btn) return;
     if (sending) {
-        btn.classList.add('ip-disabled');
+        btn.classList.add('sse-modal-disabled');
         btn.innerHTML = '<span class="fa-solid fa-spinner fa-spin"></span> Generating…';
         btn.title = `Generating an image on ${label}. Use ST's progress toast to stop it.`;
     } else {
-        btn.classList.remove('ip-disabled');
+        btn.classList.remove('sse-modal-disabled');
         refreshImageGenButton();
-        refreshActionButtonStates();
+        actions.refresh();
     }
 }
 
-// ─── Actions ───
+// ─── Generation ───
+
+function readGuidance() {
+    return document.getElementById('ip_guidance')?.value?.trim() || '';
+}
 
 function readModalContextOptions() {
-    const includeChat = !!document.getElementById('ip_use_chat_context')?.checked;
-    const picker = activeBody?._ipLorebookPicker;
-    const loreBookNames = picker ? picker.getSelected() : [];
-    return { includeChat, loreBookNames };
-}
-
-async function handleGenerate() {
-    if (isGenerating) {
-        if (activeAction === 'generate') {
-            abortRequested = true;
-            stopGeneration();
-        }
-        return;
-    }
-
-    const guidance = document.getElementById('ip_guidance')?.value?.trim() || '';
-    const ctxOptions = readModalContextOptions();
-    if (!ctxOptions.includeChat && !ctxOptions.loreBookNames.length && !guidance) {
-        toast('Nothing to work from — enable Use Chat Context, select a lore book, or enter Guidance.', 'warning');
-        return;
-    }
-
-    const output = document.getElementById('ip_prompt_output');
-    restorePoint = output?.value || '';
-    await runGeneration('generate', guidance);
-}
-
-async function handleContinue() {
-    if (isGenerating) {
-        if (activeAction === 'continue') {
-            abortRequested = true;
-            stopGeneration();
-        }
-        return;
-    }
-
-    const output = document.getElementById('ip_prompt_output');
-    const existing = output?.value || '';
-    if (!existing.trim()) {
-        toast('Nothing to continue from. Generate an image prompt first or type some text.', 'warning');
-        return;
-    }
-
-    const guidance = document.getElementById('ip_guidance')?.value?.trim() || '';
-    restorePoint = existing;
-    await runGeneration('continue', guidance);
-}
-
-function handleCheckpoint() {
-    if (isGenerating) return;
-    const output = document.getElementById('ip_prompt_output');
-    const current = output?.value || '';
-    if (!current.trim()) {
-        toast('Nothing to checkpoint — the image prompt is empty.', 'warning');
-        return;
-    }
-    restorePoint = current;
-    lastAction = 'continue';
-    toast('Checkpoint saved. Retry will restore to this point.', 'success');
-    refreshActionButtonStates();
-    debug('Checkpoint saved, length:', current.length);
-}
-
-async function handleRetry() {
-    if (isGenerating) return;
-    if (!lastAction || restorePoint === null) {
-        toast('Nothing to retry yet.', 'warning');
-        return;
-    }
-
-    const guidance = document.getElementById('ip_guidance')?.value?.trim() || '';
-    if (lastAction === 'continue' && !restorePoint.trim()) {
-        toast('Cannot continue from an empty restore point.', 'warning');
-        return;
-    }
-
-    const output = document.getElementById('ip_prompt_output');
-    if (output) output.value = restorePoint;
-    await runGeneration(lastAction, guidance);
-}
-
-async function runGeneration(action, guidance) {
-    isGenerating = true;
-    abortRequested = false;
-    activeAction = action;
-
-    const isContinue = action === 'continue';
-    setGeneratingUI(true, action);
-    setStatusBar(isContinue ? 'Continuing image prompt...' : 'Generating image prompt...');
-
-    try {
-        const ctxOptions = readModalContextOptions();
-        const output = document.getElementById('ip_prompt_output');
-        const existing = output?.value || '';
-
-        const result = isContinue
-            ? await generateContinuation(guidance, existing, ctxOptions)
-            : await generateImagePrompt(guidance, ctxOptions);
-
-        if (abortRequested) {
-            debug(`${action} aborted, discarding result; keeping the streamed partial`);
-            // Leave the streamed partial in the field so the user can edit it
-            // and Continue from there.
-            if (output?.value?.trim()) lastAction = action;
-            return;
-        }
-
-        if (!output) return;
-        if (isContinue) {
-            const sep = needsSeparator(existing) ? ' ' : '';
-            output.value = existing + sep + result;
-        } else {
-            output.value = result;
-        }
-        lastAction = action;
-        debug(`${action} complete, length:`, result.length);
-    } catch (err) {
-        if (isSilentGenerationAbort(err)) {
-            debug(`${action} aborted via cancellation; keeping the streamed partial`);
-            const out = document.getElementById('ip_prompt_output');
-            if (out?.value?.trim()) lastAction = action;
-        } else if (!abortRequested) {
-            console.error('Image Prompting generation error:', err);
-            toast(`Generation failed: ${err.message}`, 'error');
-        }
-    } finally {
-        isGenerating = false;
-        abortRequested = false;
-        activeAction = null;
-        setGeneratingUI(false, action);
-        setStatusBar(null);
-        refreshActionButtonStates();
-    }
-}
-
-function needsSeparator(text) {
-    if (!text) return false;
-    const last = text[text.length - 1];
-    return last !== ' ' && last !== '\n' && last !== '\t';
+    return {
+        includeChat: !!document.getElementById('ip_use_chat_context')?.checked,
+        loreBookNames: lorebookPicker?.getSelected() ?? [],
+    };
 }
 
 // ─── Prompt Composition ───
@@ -1300,49 +1103,26 @@ function composeContinuePrompt(preambleBlock, guidance) {
     return `${prompt}\n\nYour reply has been prefilled with the image prompt so far. Continue seamlessly from exactly where it stops — do not repeat any existing text. Maintain the same prompt style. Output only the continuation.`;
 }
 
-async function generateImagePrompt(guidance, ctxOptions) {
-    const preambleBlock = await buildPreambleBlock(ctxOptions);
-    const prompt = composeGeneratePrompt(preambleBlock, guidance);
-    const systemPrompt = IP_GENERATE_SYSTEM_PROMPT;
-    const responseLength = getResponseLength();
+async function generateImagePrompt(outputEl, responseLength) {
+    const guidance = readGuidance();
+    const prompt = composeGeneratePrompt(await buildPreambleBlock(responseLength), guidance);
     const prefill = getPrefill();
-
     debug('Generating with guidance length', guidance.length, 'tokens', responseLength);
-    debug('System prompt:', systemPrompt);
     debug('Prompt:', prompt);
     debug('Prefill:', prefill);
-
-    const outputEl = document.getElementById('ip_prompt_output');
-    const result = await withSingleLineDisabled(() => streamingGenerate(
-        { prompt, systemPrompt, responseLength, ...(prefill ? { prefill } : {}) },
-        outputEl,
-        { append: false, name: 'image-prompt' },
-    ));
-    // Backends that ignore the assistant prefix may re-emit the prefill;
-    // strip the echo so prepending it doesn't double the opening.
-    const cleaned = stripPrefillEcho(removeReasoningFromString(result).trim(), prefill);
-    return (prefill || '') + cleaned;
+    return streamFresh({
+        prompt, systemPrompt: IP_GENERATE_SYSTEM_PROMPT, responseLength, prefill, outputEl, name: 'image-prompt',
+    });
 }
 
-async function generateContinuation(guidance, existing, ctxOptions) {
-    const preambleBlock = await buildPreambleBlock(ctxOptions);
-    const prompt = composeContinuePrompt(preambleBlock, guidance);
-    const systemPrompt = IP_CONTINUE_SYSTEM_PROMPT;
-    const responseLength = getResponseLength();
-
+async function generateContinuation(existing, outputEl, responseLength) {
+    const prompt = composeContinuePrompt(await buildPreambleBlock(responseLength), readGuidance());
     debug('Continuing with existing length', existing.length, 'tokens', responseLength);
-    debug('System prompt:', systemPrompt);
     debug('Prompt:', prompt);
-
-    const outputEl = document.getElementById('ip_prompt_output');
-    // The prompt-so-far is the assistant prefill, so the model continues from
-    // its exact end; strip any prefill echo to keep only the new tail.
-    const result = await withSingleLineDisabled(() => streamingGenerate(
-        { prompt, systemPrompt, responseLength, ...(existing ? { prefill: existing } : {}) },
-        outputEl,
-        { append: true, name: 'image-prompt-continue' },
-    ));
-    return stripPrefillEcho(removeReasoningFromString(result).trim(), existing);
+    return streamContinuation({
+        prompt, systemPrompt: IP_CONTINUE_SYSTEM_PROMPT, responseLength, existing, outputEl,
+        name: 'image-prompt-continue',
+    });
 }
 
 function getPromptTemplate() {
@@ -1353,21 +1133,13 @@ function getPrefill() {
     return textSetting(moduleSettings, 'imagePromptPrefill', DEFAULT_IMAGE_PROMPT_PREFILL);
 }
 
-function getResponseLength() {
-    return parsePositiveInt(document.getElementById('ip_response_length')?.value) ?? getSavedResponseLength();
-}
-
-function getSavedResponseLength() {
-    return positiveIntSetting(moduleSettings, 'imagePromptResponseLength', DEFAULT_IMAGE_PROMPT_RESPONSE_LENGTH);
-}
-
-async function buildPreambleBlock(ctxOptions) {
-    if (!ctxOptions) return '';
-    if (!ctxOptions.includeChat && !(ctxOptions.loreBookNames && ctxOptions.loreBookNames.length)) return '';
+async function buildPreambleBlock(responseLength) {
+    const ctxOptions = readModalContextOptions();
+    if (!ctxOptions.includeChat && !ctxOptions.loreBookNames.length) return '';
     const anchored = contextAnchorIndex !== null;
     const preamble = await buildContextPreamble({
         ...ctxOptions,
-        responseLength: getResponseLength(),
+        responseLength,
         maxContextOverride: moduleSettings?.imagePromptMaxContextOverride || 0,
         ...(anchored ? { endAtMessageIndex: contextAnchorIndex } : {}),
     });
@@ -1379,93 +1151,4 @@ async function buildPreambleBlock(ctxOptions) {
         ? 'Scene to visualize (the roleplay chat up to the chosen moment, characters, and selected lore — the final message of the Recent Chat is the current moment to depict):'
         : 'Scene to visualize (the roleplay chat, characters, and selected lore):';
     return `${header}\n${preamble}\n\n`;
-}
-
-function stopGeneration() {
-    // Route through abortAllGenerations() so that ST's GENERATION_STOPPED
-    // event also fires and the backend fetch is actually cancelled — see
-    // the silent-generation module for the full rationale.
-    abortAllGenerations('image-prompt-cancel');
-    debug('Stop generation triggered');
-}
-
-// ─── UI Helpers ───
-
-const ACTION_BUTTON_IDS = ['ip_generate_btn', 'ip_continue_btn', 'ip_checkpoint_btn', 'ip_retry_btn'];
-
-const ACTION_LABELS = {
-    ip_generate_btn: '<span class="fa-solid fa-wand-magic-sparkles"></span> Generate',
-    ip_continue_btn: '<span class="fa-solid fa-arrow-right"></span> Continue',
-    ip_checkpoint_btn: '<span class="fa-solid fa-flag"></span> Checkpoint',
-    ip_retry_btn: '<span class="fa-solid fa-rotate-right"></span> Retry',
-};
-
-function setGeneratingUI(generating, action) {
-    const guidanceInput = document.getElementById('ip_guidance');
-    const activeBtnId = action === 'continue' ? 'ip_continue_btn' : 'ip_generate_btn';
-
-    for (const id of ACTION_BUTTON_IDS) {
-        const btn = document.getElementById(id);
-        if (!btn) continue;
-        if (generating) {
-            if (id === activeBtnId) {
-                btn.innerHTML = '<span class="fa-solid fa-stop"></span> Stop';
-                btn.classList.remove('ip-disabled');
-            } else {
-                btn.innerHTML = ACTION_LABELS[id];
-                btn.classList.add('ip-disabled');
-            }
-        } else {
-            btn.innerHTML = ACTION_LABELS[id];
-            btn.classList.remove('ip-disabled');
-        }
-    }
-
-    // Popup owns the OK/Cancel buttons; toggle the OK button visually so
-    // users get a clear "wait for generation" hint. The onClosing guard
-    // still blocks the close if they click it mid-flight.
-    const okBtn = activePopup?.okButton;
-    if (okBtn) okBtn.classList.toggle('disabled', !!generating);
-
-    if (generating) {
-        guidanceInput?.setAttribute('disabled', 'true');
-        // The prompt is still being written — there's nothing final to render
-        // yet, so the image hand-off is off-limits until the stream settles.
-        setButtonDisabled('ip_send_imagegen_btn', true);
-    } else {
-        guidanceInput?.removeAttribute('disabled');
-        refreshActionButtonStates();
-    }
-}
-
-function refreshActionButtonStates() {
-    if (isGenerating) return;
-    const output = document.getElementById('ip_prompt_output');
-    const hasText = !!output?.value?.trim();
-
-    setButtonDisabled('ip_continue_btn', !hasText);
-    setButtonDisabled('ip_checkpoint_btn', !hasText);
-    setButtonDisabled('ip_retry_btn', !lastAction || restorePoint === null);
-    // Left disabled while an image is already rendering — setSendingImageUI
-    // owns the button in that window.
-    if (!isSendingImage) setButtonDisabled('ip_send_imagegen_btn', !hasText);
-}
-
-function setButtonDisabled(id, disabled) {
-    const btn = document.getElementById(id);
-    if (!btn) return;
-    if (disabled) btn.classList.add('ip-disabled');
-    else btn.classList.remove('ip-disabled');
-}
-
-function setStatusBar(message) {
-    const bar = document.getElementById('ip_status_bar');
-    const text = document.getElementById('ip_status_text');
-    if (!bar || !text) return;
-    if (message) {
-        text.textContent = message;
-        bar.classList.remove('ip-hidden');
-    } else {
-        bar.classList.add('ip-hidden');
-    }
 }

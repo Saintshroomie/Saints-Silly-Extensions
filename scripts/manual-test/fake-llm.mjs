@@ -4,7 +4,9 @@
 // smoke script can read the exact prompt) and answers with canned text:
 //   1. $SSE_TEST_DIR/fake-llm-replies.json — optional [{ "match": "...", "reply": "..." }]
 //      rules; the first rule whose `match` substring appears anywhere in the
-//      request's messages wins. Re-read on every request.
+//      request's messages wins. Re-read on every request. A rule's optional
+//      `chunkDelayMs` spaces its streamed chunks out, so a script can press
+//      Stop mid-stream.
 //   2. $SSE_TEST_DIR/fake-llm-reply.txt — the fallback reply, re-read on every
 //      request (a script can rewrite it between steps).
 //   3. A built-in default.
@@ -40,14 +42,18 @@ function pickReply(body) {
     if (rules) {
         try {
             for (const rule of JSON.parse(rules)) {
-                if (rule?.match && haystack.includes(rule.match)) return String(rule.reply ?? '');
+                if (rule?.match && haystack.includes(rule.match)) {
+                    return { reply: String(rule.reply ?? ''), delay: Number(rule.chunkDelayMs) || 0 };
+                }
             }
         } catch (err) {
             console.error('fake-llm: bad replies file:', err.message);
         }
     }
-    return readIfExists(FALLBACK) ?? DEFAULT_REPLY;
+    return { reply: readIfExists(FALLBACK) ?? DEFAULT_REPLY, delay: 0 };
 }
+
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 function chunk(content, finish = null) {
     return `data: ${JSON.stringify({
@@ -59,7 +65,7 @@ function chunk(content, finish = null) {
 http.createServer((req, res) => {
     let raw = '';
     req.on('data', part => { raw += part; });
-    req.on('end', () => {
+    req.on('end', async () => {
         if (req.method === 'GET' && req.url.endsWith('/models')) {
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ object: 'list', data: [{ id: 'fake-model', object: 'model' }] }));
@@ -70,11 +76,17 @@ http.createServer((req, res) => {
             body = JSON.parse(raw || '{}');
         } catch { /* keep {} */ }
         fs.appendFileSync(LOG, JSON.stringify({ at: new Date().toISOString(), url: req.url, body }) + '\n');
-        const reply = pickReply(body);
+        const { reply, delay } = pickReply(body);
 
         if (body.stream) {
             res.writeHead(200, { 'Content-Type': 'text/event-stream' });
-            for (const piece of reply.match(/[\s\S]{1,16}/g) || ['']) res.write(chunk(piece));
+            let aborted = false;
+            res.on('close', () => { aborted = true; });
+            for (const piece of reply.match(/[\s\S]{1,16}/g) || ['']) {
+                if (aborted) return;
+                res.write(chunk(piece));
+                if (delay) await sleep(delay);
+            }
             res.write(chunk(null, 'stop'));
             res.end('data: [DONE]\n\n');
             return;

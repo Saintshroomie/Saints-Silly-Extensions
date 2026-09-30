@@ -6,7 +6,6 @@
  * and clicks Done to copy it into SillyTavern's description field.
  */
 
-import { removeReasoningFromString } from '../../../../reasoning.js';
 import {
     Popup,
     POPUP_TYPE,
@@ -17,19 +16,22 @@ import {
     toast,
     buildContextPreamble,
     createLoreBookPicker,
-    streamingGenerate,
-    withSingleLineDisabled,
     applyTemplateMacros,
-    stripPrefillEcho,
     showPromptPreview,
     createSettingsBinder,
 } from './utils.js';
-import { templateSetting, textSetting, parsePositiveInt, positiveIntSetting } from './settings-helpers.js';
-import {
-    abortAllGenerations,
-    isSilentGenerationAbort,
-} from './silent-generation.js';
+import { templateSetting, textSetting } from './settings-helpers.js';
 import { createToolPresetSelector } from './prompt-templates.js';
+import {
+    MODAL_LOREBOOK_PREFIX,
+    actionRowHtml,
+    createGenerationActions,
+    smallButtonHtml,
+    statusBarHtml,
+    streamContinuation,
+    streamFresh,
+    tokensRowHtml,
+} from './generation-modal.js';
 
 // ─── Default Prompt ───
 
@@ -138,13 +140,8 @@ export const DEFAULT_ACC_RESPONSE_LENGTH = 1000;
 // ─── Module State ───
 
 let moduleSettings = null;
+let saveSettingsFn = null;
 let debug = () => {};
-
-let isGenerating = false;
-let abortRequested = false;
-let activeAction = null;       // which button initiated the current generation
-let lastAction = null;         // 'generate' | 'continue' — what Retry should redo
-let restorePoint = null;       // textarea snapshot used by Retry
 
 // Modal contents are remembered across open/close so the user doesn't lose
 // their brief, generated description, or context-toggle selections — even
@@ -169,8 +166,6 @@ export function initACC({ settings, saveSettings }) {
     debug = createDebugLogger('ACC', () => moduleSettings.accDebugMode);
     debug('Module initialized');
 }
-
-let saveSettingsFn = null;
 
 // ─── Character Page Integration ───
 
@@ -237,18 +232,39 @@ function showACCPromptPreview() {
 // ─── Modal ───
 
 let activePopup = null;
-let activeBody = null;
+
+const actions = createGenerationActions({
+    prefix: 'acc',
+    outputId: 'acc_description_output',
+    noun: 'description',
+    aNoun: 'a description',
+    statusText: {
+        generate: 'Generating character description…',
+        continue: 'Continuing description…',
+    },
+    lockIds: ['acc_character_brief'],
+    responseLength: {
+        get settings() { return moduleSettings; },
+        key: 'accResponseLength',
+        fallback: DEFAULT_ACC_RESPONSE_LENGTH,
+        save: () => saveSettingsFn?.(),
+    },
+    getPopup: () => activePopup,
+    canRun: () => {
+        if (readBrief()) return true;
+        toast('Please enter a Character Brief first.', 'warning');
+        return false;
+    },
+    run: (action, { existing, outputEl, responseLength }) => (action === 'continue'
+        ? generateContinuation(existing, outputEl, responseLength)
+        : generateDescription(outputEl, responseLength)),
+    logLabel: 'ACC',
+    debug: (...args) => debug(...args),
+});
 
 async function openModal() {
     if (activePopup) return;
-
-    isGenerating = false;
-    abortRequested = false;
-    activeAction = null;
-    // Note: lastAction / restorePoint stay null on each open. They're
-    // retry-only state and don't need to persist across modal sessions.
-    lastAction = null;
-    restorePoint = null;
+    actions.reset();
 
     const body = buildModalBody();
 
@@ -260,13 +276,13 @@ async function openModal() {
         allowVerticalScrolling: true,
         onOpen: () => {
             bindModalHandlers();
-            refreshActionButtonStates();
+            actions.bind();
             debug('Modal opened');
         },
         onClosing: (p) => {
             if (p.result === POPUP_RESULT.AFFIRMATIVE) {
                 // Done clicked — refuse to close mid-generation.
-                if (isGenerating) {
+                if (actions.isGenerating()) {
                     toast('Wait for generation to finish before clicking Done.', 'warning');
                     return false;
                 }
@@ -278,15 +294,11 @@ async function openModal() {
                 return true;
             }
             // Cancel / Esc / X — abort any in-flight job, then allow close.
-            if (isGenerating) {
-                abortRequested = true;
-                stopGeneration();
-            }
+            actions.stopIfRunning();
             return true;
         },
     });
     activePopup = popup;
-    activeBody = body;
 
     try {
         const result = await popup.show();
@@ -298,11 +310,7 @@ async function openModal() {
         // the next open shows the same brief / output / context options.
         capturePersistedModalState(body);
         activePopup = null;
-        activeBody = null;
-        isGenerating = false;
-        activeAction = null;
-        lastAction = null;
-        restorePoint = null;
+        actions.reset();
         debug('Modal closed');
     }
 }
@@ -312,108 +320,67 @@ function capturePersistedModalState(body) {
     persistedModalState.brief = body.querySelector('#acc_character_brief')?.value || '';
     persistedModalState.output = body.querySelector('#acc_description_output')?.value || '';
     persistedModalState.useChatContext = !!body.querySelector('#acc_use_chat_context')?.checked;
-    const picker = body._accLorebookPicker;
-    persistedModalState.selectedLoreBooks = picker ? picker.getSelected() : [];
-    // The Max Tokens field is the tool's saved setting (its change listener
-    // writes it through), so keep a typed value that never fired 'change'
-    // there too, rather than as a modal-only copy that would outlive a
-    // preset switch.
-    const tokenInput = body.querySelector('#acc_response_length');
-    const parsed = tokenInput ? parseInt(tokenInput.value, 10) : NaN;
-    if (!isNaN(parsed) && parsed > 0 && parsed !== moduleSettings.accResponseLength) {
-        moduleSettings.accResponseLength = parsed;
-        saveSettingsFn?.();
-    }
+    persistedModalState.selectedLoreBooks = lorebookPicker?.getSelected() ?? [];
+    actions.commitResponseLength(body);
 }
+
+let lorebookPicker = null;
 
 function buildModalBody() {
     const root = document.createElement('div');
-    root.className = 'acc-modal-body';
+    root.className = 'sse-modal-body';
     root.innerHTML = `
-        <div class="acc-context-section">
+        <div class="sse-modal-context">
             <label class="checkbox_label" title="Prepend the current chat / character context to the generation, and auto-include the chat's relevant World Info entries. The lore-book dropdown adds extra books on top of that.">
                 <input id="acc_use_chat_context" type="checkbox" />
                 <span>Use Chat Context</span>
             </label>
             <div class="acc-lorebook-host"></div>
         </div>
-        <div class="acc-preset-row">
-            <label class="acc-preset-label"><span class="fa-solid fa-file-pen"></span> Prompt Preset:</label>
+        <div class="sse-modal-preset-row">
+            <label class="sse-modal-preset-label"><span class="fa-solid fa-file-pen"></span> Prompt Preset:</label>
             <div class="acc-preset-host"></div>
         </div>
-        <div class="acc-brief-section">
-            <div class="acc-field-header">
+        <div class="sse-modal-section">
+            <div class="sse-modal-field-header">
                 <label for="acc_character_brief"><b>Character Brief:</b></label>
-                <div id="acc_clear_brief_btn" class="menu_button interactable acc-clear-btn" title="Clear the brief">
-                    <span class="fa-solid fa-eraser"></span> Clear
-                </div>
+                ${smallButtonHtml('acc_clear_brief_btn', 'fa-eraser', 'Clear', 'Clear the brief')}
             </div>
             <textarea id="acc_character_brief" class="text_pole" rows="4" placeholder="Describe your character concept, setting, and any key details..."></textarea>
         </div>
-        <div class="acc-action-row">
-            <div id="acc_generate_btn" class="menu_button interactable acc-action-btn acc-generate-btn" title="Generate a fresh description from the brief (replaces the textarea)">
-                <span class="fa-solid fa-wand-magic-sparkles"></span> Generate
-            </div>
-            <div id="acc_continue_btn" class="menu_button interactable acc-action-btn acc-continue-btn" title="Continue from where the description leaves off">
-                <span class="fa-solid fa-arrow-right"></span> Continue
-            </div>
-            <div id="acc_checkpoint_btn" class="menu_button interactable acc-action-btn acc-checkpoint-btn" title="Save the current description as the Retry restore point">
-                <span class="fa-solid fa-flag"></span> Checkpoint
-            </div>
-            <div id="acc_retry_btn" class="menu_button interactable acc-action-btn acc-retry-btn" title="Restore to the last snapshot and re-run the last action">
-                <span class="fa-solid fa-rotate-right"></span> Retry
-            </div>
-        </div>
-        <div class="acc-tokens-row">
-            <label class="acc-tokens-label" for="acc_response_length" title="Maximum tokens for each generation">
-                <span class="fa-solid fa-coins"></span> Max Tokens:
-            </label>
-            <input id="acc_response_length" type="number" class="text_pole acc-tokens-input" min="50" max="8192" step="50" />
-        </div>
-        <div class="acc-status-bar acc-hidden" id="acc_status_bar">
-            <span class="fa-solid fa-spinner fa-spin"></span>
-            <span id="acc_status_text"></span>
-        </div>
-        <div class="acc-description-section">
-            <div class="acc-field-header">
+        ${actionRowHtml('acc', {
+        noun: 'description',
+        generateTitle: 'Generate a fresh description from the brief (replaces the textarea)',
+    })}
+        ${tokensRowHtml('acc')}
+        ${statusBarHtml('acc')}
+        <div class="sse-modal-output-section">
+            <div class="sse-modal-field-header">
                 <label for="acc_description_output"><b>Character Description:</b></label>
-                <div id="acc_clear_output_btn" class="menu_button interactable acc-clear-btn" title="Clear the generated description">
-                    <span class="fa-solid fa-eraser"></span> Clear
-                </div>
+                ${smallButtonHtml('acc_clear_output_btn', 'fa-eraser', 'Clear', 'Clear the generated description')}
             </div>
-            <textarea id="acc_description_output" class="text_pole acc-description-output" rows="18" placeholder="Generated description will appear here. You can edit it before clicking Done."></textarea>
+            <textarea id="acc_description_output" class="text_pole sse-modal-output" rows="18" placeholder="Generated description will appear here. You can edit it before clicking Done."></textarea>
         </div>
     `;
 
     // Hydrate the persisted-across-opens fields.
-    const briefEl = root.querySelector('#acc_character_brief');
-    if (briefEl) briefEl.value = persistedModalState.brief || '';
-    const outputEl = root.querySelector('#acc_description_output');
-    if (outputEl) outputEl.value = persistedModalState.output || '';
-    const chatCb = root.querySelector('#acc_use_chat_context');
-    if (chatCb) chatCb.checked = !!persistedModalState.useChatContext;
-
-    // Initialize the token field from the saved setting (which a preset
-    // switch may have changed since the modal last closed).
-    const tokenInput = root.querySelector('#acc_response_length');
-    if (tokenInput) tokenInput.value = String(getSavedResponseLength());
+    root.querySelector('#acc_character_brief').value = persistedModalState.brief || '';
+    root.querySelector('#acc_description_output').value = persistedModalState.output || '';
+    root.querySelector('#acc_use_chat_context').checked = !!persistedModalState.useChatContext;
+    actions.fillResponseLength(root);
 
     // Mount the shared lore-book picker with previously-selected entries.
-    const picker = createLoreBookPicker({
-        classPrefix: 'acc-lorebook',
-        initialSelection: Array.isArray(persistedModalState.selectedLoreBooks)
-            ? persistedModalState.selectedLoreBooks.slice()
-            : [],
+    lorebookPicker = createLoreBookPicker({
+        classPrefix: MODAL_LOREBOOK_PREFIX,
+        initialSelection: persistedModalState.selectedLoreBooks.slice(),
     });
-    root.querySelector('.acc-lorebook-host').replaceWith(picker.element);
-    root._accLorebookPicker = picker;
+    root.querySelector('.acc-lorebook-host').replaceWith(lorebookPicker.element);
 
     // Point-of-use preset selection — which prompt + prefill bundle
     // Generate/Continue uses, synced with the settings widget (which also
     // manages presets).
     root.querySelector('.acc-preset-host').replaceWith(createToolPresetSelector({
         toolKey: 'acc',
-        className: 'acc-preset-select',
         title: 'Prompt preset used for Generate/Continue — the bundle of prompt + prefill that shapes '
             + 'the character sheet. Save and edit presets in the extension settings.',
     }));
@@ -422,42 +389,12 @@ function buildModalBody() {
 }
 
 function bindModalHandlers() {
-    document.getElementById('acc_generate_btn')?.addEventListener('click', handleGenerate);
-    document.getElementById('acc_continue_btn')?.addEventListener('click', handleContinue);
-    document.getElementById('acc_checkpoint_btn')?.addEventListener('click', handleCheckpoint);
-    document.getElementById('acc_retry_btn')?.addEventListener('click', handleRetry);
-
-    const output = document.getElementById('acc_description_output');
-    output?.addEventListener('input', refreshActionButtonStates);
-
-    const tokenInput = document.getElementById('acc_response_length');
-    tokenInput?.addEventListener('change', () => {
-        const parsed = parseInt(tokenInput.value, 10);
-        if (!isNaN(parsed) && parsed > 0) {
-            moduleSettings.accResponseLength = parsed;
-            saveSettingsFn?.();
-        }
-    });
-
     document.getElementById('acc_clear_brief_btn')?.addEventListener('click', () => {
-        if (isGenerating) return;
+        if (actions.isGenerating()) return;
         const brief = document.getElementById('acc_character_brief');
         if (!brief) return;
         brief.value = '';
         brief.focus();
-        refreshActionButtonStates();
-    });
-    document.getElementById('acc_clear_output_btn')?.addEventListener('click', () => {
-        if (isGenerating) return;
-        const out = document.getElementById('acc_description_output');
-        if (!out) return;
-        out.value = '';
-        // Clearing the output invalidates the existing Retry restore point
-        // so the user doesn't accidentally restore an unrelated description.
-        restorePoint = null;
-        lastAction = null;
-        out.focus();
-        refreshActionButtonStates();
     });
 }
 
@@ -472,152 +409,17 @@ function applyDescription(body) {
     toast('Character description applied!', 'success');
 }
 
-// ─── Actions ───
+// ─── Generation ───
+
+function readBrief() {
+    return document.getElementById('acc_character_brief')?.value?.trim() || '';
+}
 
 function readModalContextOptions() {
-    const includeChat = !!document.getElementById('acc_use_chat_context')?.checked;
-    const picker = activeBody?._accLorebookPicker;
-    const loreBookNames = picker ? picker.getSelected() : [];
-    return { includeChat, loreBookNames };
-}
-
-async function handleGenerate() {
-    if (isGenerating) {
-        if (activeAction === 'generate') {
-            abortRequested = true;
-            stopGeneration();
-        }
-        return;
-    }
-
-    const brief = document.getElementById('acc_character_brief')?.value?.trim() || '';
-    if (!brief) {
-        toast('Please enter a Character Brief before generating.', 'warning');
-        return;
-    }
-
-    const output = document.getElementById('acc_description_output');
-    restorePoint = output?.value || '';
-    await runGeneration('generate', brief);
-}
-
-async function handleContinue() {
-    if (isGenerating) {
-        if (activeAction === 'continue') {
-            abortRequested = true;
-            stopGeneration();
-        }
-        return;
-    }
-
-    const output = document.getElementById('acc_description_output');
-    const existing = output?.value || '';
-    if (!existing.trim()) {
-        toast('Nothing to continue from. Generate a description first or type some text.', 'warning');
-        return;
-    }
-
-    const brief = document.getElementById('acc_character_brief')?.value?.trim() || '';
-    restorePoint = existing;
-    await runGeneration('continue', brief);
-}
-
-function handleCheckpoint() {
-    if (isGenerating) return;
-    const output = document.getElementById('acc_description_output');
-    const current = output?.value || '';
-    if (!current.trim()) {
-        toast('Nothing to checkpoint — the description is empty.', 'warning');
-        return;
-    }
-    restorePoint = current;
-    lastAction = 'continue';
-    toast('Checkpoint saved. Retry will restore to this point.', 'success');
-    refreshActionButtonStates();
-    debug('Checkpoint saved, length:', current.length);
-}
-
-async function handleRetry() {
-    if (isGenerating) return;
-    if (!lastAction || restorePoint === null) {
-        toast('Nothing to retry yet.', 'warning');
-        return;
-    }
-
-    const brief = document.getElementById('acc_character_brief')?.value?.trim() || '';
-    if (lastAction === 'continue' && !restorePoint.trim()) {
-        toast('Cannot continue from an empty restore point.', 'warning');
-        return;
-    }
-    if (lastAction === 'generate' && !brief) {
-        toast('Please enter a Character Brief before retrying.', 'warning');
-        return;
-    }
-
-    const output = document.getElementById('acc_description_output');
-    if (output) output.value = restorePoint;
-    await runGeneration(lastAction, brief);
-}
-
-async function runGeneration(action, brief) {
-    isGenerating = true;
-    abortRequested = false;
-    activeAction = action;
-
-    const isContinue = action === 'continue';
-    setGeneratingUI(true, action);
-    setStatusBar(isContinue ? 'Continuing description...' : 'Generating character description...');
-
-    try {
-        const ctxOptions = readModalContextOptions();
-        const output = document.getElementById('acc_description_output');
-        const existing = output?.value || '';
-
-        const result = isContinue
-            ? await generateContinuation(brief, existing, ctxOptions)
-            : await generateDescription(brief, ctxOptions);
-
-        if (abortRequested) {
-            debug(`${action} aborted, discarding result; keeping the streamed partial`);
-            // Leave the streamed partial in the field so the user can edit it
-            // and Continue from there; treat the stop like a short result so
-            // Retry can redo it (Continue/Checkpoint enable on field content).
-            if (output?.value?.trim()) lastAction = action;
-            return;
-        }
-
-        if (!output) return;
-        if (isContinue) {
-            const sep = needsSeparator(existing) ? ' ' : '';
-            output.value = existing + sep + result;
-        } else {
-            output.value = result;
-        }
-        lastAction = action;
-        debug(`${action} complete, length:`, result.length);
-    } catch (err) {
-        if (isSilentGenerationAbort(err)) {
-            debug(`${action} aborted via cancellation; keeping the streamed partial`);
-            const out = document.getElementById('acc_description_output');
-            if (out?.value?.trim()) lastAction = action;
-        } else if (!abortRequested) {
-            console.error('ACC generation error:', err);
-            toast(`Generation failed: ${err.message}`, 'error');
-        }
-    } finally {
-        isGenerating = false;
-        abortRequested = false;
-        activeAction = null;
-        setGeneratingUI(false, action);
-        setStatusBar(null);
-        refreshActionButtonStates();
-    }
-}
-
-function needsSeparator(text) {
-    if (!text) return false;
-    const last = text[text.length - 1];
-    return last !== ' ' && last !== '\n' && last !== '\t';
+    return {
+        includeChat: !!document.getElementById('acc_use_chat_context')?.checked,
+        loreBookNames: lorebookPicker?.getSelected() ?? [],
+    };
 }
 
 /**
@@ -655,49 +457,25 @@ function composeContinuePrompt(preambleBlock, brief) {
     return `${prompt}\n\nYour reply has been prefilled with the character sheet so far. Continue seamlessly from exactly where it stops — do not repeat any existing text. Maintain the same format and style. Output only the continuation.`;
 }
 
-async function generateDescription(brief, ctxOptions) {
-    const preambleBlock = await buildPreambleBlock(ctxOptions);
-    const prompt = composeGeneratePrompt(preambleBlock, brief);
-    const systemPrompt = ACC_GENERATE_SYSTEM_PROMPT;
-    const responseLength = getResponseLength();
+async function generateDescription(outputEl, responseLength) {
+    const brief = readBrief();
+    const prompt = composeGeneratePrompt(await buildPreambleBlock(responseLength), brief);
     const prefill = getPrefill();
-
     debug('Generating with brief length', brief.length, 'tokens', responseLength);
-    debug('System prompt:', systemPrompt);
     debug('Prompt:', prompt);
     debug('Prefill:', prefill);
-
-    const outputEl = document.getElementById('acc_description_output');
-    const result = await withSingleLineDisabled(() => streamingGenerate(
-        { prompt, systemPrompt, responseLength, ...(prefill ? { prefill } : {}) },
-        outputEl,
-        { append: false },
-    ));
-    // Backends that ignore the assistant prefix may re-emit the prefill;
-    // strip the echo so prepending it doesn't double the opening.
-    const cleaned = stripPrefillEcho(removeReasoningFromString(result).trim(), prefill);
-    return (prefill || '') + cleaned;
+    return streamFresh({
+        prompt, systemPrompt: ACC_GENERATE_SYSTEM_PROMPT, responseLength, prefill, outputEl, name: 'acc',
+    });
 }
 
-async function generateContinuation(brief, existing, ctxOptions) {
-    const preambleBlock = await buildPreambleBlock(ctxOptions);
-    const prompt = composeContinuePrompt(preambleBlock, brief);
-    const systemPrompt = ACC_CONTINUE_SYSTEM_PROMPT;
-    const responseLength = getResponseLength();
-
+async function generateContinuation(existing, outputEl, responseLength) {
+    const prompt = composeContinuePrompt(await buildPreambleBlock(responseLength), readBrief());
     debug('Continuing with existing length', existing.length, 'tokens', responseLength);
-    debug('System prompt:', systemPrompt);
     debug('Prompt:', prompt);
-
-    const outputEl = document.getElementById('acc_description_output');
-    // The sheet-so-far is the assistant prefill, so the model continues from
-    // its exact end; strip any prefill echo to keep only the new tail.
-    const result = await withSingleLineDisabled(() => streamingGenerate(
-        { prompt, systemPrompt, responseLength, ...(existing ? { prefill: existing } : {}) },
-        outputEl,
-        { append: true },
-    ));
-    return stripPrefillEcho(removeReasoningFromString(result).trim(), existing);
+    return streamContinuation({
+        prompt, systemPrompt: ACC_CONTINUE_SYSTEM_PROMPT, responseLength, existing, outputEl, name: 'acc-continue',
+    });
 }
 
 function getPromptTemplate() {
@@ -708,109 +486,15 @@ function getPrefill() {
     return textSetting(moduleSettings, 'accPrefill', DEFAULT_ACC_PREFILL);
 }
 
-function getResponseLength() {
-    return parsePositiveInt(document.getElementById('acc_response_length')?.value) ?? getSavedResponseLength();
-}
-
-function getSavedResponseLength() {
-    return positiveIntSetting(moduleSettings, 'accResponseLength', DEFAULT_ACC_RESPONSE_LENGTH);
-}
-
-async function buildPreambleBlock(ctxOptions) {
-    if (!ctxOptions) return '';
-    if (!ctxOptions.includeChat && !(ctxOptions.loreBookNames && ctxOptions.loreBookNames.length)) return '';
+async function buildPreambleBlock(responseLength) {
+    const ctxOptions = readModalContextOptions();
+    if (!ctxOptions.includeChat && !ctxOptions.loreBookNames.length) return '';
     const preamble = await buildContextPreamble({
         ...ctxOptions,
-        responseLength: getResponseLength(),
+        responseLength,
         maxContextOverride: moduleSettings?.accMaxContextOverride || 0,
     });
     if (!preamble) return '';
     debug('Context preamble length:', preamble.length);
     return `Existing context to consider when generating (do not repeat verbatim):\n${preamble}\n\n`;
-}
-
-function stopGeneration() {
-    // Route through abortAllGenerations() so that ST's GENERATION_STOPPED
-    // event also fires. That's what triggers generateRawData() to abort
-    // its fetch, close the connection, and let ST's server propagate the
-    // abort to the backend (e.g. POST /api/extra/abort to KoboldCpp).
-    // Aborting only our local controllers would free the UI but leave the
-    // LLM generating to the response cap.
-    abortAllGenerations('acc-cancel');
-    debug('Stop generation triggered');
-}
-
-// ─── UI Helpers ───
-
-const ACTION_BUTTON_IDS = ['acc_generate_btn', 'acc_continue_btn', 'acc_checkpoint_btn', 'acc_retry_btn'];
-
-const ACTION_LABELS = {
-    acc_generate_btn: '<span class="fa-solid fa-wand-magic-sparkles"></span> Generate',
-    acc_continue_btn: '<span class="fa-solid fa-arrow-right"></span> Continue',
-    acc_checkpoint_btn: '<span class="fa-solid fa-flag"></span> Checkpoint',
-    acc_retry_btn: '<span class="fa-solid fa-rotate-right"></span> Retry',
-};
-
-function setGeneratingUI(generating, action) {
-    const briefInput = document.getElementById('acc_character_brief');
-    const activeBtnId = action === 'continue' ? 'acc_continue_btn' : 'acc_generate_btn';
-
-    for (const id of ACTION_BUTTON_IDS) {
-        const btn = document.getElementById(id);
-        if (!btn) continue;
-        if (generating) {
-            if (id === activeBtnId) {
-                btn.innerHTML = '<span class="fa-solid fa-stop"></span> Stop';
-                btn.classList.remove('acc-disabled');
-            } else {
-                btn.innerHTML = ACTION_LABELS[id];
-                btn.classList.add('acc-disabled');
-            }
-        } else {
-            btn.innerHTML = ACTION_LABELS[id];
-            btn.classList.remove('acc-disabled');
-        }
-    }
-
-    // Popup owns the Done/Cancel buttons; toggle the OK button visually so
-    // users get a clear "wait for generation" hint. The onClosing guard
-    // still blocks the close if they click it mid-flight.
-    const okBtn = activePopup?.okButton;
-    if (okBtn) okBtn.classList.toggle('disabled', !!generating);
-
-    if (generating) {
-        briefInput?.setAttribute('disabled', 'true');
-    } else {
-        briefInput?.removeAttribute('disabled');
-        refreshActionButtonStates();
-    }
-}
-
-function refreshActionButtonStates() {
-    if (isGenerating) return;
-    const output = document.getElementById('acc_description_output');
-    const hasText = !!output?.value?.trim();
-
-    setButtonDisabled('acc_continue_btn', !hasText);
-    setButtonDisabled('acc_checkpoint_btn', !hasText);
-    setButtonDisabled('acc_retry_btn', !lastAction || restorePoint === null);
-}
-
-function setButtonDisabled(id, disabled) {
-    const btn = document.getElementById(id);
-    if (!btn) return;
-    if (disabled) btn.classList.add('acc-disabled');
-    else btn.classList.remove('acc-disabled');
-}
-
-function setStatusBar(message) {
-    const bar = document.getElementById('acc_status_bar');
-    const text = document.getElementById('acc_status_text');
-    if (!bar || !text) return;
-    if (message) {
-        text.textContent = message;
-        bar.classList.remove('acc-hidden');
-    } else {
-        bar.classList.add('acc-hidden');
-    }
 }

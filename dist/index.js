@@ -55,18 +55,15 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Saint's Silly Extensions — Combin
    SHARED: BANNERS & STATUS BARS
    ═══════════════════════════════════════════════════════════════════════════════ */
 
-/* One readable surface for every modal banner / status bar (ACC, Compaction,
-   Image Prompting). ST's --SmartThemeBodyColor is the *text* colour, not a
+/* One readable surface for every modal banner / status bar (the generation
+   modals' status bars, Compaction's usage banner, Image Prompting's anchor bar). ST's --SmartThemeBodyColor is the *text* colour, not a
    background — painting a bar with it renders the block in the same colour as
    the text on top of it, which is what made these unreadable (a white bar with
    near-white text on light themes). The surface is a translucent black wash
    instead: it darkens whatever the theme's own background is, so body-coloured
    text keeps its contrast on both light and dark themes. */
-.acc-status-bar,
-.cc-status-bar,
-.ip-status-bar,
-.ip-anchor-bar,
-.cc-usage-banner {
+.sse-modal-status,
+.sse-modal-banner {
     background-color: rgba(0, 0, 0, 0.2);
     border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));
     border-radius: 4px;
@@ -76,13 +73,236 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Saint's Silly Extensions — Combin
 /* The accent lives on the icon, never on the message text: a theme accent
    (gold, etc.) can fall below readable contrast on a light background, the
    body colour can't. */
-.acc-status-bar > .fa-solid,
-.cc-status-bar > .fa-solid,
-.ip-status-bar > .fa-solid,
-.ip-anchor-bar > .fa-solid {
+.sse-modal-status > .fa-solid,
+.sse-modal-banner > .fa-solid {
     color: var(--SmartThemeQuoteColor, #e8a23a);
 }
 
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   SHARED: GENERATION MODALS
+   (ACC, Compaction, Image Prompting, Character State — rendered inside ST's
+   Popup, which provides the chrome. Markup comes from generation-modal.js.)
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+.sse-modal-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0%;
+    min-height: 0;
+    text-align: left;
+}
+
+.sse-modal-hidden {
+    display: none !important;
+}
+
+.sse-modal-disabled {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+/* ── Context row: Use Chat Context + lore-book picker ── */
+
+.sse-modal-context {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    padding: 8px 10px;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 4px;
+}
+
+.sse-modal-context .checkbox_label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9em;
+    cursor: pointer;
+}
+
+.sse-modal-lorebook-picker {
+    position: relative;
+    font-size: 0.9em;
+}
+
+.sse-modal-lorebook-picker > summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 4px 8px;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0.85;
+}
+
+.sse-modal-lorebook-picker > summary::-webkit-details-marker {
+    display: none;
+}
+
+.sse-modal-lorebook-picker > summary:hover {
+    opacity: 1;
+}
+
+.sse-modal-lorebook-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 2px;
+    z-index: 10002;
+    min-width: 240px;
+    max-height: 260px;
+    overflow-y: auto;
+    background: var(--SmartThemeBlurTintColor, #1a1a2e);
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 4px;
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.sse-modal-lorebook-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.sse-modal-lorebook-empty {
+    opacity: 0.6;
+    font-style: italic;
+}
+
+.sse-modal-preset-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 0.9em;
+}
+
+.sse-modal-preset-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    user-select: none;
+    opacity: 0.85;
+}
+
+/* ── Fields: label on the left, small buttons on the right ── */
+
+.sse-modal-section {
+    margin-bottom: 12px;
+}
+
+.sse-modal-section textarea {
+    width: 100%;
+    margin-top: 4px;
+    resize: vertical;
+}
+
+.sse-modal-field-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.sse-modal-field-header-buttons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sse-modal-small-btn {
+    font-size: 0.8em;
+    padding: 2px 8px;
+    opacity: 0.85;
+    white-space: nowrap;
+}
+
+.sse-modal-small-btn:hover {
+    opacity: 1;
+}
+
+.sse-modal-small-btn.sse-modal-disabled {
+    opacity: 0.3;
+}
+
+.sse-modal-output-section {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0%;
+    min-height: 0;
+}
+
+.sse-modal-output {
+    width: 100%;
+    flex: 1 1 0%;
+    min-height: 200px;
+    resize: vertical;
+}
+
+/* ── Actions, Max Tokens, status ── */
+
+.sse-modal-action-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.sse-modal-action-btn {
+    flex: 1 1 0;
+    min-width: 110px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* The primary "make something" action (Generate, Generate Image, …). */
+.sse-modal-primary {
+    color: var(--SmartThemeQuoteColor, #e8a23a);
+}
+
+.sse-modal-tokens-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-bottom: 12px;
+    font-size: 0.85em;
+    opacity: 0.85;
+}
+
+.sse-modal-tokens-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    user-select: none;
+}
+
+.sse-modal-tokens-input {
+    width: 90px !important;
+    padding: 2px 6px !important;
+    font-size: 0.9em !important;
+    text-align: center;
+}
+
+.sse-modal-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    font-size: 0.9em;
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    POSSESSION STYLES
@@ -344,110 +564,8 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Saint's Silly Extensions — Combin
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════
-   ACC MODAL STYLES (rendered inside ST's Popup; chrome is provided by Popup)
+   ASSISTED CHARACTER CREATION (modal styles are shared — see GENERATION MODALS)
    ═══════════════════════════════════════════════════════════════════════════════ */
-
-.acc-modal-body {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 0%;
-    min-height: 0;
-    text-align: left;
-}
-
-.acc-brief-section {
-    margin-bottom: 12px;
-}
-
-.acc-brief-section textarea {
-    width: 100%;
-    margin-top: 4px;
-    resize: vertical;
-}
-
-.acc-action-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 8px;
-}
-
-.acc-tokens-row {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 6px;
-    margin-bottom: 12px;
-    font-size: 0.85em;
-    opacity: 0.85;
-}
-
-.acc-tokens-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    user-select: none;
-}
-
-.acc-tokens-input {
-    width: 80px !important;
-    padding: 2px 6px !important;
-    font-size: 0.9em !important;
-    text-align: center;
-}
-
-.acc-action-btn {
-    flex: 1 1 0;
-    min-width: 110px;
-    text-align: center;
-    white-space: nowrap;
-}
-
-.acc-action-btn.acc-disabled {
-    opacity: 0.3;
-    pointer-events: none;
-}
-
-.acc-generate-btn {
-    color: var(--SmartThemeQuoteColor, #e8a23a);
-}
-
-/* Surface/colour come from the shared banner rule at the top of this file. */
-.acc-status-bar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    margin-bottom: 12px;
-    font-size: 0.9em;
-}
-
-.acc-description-section {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 0%;
-    min-height: 0;
-}
-
-.acc-description-section label {
-    margin-bottom: 4px;
-}
-
-.acc-description-output {
-    width: 100%;
-    flex: 1 1 0%;
-    min-height: 200px;
-    resize: vertical;
-}
-
-.acc-description-output[disabled] {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.acc-hidden {
-    display: none !important;
-}
 
 /* ACC Launch button in character creator */
 #acc_launch_btn {
@@ -456,28 +574,9 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Saint's Silly Extensions — Combin
     gap: 4px;
 }
 
-/* Field header row: label on the left, Clear button on the right. */
-.acc-modal-body .acc-field-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 4px;
-}
-
-.acc-modal-body .acc-clear-btn {
-    font-size: 0.8em;
-    padding: 2px 8px;
-    opacity: 0.85;
-}
-
-.acc-modal-body .acc-clear-btn:hover {
-    opacity: 1;
-}
-
 /* ═══════════════════════════════════════════════════════════════════════════════
-   CHARACTER STATE STYLES (pane rendered inside ST's Popup; reuses the ACC
-   action/status/context classes)
+   CHARACTER STATE STYLES (pane rendered inside ST's Popup; its assist section
+   reuses the shared generation-modal classes)
    ═══════════════════════════════════════════════════════════════════════════════ */
 
 /* Launch button on each group member row, after Possession's radio. */
@@ -609,9 +708,9 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Saint's Silly Extensions — Combin
     border-top: 1px solid var(--SmartThemeBorderColor, #555);
 }
 
-.cs-assist-section .acc-context-section,
-.cs-assist-section .acc-preset-row,
-.cs-assist-section .acc-status-bar {
+.cs-assist-section .sse-modal-context,
+.cs-assist-section .sse-modal-preset-row,
+.cs-assist-section .sse-modal-status {
     margin-bottom: 0;
 }
 
@@ -627,7 +726,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Saint's Silly Extensions — Combin
     gap: 8px;
 }
 
-.cs-action-row .acc-tokens-label {
+.cs-action-row .sse-modal-tokens-label {
     margin-left: auto;
     font-size: 0.85em;
     opacity: 0.85;
@@ -875,94 +974,9 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Saint's Silly Extensions — Combin
     text-align: center;
 }
 
-/* ── ACC modal: context preamble controls ── */
-
-.acc-context-section {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-bottom: 12px;
-    padding: 8px 10px;
-    border: 1px solid var(--SmartThemeBorderColor, #555);
-    border-radius: 4px;
-}
-
-.acc-context-section .checkbox_label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.9em;
-    cursor: pointer;
-}
-
-.acc-lorebook-picker {
-    position: relative;
-    font-size: 0.9em;
-}
-
-.acc-lorebook-picker > summary {
-    cursor: pointer;
-    list-style: none;
-    padding: 4px 8px;
-    border: 1px solid var(--SmartThemeBorderColor, #555);
-    border-radius: 4px;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    opacity: 0.85;
-}
-
-.acc-lorebook-picker > summary::-webkit-details-marker {
-    display: none;
-}
-
-.acc-lorebook-picker > summary:hover {
-    opacity: 1;
-}
-
-.acc-lorebook-list {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    margin-top: 2px;
-    z-index: 10002;
-    min-width: 240px;
-    max-height: 260px;
-    overflow-y: auto;
-    background: var(--SmartThemeBlurTintColor, #1a1a2e);
-    border: 1px solid var(--SmartThemeBorderColor, #555);
-    border-radius: 4px;
-    padding: 6px 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-}
-
-.acc-lorebook-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-}
-
-.acc-lorebook-empty {
-    opacity: 0.6;
-    font-style: italic;
-}
-
 /* ═══════════════════════════════════════════════════════════════════════════════
-   COMPACTION MODAL STYLES (rendered inside ST's Popup; mirror the ACC flex chain)
+   COMPACTION MODAL STYLES (on top of the shared generation-modal styles)
    ═══════════════════════════════════════════════════════════════════════════════ */
-
-.cc-modal-body {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 0%;
-    min-height: 0;
-    text-align: left;
-}
 
 /* Surface/colour come from the shared banner rule at the top of this file. */
 .cc-usage-banner {
@@ -979,126 +993,8 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Saint's Silly Extensions — Combin
     font-weight: 600;
 }
 
-.cc-context-section {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-bottom: 12px;
-    padding: 8px 10px;
-    border: 1px solid var(--SmartThemeBorderColor, #555);
-    border-radius: 4px;
-}
-
 .cc-context-hint {
     opacity: 0.7;
-}
-
-.cc-guidance-section {
-    margin-bottom: 12px;
-}
-
-.cc-guidance-section textarea {
-    width: 100%;
-    margin-top: 4px;
-    resize: vertical;
-}
-
-.cc-action-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 8px;
-}
-
-.cc-action-btn {
-    flex: 1 1 0;
-    min-width: 130px;
-    text-align: center;
-    white-space: nowrap;
-}
-
-.cc-action-btn.cc-disabled {
-    opacity: 0.3;
-    pointer-events: none;
-}
-
-.cc-generate-btn {
-    color: var(--SmartThemeQuoteColor, #e8a23a);
-}
-
-.cc-tokens-row {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 6px;
-    margin-bottom: 12px;
-    font-size: 0.85em;
-    opacity: 0.85;
-}
-
-.cc-tokens-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    user-select: none;
-}
-
-.cc-tokens-input {
-    width: 90px !important;
-    padding: 2px 6px !important;
-    font-size: 0.9em !important;
-    text-align: center;
-}
-
-/* Surface/colour come from the shared banner rule at the top of this file. */
-.cc-status-bar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    margin-bottom: 12px;
-    font-size: 0.9em;
-}
-
-.cc-summary-section {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 0%;
-    min-height: 0;
-}
-
-.cc-summary-section label {
-    margin-bottom: 4px;
-}
-
-.cc-summary-output {
-    width: 100%;
-    flex: 1 1 0%;
-    min-height: 200px;
-    resize: vertical;
-}
-
-.cc-hidden {
-    display: none !important;
-}
-
-.cc-modal-body .cc-field-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 4px;
-}
-
-.cc-modal-body .cc-clear-btn {
-    font-size: 0.8em;
-    padding: 2px 8px;
-    opacity: 0.85;
-}
-
-.cc-modal-body .cc-clear-btn:hover {
-    opacity: 1;
 }
 
 .cc-confirm .cc-dont-ask {
@@ -1106,63 +1002,6 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Saint's Silly Extensions — Combin
     display: flex;
     align-items: center;
     gap: 6px;
-}
-
-/* Compaction lore-book picker (shares the ACC picker shape) */
-.cc-lorebook-picker {
-    position: relative;
-    font-size: 0.9em;
-}
-
-.cc-lorebook-picker > summary {
-    cursor: pointer;
-    list-style: none;
-    padding: 4px 8px;
-    border: 1px solid var(--SmartThemeBorderColor, #555);
-    border-radius: 4px;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    opacity: 0.85;
-}
-
-.cc-lorebook-picker > summary::-webkit-details-marker {
-    display: none;
-}
-
-.cc-lorebook-picker > summary:hover {
-    opacity: 1;
-}
-
-.cc-lorebook-list {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    margin-top: 2px;
-    z-index: 10002;
-    min-width: 240px;
-    max-height: 260px;
-    overflow-y: auto;
-    background: var(--SmartThemeBlurTintColor, #1a1a2e);
-    border: 1px solid var(--SmartThemeBorderColor, #555);
-    border-radius: 4px;
-    padding: 6px 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-}
-
-.cc-lorebook-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-}
-
-.cc-lorebook-empty {
-    opacity: 0.6;
-    font-style: italic;
 }
 
 /* Compaction launch item in the hamburger menu */
@@ -1184,102 +1023,8 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Saint's Silly Extensions — Combin
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════
-   IMAGE PROMPTING MODAL STYLES (rendered inside ST's Popup; mirror the ACC flex chain)
+   IMAGE PROMPTING MODAL STYLES (on top of the shared generation-modal styles)
    ═══════════════════════════════════════════════════════════════════════════════ */
-
-.ip-modal-body {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 0%;
-    min-height: 0;
-    text-align: left;
-}
-
-.ip-context-section {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-bottom: 12px;
-    padding: 8px 10px;
-    border: 1px solid var(--SmartThemeBorderColor, #555);
-    border-radius: 4px;
-}
-
-.ip-context-section .checkbox_label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.9em;
-    cursor: pointer;
-}
-
-.ip-guidance-section {
-    margin-bottom: 12px;
-}
-
-.ip-guidance-section textarea {
-    width: 100%;
-    margin-top: 4px;
-    resize: vertical;
-}
-
-.ip-action-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 8px;
-}
-
-.ip-action-btn {
-    flex: 1 1 0;
-    min-width: 130px;
-    text-align: center;
-    white-space: nowrap;
-}
-
-.ip-action-btn.ip-disabled {
-    opacity: 0.3;
-    pointer-events: none;
-}
-
-.ip-generate-btn {
-    color: var(--SmartThemeQuoteColor, #e8a23a);
-}
-
-.ip-tokens-row {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 6px;
-    margin-bottom: 12px;
-    font-size: 0.85em;
-    opacity: 0.85;
-}
-
-.ip-tokens-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    user-select: none;
-}
-
-.ip-tokens-input {
-    width: 90px !important;
-    padding: 2px 6px !important;
-    font-size: 0.9em !important;
-    text-align: center;
-}
-
-/* Surface/colour come from the shared banner rule at the top of this file. */
-.ip-status-bar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    margin-bottom: 12px;
-    font-size: 0.9em;
-}
 
 /* Context-anchor bar — shown when the modal was opened from a per-message
    button, so the packed chat context ends at that message. */
@@ -1301,129 +1046,19 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Saint's Silly Extensions — Combin
     opacity: 0.9;
 }
 
-.ip-output-section {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 0%;
-    min-height: 0;
-}
-
-.ip-output-section label {
-    margin-bottom: 4px;
-}
-
-.ip-prompt-output {
-    width: 100%;
-    flex: 1 1 0%;
+.sse-modal-output.ip-prompt-output {
     min-height: 180px;
-    resize: vertical;
-}
-
-.ip-hidden {
-    display: none !important;
-}
-
-.ip-modal-body .ip-field-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 4px;
-}
-
-.ip-modal-body .ip-field-header-buttons {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.ip-modal-body .ip-clear-btn {
-    font-size: 0.8em;
-    padding: 2px 8px;
-    opacity: 0.85;
-}
-
-.ip-modal-body .ip-clear-btn:hover {
-    opacity: 1;
-}
-
-.ip-modal-body .ip-clear-btn.ip-disabled {
-    opacity: 0.3;
-    pointer-events: none;
-}
-
-/* Hand-off to ST's Image Generation extension — tinted like the primary
-   Generate action, since it's the other "make something" button in the modal. */
-.ip-modal-body .ip-send-btn {
-    color: var(--SmartThemeQuoteColor, #e8a23a);
 }
 
 .ip-negative-section {
     margin-top: 10px;
 }
 
-.ip-modal-body .ip-negative-prompt {
+.ip-negative-prompt {
     width: 100%;
     min-height: 60px;
     resize: vertical;
     font-size: 0.9em;
-}
-
-/* Image Prompting lore-book picker (shares the ACC picker shape) */
-.ip-lorebook-picker {
-    position: relative;
-    font-size: 0.9em;
-}
-
-.ip-lorebook-picker > summary {
-    cursor: pointer;
-    list-style: none;
-    padding: 4px 8px;
-    border: 1px solid var(--SmartThemeBorderColor, #555);
-    border-radius: 4px;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    opacity: 0.85;
-}
-
-.ip-lorebook-picker > summary::-webkit-details-marker {
-    display: none;
-}
-
-.ip-lorebook-picker > summary:hover {
-    opacity: 1;
-}
-
-.ip-lorebook-list {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    margin-top: 2px;
-    z-index: 10002;
-    min-width: 240px;
-    max-height: 260px;
-    overflow-y: auto;
-    background: var(--SmartThemeBlurTintColor, #1a1a2e);
-    border: 1px solid var(--SmartThemeBorderColor, #555);
-    border-radius: 4px;
-    padding: 6px 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-}
-
-.ip-lorebook-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-}
-
-.ip-lorebook-empty {
-    opacity: 0.6;
-    font-style: italic;
 }
 
 /* Image Prompting saved-prompt store (per-chat) */
@@ -1938,26 +1573,6 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Saint's Silly Extensions — Combin
     max-width: 260px;
 }
 
-.acc-preset-row,
-.ip-preset-row,
-.cc-preset-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-    font-size: 0.9em;
-}
-
-.acc-preset-label,
-.ip-preset-label,
-.cc-preset-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    user-select: none;
-    opacity: 0.85;
-}
-
 .wia-controls .wia-preset-row {
     display: inline-flex;
     align-items: center;
@@ -2021,7 +1636,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Saint's Silly Extensions — Combin
     border-style: dashed;
     opacity: 0.92;
 }
-`, "",{"version":3,"sources":["webpack://./src/style.css"],"names":[],"mappings":"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","sourcesContent":["/* Saint's Silly Extensions — Combined Styles */\n\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SHARED: LORE BOOK PICKER\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Applied to every lore book picker (ACC / WIA / NG / Compaction) via the shared\n   factory. The picker text is pure UI and must not be selectable: tapping a\n   selectable lore book name engages Android Chrome's text-selection/magnifier\n   subsystem, which can crash the renderer (\"Aw, Snap\"). Disabling selection +\n   the touch callout/highlight keeps taps lightweight. user-select inherits, so\n   one rule on the root covers the summary and every list item. */\n.sse-lorebook-picker,\n.sse-lorebook-picker * {\n    -webkit-user-select: none;\n    user-select: none;\n    -webkit-touch-callout: none;\n    -webkit-tap-highlight-color: transparent;\n}\n\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SHARED: BANNERS & STATUS BARS\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* One readable surface for every modal banner / status bar (ACC, Compaction,\n   Image Prompting). ST's --SmartThemeBodyColor is the *text* colour, not a\n   background — painting a bar with it renders the block in the same colour as\n   the text on top of it, which is what made these unreadable (a white bar with\n   near-white text on light themes). The surface is a translucent black wash\n   instead: it darkens whatever the theme's own background is, so body-coloured\n   text keeps its contrast on both light and dark themes. */\n.acc-status-bar,\n.cc-status-bar,\n.ip-status-bar,\n.ip-anchor-bar,\n.cc-usage-banner {\n    background-color: rgba(0, 0, 0, 0.2);\n    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));\n    border-radius: 4px;\n    color: var(--SmartThemeBodyColor, #ddd);\n}\n\n/* The accent lives on the icon, never on the message text: a theme accent\n   (gold, etc.) can fall below readable contrast on a light background, the\n   body colour can't. */\n.acc-status-bar > .fa-solid,\n.cc-status-bar > .fa-solid,\n.ip-status-bar > .fa-solid,\n.ip-anchor-bar > .fa-solid {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   POSSESSION STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Group Chat: Radio Button Toggle ── */\n\n.possession_radio_wrapper {\n    display: inline-flex;\n    align-items: center;\n    margin-left: 4px;\n    cursor: pointer;\n}\n\n.possession_radio {\n    width: 16px;\n    height: 16px;\n    border-radius: 50%;\n    border: 2px solid var(--SmartThemeBorderColor, #555);\n    background: transparent;\n    cursor: pointer;\n    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;\n    position: relative;\n    flex-shrink: 0;\n}\n\n.possession_radio:hover {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.possession_radio.possession_active {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n    background: var(--SmartThemeQuoteColor, #e8a23a);\n    box-shadow: inset 0 0 0 3px var(--SmartThemeBlurTintColor, #1a1a2e);\n}\n\n/* ── Solo Chat: Possess Toggle Button ── */\n\n#possession_solo_btn {\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    cursor: pointer;\n    position: relative;\n}\n\n#possession_solo_btn:hover {\n    opacity: 1;\n}\n\n#possession_solo_btn.possession_active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n#possession_solo_btn.possession_active::after {\n    content: '';\n    position: absolute;\n    bottom: -2px;\n    left: 50%;\n    transform: translateX(-50%);\n    width: 6px;\n    height: 6px;\n    border-radius: 50%;\n    background-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Group member highlight when possessed ── */\n\n.group_member.possession_possessed {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n/* ── Possession Impersonate Button (Character Avatar) ── */\n\n#possession_impersonate_btn {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease;\n    padding: 2px;\n}\n\n#possession_impersonate_btn:hover {\n    opacity: 1;\n}\n\n.possession_impersonate_avatar {\n    width: 26px;\n    height: 26px;\n    border-radius: 50%;\n    object-fit: cover;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    transition: border-color 0.15s ease;\n}\n\n#possession_impersonate_btn:hover .possession_impersonate_avatar {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hide controls when extension is disabled ── */\n\n.possession_hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PHRASING STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Input Area Button (next to Send) ── */\n\n#phrasing_send_button {\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    padding: 3px;\n    font-size: 1.2em;\n}\n\n#phrasing_send_button:hover {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hamburger Menu Item ── */\n\n#phrasing_menu_button {\n    cursor: pointer;\n}\n\n#phrasing_menu_button .fa-solid {\n    margin-right: 5px;\n    width: 1em;\n    text-align: center;\n}\n\n/* ── Hide buttons during generation ── */\n\n.phrasing-hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SETTINGS PANEL STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .inline-drawer-content {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n    padding: 8px 0;\n}\n\n/* Nested drawers (template fields inside each tool's panel) — slightly\n   indented and with a smaller, dimmer header so they read as a sub-section\n   rather than a peer of the top-level tool drawer. */\n#saints_silly_settings .saints_nested_drawer {\n    margin: 4px 0 4px 4px;\n    border-left: 2px solid var(--SmartThemeBorderColor, #555);\n    padding-left: 8px;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-toggle {\n    font-size: 0.95em;\n    opacity: 0.85;\n    padding: 2px 0;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-toggle:hover {\n    opacity: 1;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-content {\n    padding: 4px 0 4px 0;\n}\n\n#saints_silly_settings .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_section_header {\n    margin: 4px 0 2px 0;\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_divider {\n    border: none;\n    border-top: 1px solid var(--SmartThemeBorderColor, #555);\n    margin: 8px 0;\n}\n\n#saints_silly_settings .phrasing_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #phrasing_prompt_textarea {\n    width: 100%;\n    min-height: 120px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .acc_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #acc_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC MODAL STYLES (rendered inside ST's Popup; chrome is provided by Popup)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n.acc-modal-body {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n    text-align: left;\n}\n\n.acc-brief-section {\n    margin-bottom: 12px;\n}\n\n.acc-brief-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.acc-action-row {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    margin-bottom: 8px;\n}\n\n.acc-tokens-row {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 6px;\n    margin-bottom: 12px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.acc-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.acc-tokens-input {\n    width: 80px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n.acc-action-btn {\n    flex: 1 1 0;\n    min-width: 110px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n.acc-action-btn.acc-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.acc-generate-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* Surface/colour come from the shared banner rule at the top of this file. */\n.acc-status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    font-size: 0.9em;\n}\n\n.acc-description-section {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.acc-description-section label {\n    margin-bottom: 4px;\n}\n\n.acc-description-output {\n    width: 100%;\n    flex: 1 1 0%;\n    min-height: 200px;\n    resize: vertical;\n}\n\n.acc-description-output[disabled] {\n    opacity: 0.5;\n    cursor: not-allowed;\n}\n\n.acc-hidden {\n    display: none !important;\n}\n\n/* ACC Launch button in character creator */\n#acc_launch_btn {\n    display: flex;\n    align-items: center;\n    gap: 4px;\n}\n\n/* Field header row: label on the left, Clear button on the right. */\n.acc-modal-body .acc-field-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin-bottom: 4px;\n}\n\n.acc-modal-body .acc-clear-btn {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.acc-modal-body .acc-clear-btn:hover {\n    opacity: 1;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   CHARACTER STATE STYLES (pane rendered inside ST's Popup; reuses the ACC\n   action/status/context classes)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Launch button on each group member row, after Possession's radio. */\n.character_state_btn {\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n}\n\n.character_state_btn:hover {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n#character_state_solo_btn {\n    display: flex;\n    align-items: center;\n}\n\n.cs-modal-body {\n    display: flex;\n    flex-direction: column;\n    gap: 12px;\n    text-align: left;\n}\n\n.cs-header {\n    display: flex;\n    align-items: center;\n    gap: 10px;\n}\n\n.cs-header-avatar {\n    width: 40px;\n    height: 40px;\n    border-radius: 50%;\n    object-fit: cover;\n    flex-shrink: 0;\n}\n\n.cs-header-title {\n    margin: 0;\n}\n\n.cs-variable-list {\n    display: flex;\n    flex-direction: column;\n    gap: 10px;\n}\n\n.cs-empty {\n    opacity: 0.7;\n    font-style: italic;\n}\n\n.cs-variable {\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-left-width: 3px;\n    border-radius: 4px;\n    transition: border-color 0.15s ease;\n}\n\n.cs-variable.cs-dirty {\n    border-left-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.cs-variable.cs-proposed {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.cs-variable-head {\n    display: flex;\n    align-items: center;\n    flex-wrap: wrap;\n    gap: 6px 8px;\n    margin-bottom: 6px;\n}\n\n.cs-variable-name {\n    font-size: 0.8em;\n    opacity: 0.7;\n}\n\n.cs-variable-source {\n    font-size: 0.8em;\n    opacity: 0.7;\n}\n\n/* Status + row buttons sit at the right end of the head row. */\n.cs-variable-status {\n    margin-left: auto;\n    font-size: 0.8em;\n    opacity: 0.85;\n}\n\n.cs-variable.cs-dirty .cs-variable-status {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    opacity: 1;\n}\n\n.cs-row-btn {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    margin: 0;\n}\n\n.cs-row-btn.cs-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.cs-variable-value {\n    width: 100%;\n    resize: vertical;\n    min-height: 3em;\n}\n\n/* Showing the card default (variable unset): dimmed so it reads as a fallback. */\n.cs-variable.cs-default .cs-variable-value {\n    font-style: italic;\n    opacity: 0.7;\n}\n\n.cs-assist-section {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n    padding-top: 10px;\n    border-top: 1px solid var(--SmartThemeBorderColor, #555);\n}\n\n.cs-assist-section .acc-context-section,\n.cs-assist-section .acc-preset-row,\n.cs-assist-section .acc-status-bar {\n    margin-bottom: 0;\n}\n\n.cs-instruction {\n    width: 100%;\n    resize: vertical;\n}\n\n.cs-action-row {\n    display: flex;\n    align-items: center;\n    flex-wrap: wrap;\n    gap: 8px;\n}\n\n.cs-action-row .acc-tokens-label {\n    margin-left: auto;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.cs-reply-details > summary {\n    cursor: pointer;\n    font-size: 0.85em;\n    opacity: 0.8;\n}\n\n.cs-reply {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n    font-family: var(--monoFontFamily, monospace);\n    font-size: 0.85em;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   WORLD INFO ASSIST STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Settings panel */\n#saints_silly_settings .wia_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #wia_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* Per-entry assist controls injected into each WI entry form */\n.wia-controls {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    flex-wrap: wrap;\n    margin: 6px 0 6px 0;\n}\n\n.wia-controls .wia-btn {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    cursor: pointer;\n    font-size: 0.85em;\n    padding: 4px 8px;\n}\n\n.wia-controls .wia-btn-assist {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.wia-controls .wia-btn-label {\n    font-weight: 500;\n}\n\n.wia-controls .wia-spinner {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 1em;\n    display: inline-flex;\n    align-items: center;\n    padding: 4px 6px;\n}\n\n.wia-controls .wia-hidden {\n    display: none !important;\n}\n\n/* Use Chat Context checkbox */\n.wia-controls .wia-context-toggle {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    font-size: 0.85em;\n    cursor: pointer;\n    opacity: 0.85;\n    user-select: none;\n}\n\n.wia-controls .wia-context-toggle:hover {\n    opacity: 1;\n}\n\n/* Lore book multi-select picker (per-entry) */\n.wia-controls .wia-lorebook-picker {\n    position: relative;\n    font-size: 0.85em;\n}\n\n.wia-controls .wia-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.wia-controls .wia-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.wia-controls .wia-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.wia-controls .wia-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 50;\n    min-width: 220px;\n    max-height: 240px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);\n}\n\n.wia-controls .wia-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.wia-controls .wia-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Content-actions row — sits directly above the entry's content textarea so\n   it's unambiguous which field the buttons act on. Holds Clear Content (with\n   the Assist controls) and Copy (independently toggleable). */\n.wia-content-actions-row {\n    display: flex;\n    justify-content: flex-end;\n    gap: 4px;\n    margin: 2px 0 4px 0;\n}\n\n.wia-content-actions-row .wia-btn {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n    cursor: pointer;\n}\n\n.wia-content-actions-row .wia-btn:hover {\n    opacity: 1;\n}\n\n/* Per-entry guidance section — sits between the controls and the entry's\n   content textarea so it's clearly the user's *input* to the assist. */\n.wia-guidance-block {\n    margin: 0 0 8px 0;\n}\n\n.wia-guidance-block .wia-guidance-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin: 0 0 4px 0;\n}\n\n.wia-guidance-block .wia-guidance-label {\n    font-size: 0.9em;\n    font-weight: 500;\n    opacity: 0.9;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n}\n\n.wia-guidance-block .wia-btn-clear-guidance {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.wia-guidance-block .wia-btn-clear-guidance:hover {\n    opacity: 1;\n}\n\n.wia-guidance-block .wia-guidance-textarea {\n    width: 100%;\n    resize: vertical;\n    min-height: 60px;\n    font-size: 0.9em;\n}\n\n/* Per-entry token limit row */\n.wia-controls .wia-tokens-row {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.85em;\n    opacity: 0.85;\n    margin-left: auto;\n}\n\n.wia-controls .wia-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.wia-controls .wia-tokens-input {\n    width: 72px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n/* ── ACC modal: context preamble controls ── */\n\n.acc-context-section {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: wrap;\n    margin-bottom: 12px;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.acc-context-section .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.9em;\n    cursor: pointer;\n}\n\n.acc-lorebook-picker {\n    position: relative;\n    font-size: 0.9em;\n}\n\n.acc-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.acc-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.acc-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.acc-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 10002;\n    min-width: 240px;\n    max-height: 260px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\n}\n\n.acc-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.acc-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   COMPACTION MODAL STYLES (rendered inside ST's Popup; mirror the ACC flex chain)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n.cc-modal-body {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n    text-align: left;\n}\n\n/* Surface/colour come from the shared banner rule at the top of this file. */\n.cc-usage-banner {\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    font-size: 0.9em;\n}\n\n/* The alarm is carried by the tinted surface, the accent border and the weight\n   — not by recolouring the text, which is the readable part. */\n.cc-usage-banner.cc-usage-high {\n    background-color: rgba(232, 162, 58, 0.18);\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-weight: 600;\n}\n\n.cc-context-section {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: wrap;\n    margin-bottom: 12px;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.cc-context-hint {\n    opacity: 0.7;\n}\n\n.cc-guidance-section {\n    margin-bottom: 12px;\n}\n\n.cc-guidance-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.cc-action-row {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    margin-bottom: 8px;\n}\n\n.cc-action-btn {\n    flex: 1 1 0;\n    min-width: 130px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n.cc-action-btn.cc-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.cc-generate-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.cc-tokens-row {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 6px;\n    margin-bottom: 12px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.cc-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.cc-tokens-input {\n    width: 90px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n/* Surface/colour come from the shared banner rule at the top of this file. */\n.cc-status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    font-size: 0.9em;\n}\n\n.cc-summary-section {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.cc-summary-section label {\n    margin-bottom: 4px;\n}\n\n.cc-summary-output {\n    width: 100%;\n    flex: 1 1 0%;\n    min-height: 200px;\n    resize: vertical;\n}\n\n.cc-hidden {\n    display: none !important;\n}\n\n.cc-modal-body .cc-field-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin-bottom: 4px;\n}\n\n.cc-modal-body .cc-clear-btn {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.cc-modal-body .cc-clear-btn:hover {\n    opacity: 1;\n}\n\n.cc-confirm .cc-dont-ask {\n    margin-top: 10px;\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n/* Compaction lore-book picker (shares the ACC picker shape) */\n.cc-lorebook-picker {\n    position: relative;\n    font-size: 0.9em;\n}\n\n.cc-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.cc-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.cc-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.cc-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 10002;\n    min-width: 240px;\n    max-height: 260px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\n}\n\n.cc-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.cc-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Compaction launch item in the hamburger menu */\n#compaction_menu_button {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n/* The seeded \"Story so far\" recap message. The class is applied to the .mes\n   node by tagCompactionSummaries() (extra.sse_summary alone has no DOM hook). */\n#chat .mes.cc-summary-message {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n#chat .mes.cc-summary-message .ch_name .name_text {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-style: italic;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   IMAGE PROMPTING MODAL STYLES (rendered inside ST's Popup; mirror the ACC flex chain)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n.ip-modal-body {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n    text-align: left;\n}\n\n.ip-context-section {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: wrap;\n    margin-bottom: 12px;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.ip-context-section .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.9em;\n    cursor: pointer;\n}\n\n.ip-guidance-section {\n    margin-bottom: 12px;\n}\n\n.ip-guidance-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.ip-action-row {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    margin-bottom: 8px;\n}\n\n.ip-action-btn {\n    flex: 1 1 0;\n    min-width: 130px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n.ip-action-btn.ip-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.ip-generate-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.ip-tokens-row {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 6px;\n    margin-bottom: 12px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.ip-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.ip-tokens-input {\n    width: 90px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n/* Surface/colour come from the shared banner rule at the top of this file. */\n.ip-status-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    font-size: 0.9em;\n}\n\n/* Context-anchor bar — shown when the modal was opened from a per-message\n   button, so the packed chat context ends at that message. */\n.ip-anchor-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 6px 12px;\n    margin-bottom: 8px;\n    font-size: 0.9em;\n}\n\n.ip-anchor-text {\n    flex: 1 1 0%;\n    min-width: 0;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n    opacity: 0.9;\n}\n\n.ip-output-section {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.ip-output-section label {\n    margin-bottom: 4px;\n}\n\n.ip-prompt-output {\n    width: 100%;\n    flex: 1 1 0%;\n    min-height: 180px;\n    resize: vertical;\n}\n\n.ip-hidden {\n    display: none !important;\n}\n\n.ip-modal-body .ip-field-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin-bottom: 4px;\n}\n\n.ip-modal-body .ip-field-header-buttons {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n.ip-modal-body .ip-clear-btn {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.ip-modal-body .ip-clear-btn:hover {\n    opacity: 1;\n}\n\n.ip-modal-body .ip-clear-btn.ip-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n/* Hand-off to ST's Image Generation extension — tinted like the primary\n   Generate action, since it's the other \"make something\" button in the modal. */\n.ip-modal-body .ip-send-btn {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.ip-negative-section {\n    margin-top: 10px;\n}\n\n.ip-modal-body .ip-negative-prompt {\n    width: 100%;\n    min-height: 60px;\n    resize: vertical;\n    font-size: 0.9em;\n}\n\n/* Image Prompting lore-book picker (shares the ACC picker shape) */\n.ip-lorebook-picker {\n    position: relative;\n    font-size: 0.9em;\n}\n\n.ip-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.ip-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.ip-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.ip-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 10002;\n    min-width: 240px;\n    max-height: 260px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\n}\n\n.ip-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.ip-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Image Prompting saved-prompt store (per-chat) */\n.ip-saved-section {\n    margin-top: 8px;\n}\n\n.ip-saved-picker {\n    font-size: 0.9em;\n}\n\n.ip-saved-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.ip-saved-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.ip-saved-picker > summary:hover {\n    opacity: 1;\n}\n\n.ip-saved-list {\n    margin-top: 4px;\n    max-height: 220px;\n    overflow-y: auto;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n}\n\n.ip-saved-item {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 4px 6px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.ip-saved-item-info {\n    flex: 1;\n    min-width: 0;\n}\n\n.ip-saved-item-head {\n    display: flex;\n    align-items: baseline;\n    justify-content: space-between;\n    gap: 8px;\n}\n\n.ip-saved-item-title {\n    font-weight: bold;\n    white-space: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n\n.ip-saved-item-untitled {\n    font-weight: normal;\n    font-style: italic;\n    opacity: 0.7;\n}\n\n.ip-saved-item-date {\n    font-size: 0.85em;\n    opacity: 0.7;\n    flex-shrink: 0;\n}\n\n.ip-saved-item-preview {\n    white-space: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n\n.ip-saved-item-buttons {\n    display: flex;\n    gap: 4px;\n    flex-shrink: 0;\n}\n\n.ip-saved-item-btn {\n    font-size: 0.85em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.ip-saved-item-btn:hover {\n    opacity: 1;\n}\n\n.ip-saved-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Image Prompting launch item in the hamburger menu */\n#image_prompt_menu_button {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   NARRATIVE GUIDANCE SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_subsection_header {\n    margin: 12px 0 4px 0;\n    opacity: 0.85;\n}\n\n#saints_silly_settings .ng_field_header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n}\n\n#saints_silly_settings .ng_clear_guidance_button {\n    font-size: 0.85em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n#saints_silly_settings .ng_clear_guidance_button:hover {\n    opacity: 1;\n}\n\n#saints_silly_settings .ng_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings .ng_prompt_section textarea {\n    width: 100%;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .ng_inline_row {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin: 6px 0;\n}\n\n#saints_silly_settings .ng_number_input {\n    width: 5em;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng_select_input {\n    width: auto;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng-lorebook-picker {\n    margin: 8px 0;\n}\n\n/* Lore-book picker + \"Chat's books\" reset side by side; the picker's list\n   expands in place, so the row aligns to the top. */\n#saints_silly_settings .ng_lorebooks_row {\n    align-items: flex-start;\n}\n\n#saints_silly_settings .ng_lorebooks_row > div:first-child {\n    flex: 1 1 auto;\n    min-width: 0;\n}\n\n#saints_silly_settings .ng_lorebooks_row .menu_button {\n    margin-top: 8px;\n    white-space: nowrap;\n}\n\n/* ── Narrative Guidance: Scenario picker ── */\n\n#saints_silly_settings .ng_scenario_section {\n    margin: 10px 0;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n#saints_silly_settings .ng_scenario_select {\n    flex: 1 1 auto;\n    min-width: 0;\n    width: auto;\n}\n\n#saints_silly_settings .ng_scenario_apply_row .menu_button {\n    flex: 1 1 0;\n    min-width: 0;\n    white-space: nowrap;\n    text-align: center;\n}\n\n#saints_silly_settings .ng_scenario_row .menu_button.disabled {\n    opacity: 0.4;\n    pointer-events: none;\n}\n\n#saints_silly_settings #ng_scenario_hint {\n    display: block;\n    opacity: 0.8;\n    margin-bottom: 4px;\n}\n\n#saints_silly_settings .ng-lorebook-list {\n    margin-top: 4px;\n    padding: 6px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n}\n\n#saints_silly_settings .ng-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n#saints_silly_settings .ng-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n#saints_silly_settings [id$=\"_regenerate_now\"].disabled,\n#saints_silly_settings [id$=\"_continue_now\"].disabled,\n#saints_silly_settings [id$=\"_retry_now\"].disabled {\n    opacity: 0.6;\n    pointer-events: none;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PROMPT TEMPLATE CONTROLS (shared, one row per prompt)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_template_controls {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin-top: 6px;\n}\n\n#saints_silly_settings .saints_template_select {\n    width: 100%;\n}\n\n#saints_silly_settings .saints_template_buttons {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button {\n    flex: 1 1 0;\n    min-width: 100px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button.disabled {\n    opacity: 0.5;\n    pointer-events: none;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   TOOL PRESET BLOCK & PROMPT PREVIEW\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_preset_block {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin: 8px 0;\n    padding: 8px;\n    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));\n    border-radius: 6px;\n}\n\n#saints_silly_settings .saints_preview_btn {\n    align-self: flex-start;\n    white-space: nowrap;\n}\n\n.sse-prompt-preview {\n    text-align: left;\n}\n\n.sse-prompt-preview h3 {\n    margin: 0 0 10px 0;\n}\n\n.sse-preview-section {\n    margin-bottom: 12px;\n}\n\n.sse-preview-label {\n    font-weight: bold;\n    opacity: 0.8;\n    margin-bottom: 4px;\n}\n\n.sse-preview-text {\n    white-space: pre-wrap;\n    word-break: break-word;\n    text-align: left;\n    font-size: calc(var(--mainFontSize, 14px) * 0.85);\n    background-color: rgba(0, 0, 0, 0.2);\n    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));\n    border-radius: 6px;\n    padding: 8px;\n    margin: 0;\n    max-height: 40vh;\n    overflow-y: auto;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   REFORMATTING\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Engine-specific option blocks; toggled by the Engine dropdown. */\n#saints_silly_settings .reformatting_section {\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    margin-top: 6px;\n}\n\n#saints_silly_settings .reformatting-hidden {\n    display: none;\n}\n\n/* Mutually-exclusive asterisk-handling choice. */\n#saints_silly_settings .reformatting_radio_group {\n    display: flex;\n    flex-direction: column;\n    gap: 2px;\n    margin: 2px 0 4px 12px;\n}\n\n/* Per-message reformat button — inherits ST's .mes_button sizing; this just\n   gives it a subtle hover tint consistent with the other quick buttons. */\n.sse-reformat-button {\n    cursor: pointer;\n}\n\n.sse-reformat-button:hover {\n    color: var(--SmartThemeQuoteColor, #6bf);\n}\n\n/* Image Prompting per-message button (same shape as the reformat button) */\n.sse-image-prompt-button {\n    cursor: pointer;\n}\n\n.sse-image-prompt-button:hover {\n    color: var(--SmartThemeQuoteColor, #6bf);\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PHRASE BAN\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .phrase_ban_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings .phrase_ban_section textarea {\n    width: 100%;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n/* Live pattern-list validation readout under the patterns textarea. */\n#saints_silly_settings #phrase_ban_pattern_status {\n    display: block;\n    margin-top: 4px;\n    opacity: 0.8;\n}\n\n/* Same reasoning as the Compaction usage banner: warning colour goes on the\n   rule and the tint, the text stays at the theme's readable body colour. */\n#saints_silly_settings #phrase_ban_pattern_status.phrase-ban-status-error {\n    color: var(--SmartThemeBodyColor, #ddd);\n    background-color: rgba(232, 162, 58, 0.18);\n    border-left: 3px solid var(--warning, #e8a23a);\n    border-radius: 3px;\n    padding: 2px 6px;\n    opacity: 1;\n}\n\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   RETRY CONTINUE\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Retry Continue button (hamburger menu item) */\n#option_retry_continue {\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n}\n\n#option_retry_continue:hover {\n    opacity: 1;\n}\n\n/* Active state — checkpoint is set */\n#option_retry_continue.retry-active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* Retry Continue quick-action button */\n#quick_retry_continue {\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    font-size: 1.1em;\n    padding: 2px 5px;\n    position: relative;\n}\n\n#quick_retry_continue:hover {\n    opacity: 1;\n}\n\n#quick_retry_continue.retry-active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n#quick_retry_continue.retry-active::after {\n    content: '';\n    position: absolute;\n    bottom: -2px;\n    left: 50%;\n    transform: translateX(-50%);\n    width: 6px;\n    height: 6px;\n    border-radius: 50%;\n    background-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* Message indicator: colored left border */\n.mes.retry-checkpoint-border {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n/* Message indicator: bookmark icon */\n.retry-checkpoint-indicator {\n    margin-left: 6px;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 0.85em;\n    vertical-align: middle;\n}\n\n/* Settings: spacing for the Clear Checkpoint button */\n#saints_silly_settings #retry_continue_clear {\n    margin-top: 10px;\n}\n\n/* ─── Point-of-use Preset Selectors ─── */\n\n/* Shared base for the compact preset dropdowns mounted at each tool's\n   working surface (modals, WIA entry rows). */\n.saints_preset_select {\n    flex: 0 1 auto;\n    width: auto !important;\n    min-width: 120px;\n    max-width: 260px;\n}\n\n.acc-preset-row,\n.ip-preset-row,\n.cc-preset-row {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    margin-bottom: 8px;\n    font-size: 0.9em;\n}\n\n.acc-preset-label,\n.ip-preset-label,\n.cc-preset-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n    opacity: 0.85;\n}\n\n.wia-controls .wia-preset-row {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.wia-controls .wia-preset-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.wia-controls .wia-preset-select {\n    max-width: 160px;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n}\n\n/* ─── Group Director ─── */\n\n.sse-director-dialog {\n    text-align: left;\n}\n\n.sse-director-heading {\n    font-size: 1.05em;\n    margin-bottom: 4px;\n}\n\n.sse-director-heading strong {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.sse-director-hint {\n    opacity: 0.75;\n    font-size: 0.9em;\n    margin-bottom: 10px;\n}\n\n.sse-director-choices {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    justify-content: center;\n}\n\n.sse-director-choice {\n    cursor: pointer;\n}\n\n.sse-director-choice.sse-director-suggested {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* Walk-on choices read as guests — dashed border to distinguish from members. */\n.sse-director-choice.sse-director-walkon {\n    border-style: dashed;\n    opacity: 0.92;\n}\n"],"sourceRoot":""}]);
+`, "",{"version":3,"sources":["webpack://./src/style.css"],"names":[],"mappings":"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","sourcesContent":["/* Saint's Silly Extensions — Combined Styles */\n\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SHARED: LORE BOOK PICKER\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Applied to every lore book picker (ACC / WIA / NG / Compaction) via the shared\n   factory. The picker text is pure UI and must not be selectable: tapping a\n   selectable lore book name engages Android Chrome's text-selection/magnifier\n   subsystem, which can crash the renderer (\"Aw, Snap\"). Disabling selection +\n   the touch callout/highlight keeps taps lightweight. user-select inherits, so\n   one rule on the root covers the summary and every list item. */\n.sse-lorebook-picker,\n.sse-lorebook-picker * {\n    -webkit-user-select: none;\n    user-select: none;\n    -webkit-touch-callout: none;\n    -webkit-tap-highlight-color: transparent;\n}\n\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SHARED: BANNERS & STATUS BARS\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* One readable surface for every modal banner / status bar (the generation\n   modals' status bars, Compaction's usage banner, Image Prompting's anchor bar). ST's --SmartThemeBodyColor is the *text* colour, not a\n   background — painting a bar with it renders the block in the same colour as\n   the text on top of it, which is what made these unreadable (a white bar with\n   near-white text on light themes). The surface is a translucent black wash\n   instead: it darkens whatever the theme's own background is, so body-coloured\n   text keeps its contrast on both light and dark themes. */\n.sse-modal-status,\n.sse-modal-banner {\n    background-color: rgba(0, 0, 0, 0.2);\n    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));\n    border-radius: 4px;\n    color: var(--SmartThemeBodyColor, #ddd);\n}\n\n/* The accent lives on the icon, never on the message text: a theme accent\n   (gold, etc.) can fall below readable contrast on a light background, the\n   body colour can't. */\n.sse-modal-status > .fa-solid,\n.sse-modal-banner > .fa-solid {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SHARED: GENERATION MODALS\n   (ACC, Compaction, Image Prompting, Character State — rendered inside ST's\n   Popup, which provides the chrome. Markup comes from generation-modal.js.)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n.sse-modal-body {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n    text-align: left;\n}\n\n.sse-modal-hidden {\n    display: none !important;\n}\n\n.sse-modal-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n/* ── Context row: Use Chat Context + lore-book picker ── */\n\n.sse-modal-context {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    flex-wrap: wrap;\n    margin-bottom: 12px;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.sse-modal-context .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.9em;\n    cursor: pointer;\n}\n\n.sse-modal-lorebook-picker {\n    position: relative;\n    font-size: 0.9em;\n}\n\n.sse-modal-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.sse-modal-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.sse-modal-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.sse-modal-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 10002;\n    min-width: 240px;\n    max-height: 260px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);\n}\n\n.sse-modal-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.sse-modal-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n.sse-modal-preset-row {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    margin-bottom: 8px;\n    font-size: 0.9em;\n}\n\n.sse-modal-preset-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n    opacity: 0.85;\n}\n\n/* ── Fields: label on the left, small buttons on the right ── */\n\n.sse-modal-section {\n    margin-bottom: 12px;\n}\n\n.sse-modal-section textarea {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n}\n\n.sse-modal-field-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin-bottom: 4px;\n}\n\n.sse-modal-field-header-buttons {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n.sse-modal-small-btn {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n    white-space: nowrap;\n}\n\n.sse-modal-small-btn:hover {\n    opacity: 1;\n}\n\n.sse-modal-small-btn.sse-modal-disabled {\n    opacity: 0.3;\n}\n\n.sse-modal-output-section {\n    display: flex;\n    flex-direction: column;\n    flex: 1 1 0%;\n    min-height: 0;\n}\n\n.sse-modal-output {\n    width: 100%;\n    flex: 1 1 0%;\n    min-height: 200px;\n    resize: vertical;\n}\n\n/* ── Actions, Max Tokens, status ── */\n\n.sse-modal-action-row {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    margin-bottom: 8px;\n}\n\n.sse-modal-action-btn {\n    flex: 1 1 0;\n    min-width: 110px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* The primary \"make something\" action (Generate, Generate Image, …). */\n.sse-modal-primary {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.sse-modal-tokens-row {\n    display: flex;\n    align-items: center;\n    justify-content: flex-end;\n    gap: 6px;\n    margin-bottom: 12px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.sse-modal-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.sse-modal-tokens-input {\n    width: 90px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n.sse-modal-status {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    font-size: 0.9em;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   POSSESSION STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Group Chat: Radio Button Toggle ── */\n\n.possession_radio_wrapper {\n    display: inline-flex;\n    align-items: center;\n    margin-left: 4px;\n    cursor: pointer;\n}\n\n.possession_radio {\n    width: 16px;\n    height: 16px;\n    border-radius: 50%;\n    border: 2px solid var(--SmartThemeBorderColor, #555);\n    background: transparent;\n    cursor: pointer;\n    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;\n    position: relative;\n    flex-shrink: 0;\n}\n\n.possession_radio:hover {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.possession_radio.possession_active {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n    background: var(--SmartThemeQuoteColor, #e8a23a);\n    box-shadow: inset 0 0 0 3px var(--SmartThemeBlurTintColor, #1a1a2e);\n}\n\n/* ── Solo Chat: Possess Toggle Button ── */\n\n#possession_solo_btn {\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    cursor: pointer;\n    position: relative;\n}\n\n#possession_solo_btn:hover {\n    opacity: 1;\n}\n\n#possession_solo_btn.possession_active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n#possession_solo_btn.possession_active::after {\n    content: '';\n    position: absolute;\n    bottom: -2px;\n    left: 50%;\n    transform: translateX(-50%);\n    width: 6px;\n    height: 6px;\n    border-radius: 50%;\n    background-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Group member highlight when possessed ── */\n\n.group_member.possession_possessed {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n/* ── Possession Impersonate Button (Character Avatar) ── */\n\n#possession_impersonate_btn {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease;\n    padding: 2px;\n}\n\n#possession_impersonate_btn:hover {\n    opacity: 1;\n}\n\n.possession_impersonate_avatar {\n    width: 26px;\n    height: 26px;\n    border-radius: 50%;\n    object-fit: cover;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    transition: border-color 0.15s ease;\n}\n\n#possession_impersonate_btn:hover .possession_impersonate_avatar {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hide controls when extension is disabled ── */\n\n.possession_hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PHRASING STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ── Input Area Button (next to Send) ── */\n\n#phrasing_send_button {\n    cursor: pointer;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    padding: 3px;\n    font-size: 1.2em;\n}\n\n#phrasing_send_button:hover {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* ── Hamburger Menu Item ── */\n\n#phrasing_menu_button {\n    cursor: pointer;\n}\n\n#phrasing_menu_button .fa-solid {\n    margin-right: 5px;\n    width: 1em;\n    text-align: center;\n}\n\n/* ── Hide buttons during generation ── */\n\n.phrasing-hidden {\n    display: none !important;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   SETTINGS PANEL STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .inline-drawer-content {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n    padding: 8px 0;\n}\n\n/* Nested drawers (template fields inside each tool's panel) — slightly\n   indented and with a smaller, dimmer header so they read as a sub-section\n   rather than a peer of the top-level tool drawer. */\n#saints_silly_settings .saints_nested_drawer {\n    margin: 4px 0 4px 4px;\n    border-left: 2px solid var(--SmartThemeBorderColor, #555);\n    padding-left: 8px;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-toggle {\n    font-size: 0.95em;\n    opacity: 0.85;\n    padding: 2px 0;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-toggle:hover {\n    opacity: 1;\n}\n\n#saints_silly_settings .saints_nested_drawer > .inline-drawer-content {\n    padding: 4px 0 4px 0;\n}\n\n#saints_silly_settings .checkbox_label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_section_header {\n    margin: 4px 0 2px 0;\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n#saints_silly_settings .saints_divider {\n    border: none;\n    border-top: 1px solid var(--SmartThemeBorderColor, #555);\n    margin: 8px 0;\n}\n\n#saints_silly_settings .phrasing_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #phrasing_prompt_textarea {\n    width: 100%;\n    min-height: 120px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .phrasing_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ACC SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .acc_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #acc_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .acc_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   ASSISTED CHARACTER CREATION (modal styles are shared — see GENERATION MODALS)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* ACC Launch button in character creator */\n#acc_launch_btn {\n    display: flex;\n    align-items: center;\n    gap: 4px;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   CHARACTER STATE STYLES (pane rendered inside ST's Popup; its assist section\n   reuses the shared generation-modal classes)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Launch button on each group member row, after Possession's radio. */\n.character_state_btn {\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n}\n\n.character_state_btn:hover {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n#character_state_solo_btn {\n    display: flex;\n    align-items: center;\n}\n\n.cs-modal-body {\n    display: flex;\n    flex-direction: column;\n    gap: 12px;\n    text-align: left;\n}\n\n.cs-header {\n    display: flex;\n    align-items: center;\n    gap: 10px;\n}\n\n.cs-header-avatar {\n    width: 40px;\n    height: 40px;\n    border-radius: 50%;\n    object-fit: cover;\n    flex-shrink: 0;\n}\n\n.cs-header-title {\n    margin: 0;\n}\n\n.cs-variable-list {\n    display: flex;\n    flex-direction: column;\n    gap: 10px;\n}\n\n.cs-empty {\n    opacity: 0.7;\n    font-style: italic;\n}\n\n.cs-variable {\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-left-width: 3px;\n    border-radius: 4px;\n    transition: border-color 0.15s ease;\n}\n\n.cs-variable.cs-dirty {\n    border-left-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.cs-variable.cs-proposed {\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.cs-variable-head {\n    display: flex;\n    align-items: center;\n    flex-wrap: wrap;\n    gap: 6px 8px;\n    margin-bottom: 6px;\n}\n\n.cs-variable-name {\n    font-size: 0.8em;\n    opacity: 0.7;\n}\n\n.cs-variable-source {\n    font-size: 0.8em;\n    opacity: 0.7;\n}\n\n/* Status + row buttons sit at the right end of the head row. */\n.cs-variable-status {\n    margin-left: auto;\n    font-size: 0.8em;\n    opacity: 0.85;\n}\n\n.cs-variable.cs-dirty .cs-variable-status {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    opacity: 1;\n}\n\n.cs-row-btn {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    margin: 0;\n}\n\n.cs-row-btn.cs-disabled {\n    opacity: 0.3;\n    pointer-events: none;\n}\n\n.cs-variable-value {\n    width: 100%;\n    resize: vertical;\n    min-height: 3em;\n}\n\n/* Showing the card default (variable unset): dimmed so it reads as a fallback. */\n.cs-variable.cs-default .cs-variable-value {\n    font-style: italic;\n    opacity: 0.7;\n}\n\n.cs-assist-section {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n    padding-top: 10px;\n    border-top: 1px solid var(--SmartThemeBorderColor, #555);\n}\n\n.cs-assist-section .sse-modal-context,\n.cs-assist-section .sse-modal-preset-row,\n.cs-assist-section .sse-modal-status {\n    margin-bottom: 0;\n}\n\n.cs-instruction {\n    width: 100%;\n    resize: vertical;\n}\n\n.cs-action-row {\n    display: flex;\n    align-items: center;\n    flex-wrap: wrap;\n    gap: 8px;\n}\n\n.cs-action-row .sse-modal-tokens-label {\n    margin-left: auto;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.cs-reply-details > summary {\n    cursor: pointer;\n    font-size: 0.85em;\n    opacity: 0.8;\n}\n\n.cs-reply {\n    width: 100%;\n    margin-top: 4px;\n    resize: vertical;\n    font-family: var(--monoFontFamily, monospace);\n    font-size: 0.85em;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   WORLD INFO ASSIST STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Settings panel */\n#saints_silly_settings .wia_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings #wia_prompt_textarea {\n    width: 100%;\n    min-height: 160px;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .wia_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n/* Per-entry assist controls injected into each WI entry form */\n.wia-controls {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    flex-wrap: wrap;\n    margin: 6px 0 6px 0;\n}\n\n.wia-controls .wia-btn {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    cursor: pointer;\n    font-size: 0.85em;\n    padding: 4px 8px;\n}\n\n.wia-controls .wia-btn-assist {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.wia-controls .wia-btn-label {\n    font-weight: 500;\n}\n\n.wia-controls .wia-spinner {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 1em;\n    display: inline-flex;\n    align-items: center;\n    padding: 4px 6px;\n}\n\n.wia-controls .wia-hidden {\n    display: none !important;\n}\n\n/* Use Chat Context checkbox */\n.wia-controls .wia-context-toggle {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    font-size: 0.85em;\n    cursor: pointer;\n    opacity: 0.85;\n    user-select: none;\n}\n\n.wia-controls .wia-context-toggle:hover {\n    opacity: 1;\n}\n\n/* Lore book multi-select picker (per-entry) */\n.wia-controls .wia-lorebook-picker {\n    position: relative;\n    font-size: 0.85em;\n}\n\n.wia-controls .wia-lorebook-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.wia-controls .wia-lorebook-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.wia-controls .wia-lorebook-picker > summary:hover {\n    opacity: 1;\n}\n\n.wia-controls .wia-lorebook-list {\n    position: absolute;\n    top: 100%;\n    left: 0;\n    margin-top: 2px;\n    z-index: 50;\n    min-width: 220px;\n    max-height: 240px;\n    overflow-y: auto;\n    background: var(--SmartThemeBlurTintColor, #1a1a2e);\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);\n}\n\n.wia-controls .wia-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n.wia-controls .wia-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Content-actions row — sits directly above the entry's content textarea so\n   it's unambiguous which field the buttons act on. Holds Clear Content (with\n   the Assist controls) and Copy (independently toggleable). */\n.wia-content-actions-row {\n    display: flex;\n    justify-content: flex-end;\n    gap: 4px;\n    margin: 2px 0 4px 0;\n}\n\n.wia-content-actions-row .wia-btn {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n    cursor: pointer;\n}\n\n.wia-content-actions-row .wia-btn:hover {\n    opacity: 1;\n}\n\n/* Per-entry guidance section — sits between the controls and the entry's\n   content textarea so it's clearly the user's *input* to the assist. */\n.wia-guidance-block {\n    margin: 0 0 8px 0;\n}\n\n.wia-guidance-block .wia-guidance-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    margin: 0 0 4px 0;\n}\n\n.wia-guidance-block .wia-guidance-label {\n    font-size: 0.9em;\n    font-weight: 500;\n    opacity: 0.9;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n}\n\n.wia-guidance-block .wia-btn-clear-guidance {\n    font-size: 0.8em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.wia-guidance-block .wia-btn-clear-guidance:hover {\n    opacity: 1;\n}\n\n.wia-guidance-block .wia-guidance-textarea {\n    width: 100%;\n    resize: vertical;\n    min-height: 60px;\n    font-size: 0.9em;\n}\n\n/* Per-entry token limit row */\n.wia-controls .wia-tokens-row {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.85em;\n    opacity: 0.85;\n    margin-left: auto;\n}\n\n.wia-controls .wia-tokens-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.wia-controls .wia-tokens-input {\n    width: 72px !important;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n    text-align: center;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   COMPACTION MODAL STYLES (on top of the shared generation-modal styles)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Surface/colour come from the shared banner rule at the top of this file. */\n.cc-usage-banner {\n    padding: 8px 12px;\n    margin-bottom: 12px;\n    font-size: 0.9em;\n}\n\n/* The alarm is carried by the tinted surface, the accent border and the weight\n   — not by recolouring the text, which is the readable part. */\n.cc-usage-banner.cc-usage-high {\n    background-color: rgba(232, 162, 58, 0.18);\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-weight: 600;\n}\n\n.cc-context-hint {\n    opacity: 0.7;\n}\n\n.cc-confirm .cc-dont-ask {\n    margin-top: 10px;\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n/* Compaction launch item in the hamburger menu */\n#compaction_menu_button {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n/* The seeded \"Story so far\" recap message. The class is applied to the .mes\n   node by tagCompactionSummaries() (extra.sse_summary alone has no DOM hook). */\n#chat .mes.cc-summary-message {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n#chat .mes.cc-summary-message .ch_name .name_text {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-style: italic;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   IMAGE PROMPTING MODAL STYLES (on top of the shared generation-modal styles)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Context-anchor bar — shown when the modal was opened from a per-message\n   button, so the packed chat context ends at that message. */\n.ip-anchor-bar {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 6px 12px;\n    margin-bottom: 8px;\n    font-size: 0.9em;\n}\n\n.ip-anchor-text {\n    flex: 1 1 0%;\n    min-width: 0;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n    opacity: 0.9;\n}\n\n.sse-modal-output.ip-prompt-output {\n    min-height: 180px;\n}\n\n.ip-negative-section {\n    margin-top: 10px;\n}\n\n.ip-negative-prompt {\n    width: 100%;\n    min-height: 60px;\n    resize: vertical;\n    font-size: 0.9em;\n}\n\n/* Image Prompting saved-prompt store (per-chat) */\n.ip-saved-section {\n    margin-top: 8px;\n}\n\n.ip-saved-picker {\n    font-size: 0.9em;\n}\n\n.ip-saved-picker > summary {\n    cursor: pointer;\n    list-style: none;\n    padding: 4px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    opacity: 0.85;\n}\n\n.ip-saved-picker > summary::-webkit-details-marker {\n    display: none;\n}\n\n.ip-saved-picker > summary:hover {\n    opacity: 1;\n}\n\n.ip-saved-list {\n    margin-top: 4px;\n    max-height: 220px;\n    overflow-y: auto;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    padding: 6px 8px;\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n}\n\n.ip-saved-item {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 4px 6px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n.ip-saved-item-info {\n    flex: 1;\n    min-width: 0;\n}\n\n.ip-saved-item-head {\n    display: flex;\n    align-items: baseline;\n    justify-content: space-between;\n    gap: 8px;\n}\n\n.ip-saved-item-title {\n    font-weight: bold;\n    white-space: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n\n.ip-saved-item-untitled {\n    font-weight: normal;\n    font-style: italic;\n    opacity: 0.7;\n}\n\n.ip-saved-item-date {\n    font-size: 0.85em;\n    opacity: 0.7;\n    flex-shrink: 0;\n}\n\n.ip-saved-item-preview {\n    white-space: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n\n.ip-saved-item-buttons {\n    display: flex;\n    gap: 4px;\n    flex-shrink: 0;\n}\n\n.ip-saved-item-btn {\n    font-size: 0.85em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n.ip-saved-item-btn:hover {\n    opacity: 1;\n}\n\n.ip-saved-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n/* Image Prompting launch item in the hamburger menu */\n#image_prompt_menu_button {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   NARRATIVE GUIDANCE SETTINGS STYLES\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_subsection_header {\n    margin: 12px 0 4px 0;\n    opacity: 0.85;\n}\n\n#saints_silly_settings .ng_field_header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n}\n\n#saints_silly_settings .ng_clear_guidance_button {\n    font-size: 0.85em;\n    padding: 2px 8px;\n    opacity: 0.85;\n}\n\n#saints_silly_settings .ng_clear_guidance_button:hover {\n    opacity: 1;\n}\n\n#saints_silly_settings .ng_prompt_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings .ng_prompt_section textarea {\n    width: 100%;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin-top: 4px;\n}\n\n#saints_silly_settings .ng_buttons_row .menu_button {\n    flex: 1;\n    min-width: 0;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .ng_inline_row {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    flex-wrap: wrap;\n    margin: 6px 0;\n}\n\n#saints_silly_settings .ng_number_input {\n    width: 5em;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng_select_input {\n    width: auto;\n    flex: 0 0 auto;\n}\n\n#saints_silly_settings .ng-lorebook-picker {\n    margin: 8px 0;\n}\n\n/* Lore-book picker + \"Chat's books\" reset side by side; the picker's list\n   expands in place, so the row aligns to the top. */\n#saints_silly_settings .ng_lorebooks_row {\n    align-items: flex-start;\n}\n\n#saints_silly_settings .ng_lorebooks_row > div:first-child {\n    flex: 1 1 auto;\n    min-width: 0;\n}\n\n#saints_silly_settings .ng_lorebooks_row .menu_button {\n    margin-top: 8px;\n    white-space: nowrap;\n}\n\n/* ── Narrative Guidance: Scenario picker ── */\n\n#saints_silly_settings .ng_scenario_section {\n    margin: 10px 0;\n    padding: 8px 10px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n}\n\n#saints_silly_settings .ng_scenario_select {\n    flex: 1 1 auto;\n    min-width: 0;\n    width: auto;\n}\n\n#saints_silly_settings .ng_scenario_apply_row .menu_button {\n    flex: 1 1 0;\n    min-width: 0;\n    white-space: nowrap;\n    text-align: center;\n}\n\n#saints_silly_settings .ng_scenario_row .menu_button.disabled {\n    opacity: 0.4;\n    pointer-events: none;\n}\n\n#saints_silly_settings #ng_scenario_hint {\n    display: block;\n    opacity: 0.8;\n    margin-bottom: 4px;\n}\n\n#saints_silly_settings .ng-lorebook-list {\n    margin-top: 4px;\n    padding: 6px 8px;\n    border: 1px solid var(--SmartThemeBorderColor, #555);\n    border-radius: 4px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n}\n\n#saints_silly_settings .ng-lorebook-item {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n\n#saints_silly_settings .ng-lorebook-empty {\n    opacity: 0.6;\n    font-style: italic;\n}\n\n#saints_silly_settings [id$=\"_regenerate_now\"].disabled,\n#saints_silly_settings [id$=\"_continue_now\"].disabled,\n#saints_silly_settings [id$=\"_retry_now\"].disabled {\n    opacity: 0.6;\n    pointer-events: none;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PROMPT TEMPLATE CONTROLS (shared, one row per prompt)\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_template_controls {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin-top: 6px;\n}\n\n#saints_silly_settings .saints_template_select {\n    width: 100%;\n}\n\n#saints_silly_settings .saints_template_buttons {\n    display: flex;\n    gap: 8px;\n    flex-wrap: wrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button {\n    flex: 1 1 0;\n    min-width: 100px;\n    text-align: center;\n    white-space: nowrap;\n}\n\n#saints_silly_settings .saints_template_buttons .menu_button.disabled {\n    opacity: 0.5;\n    pointer-events: none;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   TOOL PRESET BLOCK & PROMPT PREVIEW\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .saints_preset_block {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin: 8px 0;\n    padding: 8px;\n    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));\n    border-radius: 6px;\n}\n\n#saints_silly_settings .saints_preview_btn {\n    align-self: flex-start;\n    white-space: nowrap;\n}\n\n.sse-prompt-preview {\n    text-align: left;\n}\n\n.sse-prompt-preview h3 {\n    margin: 0 0 10px 0;\n}\n\n.sse-preview-section {\n    margin-bottom: 12px;\n}\n\n.sse-preview-label {\n    font-weight: bold;\n    opacity: 0.8;\n    margin-bottom: 4px;\n}\n\n.sse-preview-text {\n    white-space: pre-wrap;\n    word-break: break-word;\n    text-align: left;\n    font-size: calc(var(--mainFontSize, 14px) * 0.85);\n    background-color: rgba(0, 0, 0, 0.2);\n    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));\n    border-radius: 6px;\n    padding: 8px;\n    margin: 0;\n    max-height: 40vh;\n    overflow-y: auto;\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   REFORMATTING\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Engine-specific option blocks; toggled by the Engine dropdown. */\n#saints_silly_settings .reformatting_section {\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    margin-top: 6px;\n}\n\n#saints_silly_settings .reformatting-hidden {\n    display: none;\n}\n\n/* Mutually-exclusive asterisk-handling choice. */\n#saints_silly_settings .reformatting_radio_group {\n    display: flex;\n    flex-direction: column;\n    gap: 2px;\n    margin: 2px 0 4px 12px;\n}\n\n/* Per-message reformat button — inherits ST's .mes_button sizing; this just\n   gives it a subtle hover tint consistent with the other quick buttons. */\n.sse-reformat-button {\n    cursor: pointer;\n}\n\n.sse-reformat-button:hover {\n    color: var(--SmartThemeQuoteColor, #6bf);\n}\n\n/* Image Prompting per-message button (same shape as the reformat button) */\n.sse-image-prompt-button {\n    cursor: pointer;\n}\n\n.sse-image-prompt-button:hover {\n    color: var(--SmartThemeQuoteColor, #6bf);\n}\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   PHRASE BAN\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n#saints_silly_settings .phrase_ban_section {\n    margin-top: 8px;\n    margin-bottom: 8px;\n}\n\n#saints_silly_settings .phrase_ban_section textarea {\n    width: 100%;\n    resize: vertical;\n    font-family: monospace;\n    font-size: 0.9em;\n    margin-top: 4px;\n}\n\n/* Live pattern-list validation readout under the patterns textarea. */\n#saints_silly_settings #phrase_ban_pattern_status {\n    display: block;\n    margin-top: 4px;\n    opacity: 0.8;\n}\n\n/* Same reasoning as the Compaction usage banner: warning colour goes on the\n   rule and the tint, the text stays at the theme's readable body colour. */\n#saints_silly_settings #phrase_ban_pattern_status.phrase-ban-status-error {\n    color: var(--SmartThemeBodyColor, #ddd);\n    background-color: rgba(232, 162, 58, 0.18);\n    border-left: 3px solid var(--warning, #e8a23a);\n    border-radius: 3px;\n    padding: 2px 6px;\n    opacity: 1;\n}\n\n\n/* ═══════════════════════════════════════════════════════════════════════════════\n   RETRY CONTINUE\n   ═══════════════════════════════════════════════════════════════════════════════ */\n\n/* Retry Continue button (hamburger menu item) */\n#option_retry_continue {\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n}\n\n#option_retry_continue:hover {\n    opacity: 1;\n}\n\n/* Active state — checkpoint is set */\n#option_retry_continue.retry-active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* Retry Continue quick-action button */\n#quick_retry_continue {\n    cursor: pointer;\n    opacity: 0.7;\n    transition: opacity 0.15s ease, color 0.15s ease;\n    font-size: 1.1em;\n    padding: 2px 5px;\n    position: relative;\n}\n\n#quick_retry_continue:hover {\n    opacity: 1;\n}\n\n#quick_retry_continue.retry-active {\n    opacity: 1;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n#quick_retry_continue.retry-active::after {\n    content: '';\n    position: absolute;\n    bottom: -2px;\n    left: 50%;\n    transform: translateX(-50%);\n    width: 6px;\n    height: 6px;\n    border-radius: 50%;\n    background-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* Message indicator: colored left border */\n.mes.retry-checkpoint-border {\n    border-left: 3px solid var(--SmartThemeQuoteColor, #e8a23a) !important;\n}\n\n/* Message indicator: bookmark icon */\n.retry-checkpoint-indicator {\n    margin-left: 6px;\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    font-size: 0.85em;\n    vertical-align: middle;\n}\n\n/* Settings: spacing for the Clear Checkpoint button */\n#saints_silly_settings #retry_continue_clear {\n    margin-top: 10px;\n}\n\n/* ─── Point-of-use Preset Selectors ─── */\n\n/* Shared base for the compact preset dropdowns mounted at each tool's\n   working surface (modals, WIA entry rows). */\n.saints_preset_select {\n    flex: 0 1 auto;\n    width: auto !important;\n    min-width: 120px;\n    max-width: 260px;\n}\n\n.wia-controls .wia-preset-row {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 0.85em;\n    opacity: 0.85;\n}\n\n.wia-controls .wia-preset-label {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    user-select: none;\n}\n\n.wia-controls .wia-preset-select {\n    max-width: 160px;\n    padding: 2px 6px !important;\n    font-size: 0.9em !important;\n}\n\n/* ─── Group Director ─── */\n\n.sse-director-dialog {\n    text-align: left;\n}\n\n.sse-director-heading {\n    font-size: 1.05em;\n    margin-bottom: 4px;\n}\n\n.sse-director-heading strong {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n.sse-director-hint {\n    opacity: 0.75;\n    font-size: 0.9em;\n    margin-bottom: 10px;\n}\n\n.sse-director-choices {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 8px;\n    justify-content: center;\n}\n\n.sse-director-choice {\n    cursor: pointer;\n}\n\n.sse-director-choice.sse-director-suggested {\n    color: var(--SmartThemeQuoteColor, #e8a23a);\n    border-color: var(--SmartThemeQuoteColor, #e8a23a);\n}\n\n/* Walk-on choices read as guests — dashed border to distinguish from members. */\n.sse-director-choice.sse-director-walkon {\n    border-style: dashed;\n    opacity: 0.92;\n}\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -6740,8 +6355,6 @@ function registerPhraseBanSlashCommand() {
     phrase_ban_debug('Registered /phraseban slash command');
 }
 
-;// external "../../../../reasoning.js"
-
 ;// ./src/prompt-templates.js
 /**
  * Tool Presets — named, reusable bundles of every editable prompt/prefill a
@@ -7390,6 +7003,406 @@ function setupToolPresets({ toolKey, label, containerId, fields, responseLength 
     refreshDropdown();
 }
 
+;// external "../../../../reasoning.js"
+
+;// ./src/generation-modal.js
+/**
+ * Shared machinery for the "brief in, streamed text out" modals — Assisted
+ * Character Creation, Compaction and Image Prompting all follow one flow:
+ * Generate (fresh, from the tool's prefill) / Continue (from the output's
+ * exact end) / Checkpoint / Retry, a Max Tokens field bound to the tool's
+ * response-length setting, a status bar, and Stop on the active button.
+ *
+ * Each tool keeps its own markup, prompts and close behaviour; this module
+ * owns the action state machine, the button/status UI, and the prefill-aware
+ * streamed generation. Element ids follow `${prefix}_generate_btn`,
+ * `${prefix}_status_bar`, … (see the HTML helpers below).
+ */
+
+
+
+
+
+
+const HIDDEN = 'sse-modal-hidden';
+const DISABLED = 'sse-modal-disabled';
+
+/** Lore-book picker class prefix shared by the modals (one set of styles). */
+const MODAL_LOREBOOK_PREFIX = 'sse-modal-lorebook';
+
+// ─── Markup ───
+
+const ACTIONS = ['generate', 'continue', 'checkpoint', 'retry'];
+
+function actionLabel(action, generateLabel) {
+    switch (action) {
+        case 'generate': return `<span class="fa-solid fa-wand-magic-sparkles"></span> ${generateLabel}`;
+        case 'continue': return '<span class="fa-solid fa-arrow-right"></span> Continue';
+        case 'checkpoint': return '<span class="fa-solid fa-flag"></span> Checkpoint';
+        default: return '<span class="fa-solid fa-rotate-right"></span> Retry';
+    }
+}
+
+/**
+ * The Generate / Continue / Checkpoint / Retry button row.
+ *
+ * @param {string} prefix - Id prefix (e.g. 'acc').
+ * @param {object} opts
+ * @param {string} opts.noun - What the output is ('description', 'summary', …).
+ * @param {string} [opts.generateLabel='Generate']
+ * @param {string} [opts.generateTitle]
+ */
+function actionRowHtml(prefix, { noun, generateLabel = 'Generate', generateTitle }) {
+    const titles = {
+        generate: generateTitle || `Generate a fresh ${noun} (replaces the text below)`,
+        continue: `Continue from where the ${noun} leaves off`,
+        checkpoint: `Save the current ${noun} as the Retry restore point`,
+        retry: 'Restore to the last snapshot and re-run the last action',
+    };
+    const buttons = ACTIONS.map(action => `
+            <div id="${prefix}_${action}_btn" class="menu_button interactable sse-modal-action-btn${action === 'generate' ? ' sse-modal-primary' : ''}" title="${titles[action]}">
+                ${actionLabel(action, generateLabel)}
+            </div>`).join('');
+    return `<div class="sse-modal-action-row">${buttons}\n        </div>`;
+}
+
+/** The Max Tokens row (`${prefix}_response_length`). */
+function tokensRowHtml(prefix, { max = 8192, title = 'Maximum tokens for each generation' } = {}) {
+    return `
+        <div class="sse-modal-tokens-row">
+            <label class="sse-modal-tokens-label" for="${prefix}_response_length" title="${title}">
+                <span class="fa-solid fa-coins"></span> Max Tokens:
+            </label>
+            <input id="${prefix}_response_length" type="number" class="text_pole sse-modal-tokens-input" min="50" max="${max}" step="50" />
+        </div>`;
+}
+
+/** The spinner status bar (`${prefix}_status_bar` / `${prefix}_status_text`), hidden until used. */
+function statusBarHtml(prefix) {
+    return `
+        <div class="sse-modal-status ${HIDDEN}" id="${prefix}_status_bar">
+            <span class="fa-solid fa-spinner fa-spin"></span>
+            <span id="${prefix}_status_text"></span>
+        </div>`;
+}
+
+/** A small header button (Clear, Copy, …). */
+function smallButtonHtml(id, icon, label, title, extraClass = '') {
+    return `<div id="${id}" class="menu_button interactable sse-modal-small-btn${extraClass ? ` ${extraClass}` : ''}" title="${title}">
+                    <span class="fa-solid ${icon}"></span> ${label}
+                </div>`;
+}
+
+// ─── UI Helpers ───
+
+/** Toggle the shared disabled look (and click-through) on an element by id. */
+function setModalButtonDisabled(id, disabled) {
+    document.getElementById(id)?.classList.toggle(DISABLED, !!disabled);
+}
+
+/** Show `message` in `${prefix}_status_bar`, or hide the bar when it's falsy. */
+function setModalStatus(prefix, message) {
+    const bar = document.getElementById(`${prefix}_status_bar`);
+    const text = document.getElementById(`${prefix}_status_text`);
+    if (!bar || !text) return;
+    if (message) text.textContent = message;
+    bar.classList.toggle(HIDDEN, !message);
+}
+
+// ─── Generation ───
+
+function cleanReply(text, prefill) {
+    return stripPrefillEcho(__WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(text).trim(), prefill);
+}
+
+/**
+ * Stream a fresh generation into `outputEl`. The prefill is sent as the
+ * assistant prefix *and* kept at the top of the result (echo-stripped, since
+ * some backends re-emit it).
+ *
+ * @returns {Promise<string>} prefill + reply.
+ */
+async function streamFresh({ prompt, systemPrompt, responseLength, prefill = '', outputEl, name }) {
+    const result = await withSingleLineDisabled(() => cancellableStreamingGenerate(
+        { prompt, systemPrompt, responseLength, ...(prefill ? { prefill } : {}) },
+        outputEl,
+        { append: false, name },
+    ));
+    return prefill + cleanReply(result, prefill);
+}
+
+/**
+ * Stream a continuation of `existing`: the text so far is the assistant
+ * prefill, so the model picks up from its exact end (like ST's Continue).
+ *
+ * @returns {Promise<string>} Only the new tail.
+ */
+async function streamContinuation({ prompt, systemPrompt, responseLength, existing, outputEl, name }) {
+    const result = await withSingleLineDisabled(() => cancellableStreamingGenerate(
+        { prompt, systemPrompt, responseLength, ...(existing ? { prefill: existing } : {}) },
+        outputEl,
+        { append: true, name },
+    ));
+    return cleanReply(result, existing);
+}
+
+function needsSeparator(text) {
+    return !!text && !/\s$/.test(text);
+}
+
+// ─── Action Controller ───
+
+/**
+ * Create the Generate / Continue / Checkpoint / Retry controller for a modal.
+ *
+ * @param {object} cfg
+ * @param {string} cfg.prefix - Element id prefix (`${prefix}_generate_btn`, …).
+ * @param {string} cfg.outputId - The output textarea's id.
+ * @param {string} cfg.noun - What the output is, for messages ('description').
+ * @param {string} cfg.aNoun - The noun with its article ('a description').
+ * @param {{ generate: string, continue: string }} cfg.statusText - Status-bar text per action.
+ * @param {string} [cfg.generateLabel='Generate'] - Must match the markup's label.
+ * @param {string[]} [cfg.lockIds=[]] - Inputs disabled while generating.
+ * @param {{ settings: object, key: string, fallback: number, save: () => void }} cfg.responseLength
+ *        - The tool's response-length setting, bound to `${prefix}_response_length`.
+ * @param {() => object|null} cfg.getPopup - The open Popup (its OK button is greyed while generating).
+ * @param {(action: string) => boolean} [cfg.canRun] - Tool preflight for generate/retry-of-generate;
+ *        toasts its own reason and returns false to refuse.
+ * @param {(action: 'generate'|'continue', ctx: { existing: string, outputEl: HTMLElement,
+ *        responseLength: number }) => Promise<string>} cfg.run - The tool's generation: the full
+ *        text for generate, the new tail for continue.
+ * @param {(generating: boolean, hasText: boolean) => void} [cfg.onRefresh] - Extra UI to sync.
+ * @param {string} cfg.logLabel - Console label for errors.
+ * @param {function} [cfg.debug]
+ */
+function createGenerationActions(cfg) {
+    const {
+        prefix, outputId, noun, aNoun, statusText, lockIds = [], responseLength,
+        getPopup, canRun = () => true, run, onRefresh, logLabel,
+        generateLabel = 'Generate', debug = () => {},
+    } = cfg;
+    const id = action => `${prefix}_${action}_btn`;
+    const output = () => document.getElementById(outputId);
+    const tokenInput = () => document.getElementById(`${prefix}_response_length`);
+
+    let generating = false;
+    let abortRequested = false;
+    let activeAction = null;   // which button started the current generation
+    let lastAction = null;     // 'generate' | 'continue' — what Retry redoes
+    let restorePoint = null;   // output snapshot Retry restores
+
+    function savedResponseLength() {
+        return positiveIntSetting(responseLength.settings, responseLength.key, responseLength.fallback);
+    }
+
+    function currentResponseLength() {
+        return parsePositiveInt(tokenInput()?.value) ?? savedResponseLength();
+    }
+
+    function writeResponseLength(n) {
+        if (n === null || n === responseLength.settings[responseLength.key]) return;
+        responseLength.settings[responseLength.key] = n;
+        responseLength.save();
+    }
+
+    function dropRestorePoint() {
+        restorePoint = null;
+        lastAction = null;
+        refresh();
+    }
+
+    function refresh() {
+        if (generating) return;
+        const hasText = !!output()?.value?.trim();
+        setModalButtonDisabled(id('continue'), !hasText);
+        setModalButtonDisabled(id('checkpoint'), !hasText);
+        setModalButtonDisabled(id('retry'), !lastAction || restorePoint === null);
+        onRefresh?.(false, hasText);
+    }
+
+    function setGeneratingUI(on, action) {
+        const activeId = id(action === 'continue' ? 'continue' : 'generate');
+        for (const a of ACTIONS) {
+            const btn = document.getElementById(id(a));
+            if (!btn) continue;
+            const isActive = on && id(a) === activeId;
+            btn.innerHTML = isActive ? '<span class="fa-solid fa-stop"></span> Stop' : actionLabel(a, generateLabel);
+            btn.classList.toggle(DISABLED, on && !isActive);
+        }
+        // Popup owns the OK button: grey it as a "wait" hint (each tool's
+        // onClosing still refuses a mid-generation close).
+        getPopup()?.okButton?.classList.toggle('disabled', on);
+        for (const lockId of lockIds) {
+            const el = document.getElementById(lockId);
+            if (on) el?.setAttribute('disabled', 'true');
+            else el?.removeAttribute('disabled');
+        }
+        if (on) onRefresh?.(true, !!output()?.value?.trim());
+        else refresh();
+    }
+
+    function stop() {
+        abortRequested = true;
+        // abortAllGenerations (not just our controller) so ST's
+        // GENERATION_STOPPED fires and the backend request is cancelled too.
+        abortAllGenerations(`${prefix}-cancel`);
+        debug('Stop generation triggered');
+    }
+
+    /** Keep the streamed partial on a stop, and let Retry redo it. */
+    function adoptPartial(action) {
+        if (output()?.value?.trim()) lastAction = action;
+    }
+
+    async function runAction(action) {
+        generating = true;
+        abortRequested = false;
+        activeAction = action;
+        const isContinue = action === 'continue';
+        setGeneratingUI(true, action);
+        setModalStatus(prefix, statusText[action]);
+
+        try {
+            const outputEl = output();
+            const existing = outputEl?.value || '';
+            const result = await run(action, { existing, outputEl, responseLength: currentResponseLength() });
+
+            if (abortRequested) {
+                debug(`${action} aborted; keeping the streamed partial`);
+                adoptPartial(action);
+                return;
+            }
+            if (!outputEl) return;
+            outputEl.value = isContinue
+                ? existing + (needsSeparator(existing) ? ' ' : '') + result
+                : result;
+            lastAction = action;
+            debug(`${action} complete, length:`, result.length);
+        } catch (err) {
+            if (isSilentGenerationAbort(err)) {
+                debug(`${action} aborted via cancellation; keeping the streamed partial`);
+                adoptPartial(action);
+            } else if (!abortRequested) {
+                console.error(`${logLabel} generation error:`, err);
+                toast(`Generation failed: ${err.message}`, 'error');
+            }
+        } finally {
+            generating = false;
+            abortRequested = false;
+            activeAction = null;
+            setGeneratingUI(false, action);
+            setModalStatus(prefix, null);
+        }
+    }
+
+    async function handleGenerate() {
+        if (generating) {
+            if (activeAction === 'generate') stop();
+            return;
+        }
+        if (!canRun('generate')) return;
+        restorePoint = output()?.value || '';
+        await runAction('generate');
+    }
+
+    async function handleContinue() {
+        if (generating) {
+            if (activeAction === 'continue') stop();
+            return;
+        }
+        const existing = output()?.value || '';
+        if (!existing.trim()) {
+            toast(`Nothing to continue from. Generate ${aNoun} first or type some text.`, 'warning');
+            return;
+        }
+        restorePoint = existing;
+        await runAction('continue');
+    }
+
+    function handleCheckpoint() {
+        if (generating) return;
+        const current = output()?.value || '';
+        if (!current.trim()) {
+            toast(`Nothing to checkpoint — the ${noun} is empty.`, 'warning');
+            return;
+        }
+        restorePoint = current;
+        lastAction = 'continue';
+        toast('Checkpoint saved. Retry will restore to this point.', 'success');
+        refresh();
+        debug('Checkpoint saved, length:', current.length);
+    }
+
+    async function handleRetry() {
+        if (generating) return;
+        if (!lastAction || restorePoint === null) {
+            toast('Nothing to retry yet.', 'warning');
+            return;
+        }
+        if (lastAction === 'continue' && !restorePoint.trim()) {
+            toast('Cannot continue from an empty restore point.', 'warning');
+            return;
+        }
+        if (lastAction === 'generate' && !canRun('generate')) return;
+        const out = output();
+        if (out) out.value = restorePoint;
+        await runAction(lastAction);
+    }
+
+    return {
+        /** Attach the modal's handlers. Call from the Popup's onOpen. */
+        bind() {
+            document.getElementById(id('generate'))?.addEventListener('click', handleGenerate);
+            document.getElementById(id('continue'))?.addEventListener('click', handleContinue);
+            document.getElementById(id('checkpoint'))?.addEventListener('click', handleCheckpoint);
+            document.getElementById(id('retry'))?.addEventListener('click', handleRetry);
+            output()?.addEventListener('input', refresh);
+            const input = tokenInput();
+            input?.addEventListener('change', () => writeResponseLength(parsePositiveInt(input.value)));
+            document.getElementById(`${prefix}_clear_output_btn`)?.addEventListener('click', () => {
+                if (generating) return;
+                const out = output();
+                if (!out) return;
+                out.value = '';
+                dropRestorePoint();
+                out.focus();
+            });
+            refresh();
+        },
+        /** Fill the Max Tokens field from the saved setting (a preset may have changed it). */
+        fillResponseLength(root) {
+            const input = root.querySelector(`#${prefix}_response_length`);
+            if (input) input.value = String(savedResponseLength());
+        },
+        /**
+         * Keep a typed Max Tokens value that never fired `change` (the field
+         * is the tool's saved setting, not a modal-only copy). Call on close.
+         */
+        commitResponseLength(root) {
+            const input = root?.querySelector(`#${prefix}_response_length`);
+            if (input) writeResponseLength(parsePositiveInt(input.value));
+        },
+        /** Reset per-session state (on open and on close). */
+        reset() {
+            generating = false;
+            abortRequested = false;
+            activeAction = null;
+            lastAction = null;
+            restorePoint = null;
+        },
+        /** The output was replaced wholesale — the old Retry snapshot no longer applies. */
+        dropRestorePoint,
+        /** Abort a running generation (the modal is closing). */
+        stopIfRunning() {
+            if (generating) stop();
+        },
+        isGenerating: () => generating,
+        responseLength: currentResponseLength,
+        refresh,
+        generate: handleGenerate,
+    };
+}
+
 ;// ./src/assisted-character-creation.js
 /**
  * Assisted Character Creation (ACC)
@@ -7398,7 +7411,6 @@ function setupToolPresets({ toolKey, label, containerId, fields, responseLength 
  * generates a complete description, optionally extends or re-rolls it,
  * and clicks Done to copy it into SillyTavern's description field.
  */
-
 
 
 
@@ -7513,13 +7525,8 @@ const DEFAULT_ACC_RESPONSE_LENGTH = 1000;
 // ─── Module State ───
 
 let assisted_character_creation_moduleSettings = null;
+let saveSettingsFn = null;
 let assisted_character_creation_debug = () => {};
-
-let isGenerating = false;
-let abortRequested = false;
-let activeAction = null;       // which button initiated the current generation
-let lastAction = null;         // 'generate' | 'continue' — what Retry should redo
-let restorePoint = null;       // textarea snapshot used by Retry
 
 // Modal contents are remembered across open/close so the user doesn't lose
 // their brief, generated description, or context-toggle selections — even
@@ -7544,8 +7551,6 @@ function initACC({ settings, saveSettings }) {
     assisted_character_creation_debug = createDebugLogger('ACC', () => assisted_character_creation_moduleSettings.accDebugMode);
     assisted_character_creation_debug('Module initialized');
 }
-
-let saveSettingsFn = null;
 
 // ─── Character Page Integration ───
 
@@ -7612,18 +7617,39 @@ function showACCPromptPreview() {
 // ─── Modal ───
 
 let activePopup = null;
-let activeBody = null;
+
+const actions = createGenerationActions({
+    prefix: 'acc',
+    outputId: 'acc_description_output',
+    noun: 'description',
+    aNoun: 'a description',
+    statusText: {
+        generate: 'Generating character description…',
+        continue: 'Continuing description…',
+    },
+    lockIds: ['acc_character_brief'],
+    responseLength: {
+        get settings() { return assisted_character_creation_moduleSettings; },
+        key: 'accResponseLength',
+        fallback: DEFAULT_ACC_RESPONSE_LENGTH,
+        save: () => saveSettingsFn?.(),
+    },
+    getPopup: () => activePopup,
+    canRun: () => {
+        if (readBrief()) return true;
+        toast('Please enter a Character Brief first.', 'warning');
+        return false;
+    },
+    run: (action, { existing, outputEl, responseLength }) => (action === 'continue'
+        ? generateContinuation(existing, outputEl, responseLength)
+        : generateDescription(outputEl, responseLength)),
+    logLabel: 'ACC',
+    debug: (...args) => assisted_character_creation_debug(...args),
+});
 
 async function openModal() {
     if (activePopup) return;
-
-    isGenerating = false;
-    abortRequested = false;
-    activeAction = null;
-    // Note: lastAction / restorePoint stay null on each open. They're
-    // retry-only state and don't need to persist across modal sessions.
-    lastAction = null;
-    restorePoint = null;
+    actions.reset();
 
     const body = buildModalBody();
 
@@ -7635,13 +7661,13 @@ async function openModal() {
         allowVerticalScrolling: true,
         onOpen: () => {
             bindModalHandlers();
-            refreshActionButtonStates();
+            actions.bind();
             assisted_character_creation_debug('Modal opened');
         },
         onClosing: (p) => {
             if (p.result === __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_POPUP_RESULT__.AFFIRMATIVE) {
                 // Done clicked — refuse to close mid-generation.
-                if (isGenerating) {
+                if (actions.isGenerating()) {
                     toast('Wait for generation to finish before clicking Done.', 'warning');
                     return false;
                 }
@@ -7653,15 +7679,11 @@ async function openModal() {
                 return true;
             }
             // Cancel / Esc / X — abort any in-flight job, then allow close.
-            if (isGenerating) {
-                abortRequested = true;
-                stopGeneration();
-            }
+            actions.stopIfRunning();
             return true;
         },
     });
     activePopup = popup;
-    activeBody = body;
 
     try {
         const result = await popup.show();
@@ -7673,11 +7695,7 @@ async function openModal() {
         // the next open shows the same brief / output / context options.
         capturePersistedModalState(body);
         activePopup = null;
-        activeBody = null;
-        isGenerating = false;
-        activeAction = null;
-        lastAction = null;
-        restorePoint = null;
+        actions.reset();
         assisted_character_creation_debug('Modal closed');
     }
 }
@@ -7687,108 +7705,67 @@ function capturePersistedModalState(body) {
     persistedModalState.brief = body.querySelector('#acc_character_brief')?.value || '';
     persistedModalState.output = body.querySelector('#acc_description_output')?.value || '';
     persistedModalState.useChatContext = !!body.querySelector('#acc_use_chat_context')?.checked;
-    const picker = body._accLorebookPicker;
-    persistedModalState.selectedLoreBooks = picker ? picker.getSelected() : [];
-    // The Max Tokens field is the tool's saved setting (its change listener
-    // writes it through), so keep a typed value that never fired 'change'
-    // there too, rather than as a modal-only copy that would outlive a
-    // preset switch.
-    const tokenInput = body.querySelector('#acc_response_length');
-    const parsed = tokenInput ? parseInt(tokenInput.value, 10) : NaN;
-    if (!isNaN(parsed) && parsed > 0 && parsed !== assisted_character_creation_moduleSettings.accResponseLength) {
-        assisted_character_creation_moduleSettings.accResponseLength = parsed;
-        saveSettingsFn?.();
-    }
+    persistedModalState.selectedLoreBooks = lorebookPicker?.getSelected() ?? [];
+    actions.commitResponseLength(body);
 }
+
+let lorebookPicker = null;
 
 function buildModalBody() {
     const root = document.createElement('div');
-    root.className = 'acc-modal-body';
+    root.className = 'sse-modal-body';
     root.innerHTML = `
-        <div class="acc-context-section">
+        <div class="sse-modal-context">
             <label class="checkbox_label" title="Prepend the current chat / character context to the generation, and auto-include the chat's relevant World Info entries. The lore-book dropdown adds extra books on top of that.">
                 <input id="acc_use_chat_context" type="checkbox" />
                 <span>Use Chat Context</span>
             </label>
             <div class="acc-lorebook-host"></div>
         </div>
-        <div class="acc-preset-row">
-            <label class="acc-preset-label"><span class="fa-solid fa-file-pen"></span> Prompt Preset:</label>
+        <div class="sse-modal-preset-row">
+            <label class="sse-modal-preset-label"><span class="fa-solid fa-file-pen"></span> Prompt Preset:</label>
             <div class="acc-preset-host"></div>
         </div>
-        <div class="acc-brief-section">
-            <div class="acc-field-header">
+        <div class="sse-modal-section">
+            <div class="sse-modal-field-header">
                 <label for="acc_character_brief"><b>Character Brief:</b></label>
-                <div id="acc_clear_brief_btn" class="menu_button interactable acc-clear-btn" title="Clear the brief">
-                    <span class="fa-solid fa-eraser"></span> Clear
-                </div>
+                ${smallButtonHtml('acc_clear_brief_btn', 'fa-eraser', 'Clear', 'Clear the brief')}
             </div>
             <textarea id="acc_character_brief" class="text_pole" rows="4" placeholder="Describe your character concept, setting, and any key details..."></textarea>
         </div>
-        <div class="acc-action-row">
-            <div id="acc_generate_btn" class="menu_button interactable acc-action-btn acc-generate-btn" title="Generate a fresh description from the brief (replaces the textarea)">
-                <span class="fa-solid fa-wand-magic-sparkles"></span> Generate
-            </div>
-            <div id="acc_continue_btn" class="menu_button interactable acc-action-btn acc-continue-btn" title="Continue from where the description leaves off">
-                <span class="fa-solid fa-arrow-right"></span> Continue
-            </div>
-            <div id="acc_checkpoint_btn" class="menu_button interactable acc-action-btn acc-checkpoint-btn" title="Save the current description as the Retry restore point">
-                <span class="fa-solid fa-flag"></span> Checkpoint
-            </div>
-            <div id="acc_retry_btn" class="menu_button interactable acc-action-btn acc-retry-btn" title="Restore to the last snapshot and re-run the last action">
-                <span class="fa-solid fa-rotate-right"></span> Retry
-            </div>
-        </div>
-        <div class="acc-tokens-row">
-            <label class="acc-tokens-label" for="acc_response_length" title="Maximum tokens for each generation">
-                <span class="fa-solid fa-coins"></span> Max Tokens:
-            </label>
-            <input id="acc_response_length" type="number" class="text_pole acc-tokens-input" min="50" max="8192" step="50" />
-        </div>
-        <div class="acc-status-bar acc-hidden" id="acc_status_bar">
-            <span class="fa-solid fa-spinner fa-spin"></span>
-            <span id="acc_status_text"></span>
-        </div>
-        <div class="acc-description-section">
-            <div class="acc-field-header">
+        ${actionRowHtml('acc', {
+        noun: 'description',
+        generateTitle: 'Generate a fresh description from the brief (replaces the textarea)',
+    })}
+        ${tokensRowHtml('acc')}
+        ${statusBarHtml('acc')}
+        <div class="sse-modal-output-section">
+            <div class="sse-modal-field-header">
                 <label for="acc_description_output"><b>Character Description:</b></label>
-                <div id="acc_clear_output_btn" class="menu_button interactable acc-clear-btn" title="Clear the generated description">
-                    <span class="fa-solid fa-eraser"></span> Clear
-                </div>
+                ${smallButtonHtml('acc_clear_output_btn', 'fa-eraser', 'Clear', 'Clear the generated description')}
             </div>
-            <textarea id="acc_description_output" class="text_pole acc-description-output" rows="18" placeholder="Generated description will appear here. You can edit it before clicking Done."></textarea>
+            <textarea id="acc_description_output" class="text_pole sse-modal-output" rows="18" placeholder="Generated description will appear here. You can edit it before clicking Done."></textarea>
         </div>
     `;
 
     // Hydrate the persisted-across-opens fields.
-    const briefEl = root.querySelector('#acc_character_brief');
-    if (briefEl) briefEl.value = persistedModalState.brief || '';
-    const outputEl = root.querySelector('#acc_description_output');
-    if (outputEl) outputEl.value = persistedModalState.output || '';
-    const chatCb = root.querySelector('#acc_use_chat_context');
-    if (chatCb) chatCb.checked = !!persistedModalState.useChatContext;
-
-    // Initialize the token field from the saved setting (which a preset
-    // switch may have changed since the modal last closed).
-    const tokenInput = root.querySelector('#acc_response_length');
-    if (tokenInput) tokenInput.value = String(getSavedResponseLength());
+    root.querySelector('#acc_character_brief').value = persistedModalState.brief || '';
+    root.querySelector('#acc_description_output').value = persistedModalState.output || '';
+    root.querySelector('#acc_use_chat_context').checked = !!persistedModalState.useChatContext;
+    actions.fillResponseLength(root);
 
     // Mount the shared lore-book picker with previously-selected entries.
-    const picker = createLoreBookPicker({
-        classPrefix: 'acc-lorebook',
-        initialSelection: Array.isArray(persistedModalState.selectedLoreBooks)
-            ? persistedModalState.selectedLoreBooks.slice()
-            : [],
+    lorebookPicker = createLoreBookPicker({
+        classPrefix: MODAL_LOREBOOK_PREFIX,
+        initialSelection: persistedModalState.selectedLoreBooks.slice(),
     });
-    root.querySelector('.acc-lorebook-host').replaceWith(picker.element);
-    root._accLorebookPicker = picker;
+    root.querySelector('.acc-lorebook-host').replaceWith(lorebookPicker.element);
 
     // Point-of-use preset selection — which prompt + prefill bundle
     // Generate/Continue uses, synced with the settings widget (which also
     // manages presets).
     root.querySelector('.acc-preset-host').replaceWith(createToolPresetSelector({
         toolKey: 'acc',
-        className: 'acc-preset-select',
         title: 'Prompt preset used for Generate/Continue — the bundle of prompt + prefill that shapes '
             + 'the character sheet. Save and edit presets in the extension settings.',
     }));
@@ -7797,42 +7774,12 @@ function buildModalBody() {
 }
 
 function bindModalHandlers() {
-    document.getElementById('acc_generate_btn')?.addEventListener('click', handleGenerate);
-    document.getElementById('acc_continue_btn')?.addEventListener('click', handleContinue);
-    document.getElementById('acc_checkpoint_btn')?.addEventListener('click', handleCheckpoint);
-    document.getElementById('acc_retry_btn')?.addEventListener('click', handleRetry);
-
-    const output = document.getElementById('acc_description_output');
-    output?.addEventListener('input', refreshActionButtonStates);
-
-    const tokenInput = document.getElementById('acc_response_length');
-    tokenInput?.addEventListener('change', () => {
-        const parsed = parseInt(tokenInput.value, 10);
-        if (!isNaN(parsed) && parsed > 0) {
-            assisted_character_creation_moduleSettings.accResponseLength = parsed;
-            saveSettingsFn?.();
-        }
-    });
-
     document.getElementById('acc_clear_brief_btn')?.addEventListener('click', () => {
-        if (isGenerating) return;
+        if (actions.isGenerating()) return;
         const brief = document.getElementById('acc_character_brief');
         if (!brief) return;
         brief.value = '';
         brief.focus();
-        refreshActionButtonStates();
-    });
-    document.getElementById('acc_clear_output_btn')?.addEventListener('click', () => {
-        if (isGenerating) return;
-        const out = document.getElementById('acc_description_output');
-        if (!out) return;
-        out.value = '';
-        // Clearing the output invalidates the existing Retry restore point
-        // so the user doesn't accidentally restore an unrelated description.
-        restorePoint = null;
-        lastAction = null;
-        out.focus();
-        refreshActionButtonStates();
     });
 }
 
@@ -7847,152 +7794,17 @@ function applyDescription(body) {
     toast('Character description applied!', 'success');
 }
 
-// ─── Actions ───
+// ─── Generation ───
+
+function readBrief() {
+    return document.getElementById('acc_character_brief')?.value?.trim() || '';
+}
 
 function readModalContextOptions() {
-    const includeChat = !!document.getElementById('acc_use_chat_context')?.checked;
-    const picker = activeBody?._accLorebookPicker;
-    const loreBookNames = picker ? picker.getSelected() : [];
-    return { includeChat, loreBookNames };
-}
-
-async function handleGenerate() {
-    if (isGenerating) {
-        if (activeAction === 'generate') {
-            abortRequested = true;
-            stopGeneration();
-        }
-        return;
-    }
-
-    const brief = document.getElementById('acc_character_brief')?.value?.trim() || '';
-    if (!brief) {
-        toast('Please enter a Character Brief before generating.', 'warning');
-        return;
-    }
-
-    const output = document.getElementById('acc_description_output');
-    restorePoint = output?.value || '';
-    await runGeneration('generate', brief);
-}
-
-async function handleContinue() {
-    if (isGenerating) {
-        if (activeAction === 'continue') {
-            abortRequested = true;
-            stopGeneration();
-        }
-        return;
-    }
-
-    const output = document.getElementById('acc_description_output');
-    const existing = output?.value || '';
-    if (!existing.trim()) {
-        toast('Nothing to continue from. Generate a description first or type some text.', 'warning');
-        return;
-    }
-
-    const brief = document.getElementById('acc_character_brief')?.value?.trim() || '';
-    restorePoint = existing;
-    await runGeneration('continue', brief);
-}
-
-function handleCheckpoint() {
-    if (isGenerating) return;
-    const output = document.getElementById('acc_description_output');
-    const current = output?.value || '';
-    if (!current.trim()) {
-        toast('Nothing to checkpoint — the description is empty.', 'warning');
-        return;
-    }
-    restorePoint = current;
-    lastAction = 'continue';
-    toast('Checkpoint saved. Retry will restore to this point.', 'success');
-    refreshActionButtonStates();
-    assisted_character_creation_debug('Checkpoint saved, length:', current.length);
-}
-
-async function handleRetry() {
-    if (isGenerating) return;
-    if (!lastAction || restorePoint === null) {
-        toast('Nothing to retry yet.', 'warning');
-        return;
-    }
-
-    const brief = document.getElementById('acc_character_brief')?.value?.trim() || '';
-    if (lastAction === 'continue' && !restorePoint.trim()) {
-        toast('Cannot continue from an empty restore point.', 'warning');
-        return;
-    }
-    if (lastAction === 'generate' && !brief) {
-        toast('Please enter a Character Brief before retrying.', 'warning');
-        return;
-    }
-
-    const output = document.getElementById('acc_description_output');
-    if (output) output.value = restorePoint;
-    await runGeneration(lastAction, brief);
-}
-
-async function runGeneration(action, brief) {
-    isGenerating = true;
-    abortRequested = false;
-    activeAction = action;
-
-    const isContinue = action === 'continue';
-    setGeneratingUI(true, action);
-    setStatusBar(isContinue ? 'Continuing description...' : 'Generating character description...');
-
-    try {
-        const ctxOptions = readModalContextOptions();
-        const output = document.getElementById('acc_description_output');
-        const existing = output?.value || '';
-
-        const result = isContinue
-            ? await generateContinuation(brief, existing, ctxOptions)
-            : await generateDescription(brief, ctxOptions);
-
-        if (abortRequested) {
-            assisted_character_creation_debug(`${action} aborted, discarding result; keeping the streamed partial`);
-            // Leave the streamed partial in the field so the user can edit it
-            // and Continue from there; treat the stop like a short result so
-            // Retry can redo it (Continue/Checkpoint enable on field content).
-            if (output?.value?.trim()) lastAction = action;
-            return;
-        }
-
-        if (!output) return;
-        if (isContinue) {
-            const sep = needsSeparator(existing) ? ' ' : '';
-            output.value = existing + sep + result;
-        } else {
-            output.value = result;
-        }
-        lastAction = action;
-        assisted_character_creation_debug(`${action} complete, length:`, result.length);
-    } catch (err) {
-        if (isSilentGenerationAbort(err)) {
-            assisted_character_creation_debug(`${action} aborted via cancellation; keeping the streamed partial`);
-            const out = document.getElementById('acc_description_output');
-            if (out?.value?.trim()) lastAction = action;
-        } else if (!abortRequested) {
-            console.error('ACC generation error:', err);
-            toast(`Generation failed: ${err.message}`, 'error');
-        }
-    } finally {
-        isGenerating = false;
-        abortRequested = false;
-        activeAction = null;
-        setGeneratingUI(false, action);
-        setStatusBar(null);
-        refreshActionButtonStates();
-    }
-}
-
-function needsSeparator(text) {
-    if (!text) return false;
-    const last = text[text.length - 1];
-    return last !== ' ' && last !== '\n' && last !== '\t';
+    return {
+        includeChat: !!document.getElementById('acc_use_chat_context')?.checked,
+        loreBookNames: lorebookPicker?.getSelected() ?? [],
+    };
 }
 
 /**
@@ -8030,49 +7842,25 @@ function composeContinuePrompt(preambleBlock, brief) {
     return `${prompt}\n\nYour reply has been prefilled with the character sheet so far. Continue seamlessly from exactly where it stops — do not repeat any existing text. Maintain the same format and style. Output only the continuation.`;
 }
 
-async function generateDescription(brief, ctxOptions) {
-    const preambleBlock = await buildPreambleBlock(ctxOptions);
-    const prompt = composeGeneratePrompt(preambleBlock, brief);
-    const systemPrompt = ACC_GENERATE_SYSTEM_PROMPT;
-    const responseLength = getResponseLength();
+async function generateDescription(outputEl, responseLength) {
+    const brief = readBrief();
+    const prompt = composeGeneratePrompt(await buildPreambleBlock(responseLength), brief);
     const prefill = getPrefill();
-
     assisted_character_creation_debug('Generating with brief length', brief.length, 'tokens', responseLength);
-    assisted_character_creation_debug('System prompt:', systemPrompt);
     assisted_character_creation_debug('Prompt:', prompt);
     assisted_character_creation_debug('Prefill:', prefill);
-
-    const outputEl = document.getElementById('acc_description_output');
-    const result = await withSingleLineDisabled(() => cancellableStreamingGenerate(
-        { prompt, systemPrompt, responseLength, ...(prefill ? { prefill } : {}) },
-        outputEl,
-        { append: false },
-    ));
-    // Backends that ignore the assistant prefix may re-emit the prefill;
-    // strip the echo so prepending it doesn't double the opening.
-    const cleaned = stripPrefillEcho(__WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(result).trim(), prefill);
-    return (prefill || '') + cleaned;
+    return streamFresh({
+        prompt, systemPrompt: ACC_GENERATE_SYSTEM_PROMPT, responseLength, prefill, outputEl, name: 'acc',
+    });
 }
 
-async function generateContinuation(brief, existing, ctxOptions) {
-    const preambleBlock = await buildPreambleBlock(ctxOptions);
-    const prompt = composeContinuePrompt(preambleBlock, brief);
-    const systemPrompt = ACC_CONTINUE_SYSTEM_PROMPT;
-    const responseLength = getResponseLength();
-
+async function generateContinuation(existing, outputEl, responseLength) {
+    const prompt = composeContinuePrompt(await buildPreambleBlock(responseLength), readBrief());
     assisted_character_creation_debug('Continuing with existing length', existing.length, 'tokens', responseLength);
-    assisted_character_creation_debug('System prompt:', systemPrompt);
     assisted_character_creation_debug('Prompt:', prompt);
-
-    const outputEl = document.getElementById('acc_description_output');
-    // The sheet-so-far is the assistant prefill, so the model continues from
-    // its exact end; strip any prefill echo to keep only the new tail.
-    const result = await withSingleLineDisabled(() => cancellableStreamingGenerate(
-        { prompt, systemPrompt, responseLength, ...(existing ? { prefill: existing } : {}) },
-        outputEl,
-        { append: true },
-    ));
-    return stripPrefillEcho(__WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(result).trim(), existing);
+    return streamContinuation({
+        prompt, systemPrompt: ACC_CONTINUE_SYSTEM_PROMPT, responseLength, existing, outputEl, name: 'acc-continue',
+    });
 }
 
 function assisted_character_creation_getPromptTemplate() {
@@ -8083,111 +7871,17 @@ function getPrefill() {
     return textSetting(assisted_character_creation_moduleSettings, 'accPrefill', DEFAULT_ACC_PREFILL);
 }
 
-function getResponseLength() {
-    return parsePositiveInt(document.getElementById('acc_response_length')?.value) ?? getSavedResponseLength();
-}
-
-function getSavedResponseLength() {
-    return positiveIntSetting(assisted_character_creation_moduleSettings, 'accResponseLength', DEFAULT_ACC_RESPONSE_LENGTH);
-}
-
-async function buildPreambleBlock(ctxOptions) {
-    if (!ctxOptions) return '';
-    if (!ctxOptions.includeChat && !(ctxOptions.loreBookNames && ctxOptions.loreBookNames.length)) return '';
+async function buildPreambleBlock(responseLength) {
+    const ctxOptions = readModalContextOptions();
+    if (!ctxOptions.includeChat && !ctxOptions.loreBookNames.length) return '';
     const preamble = await buildContextPreamble({
         ...ctxOptions,
-        responseLength: getResponseLength(),
+        responseLength,
         maxContextOverride: assisted_character_creation_moduleSettings?.accMaxContextOverride || 0,
     });
     if (!preamble) return '';
     assisted_character_creation_debug('Context preamble length:', preamble.length);
     return `Existing context to consider when generating (do not repeat verbatim):\n${preamble}\n\n`;
-}
-
-function stopGeneration() {
-    // Route through abortAllGenerations() so that ST's GENERATION_STOPPED
-    // event also fires. That's what triggers generateRawData() to abort
-    // its fetch, close the connection, and let ST's server propagate the
-    // abort to the backend (e.g. POST /api/extra/abort to KoboldCpp).
-    // Aborting only our local controllers would free the UI but leave the
-    // LLM generating to the response cap.
-    abortAllGenerations('acc-cancel');
-    assisted_character_creation_debug('Stop generation triggered');
-}
-
-// ─── UI Helpers ───
-
-const ACTION_BUTTON_IDS = ['acc_generate_btn', 'acc_continue_btn', 'acc_checkpoint_btn', 'acc_retry_btn'];
-
-const ACTION_LABELS = {
-    acc_generate_btn: '<span class="fa-solid fa-wand-magic-sparkles"></span> Generate',
-    acc_continue_btn: '<span class="fa-solid fa-arrow-right"></span> Continue',
-    acc_checkpoint_btn: '<span class="fa-solid fa-flag"></span> Checkpoint',
-    acc_retry_btn: '<span class="fa-solid fa-rotate-right"></span> Retry',
-};
-
-function setGeneratingUI(generating, action) {
-    const briefInput = document.getElementById('acc_character_brief');
-    const activeBtnId = action === 'continue' ? 'acc_continue_btn' : 'acc_generate_btn';
-
-    for (const id of ACTION_BUTTON_IDS) {
-        const btn = document.getElementById(id);
-        if (!btn) continue;
-        if (generating) {
-            if (id === activeBtnId) {
-                btn.innerHTML = '<span class="fa-solid fa-stop"></span> Stop';
-                btn.classList.remove('acc-disabled');
-            } else {
-                btn.innerHTML = ACTION_LABELS[id];
-                btn.classList.add('acc-disabled');
-            }
-        } else {
-            btn.innerHTML = ACTION_LABELS[id];
-            btn.classList.remove('acc-disabled');
-        }
-    }
-
-    // Popup owns the Done/Cancel buttons; toggle the OK button visually so
-    // users get a clear "wait for generation" hint. The onClosing guard
-    // still blocks the close if they click it mid-flight.
-    const okBtn = activePopup?.okButton;
-    if (okBtn) okBtn.classList.toggle('disabled', !!generating);
-
-    if (generating) {
-        briefInput?.setAttribute('disabled', 'true');
-    } else {
-        briefInput?.removeAttribute('disabled');
-        refreshActionButtonStates();
-    }
-}
-
-function refreshActionButtonStates() {
-    if (isGenerating) return;
-    const output = document.getElementById('acc_description_output');
-    const hasText = !!output?.value?.trim();
-
-    setButtonDisabled('acc_continue_btn', !hasText);
-    setButtonDisabled('acc_checkpoint_btn', !hasText);
-    setButtonDisabled('acc_retry_btn', !lastAction || restorePoint === null);
-}
-
-function setButtonDisabled(id, disabled) {
-    const btn = document.getElementById(id);
-    if (!btn) return;
-    if (disabled) btn.classList.add('acc-disabled');
-    else btn.classList.remove('acc-disabled');
-}
-
-function setStatusBar(message) {
-    const bar = document.getElementById('acc_status_bar');
-    const text = document.getElementById('acc_status_text');
-    if (!bar || !text) return;
-    if (message) {
-        text.textContent = message;
-        bar.classList.remove('acc-hidden');
-    } else {
-        bar.classList.add('acc-hidden');
-    }
 }
 
 ;// ./src/world-info-assist.js
@@ -9272,12 +8966,12 @@ let character_state_saveSettingsFn = null;
 let character_state_debug = () => {};
 
 let character_state_activePopup = null;
-let character_state_activeBody = null;
+let activeBody = null;
 let activeCharacter = null;   // { avatar, name }
 let openChatId = null;
 let rows = [];                // see buildRowState()
-let character_state_isGenerating = false;
-let character_state_abortRequested = false;
+let isGenerating = false;
+let abortRequested = false;
 let forceClose = false;       // closing for a chat change: skip the discard prompt
 
 // Context options persist across opens (like ACC); the instruction doesn't,
@@ -9410,8 +9104,8 @@ async function openCharacterStateModal(avatar) {
     activeCharacter = { avatar: char.avatar, name: char.name };
     openChatId = chatId;
     rows = variables.map(v => buildRowState(v, char.name));
-    character_state_isGenerating = false;
-    character_state_abortRequested = false;
+    isGenerating = false;
+    abortRequested = false;
     forceClose = false;
 
     const body = character_state_buildModalBody(char);
@@ -9428,25 +9122,25 @@ async function openCharacterStateModal(avatar) {
         onClosing: (p) => {
             if (forceClose) return true;
             if (p.result === __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_POPUP_RESULT__.AFFIRMATIVE) {
-                if (character_state_isGenerating) {
+                if (isGenerating) {
                     toast('Wait for the update to finish (or Stop it) before applying.', 'warning');
                     return false;
                 }
                 return true;
             }
-            if (!character_state_isGenerating && rows.some(character_state_isDirty)
+            if (!isGenerating && rows.some(character_state_isDirty)
                 && !window.confirm('Discard the changes you haven\'t applied?')) {
                 return false;
             }
-            if (character_state_isGenerating) {
-                character_state_abortRequested = true;
-                character_state_stopGeneration();
+            if (isGenerating) {
+                abortRequested = true;
+                stopGeneration();
             }
             return true;
         },
     });
     character_state_activePopup = popup;
-    character_state_activeBody = body;
+    activeBody = body;
 
     try {
         const result = await popup.show();
@@ -9454,12 +9148,12 @@ async function openCharacterStateModal(avatar) {
     } finally {
         character_state_capturePersistedModalState(body);
         character_state_activePopup = null;
-        character_state_activeBody = null;
+        activeBody = null;
         activeCharacter = null;
         openChatId = null;
         rows = [];
-        character_state_isGenerating = false;
-        character_state_abortRequested = false;
+        isGenerating = false;
+        abortRequested = false;
         forceClose = false;
         character_state_debug('Modal closed');
     }
@@ -9483,9 +9177,9 @@ function onCharacterStateChatChanged() {
     syncCharacterStateButtons();
     if (!character_state_activePopup || getCurrentChatId() === openChatId) return;
     character_state_debug('Chat changed under the open pane; closing without applying');
-    if (character_state_isGenerating) {
-        character_state_abortRequested = true;
-        character_state_stopGeneration();
+    if (isGenerating) {
+        abortRequested = true;
+        stopGeneration();
     }
     forceClose = true;
     character_state_activePopup.completeCancelled();
@@ -9572,7 +9266,7 @@ function buildVariableRow(row) {
     undoBtn.title = 'Undo: back to the value this chat has now';
     undoBtn.innerHTML = '<span class="fa-solid fa-rotate-left"></span>';
     undoBtn.addEventListener('click', () => {
-        if (character_state_isGenerating) return;
+        if (isGenerating) return;
         row.pending = { ...row.original };
         row.proposed = false;
         refreshRow(row);
@@ -9587,7 +9281,7 @@ function buildVariableRow(row) {
         : 'Reset: unset the variable';
     resetBtn.innerHTML = '<span class="fa-solid fa-eraser"></span>';
     resetBtn.addEventListener('click', () => {
-        if (character_state_isGenerating) return;
+        if (isGenerating) return;
         row.pending = { isSet: false, value: '' };
         row.proposed = false;
         refreshRow(row);
@@ -9649,7 +9343,7 @@ function refreshApplyState() {
     const okBtn = character_state_activePopup?.okButton;
     if (okBtn) {
         okBtn.textContent = count ? `Apply (${count})` : 'Apply';
-        okBtn.classList.toggle('disabled', character_state_isGenerating);
+        okBtn.classList.toggle('disabled', isGenerating);
     }
 }
 
@@ -9658,34 +9352,31 @@ function buildAssistSection() {
     section.className = 'cs-assist-section';
     section.innerHTML = `
         <div class="cs-assist-title"><span class="fa-solid fa-wand-magic-sparkles"></span> <b>Update with AI</b></div>
-        <div class="acc-context-section cs-context-section">
+        <div class="sse-modal-context">
             <label class="checkbox_label" title="Give the model the character cards, the chat's relevant World Info, and the recent chat. Needed when the instruction is left blank.">
                 <input id="cs_use_chat_context" type="checkbox" />
                 <span>Use Chat Context</span>
             </label>
             <div class="cs-lorebook-host"></div>
         </div>
-        <div class="acc-preset-row cs-preset-row">
-            <label class="acc-preset-label"><span class="fa-solid fa-file-pen"></span> Prompt Preset:</label>
+        <div class="sse-modal-preset-row">
+            <label class="sse-modal-preset-label"><span class="fa-solid fa-file-pen"></span> Prompt Preset:</label>
             <div class="cs-preset-host"></div>
         </div>
         <textarea id="cs_instruction" class="text_pole cs-instruction" rows="3" placeholder="How should these change? e.g. &quot;She changes into a swimsuit for the beach&quot;. Leave blank to update from what happened in the recent chat."></textarea>
         <div class="cs-action-row">
-            <div id="cs_generate_btn" class="menu_button interactable acc-action-btn acc-generate-btn" title="Ask the model for new values. Proposals fill the fields above; nothing is saved until Apply.">
+            <div id="cs_generate_btn" class="menu_button interactable sse-modal-action-btn sse-modal-primary" title="Ask the model for new values. Proposals fill the fields above; nothing is saved until Apply.">
                 <span class="fa-solid fa-wand-magic-sparkles"></span> Propose Changes
             </div>
-            <div id="cs_revert_btn" class="menu_button interactable acc-action-btn" title="Undo every change in this pane">
+            <div id="cs_revert_btn" class="menu_button interactable sse-modal-action-btn" title="Undo every change in this pane">
                 <span class="fa-solid fa-rotate-left"></span> Revert All
             </div>
-            <label class="acc-tokens-label" for="cs_response_length" title="Maximum tokens for the model's reply">
+            <label class="sse-modal-tokens-label" for="cs_response_length" title="Maximum tokens for the model's reply">
                 <span class="fa-solid fa-coins"></span> Max Tokens:
             </label>
-            <input id="cs_response_length" type="number" class="text_pole acc-tokens-input" min="50" max="8192" step="50" />
+            <input id="cs_response_length" type="number" class="text_pole sse-modal-tokens-input" min="50" max="8192" step="50" />
         </div>
-        <div class="acc-status-bar acc-hidden" id="cs_status_bar">
-            <span class="fa-solid fa-spinner fa-spin"></span>
-            <span id="cs_status_text"></span>
-        </div>
+        ${statusBarHtml('cs')}
         <details class="cs-reply-details">
             <summary>Model reply</summary>
             <textarea id="cs_reply" class="text_pole cs-reply" rows="5" readonly placeholder="The model's raw reply appears here."></textarea>
@@ -9696,7 +9387,7 @@ function buildAssistSection() {
     chatCb.checked = !!character_state_persistedModalState.useChatContext;
 
     const tokenInput = section.querySelector('#cs_response_length');
-    tokenInput.value = String(character_state_getSavedResponseLength());
+    tokenInput.value = String(getSavedResponseLength());
     tokenInput.addEventListener('change', () => {
         const parsed = parseInt(tokenInput.value, 10);
         if (!isNaN(parsed) && parsed > 0) {
@@ -9706,7 +9397,7 @@ function buildAssistSection() {
     });
 
     const picker = createLoreBookPicker({
-        classPrefix: 'acc-lorebook',
+        classPrefix: MODAL_LOREBOOK_PREFIX,
         initialSelection: character_state_persistedModalState.selectedLoreBooks.slice(),
         debug: character_state_debug,
     });
@@ -9715,13 +9406,12 @@ function buildAssistSection() {
 
     section.querySelector('.cs-preset-host').replaceWith(createToolPresetSelector({
         toolKey: 'character-state',
-        className: 'acc-preset-select',
         title: 'Prompt preset used for Propose Changes. Save and edit presets in the extension settings.',
     }));
 
-    section.querySelector('#cs_generate_btn').addEventListener('click', character_state_handleGenerate);
+    section.querySelector('#cs_generate_btn').addEventListener('click', handleGenerate);
     section.querySelector('#cs_revert_btn').addEventListener('click', () => {
-        if (character_state_isGenerating) return;
+        if (isGenerating) return;
         for (const row of rows) {
             row.pending = { ...row.original };
             row.proposed = false;
@@ -9766,15 +9456,15 @@ async function applyChanges() {
 
 function character_state_readModalContextOptions() {
     const includeChat = !!document.getElementById('cs_use_chat_context')?.checked;
-    const picker = character_state_activeBody?._csLorebookPicker;
+    const picker = activeBody?._csLorebookPicker;
     const loreBookNames = picker ? picker.getSelected() : [];
     return { includeChat, loreBookNames };
 }
 
-async function character_state_handleGenerate() {
-    if (character_state_isGenerating) {
-        character_state_abortRequested = true;
-        character_state_stopGeneration();
+async function handleGenerate() {
+    if (isGenerating) {
+        abortRequested = true;
+        stopGeneration();
         return;
     }
     const instruction = document.getElementById('cs_instruction')?.value?.trim() || '';
@@ -9783,19 +9473,19 @@ async function character_state_handleGenerate() {
         toast('Write an instruction, or turn on Use Chat Context so the model can update from the recent chat.', 'warning');
         return;
     }
-    await character_state_runGeneration(instruction, ctxOptions);
+    await runGeneration(instruction, ctxOptions);
 }
 
-async function character_state_runGeneration(instruction, ctxOptions) {
-    character_state_isGenerating = true;
-    character_state_abortRequested = false;
-    character_state_setGeneratingUI(true);
-    character_state_setStatusBar(instruction ? 'Proposing changes...' : 'Reading the recent chat for changes...');
+async function runGeneration(instruction, ctxOptions) {
+    isGenerating = true;
+    abortRequested = false;
+    setGeneratingUI(true);
+    setStatusBar(instruction ? 'Proposing changes...' : 'Reading the recent chat for changes...');
 
     const replyEl = document.getElementById('cs_reply');
     try {
         const reply = await generateReply(instruction, ctxOptions, replyEl);
-        if (character_state_abortRequested) {
+        if (abortRequested) {
             character_state_debug('Generation stopped; proposals discarded');
             return;
         }
@@ -9807,21 +9497,21 @@ async function character_state_runGeneration(instruction, ctxOptions) {
             toast('The model proposed no changes.', 'info');
         } else {
             toast('Couldn\'t read any changes from the reply. See Model reply.', 'warning');
-            const details = character_state_activeBody?.querySelector('.cs-reply-details');
+            const details = activeBody?.querySelector('.cs-reply-details');
             if (details) details.open = true;
         }
     } catch (err) {
         if (isSilentGenerationAbort(err)) {
             character_state_debug('Generation aborted via cancellation');
-        } else if (!character_state_abortRequested) {
+        } else if (!abortRequested) {
             console.error('Character State generation error:', err);
             toast(`Generation failed: ${err.message}`, 'error');
         }
     } finally {
-        character_state_isGenerating = false;
-        character_state_abortRequested = false;
-        character_state_setGeneratingUI(false);
-        character_state_setStatusBar(null);
+        isGenerating = false;
+        abortRequested = false;
+        setGeneratingUI(false);
+        setStatusBar(null);
         refreshApplyState();
     }
 }
@@ -9884,27 +9574,21 @@ async function generateReply(instruction, ctxOptions, replyEl) {
         composeGuidance(instruction),
     );
     const systemPrompt = CHARACTER_STATE_SYSTEM_PROMPT;
-    const responseLength = character_state_getResponseLength();
+    const responseLength = getResponseLength();
     const prefill = character_state_getPrefill();
 
     character_state_debug('System prompt:', systemPrompt);
     character_state_debug('Prompt:', prompt);
     character_state_debug('Prefill:', prefill);
 
-    const result = await withSingleLineDisabled(() => cancellableStreamingGenerate(
-        { prompt, systemPrompt, responseLength, ...(prefill ? { prefill } : {}) },
-        replyEl,
-        { append: false, name: 'character-state' },
-    ));
-    const cleaned = stripPrefillEcho(__WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(result).trim(), prefill);
-    return (prefill || '') + cleaned;
+    return streamFresh({ prompt, systemPrompt, responseLength, prefill, outputEl: replyEl, name: 'character-state' });
 }
 
 async function character_state_buildPreambleBlock(ctxOptions) {
     if (!ctxOptions.includeChat && !ctxOptions.loreBookNames.length) return '';
     const preamble = await buildContextPreamble({
         ...ctxOptions,
-        responseLength: character_state_getResponseLength(),
+        responseLength: getResponseLength(),
         maxContextOverride: character_state_moduleSettings?.characterStateMaxContextOverride || 0,
     });
     if (!preamble) return '';
@@ -9920,15 +9604,15 @@ function character_state_getPrefill() {
     return textSetting(character_state_moduleSettings, 'characterStatePrefill', DEFAULT_CHARACTER_STATE_PREFILL);
 }
 
-function character_state_getResponseLength() {
-    return parsePositiveInt(document.getElementById('cs_response_length')?.value) ?? character_state_getSavedResponseLength();
+function getResponseLength() {
+    return parsePositiveInt(document.getElementById('cs_response_length')?.value) ?? getSavedResponseLength();
 }
 
-function character_state_getSavedResponseLength() {
+function getSavedResponseLength() {
     return positiveIntSetting(character_state_moduleSettings, 'characterStateResponseLength', DEFAULT_CHARACTER_STATE_RESPONSE_LENGTH);
 }
 
-function character_state_stopGeneration() {
+function stopGeneration() {
     // abortAllGenerations (not just a local abort) so ST's GENERATION_STOPPED
     // fires and the backend request is actually cancelled.
     abortAllGenerations('character-state-cancel');
@@ -9939,10 +9623,10 @@ function character_state_stopGeneration() {
 
 const GENERATE_LABEL = '<span class="fa-solid fa-wand-magic-sparkles"></span> Propose Changes';
 
-function character_state_setGeneratingUI(generating) {
+function setGeneratingUI(generating) {
     const btn = document.getElementById('cs_generate_btn');
     if (btn) btn.innerHTML = generating ? '<span class="fa-solid fa-stop"></span> Stop' : GENERATE_LABEL;
-    document.getElementById('cs_revert_btn')?.classList.toggle('acc-disabled', generating);
+    document.getElementById('cs_revert_btn')?.classList.toggle('sse-modal-disabled', generating);
     const instruction = document.getElementById('cs_instruction');
     if (generating) instruction?.setAttribute('disabled', 'true');
     else instruction?.removeAttribute('disabled');
@@ -9954,16 +9638,8 @@ function character_state_setGeneratingUI(generating) {
     refreshApplyState();
 }
 
-function character_state_setStatusBar(message) {
-    const bar = document.getElementById('cs_status_bar');
-    const text = document.getElementById('cs_status_text');
-    if (!bar || !text) return;
-    if (message) {
-        text.textContent = message;
-        bar.classList.remove('acc-hidden');
-    } else {
-        bar.classList.add('acc-hidden');
-    }
+function setStatusBar(message) {
+    setModalStatus('cs', message);
 }
 
 // ─── Group Member Row Buttons ───
@@ -11948,7 +11624,6 @@ function registerReformattingSlashCommand() {
 
 
 
-
 // ─── Defaults ───
 
 const DEFAULT_COMPACTION_SUMMARY_PROMPT = `{{context}}[
@@ -12011,15 +11686,8 @@ let lastPromptTokens = 0;
 // freshly-created/seeded chat.
 let compacting = false;
 
-// Modal summary-generation runtime (mirrors ACC).
-let compaction_isGenerating = false;
-let compaction_abortRequested = false;
-let compaction_activeAction = null;   // which button initiated the current generation
-let compaction_lastAction = null;     // 'generate' | 'continue' — what Retry should redo
-let compaction_restorePoint = null;   // preview snapshot used by Retry
-
 let compaction_activePopup = null;
-let compaction_activeBody = null;
+let compaction_lorebookPicker = null;
 
 let guidanceSaveTimer = null;
 
@@ -12060,11 +11728,6 @@ function getThresholdRatio() {
     const n = compaction_moduleSettings?.compactionThresholdPercent;
     const pct = (Number.isFinite(n) && n > 0) ? n : DEFAULT_COMPACTION_THRESHOLD_PERCENT;
     return Math.min(Math.max(pct, 1), 100) / 100;
-}
-
-function compaction_getResponseLength() {
-    return parsePositiveInt(document.getElementById('cc_response_length')?.value)
-        ?? positiveIntSetting(compaction_moduleSettings, 'compactionSummaryResponseLength', DEFAULT_COMPACTION_RESPONSE_LENGTH);
 }
 
 // ─── Per-chat Guidance Persistence ───
@@ -12378,12 +12041,12 @@ function showCompactionPromptPreview() {
 
 // ─── Preamble ───
 
-async function buildSummaryPreamble(loreBookNames) {
+async function buildSummaryPreamble(responseLength) {
     const tail = getTailLength();
     const preamble = await buildContextPreamble({
         includeChat: true,
-        loreBookNames: Array.isArray(loreBookNames) ? loreBookNames : [],
-        responseLength: compaction_getResponseLength(),
+        loreBookNames: compaction_lorebookPicker?.getSelected() ?? [],
+        responseLength,
         maxContextOverride: compaction_moduleSettings?.compactionMaxContextOverride || 0,
         excludeRecentCount: tail,
     });
@@ -12393,6 +12056,34 @@ async function buildSummaryPreamble(loreBookNames) {
 }
 
 // ─── Modal ───
+
+const compaction_actions = createGenerationActions({
+    prefix: 'cc',
+    outputId: 'cc_summary_output',
+    noun: 'summary',
+    aNoun: 'a summary',
+    generateLabel: 'Generate Summary',
+    statusText: { generate: 'Generating summary…', continue: 'Continuing summary…' },
+    lockIds: ['cc_guidance'],
+    responseLength: {
+        get settings() { return compaction_moduleSettings; },
+        key: 'compactionSummaryResponseLength',
+        fallback: DEFAULT_COMPACTION_RESPONSE_LENGTH,
+        save: () => compaction_saveSettingsFn?.(),
+    },
+    getPopup: () => compaction_activePopup,
+    canRun: () => {
+        const length = getContext().chat?.length || 0;
+        if (length > getTailLength()) return true;
+        toast(`The chat has ${length} messages — at or below the tail length (${getTailLength()}). There's nothing to summarize away.`, 'warning');
+        return false;
+    },
+    run: (action, { existing, outputEl, responseLength }) => (action === 'continue'
+        ? compaction_generateContinuation(existing, outputEl, responseLength)
+        : generateSummary(outputEl, responseLength)),
+    logLabel: 'Compaction summary',
+    debug: (...args) => compaction_debug(...args),
+});
 
 async function openCompactionModal({ auto = false } = {}) {
     compaction_debug('openCompactionModal — auto:', auto, 'activePopup:', !!compaction_activePopup, 'compacting:', compacting);
@@ -12416,12 +12107,7 @@ async function openCompactionModal({ auto = false } = {}) {
     }
     compaction_debug('open allowed — chat length:', ctx.chat?.length, 'groupId:', ctx.groupId ?? '(solo)');
 
-    compaction_isGenerating = false;
-    compaction_abortRequested = false;
-    compaction_activeAction = null;
-    compaction_lastAction = null;
-    compaction_restorePoint = null;
-
+    compaction_actions.reset();
     const body = compaction_buildModalBody();
 
     const popup = new __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_Popup__(body, __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_POPUP_TYPE__.TEXT, '', {
@@ -12432,13 +12118,13 @@ async function openCompactionModal({ auto = false } = {}) {
         allowVerticalScrolling: true,
         onOpen: () => {
             compaction_bindModalHandlers();
-            compaction_refreshActionButtonStates();
+            compaction_actions.bind();
             updateUsageBanner();
             compaction_debug('Modal opened', auto ? '(auto)' : '(manual)');
         },
         onClosing: (p) => {
             if (p.result === __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_POPUP_RESULT__.AFFIRMATIVE) {
-                if (compaction_isGenerating) {
+                if (compaction_actions.isGenerating()) {
                     toast('Wait for the summary generation to finish before clicking Compact.', 'warning');
                     return false;
                 }
@@ -12450,15 +12136,11 @@ async function openCompactionModal({ auto = false } = {}) {
                 return true;
             }
             // Cancel / Esc / X — abort any in-flight summary gen, commit nothing.
-            if (compaction_isGenerating) {
-                compaction_abortRequested = true;
-                compaction_stopGeneration();
-            }
+            compaction_actions.stopIfRunning();
             return true;
         },
     });
     compaction_activePopup = popup;
-    compaction_activeBody = body;
 
     let committed = false;
     try {
@@ -12473,140 +12155,83 @@ async function openCompactionModal({ auto = false } = {}) {
             }
         }
     } finally {
+        compaction_actions.commitResponseLength(body);
         compaction_activePopup = null;
-        compaction_activeBody = null;
-        compaction_isGenerating = false;
-        compaction_activeAction = null;
-        compaction_lastAction = null;
-        compaction_restorePoint = null;
+        compaction_lorebookPicker = null;
+        compaction_actions.reset();
         compaction_debug('Modal closed', committed ? '(compacted)' : '(no commit)');
     }
 }
 
 function compaction_buildModalBody() {
     const root = document.createElement('div');
-    root.className = 'cc-modal-body';
+    root.className = 'sse-modal-body';
     root.innerHTML = `
-        <div class="cc-usage-banner" id="cc_usage_banner">Measuring context usage…</div>
-        <div class="cc-context-section">
+        <div class="sse-modal-banner cc-usage-banner" id="cc_usage_banner">Measuring context usage…</div>
+        <div class="sse-modal-context">
             <div class="cc-lorebook-host"></div>
             <small class="cc-context-hint">Selected lore books are folded into the summary so canon isn't lost.</small>
         </div>
-        <div class="cc-preset-row">
-            <label class="cc-preset-label"><span class="fa-solid fa-file-pen"></span> Prompt Preset:</label>
+        <div class="sse-modal-preset-row">
+            <label class="sse-modal-preset-label"><span class="fa-solid fa-file-pen"></span> Prompt Preset:</label>
             <div class="cc-preset-host"></div>
         </div>
-        <div class="cc-guidance-section">
-            <div class="cc-field-header">
+        <div class="sse-modal-section">
+            <div class="sse-modal-field-header">
                 <label for="cc_guidance"><b>Summary Guidance:</b></label>
-                <div id="cc_clear_guidance_btn" class="menu_button interactable cc-clear-btn" title="Clear the guidance">
-                    <span class="fa-solid fa-eraser"></span> Clear
-                </div>
+                ${smallButtonHtml('cc_clear_guidance_btn', 'fa-eraser', 'Clear', 'Clear the guidance')}
             </div>
             <textarea id="cc_guidance" class="text_pole" rows="3" placeholder="Demand specific details the summary must preserve (names, items, promises, plot threads, ongoing states…). Persisted per-chat."></textarea>
         </div>
-        <div class="cc-action-row">
-            <div id="cc_generate_btn" class="menu_button interactable cc-action-btn cc-generate-btn" title="Generate a fresh summary from the chat (replaces the preview)">
-                <span class="fa-solid fa-wand-magic-sparkles"></span> Generate Summary
-            </div>
-            <div id="cc_continue_btn" class="menu_button interactable cc-action-btn" title="Continue from where the summary leaves off">
-                <span class="fa-solid fa-arrow-right"></span> Continue
-            </div>
-            <div id="cc_checkpoint_btn" class="menu_button interactable cc-action-btn" title="Save the current summary as the Retry restore point">
-                <span class="fa-solid fa-flag"></span> Checkpoint
-            </div>
-            <div id="cc_retry_btn" class="menu_button interactable cc-action-btn" title="Restore to the last snapshot and re-run the last action">
-                <span class="fa-solid fa-rotate-right"></span> Retry
-            </div>
-        </div>
-        <div class="cc-tokens-row">
-            <label class="cc-tokens-label" for="cc_response_length" title="Maximum tokens for the summary generation">
-                <span class="fa-solid fa-coins"></span> Max Tokens:
-            </label>
-            <input id="cc_response_length" type="number" class="text_pole cc-tokens-input" min="50" max="16384" step="50" />
-        </div>
-        <div class="cc-status-bar cc-hidden" id="cc_status_bar">
-            <span class="fa-solid fa-spinner fa-spin"></span>
-            <span id="cc_status_text"></span>
-        </div>
-        <div class="cc-summary-section">
-            <div class="cc-field-header">
+        ${actionRowHtml('cc', {
+        noun: 'summary',
+        generateLabel: 'Generate Summary',
+        generateTitle: 'Generate a fresh summary from the chat (replaces the preview)',
+    })}
+        ${tokensRowHtml('cc', { max: 16384, title: 'Maximum tokens for the summary generation' })}
+        ${statusBarHtml('cc')}
+        <div class="sse-modal-output-section">
+            <div class="sse-modal-field-header">
                 <label for="cc_summary_output"><b>Story so far (summary preview):</b></label>
-                <div id="cc_clear_output_btn" class="menu_button interactable cc-clear-btn" title="Clear the summary preview">
-                    <span class="fa-solid fa-eraser"></span> Clear
-                </div>
+                ${smallButtonHtml('cc_clear_output_btn', 'fa-eraser', 'Clear', 'Clear the summary preview')}
             </div>
-            <textarea id="cc_summary_output" class="text_pole cc-summary-output" rows="16" placeholder="The generated summary will appear here. Edit it freely — this exact text becomes the &quot;Story so far&quot; message. Then click Compact."></textarea>
+            <textarea id="cc_summary_output" class="text_pole sse-modal-output" rows="16" placeholder="The generated summary will appear here. Edit it freely — this exact text becomes the &quot;Story so far&quot; message. Then click Compact."></textarea>
         </div>
     `;
 
     const guidanceEl = root.querySelector('#cc_guidance');
-    if (guidanceEl) guidanceEl.value = compaction_readGuidance();
+    guidanceEl.value = compaction_readGuidance();
+    compaction_actions.fillResponseLength(root);
 
-    const tokenInput = root.querySelector('#cc_response_length');
-    if (tokenInput) tokenInput.value = String(compaction_getResponseLength());
-
-    const picker = createLoreBookPicker({
-        classPrefix: 'cc-lorebook',
+    compaction_lorebookPicker = createLoreBookPicker({
+        classPrefix: MODAL_LOREBOOK_PREFIX,
         title: 'Lore Books',
         debug: compaction_debug,
     });
-    root.querySelector('.cc-lorebook-host').replaceWith(picker.element);
-    root._ccLorebookPicker = picker;
+    root.querySelector('.cc-lorebook-host').replaceWith(compaction_lorebookPicker.element);
 
     // Point-of-use preset selection — which summary prompt + prefill bundle
     // Generate Summary uses, synced with the settings widget (which also
     // manages presets).
     root.querySelector('.cc-preset-host').replaceWith(createToolPresetSelector({
         toolKey: 'compaction',
-        className: 'cc-preset-select',
         title: 'Prompt preset used for Generate Summary — the bundle of summary prompt + prefill. '
             + 'Save and edit presets in the extension settings.',
     }));
 
-    compaction_debug('Modal body built — guidance length:', (guidanceEl?.value || '').length, 'response length:', tokenInput?.value);
+    compaction_debug('Modal body built — guidance length:', guidanceEl.value.length);
     return root;
 }
 
 function compaction_bindModalHandlers() {
-    document.getElementById('cc_generate_btn')?.addEventListener('click', compaction_handleGenerate);
-    document.getElementById('cc_continue_btn')?.addEventListener('click', compaction_handleContinue);
-    document.getElementById('cc_checkpoint_btn')?.addEventListener('click', compaction_handleCheckpoint);
-    document.getElementById('cc_retry_btn')?.addEventListener('click', compaction_handleRetry);
-
-    const output = document.getElementById('cc_summary_output');
-    output?.addEventListener('input', compaction_refreshActionButtonStates);
-
     const guidance = document.getElementById('cc_guidance');
     guidance?.addEventListener('input', () => scheduleGuidanceSave(guidance.value));
 
-    const tokenInput = document.getElementById('cc_response_length');
-    tokenInput?.addEventListener('change', () => {
-        const parsed = parseInt(tokenInput.value, 10);
-        if (!isNaN(parsed) && parsed > 0) {
-            compaction_moduleSettings.compactionSummaryResponseLength = parsed;
-            compaction_saveSettingsFn?.();
-        }
-    });
-
     document.getElementById('cc_clear_guidance_btn')?.addEventListener('click', () => {
-        if (compaction_isGenerating) return;
-        const g = document.getElementById('cc_guidance');
-        if (!g) return;
-        g.value = '';
+        if (compaction_actions.isGenerating() || !guidance) return;
+        guidance.value = '';
         scheduleGuidanceSave('');
-        g.focus();
-    });
-
-    document.getElementById('cc_clear_output_btn')?.addEventListener('click', () => {
-        if (compaction_isGenerating) return;
-        const out = document.getElementById('cc_summary_output');
-        if (!out) return;
-        out.value = '';
-        compaction_restorePoint = null;
-        compaction_lastAction = null;
-        out.focus();
-        compaction_refreshActionButtonStates();
+        guidance.focus();
     });
 }
 
@@ -12630,261 +12255,29 @@ async function updateUsageBanner() {
     }
 }
 
-// ─── Modal Actions (mirror ACC) ───
+// ─── Summary Generation ───
 
-function readModalLoreBooks() {
-    const picker = compaction_activeBody?._ccLorebookPicker;
-    return picker ? picker.getSelected() : [];
-}
-
-async function compaction_handleGenerate() {
-    compaction_debug('handleGenerate — isGenerating:', compaction_isGenerating, 'activeAction:', compaction_activeAction);
-    if (compaction_isGenerating) {
-        if (compaction_activeAction === 'generate') {
-            compaction_abortRequested = true;
-            compaction_stopGeneration();
-        }
-        return;
-    }
-    const ctx = getContext();
-    if ((ctx.chat?.length || 0) <= getTailLength()) {
-        toast(`The chat has ${ctx.chat?.length || 0} messages — at or below the tail length (${getTailLength()}). There's nothing to summarize away.`, 'warning');
-        return;
-    }
-    const output = document.getElementById('cc_summary_output');
-    compaction_restorePoint = output?.value || '';
-    await runSummaryGeneration('generate');
-}
-
-async function compaction_handleContinue() {
-    compaction_debug('handleContinue — isGenerating:', compaction_isGenerating, 'activeAction:', compaction_activeAction);
-    if (compaction_isGenerating) {
-        if (compaction_activeAction === 'continue') {
-            compaction_abortRequested = true;
-            compaction_stopGeneration();
-        }
-        return;
-    }
-    const output = document.getElementById('cc_summary_output');
-    const existing = output?.value || '';
-    if (!existing.trim()) {
-        toast('Nothing to continue from. Generate a summary first or type some text.', 'warning');
-        return;
-    }
-    compaction_restorePoint = existing;
-    await runSummaryGeneration('continue');
-}
-
-function compaction_handleCheckpoint() {
-    if (compaction_isGenerating) return;
-    const output = document.getElementById('cc_summary_output');
-    const current = output?.value || '';
-    if (!current.trim()) {
-        toast('Nothing to checkpoint — the summary is empty.', 'warning');
-        return;
-    }
-    compaction_restorePoint = current;
-    compaction_lastAction = 'continue';
-    toast('Checkpoint saved. Retry will restore to this point.', 'success');
-    compaction_refreshActionButtonStates();
-}
-
-async function compaction_handleRetry() {
-    if (compaction_isGenerating) return;
-    if (!compaction_lastAction || compaction_restorePoint === null) {
-        toast('Nothing to retry yet.', 'warning');
-        return;
-    }
-    if (compaction_lastAction === 'continue' && !compaction_restorePoint.trim()) {
-        toast('Cannot continue from an empty restore point.', 'warning');
-        return;
-    }
-    const output = document.getElementById('cc_summary_output');
-    if (output) output.value = compaction_restorePoint;
-    await runSummaryGeneration(compaction_lastAction);
-}
-
-async function runSummaryGeneration(action) {
-    compaction_debug('runSummaryGeneration — action:', action);
-    compaction_isGenerating = true;
-    compaction_abortRequested = false;
-    compaction_activeAction = action;
-
-    const isContinue = action === 'continue';
-    compaction_setGeneratingUI(true, action);
-    compaction_setStatusBar(isContinue ? 'Continuing summary…' : 'Generating summary…');
-
-    try {
-        const loreBookNames = readModalLoreBooks();
-        const guidance = document.getElementById('cc_guidance')?.value || '';
-        const output = document.getElementById('cc_summary_output');
-        const existing = output?.value || '';
-
-        const result = isContinue
-            ? await compaction_generateContinuation(loreBookNames, guidance, existing)
-            : await generateSummary(loreBookNames, guidance);
-
-        if (compaction_abortRequested) {
-            compaction_debug(`${action} aborted, discarding result; keeping the streamed partial`);
-            // The streamed partial is left in the field on purpose so the user
-            // can edit it and Continue from there. Treat the stop like a short
-            // result so Retry can redo it (Continue/Checkpoint enable on field
-            // content via refreshActionButtonStates in finally).
-            if (output?.value?.trim()) compaction_lastAction = action;
-            return;
-        }
-        if (!output) return;
-        if (isContinue) {
-            const sep = compaction_needsSeparator(existing) ? ' ' : '';
-            output.value = existing + sep + result;
-        } else {
-            output.value = result;
-        }
-        compaction_lastAction = action;
-        compaction_debug(`${action} complete, length:`, result.length);
-    } catch (err) {
-        if (isSilentGenerationAbort(err)) {
-            compaction_debug(`${action} aborted via cancellation; keeping the streamed partial`);
-            const out = document.getElementById('cc_summary_output');
-            if (out?.value?.trim()) compaction_lastAction = action;
-        } else if (!compaction_abortRequested) {
-            console.error('Compaction summary error:', err);
-            toast(`Summary generation failed: ${err.message}`, 'error');
-        }
-    } finally {
-        compaction_isGenerating = false;
-        compaction_abortRequested = false;
-        compaction_activeAction = null;
-        compaction_setGeneratingUI(false, action);
-        compaction_setStatusBar(null);
-        compaction_refreshActionButtonStates();
-    }
-}
-
-function compaction_needsSeparator(text) {
-    if (!text) return false;
-    const last = text[text.length - 1];
-    return last !== ' ' && last !== '\n' && last !== '\t';
-}
-
-async function generateSummary(loreBookNames, guidance) {
-    const preambleBlock = await buildSummaryPreamble(loreBookNames);
-    const prompt = composeSummaryPrompt(preambleBlock, guidance);
-    const systemPrompt = COMPACTION_SUMMARY_SYSTEM_PROMPT;
-    const responseLength = compaction_getResponseLength();
+async function generateSummary(outputEl, responseLength) {
+    const guidance = document.getElementById('cc_guidance')?.value || '';
+    const prompt = composeSummaryPrompt(await buildSummaryPreamble(responseLength), guidance);
     const prefill = compaction_getPrefill();
-
-    compaction_debug('generateSummary — lore books:', loreBookNames, 'guidance length:', (guidance || '').length,
-        'prompt length:', prompt.length, 'responseLength:', responseLength, 'prefill?', !!prefill);
-
-    const outputEl = document.getElementById('cc_summary_output');
-    compaction_debug('generateSummary — streamingGenerate START');
-    const result = await withSingleLineDisabled(() => cancellableStreamingGenerate(
-        { prompt, systemPrompt, responseLength, ...(prefill ? { prefill } : {}) },
-        outputEl,
-        { append: false, name: 'compaction-summary' },
-    ));
-    compaction_debug('generateSummary — streamingGenerate RESOLVED, raw length:', (result || '').length);
-    const cleaned = stripPrefillEcho(__WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(result).trim(), prefill);
-    return (prefill || '') + cleaned;
+    compaction_debug('generateSummary — guidance length:', guidance.length, 'prompt length:', prompt.length,
+        'responseLength:', responseLength, 'prefill?', !!prefill);
+    return streamFresh({
+        prompt, systemPrompt: COMPACTION_SUMMARY_SYSTEM_PROMPT, responseLength, prefill, outputEl,
+        name: 'compaction-summary',
+    });
 }
 
-async function compaction_generateContinuation(loreBookNames, guidance, existing) {
-    const preambleBlock = await buildSummaryPreamble(loreBookNames);
-    const prompt = compaction_composeContinuePrompt(preambleBlock, guidance);
-    const systemPrompt = COMPACTION_CONTINUE_SYSTEM_PROMPT;
-    const responseLength = compaction_getResponseLength();
-
-    compaction_debug('generateContinuation — existing length:', existing.length, 'prompt length:', prompt.length, 'responseLength:', responseLength);
-
-    const outputEl = document.getElementById('cc_summary_output');
-    compaction_debug('generateContinuation — streamingGenerate START');
-    // The recap-so-far is the assistant prefill — the model continues from its
-    // exact end. Strip any prefill echo so we keep only the new tail.
-    const result = await withSingleLineDisabled(() => cancellableStreamingGenerate(
-        { prompt, systemPrompt, responseLength, ...(existing ? { prefill: existing } : {}) },
-        outputEl,
-        { append: true, name: 'compaction-continue' },
-    ));
-    compaction_debug('generateContinuation — streamingGenerate RESOLVED, raw length:', (result || '').length);
-    return stripPrefillEcho(__WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(result).trim(), existing);
-}
-
-function compaction_stopGeneration() {
-    // Route through abortAllGenerations() so ST's GENERATION_STOPPED fires and
-    // the backend actually halts (not just our local controllers).
-    abortAllGenerations('compaction-cancel');
-    compaction_debug('Stop generation triggered');
-}
-
-// ─── Modal UI Helpers ───
-
-const compaction_ACTION_BUTTON_IDS = ['cc_generate_btn', 'cc_continue_btn', 'cc_checkpoint_btn', 'cc_retry_btn'];
-
-const compaction_ACTION_LABELS = {
-    cc_generate_btn: '<span class="fa-solid fa-wand-magic-sparkles"></span> Generate Summary',
-    cc_continue_btn: '<span class="fa-solid fa-arrow-right"></span> Continue',
-    cc_checkpoint_btn: '<span class="fa-solid fa-flag"></span> Checkpoint',
-    cc_retry_btn: '<span class="fa-solid fa-rotate-right"></span> Retry',
-};
-
-function compaction_setGeneratingUI(generating, action) {
-    const guidanceInput = document.getElementById('cc_guidance');
-    const activeBtnId = action === 'continue' ? 'cc_continue_btn' : 'cc_generate_btn';
-
-    for (const id of compaction_ACTION_BUTTON_IDS) {
-        const btn = document.getElementById(id);
-        if (!btn) continue;
-        if (generating) {
-            if (id === activeBtnId) {
-                btn.innerHTML = '<span class="fa-solid fa-stop"></span> Stop';
-                btn.classList.remove('cc-disabled');
-            } else {
-                btn.innerHTML = compaction_ACTION_LABELS[id];
-                btn.classList.add('cc-disabled');
-            }
-        } else {
-            btn.innerHTML = compaction_ACTION_LABELS[id];
-            btn.classList.remove('cc-disabled');
-        }
-    }
-
-    const okBtn = compaction_activePopup?.okButton;
-    if (okBtn) okBtn.classList.toggle('disabled', !!generating);
-
-    if (generating) {
-        guidanceInput?.setAttribute('disabled', 'true');
-    } else {
-        guidanceInput?.removeAttribute('disabled');
-        compaction_refreshActionButtonStates();
-    }
-}
-
-function compaction_refreshActionButtonStates() {
-    if (compaction_isGenerating) return;
-    const output = document.getElementById('cc_summary_output');
-    const hasText = !!output?.value?.trim();
-    compaction_setButtonDisabled('cc_continue_btn', !hasText);
-    compaction_setButtonDisabled('cc_checkpoint_btn', !hasText);
-    compaction_setButtonDisabled('cc_retry_btn', !compaction_lastAction || compaction_restorePoint === null);
-}
-
-function compaction_setButtonDisabled(id, disabled) {
-    const btn = document.getElementById(id);
-    if (!btn) return;
-    btn.classList.toggle('cc-disabled', disabled);
-}
-
-function compaction_setStatusBar(message) {
-    const bar = document.getElementById('cc_status_bar');
-    const text = document.getElementById('cc_status_text');
-    if (!bar || !text) return;
-    if (message) {
-        text.textContent = message;
-        bar.classList.remove('cc-hidden');
-    } else {
-        bar.classList.add('cc-hidden');
-    }
+async function compaction_generateContinuation(existing, outputEl, responseLength) {
+    const guidance = document.getElementById('cc_guidance')?.value || '';
+    const prompt = compaction_composeContinuePrompt(await buildSummaryPreamble(responseLength), guidance);
+    compaction_debug('generateContinuation — existing length:', existing.length, 'prompt length:', prompt.length,
+        'responseLength:', responseLength);
+    return streamContinuation({
+        prompt, systemPrompt: COMPACTION_CONTINUE_SYSTEM_PROMPT, responseLength, existing, outputEl,
+        name: 'compaction-continue',
+    });
 }
 
 // ─── Commit Pipeline ───
@@ -13371,7 +12764,6 @@ const IMAGE_PROMPT_PRESETS_SPEC = {
 
 
 
-
 // ─── Default Prompts & Built-in Presets ───
 
 // The prompt texts and built-in presets live in image-prompt-presets.js (no
@@ -13384,14 +12776,8 @@ let image_prompting_moduleSettings = null;
 let image_prompting_saveSettingsFn = null;
 let image_prompting_debug = () => {};
 
-let image_prompting_isGenerating = false;
-let image_prompting_abortRequested = false;
-let image_prompting_activeAction = null;       // which button initiated the current generation
-let image_prompting_lastAction = null;         // 'generate' | 'continue' — what Retry should redo
-let image_prompting_restorePoint = null;       // textarea snapshot used by Retry
-
 // True while a prompt is being rendered by ST's Image Generation extension.
-// Separate from `isGenerating` (which tracks *our* LLM prompt generation):
+// Separate from `actions.isGenerating()` (*our* LLM prompt generation):
 // the two are different backends and the modal disables them independently.
 let isSendingImage = false;
 
@@ -13494,7 +12880,7 @@ function writeSavedPrompts(list) {
 }
 
 function saveOutputToChat() {
-    if (image_prompting_isGenerating) return;
+    if (image_prompting_actions.isGenerating()) return;
     const text = document.getElementById('ip_prompt_output')?.value?.trim() || '';
     if (!text) {
         toast('Image prompt is empty. Nothing to save.', 'warning');
@@ -13529,7 +12915,7 @@ function saveOutputToChat() {
 }
 
 function renameSavedPrompt(id) {
-    if (image_prompting_isGenerating) return;
+    if (image_prompting_actions.isGenerating()) return;
     const prompts = readSavedPrompts();
     const entry = prompts.find(p => p.id === id);
     if (!entry) return;
@@ -13550,7 +12936,7 @@ function deleteSavedPrompt(id) {
 }
 
 function loadSavedPrompt(id) {
-    if (image_prompting_isGenerating) return;
+    if (image_prompting_actions.isGenerating()) return;
     const entry = readSavedPrompts().find(p => p.id === id);
     if (!entry) return;
     const output = document.getElementById('ip_prompt_output');
@@ -13573,9 +12959,7 @@ function loadSavedPrompt(id) {
     // Loading replaces the working prompt wholesale, so the old Retry
     // restore point no longer describes anything on screen — drop it,
     // mirroring the Clear button.
-    image_prompting_restorePoint = null;
-    image_prompting_lastAction = null;
-    image_prompting_refreshActionButtonStates();
+    image_prompting_actions.dropRestorePoint();
     toast('Saved image prompt loaded.', 'success');
 }
 
@@ -13661,7 +13045,7 @@ function buildSavedPromptRow(entry) {
     buttons.appendChild(buildSavedPromptButton('fa-copy', 'Copy this prompt to the clipboard', () => copyToClipboard(entry.text)));
     buttons.appendChild(buildSavedPromptButton('fa-pen', 'Rename this saved prompt', () => renameSavedPrompt(entry.id)));
     buttons.appendChild(buildSavedPromptButton('fa-trash-can', 'Delete this saved prompt', () => {
-        if (image_prompting_isGenerating) return;
+        if (image_prompting_actions.isGenerating()) return;
         if (!window.confirm('Delete this saved image prompt?')) return;
         deleteSavedPrompt(entry.id);
     }));
@@ -13890,7 +13274,39 @@ function showImagePromptPreview() {
 // ─── Modal ───
 
 let image_prompting_activePopup = null;
-let image_prompting_activeBody = null;
+let image_prompting_lorebookPicker = null;
+
+const image_prompting_actions = createGenerationActions({
+    prefix: 'ip',
+    outputId: 'ip_prompt_output',
+    noun: 'image prompt',
+    aNoun: 'an image prompt',
+    statusText: { generate: 'Generating image prompt…', continue: 'Continuing image prompt…' },
+    lockIds: ['ip_guidance'],
+    responseLength: {
+        get settings() { return image_prompting_moduleSettings; },
+        key: 'imagePromptResponseLength',
+        fallback: DEFAULT_IMAGE_PROMPT_RESPONSE_LENGTH,
+        save: () => image_prompting_saveSettingsFn?.(),
+    },
+    getPopup: () => image_prompting_activePopup,
+    canRun: () => {
+        const { includeChat, loreBookNames } = image_prompting_readModalContextOptions();
+        if (includeChat || loreBookNames.length || image_prompting_readGuidance()) return true;
+        toast('Nothing to work from — enable Use Chat Context, select a lore book, or enter Guidance.', 'warning');
+        return false;
+    },
+    run: (action, { existing, outputEl, responseLength }) => (action === 'continue'
+        ? image_prompting_generateContinuation(existing, outputEl, responseLength)
+        : generateImagePrompt(outputEl, responseLength)),
+    // The image hand-off needs a finished prompt: off while ours streams, and
+    // left alone while an image renders (setSendingImageUI owns it then).
+    onRefresh: (generating, hasText) => {
+        if (!isSendingImage) setModalButtonDisabled('ip_send_imagegen_btn', generating || !hasText);
+    },
+    logLabel: 'Image Prompting',
+    debug: (...args) => image_prompting_debug(...args),
+});
 
 async function openImagePromptModal({ anchorIndex = null, autoGenerate = false } = {}) {
     if (image_prompting_activePopup) return;
@@ -13899,14 +13315,8 @@ async function openImagePromptModal({ anchorIndex = null, autoGenerate = false }
         return;
     }
 
-    image_prompting_isGenerating = false;
-    image_prompting_abortRequested = false;
-    image_prompting_activeAction = null;
+    image_prompting_actions.reset();
     isSendingImage = false;
-    // lastAction / restorePoint are retry-only state and don't need to
-    // persist across modal sessions.
-    image_prompting_lastAction = null;
-    image_prompting_restorePoint = null;
     contextAnchorIndex = (Number.isInteger(anchorIndex) && anchorIndex >= 0) ? anchorIndex : null;
 
     const body = image_prompting_buildModalBody();
@@ -13919,16 +13329,16 @@ async function openImagePromptModal({ anchorIndex = null, autoGenerate = false }
         allowVerticalScrolling: true,
         onOpen: () => {
             image_prompting_bindModalHandlers();
+            image_prompting_actions.bind();
             refreshAnchorBar();
-            image_prompting_refreshActionButtonStates();
             presetChangeUnsubscribe = onToolPresetChange('image-prompt', onPresetChangedRefreshNegative);
             image_prompting_debug('Modal opened', contextAnchorIndex !== null ? `(anchored at message ${contextAnchorIndex})` : '');
-            if (autoGenerate) image_prompting_handleGenerate();
+            if (autoGenerate) image_prompting_actions.generate();
         },
         onClosing: (p) => {
             if (p.result === __WEBPACK_EXTERNAL_MODULE__popup_js_755810aa_POPUP_RESULT__.AFFIRMATIVE) {
                 // Copy & Close clicked — refuse to close mid-generation.
-                if (image_prompting_isGenerating) {
+                if (image_prompting_actions.isGenerating()) {
                     toast('Wait for generation to finish before copying.', 'warning');
                     return false;
                 }
@@ -13940,15 +13350,11 @@ async function openImagePromptModal({ anchorIndex = null, autoGenerate = false }
                 return true;
             }
             // Close / Esc / X — abort any in-flight job, then allow close.
-            if (image_prompting_isGenerating) {
-                image_prompting_abortRequested = true;
-                image_prompting_stopGeneration();
-            }
+            image_prompting_actions.stopIfRunning();
             return true;
         },
     });
     image_prompting_activePopup = popup;
-    image_prompting_activeBody = body;
 
     try {
         const result = await popup.show();
@@ -13961,12 +13367,9 @@ async function openImagePromptModal({ anchorIndex = null, autoGenerate = false }
         presetChangeUnsubscribe?.();
         presetChangeUnsubscribe = null;
         image_prompting_activePopup = null;
-        image_prompting_activeBody = null;
-        image_prompting_isGenerating = false;
+        image_prompting_lorebookPicker = null;
+        image_prompting_actions.reset();
         isSendingImage = false;
-        image_prompting_activeAction = null;
-        image_prompting_lastAction = null;
-        image_prompting_restorePoint = null;
         contextAnchorIndex = null;
         image_prompting_debug('Modal closed');
     }
@@ -13979,105 +13382,61 @@ function image_prompting_capturePersistedModalState(body) {
     const negativeEl = body.querySelector('#ip_negative_prompt');
     if (negativeEl) image_prompting_persistedModalState.negative = negativeEl.value;
     image_prompting_persistedModalState.useChatContext = !!body.querySelector('#ip_use_chat_context')?.checked;
-    const picker = body._ipLorebookPicker;
-    image_prompting_persistedModalState.selectedLoreBooks = picker ? picker.getSelected() : [];
-    // The Max Tokens field is the tool's saved setting (its change listener
-    // writes it through), so keep a typed value that never fired 'change'
-    // there too, rather than as a modal-only copy that would outlive a
-    // preset switch.
-    const tokenInput = body.querySelector('#ip_response_length');
-    const parsed = tokenInput ? parseInt(tokenInput.value, 10) : NaN;
-    if (!isNaN(parsed) && parsed > 0 && parsed !== image_prompting_moduleSettings.imagePromptResponseLength) {
-        image_prompting_moduleSettings.imagePromptResponseLength = parsed;
-        image_prompting_saveSettingsFn?.();
-    }
+    image_prompting_persistedModalState.selectedLoreBooks = image_prompting_lorebookPicker?.getSelected() ?? [];
+    image_prompting_actions.commitResponseLength(body);
 }
 
 function image_prompting_buildModalBody() {
     const root = document.createElement('div');
-    root.className = 'ip-modal-body';
+    root.className = 'sse-modal-body';
     root.innerHTML = `
-        <div class="ip-context-section">
+        <div class="sse-modal-context">
             <label class="checkbox_label" title="Read the current chat, character cards, and persona to describe the present moment">
                 <input id="ip_use_chat_context" type="checkbox" />
                 <span>Use Chat Context</span>
             </label>
             <div class="ip-lorebook-host"></div>
         </div>
-        <div id="ip_anchor_bar" class="ip-anchor-bar ip-hidden">
+        <div id="ip_anchor_bar" class="sse-modal-banner ip-anchor-bar sse-modal-hidden">
             <span class="fa-solid fa-anchor"></span>
             <span id="ip_anchor_text" class="ip-anchor-text"></span>
-            <div id="ip_anchor_clear_btn" class="menu_button interactable ip-clear-btn" title="Drop the anchor and use the full chat up to the latest message instead">
-                <span class="fa-solid fa-xmark"></span> Full Chat
-            </div>
+            ${smallButtonHtml('ip_anchor_clear_btn', 'fa-xmark', 'Full Chat', 'Drop the anchor and use the full chat up to the latest message instead')}
         </div>
-        <div class="ip-preset-row">
-            <label class="ip-preset-label"><span class="fa-solid fa-file-pen"></span> Prompt Preset:</label>
+        <div class="sse-modal-preset-row">
+            <label class="sse-modal-preset-label"><span class="fa-solid fa-file-pen"></span> Prompt Preset:</label>
             <div class="ip-preset-host"></div>
         </div>
-        <div class="ip-guidance-section">
-            <div class="ip-field-header">
+        <div class="sse-modal-section">
+            <div class="sse-modal-field-header">
                 <label for="ip_guidance"><b>Guidance (optional):</b></label>
-                <div id="ip_clear_guidance_btn" class="menu_button interactable ip-clear-btn" title="Clear the guidance">
-                    <span class="fa-solid fa-eraser"></span> Clear
-                </div>
+                ${smallButtonHtml('ip_clear_guidance_btn', 'fa-eraser', 'Clear', 'Clear the guidance')}
             </div>
             <textarea id="ip_guidance" class="text_pole" rows="3" placeholder="Optional extra direction: what to focus on, camera angle, art style, details to emphasize..."></textarea>
         </div>
-        <div class="ip-action-row">
-            <div id="ip_generate_btn" class="menu_button interactable ip-action-btn ip-generate-btn" title="Generate a fresh image prompt from the scene (replaces the textarea)">
-                <span class="fa-solid fa-wand-magic-sparkles"></span> Generate
-            </div>
-            <div id="ip_continue_btn" class="menu_button interactable ip-action-btn" title="Continue from where the image prompt leaves off">
-                <span class="fa-solid fa-arrow-right"></span> Continue
-            </div>
-            <div id="ip_checkpoint_btn" class="menu_button interactable ip-action-btn" title="Save the current image prompt as the Retry restore point">
-                <span class="fa-solid fa-flag"></span> Checkpoint
-            </div>
-            <div id="ip_retry_btn" class="menu_button interactable ip-action-btn" title="Restore to the last snapshot and re-run the last action">
-                <span class="fa-solid fa-rotate-right"></span> Retry
-            </div>
-        </div>
-        <div class="ip-tokens-row">
-            <label class="ip-tokens-label" for="ip_response_length" title="Maximum tokens for each generation">
-                <span class="fa-solid fa-coins"></span> Max Tokens:
-            </label>
-            <input id="ip_response_length" type="number" class="text_pole ip-tokens-input" min="50" max="8192" step="50" />
-        </div>
-        <div class="ip-status-bar ip-hidden" id="ip_status_bar">
-            <span class="fa-solid fa-spinner fa-spin"></span>
-            <span id="ip_status_text"></span>
-        </div>
-        <div class="ip-output-section">
-            <div class="ip-field-header">
+        ${actionRowHtml('ip', {
+        noun: 'image prompt',
+        generateTitle: 'Generate a fresh image prompt from the scene (replaces the textarea)',
+    })}
+        ${tokensRowHtml('ip')}
+        ${statusBarHtml('ip')}
+        <div class="sse-modal-output-section">
+            <div class="sse-modal-field-header">
                 <label for="ip_prompt_output"><b>Image Prompt:</b></label>
-                <div class="ip-field-header-buttons">
-                    <div id="ip_send_imagegen_btn" class="menu_button interactable ip-clear-btn ip-send-btn ip-hidden" title="Render this prompt on the image backend configured in SillyTavern's Image Generation settings">
-                        <span class="fa-solid fa-paintbrush"></span> Generate Image
-                    </div>
-                    <div id="ip_save_output_btn" class="menu_button interactable ip-clear-btn" title="Save the image prompt to this chat so it can be retrieved later">
-                        <span class="fa-solid fa-floppy-disk"></span> Save
-                    </div>
-                    <div id="ip_copy_output_btn" class="menu_button interactable ip-clear-btn" title="Copy the image prompt to the clipboard">
-                        <span class="fa-solid fa-copy"></span> Copy
-                    </div>
-                    <div id="ip_clear_output_btn" class="menu_button interactable ip-clear-btn" title="Clear the generated image prompt">
-                        <span class="fa-solid fa-eraser"></span> Clear
-                    </div>
+                <div class="sse-modal-field-header-buttons">
+                    ${smallButtonHtml('ip_send_imagegen_btn', 'fa-paintbrush', 'Generate Image', 'Render this prompt on the image backend configured in SillyTavern\'s Image Generation settings', 'sse-modal-primary sse-modal-hidden')}
+                    ${smallButtonHtml('ip_save_output_btn', 'fa-floppy-disk', 'Save', 'Save the image prompt to this chat so it can be retrieved later')}
+                    ${smallButtonHtml('ip_copy_output_btn', 'fa-copy', 'Copy', 'Copy the image prompt to the clipboard')}
+                    ${smallButtonHtml('ip_clear_output_btn', 'fa-eraser', 'Clear', 'Clear the generated image prompt')}
                 </div>
             </div>
-            <textarea id="ip_prompt_output" class="text_pole ip-prompt-output" rows="14" placeholder="The generated image prompt will appear here. Edit it freely, then copy it into ComfyUI or your image tool."></textarea>
+            <textarea id="ip_prompt_output" class="text_pole sse-modal-output ip-prompt-output" rows="14" placeholder="The generated image prompt will appear here. Edit it freely, then copy it into ComfyUI or your image tool."></textarea>
         </div>
         <div class="ip-negative-section">
-            <div class="ip-field-header">
+            <div class="sse-modal-field-header">
                 <label for="ip_negative_prompt" title="Sent as the negative prompt when you click Generate Image. It is added in front of the negative prompt configured in SillyTavern's own Image Generation panel, which still applies."><b>Negative Prompt:</b></label>
-                <div class="ip-field-header-buttons">
-                    <div id="ip_reset_negative_btn" class="menu_button interactable ip-clear-btn" title="Reset to the current prompt preset's negative prompt">
-                        <span class="fa-solid fa-rotate-left"></span> Reset
-                    </div>
-                    <div id="ip_clear_negative_btn" class="menu_button interactable ip-clear-btn" title="Clear the negative prompt">
-                        <span class="fa-solid fa-eraser"></span> Clear
-                    </div>
+                <div class="sse-modal-field-header-buttons">
+                    ${smallButtonHtml('ip_reset_negative_btn', 'fa-rotate-left', 'Reset', 'Reset to the current prompt preset\'s negative prompt')}
+                    ${smallButtonHtml('ip_clear_negative_btn', 'fa-eraser', 'Clear', 'Clear the negative prompt')}
                 </div>
             </div>
             <textarea id="ip_negative_prompt" class="text_pole ip-negative-prompt" rows="3" placeholder="Things to keep out of the image (e.g. lowres, bad anatomy, watermark). Follows the prompt preset unless you edit it. Leave empty to use only SillyTavern's own negative prompt."></textarea>
@@ -14103,27 +13462,20 @@ function image_prompting_buildModalBody() {
     const negativeEl = root.querySelector('#ip_negative_prompt');
     if (negativeEl) negativeEl.value = resolveNegativeForField();
 
-    // Initialize the token field from the saved setting (which a preset
-    // switch may have changed since the modal last closed).
-    const tokenInput = root.querySelector('#ip_response_length');
-    if (tokenInput) tokenInput.value = String(image_prompting_getSavedResponseLength());
+    image_prompting_actions.fillResponseLength(root);
 
     // Mount the shared lore-book picker with previously-selected entries.
-    const picker = createLoreBookPicker({
-        classPrefix: 'ip-lorebook',
-        initialSelection: Array.isArray(image_prompting_persistedModalState.selectedLoreBooks)
-            ? image_prompting_persistedModalState.selectedLoreBooks.slice()
-            : [],
+    image_prompting_lorebookPicker = createLoreBookPicker({
+        classPrefix: MODAL_LOREBOOK_PREFIX,
+        initialSelection: image_prompting_persistedModalState.selectedLoreBooks.slice(),
     });
-    root.querySelector('.ip-lorebook-host').replaceWith(picker.element);
-    root._ipLorebookPicker = picker;
+    root.querySelector('.ip-lorebook-host').replaceWith(image_prompting_lorebookPicker.element);
 
     // Point-of-use preset selection — one preset per diffusion-model family
     // (Default targets Krea 2; Anima / Danbooru Tags ship seeded), synced
     // with the settings widget (which also manages presets).
     root.querySelector('.ip-preset-host').replaceWith(createToolPresetSelector({
         toolKey: 'image-prompt',
-        className: 'ip-preset-select',
         title: 'Prompt preset used for Generate — pick the template for your target diffusion model '
             + '(e.g. Default for Krea 2, Anima, Danbooru Tags). Save and edit presets in the '
             + 'extension settings.',
@@ -14133,30 +13485,13 @@ function image_prompting_buildModalBody() {
 }
 
 function image_prompting_bindModalHandlers() {
-    document.getElementById('ip_generate_btn')?.addEventListener('click', image_prompting_handleGenerate);
-    document.getElementById('ip_continue_btn')?.addEventListener('click', image_prompting_handleContinue);
-    document.getElementById('ip_checkpoint_btn')?.addEventListener('click', image_prompting_handleCheckpoint);
-    document.getElementById('ip_retry_btn')?.addEventListener('click', image_prompting_handleRetry);
-
-    const output = document.getElementById('ip_prompt_output');
-    output?.addEventListener('input', image_prompting_refreshActionButtonStates);
-
-    const tokenInput = document.getElementById('ip_response_length');
-    tokenInput?.addEventListener('change', () => {
-        const parsed = parseInt(tokenInput.value, 10);
-        if (!isNaN(parsed) && parsed > 0) {
-            image_prompting_moduleSettings.imagePromptResponseLength = parsed;
-            image_prompting_saveSettingsFn?.();
-        }
-    });
-
     document.getElementById('ip_save_output_btn')?.addEventListener('click', saveOutputToChat);
     document.getElementById('ip_send_imagegen_btn')?.addEventListener('click', handleSendToImageGen);
     refreshImageGenButton();
     renderSavedPrompts();
 
     document.getElementById('ip_copy_output_btn')?.addEventListener('click', () => {
-        if (image_prompting_isGenerating) return;
+        if (image_prompting_actions.isGenerating()) return;
         const out = document.getElementById('ip_prompt_output');
         const text = out?.value?.trim() || '';
         if (!text) {
@@ -14166,23 +13501,23 @@ function image_prompting_bindModalHandlers() {
         copyToClipboard(text);
     });
     document.getElementById('ip_anchor_clear_btn')?.addEventListener('click', () => {
-        if (image_prompting_isGenerating) return;
+        if (image_prompting_actions.isGenerating()) return;
         contextAnchorIndex = null;
         refreshAnchorBar();
     });
     document.getElementById('ip_clear_guidance_btn')?.addEventListener('click', () => {
-        if (image_prompting_isGenerating) return;
+        if (image_prompting_actions.isGenerating()) return;
         const guidance = document.getElementById('ip_guidance');
         if (!guidance) return;
         guidance.value = '';
         guidance.focus();
     });
     document.getElementById('ip_reset_negative_btn')?.addEventListener('click', () => {
-        if (image_prompting_isGenerating) return;
+        if (image_prompting_actions.isGenerating()) return;
         setNegativeFromPreset();
     });
     document.getElementById('ip_clear_negative_btn')?.addEventListener('click', () => {
-        if (image_prompting_isGenerating) return;
+        if (image_prompting_actions.isGenerating()) return;
         const negative = document.getElementById('ip_negative_prompt');
         if (!negative) return;
         negative.value = '';
@@ -14190,18 +13525,6 @@ function image_prompting_bindModalHandlers() {
         // a preset switch doesn't quietly refill it.
         image_prompting_persistedModalState.negative = '';
         negative.focus();
-    });
-    document.getElementById('ip_clear_output_btn')?.addEventListener('click', () => {
-        if (image_prompting_isGenerating) return;
-        const out = document.getElementById('ip_prompt_output');
-        if (!out) return;
-        out.value = '';
-        // Clearing the output invalidates the existing Retry restore point
-        // so the user doesn't accidentally restore an unrelated prompt.
-        image_prompting_restorePoint = null;
-        image_prompting_lastAction = null;
-        out.focus();
-        image_prompting_refreshActionButtonStates();
     });
 }
 
@@ -14219,7 +13542,7 @@ function refreshAnchorBar() {
     const msg = (contextAnchorIndex !== null) ? getContext().chat?.[contextAnchorIndex] : null;
     if (!msg) {
         contextAnchorIndex = null;
-        bar.classList.add('ip-hidden');
+        bar.classList.add('sse-modal-hidden');
         return;
     }
 
@@ -14227,7 +13550,7 @@ function refreshAnchorBar() {
     const preview = snippet.length > 80 ? `${snippet.slice(0, 80)}…` : snippet;
     const who = msg.name ? ` — ${msg.name}` : '';
     label.textContent = `Context ends at message #${contextAnchorIndex}${who}: ${preview}`;
-    bar.classList.remove('ip-hidden');
+    bar.classList.remove('sse-modal-hidden');
 }
 
 async function copyToClipboard(text) {
@@ -14307,10 +13630,10 @@ function refreshImageGenButton() {
     const btn = document.getElementById('ip_send_imagegen_btn');
     if (!btn) return;
     if (!imageGenButtonEnabled()) {
-        btn.classList.add('ip-hidden');
+        btn.classList.add('sse-modal-hidden');
         return;
     }
-    btn.classList.remove('ip-hidden');
+    btn.classList.remove('sse-modal-hidden');
     if (!isSendingImage) {
         const label = getImageGenSourceLabel();
         btn.innerHTML = '<span class="fa-solid fa-paintbrush"></span> Generate Image';
@@ -14329,7 +13652,7 @@ function refreshImageGenButton() {
  * chat behind the modal (unless the quiet setting is on).
  */
 async function handleSendToImageGen() {
-    if (image_prompting_isGenerating || isSendingImage) return;
+    if (image_prompting_actions.isGenerating() || isSendingImage) return;
     if (!imageGenButtonEnabled()) return;
 
     const text = document.getElementById('ip_prompt_output')?.value?.trim() || '';
@@ -14360,7 +13683,7 @@ async function handleSendToImageGen() {
  * disturbing whatever is in the editor above.
  */
 async function sendSavedPromptToImageGen(id) {
-    if (image_prompting_isGenerating || isSendingImage) return;
+    if (image_prompting_actions.isGenerating() || isSendingImage) return;
     if (!imageGenButtonEnabled()) return;
 
     const entry = readSavedPrompts().find(p => p.id === id);
@@ -14420,158 +13743,27 @@ function setSendingImageUI(sending, label) {
     const btn = document.getElementById('ip_send_imagegen_btn');
     if (!btn) return;
     if (sending) {
-        btn.classList.add('ip-disabled');
+        btn.classList.add('sse-modal-disabled');
         btn.innerHTML = '<span class="fa-solid fa-spinner fa-spin"></span> Generating…';
         btn.title = `Generating an image on ${label}. Use ST's progress toast to stop it.`;
     } else {
-        btn.classList.remove('ip-disabled');
+        btn.classList.remove('sse-modal-disabled');
         refreshImageGenButton();
-        image_prompting_refreshActionButtonStates();
+        image_prompting_actions.refresh();
     }
 }
 
-// ─── Actions ───
+// ─── Generation ───
+
+function image_prompting_readGuidance() {
+    return document.getElementById('ip_guidance')?.value?.trim() || '';
+}
 
 function image_prompting_readModalContextOptions() {
-    const includeChat = !!document.getElementById('ip_use_chat_context')?.checked;
-    const picker = image_prompting_activeBody?._ipLorebookPicker;
-    const loreBookNames = picker ? picker.getSelected() : [];
-    return { includeChat, loreBookNames };
-}
-
-async function image_prompting_handleGenerate() {
-    if (image_prompting_isGenerating) {
-        if (image_prompting_activeAction === 'generate') {
-            image_prompting_abortRequested = true;
-            image_prompting_stopGeneration();
-        }
-        return;
-    }
-
-    const guidance = document.getElementById('ip_guidance')?.value?.trim() || '';
-    const ctxOptions = image_prompting_readModalContextOptions();
-    if (!ctxOptions.includeChat && !ctxOptions.loreBookNames.length && !guidance) {
-        toast('Nothing to work from — enable Use Chat Context, select a lore book, or enter Guidance.', 'warning');
-        return;
-    }
-
-    const output = document.getElementById('ip_prompt_output');
-    image_prompting_restorePoint = output?.value || '';
-    await image_prompting_runGeneration('generate', guidance);
-}
-
-async function image_prompting_handleContinue() {
-    if (image_prompting_isGenerating) {
-        if (image_prompting_activeAction === 'continue') {
-            image_prompting_abortRequested = true;
-            image_prompting_stopGeneration();
-        }
-        return;
-    }
-
-    const output = document.getElementById('ip_prompt_output');
-    const existing = output?.value || '';
-    if (!existing.trim()) {
-        toast('Nothing to continue from. Generate an image prompt first or type some text.', 'warning');
-        return;
-    }
-
-    const guidance = document.getElementById('ip_guidance')?.value?.trim() || '';
-    image_prompting_restorePoint = existing;
-    await image_prompting_runGeneration('continue', guidance);
-}
-
-function image_prompting_handleCheckpoint() {
-    if (image_prompting_isGenerating) return;
-    const output = document.getElementById('ip_prompt_output');
-    const current = output?.value || '';
-    if (!current.trim()) {
-        toast('Nothing to checkpoint — the image prompt is empty.', 'warning');
-        return;
-    }
-    image_prompting_restorePoint = current;
-    image_prompting_lastAction = 'continue';
-    toast('Checkpoint saved. Retry will restore to this point.', 'success');
-    image_prompting_refreshActionButtonStates();
-    image_prompting_debug('Checkpoint saved, length:', current.length);
-}
-
-async function image_prompting_handleRetry() {
-    if (image_prompting_isGenerating) return;
-    if (!image_prompting_lastAction || image_prompting_restorePoint === null) {
-        toast('Nothing to retry yet.', 'warning');
-        return;
-    }
-
-    const guidance = document.getElementById('ip_guidance')?.value?.trim() || '';
-    if (image_prompting_lastAction === 'continue' && !image_prompting_restorePoint.trim()) {
-        toast('Cannot continue from an empty restore point.', 'warning');
-        return;
-    }
-
-    const output = document.getElementById('ip_prompt_output');
-    if (output) output.value = image_prompting_restorePoint;
-    await image_prompting_runGeneration(image_prompting_lastAction, guidance);
-}
-
-async function image_prompting_runGeneration(action, guidance) {
-    image_prompting_isGenerating = true;
-    image_prompting_abortRequested = false;
-    image_prompting_activeAction = action;
-
-    const isContinue = action === 'continue';
-    image_prompting_setGeneratingUI(true, action);
-    image_prompting_setStatusBar(isContinue ? 'Continuing image prompt...' : 'Generating image prompt...');
-
-    try {
-        const ctxOptions = image_prompting_readModalContextOptions();
-        const output = document.getElementById('ip_prompt_output');
-        const existing = output?.value || '';
-
-        const result = isContinue
-            ? await image_prompting_generateContinuation(guidance, existing, ctxOptions)
-            : await generateImagePrompt(guidance, ctxOptions);
-
-        if (image_prompting_abortRequested) {
-            image_prompting_debug(`${action} aborted, discarding result; keeping the streamed partial`);
-            // Leave the streamed partial in the field so the user can edit it
-            // and Continue from there.
-            if (output?.value?.trim()) image_prompting_lastAction = action;
-            return;
-        }
-
-        if (!output) return;
-        if (isContinue) {
-            const sep = image_prompting_needsSeparator(existing) ? ' ' : '';
-            output.value = existing + sep + result;
-        } else {
-            output.value = result;
-        }
-        image_prompting_lastAction = action;
-        image_prompting_debug(`${action} complete, length:`, result.length);
-    } catch (err) {
-        if (isSilentGenerationAbort(err)) {
-            image_prompting_debug(`${action} aborted via cancellation; keeping the streamed partial`);
-            const out = document.getElementById('ip_prompt_output');
-            if (out?.value?.trim()) image_prompting_lastAction = action;
-        } else if (!image_prompting_abortRequested) {
-            console.error('Image Prompting generation error:', err);
-            toast(`Generation failed: ${err.message}`, 'error');
-        }
-    } finally {
-        image_prompting_isGenerating = false;
-        image_prompting_abortRequested = false;
-        image_prompting_activeAction = null;
-        image_prompting_setGeneratingUI(false, action);
-        image_prompting_setStatusBar(null);
-        image_prompting_refreshActionButtonStates();
-    }
-}
-
-function image_prompting_needsSeparator(text) {
-    if (!text) return false;
-    const last = text[text.length - 1];
-    return last !== ' ' && last !== '\n' && last !== '\t';
+    return {
+        includeChat: !!document.getElementById('ip_use_chat_context')?.checked,
+        loreBookNames: image_prompting_lorebookPicker?.getSelected() ?? [],
+    };
 }
 
 // ─── Prompt Composition ───
@@ -14607,49 +13799,26 @@ function image_prompting_composeContinuePrompt(preambleBlock, guidance) {
     return `${prompt}\n\nYour reply has been prefilled with the image prompt so far. Continue seamlessly from exactly where it stops — do not repeat any existing text. Maintain the same prompt style. Output only the continuation.`;
 }
 
-async function generateImagePrompt(guidance, ctxOptions) {
-    const preambleBlock = await image_prompting_buildPreambleBlock(ctxOptions);
-    const prompt = image_prompting_composeGeneratePrompt(preambleBlock, guidance);
-    const systemPrompt = IP_GENERATE_SYSTEM_PROMPT;
-    const responseLength = image_prompting_getResponseLength();
+async function generateImagePrompt(outputEl, responseLength) {
+    const guidance = image_prompting_readGuidance();
+    const prompt = image_prompting_composeGeneratePrompt(await image_prompting_buildPreambleBlock(responseLength), guidance);
     const prefill = image_prompting_getPrefill();
-
     image_prompting_debug('Generating with guidance length', guidance.length, 'tokens', responseLength);
-    image_prompting_debug('System prompt:', systemPrompt);
     image_prompting_debug('Prompt:', prompt);
     image_prompting_debug('Prefill:', prefill);
-
-    const outputEl = document.getElementById('ip_prompt_output');
-    const result = await withSingleLineDisabled(() => cancellableStreamingGenerate(
-        { prompt, systemPrompt, responseLength, ...(prefill ? { prefill } : {}) },
-        outputEl,
-        { append: false, name: 'image-prompt' },
-    ));
-    // Backends that ignore the assistant prefix may re-emit the prefill;
-    // strip the echo so prepending it doesn't double the opening.
-    const cleaned = stripPrefillEcho(__WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(result).trim(), prefill);
-    return (prefill || '') + cleaned;
+    return streamFresh({
+        prompt, systemPrompt: IP_GENERATE_SYSTEM_PROMPT, responseLength, prefill, outputEl, name: 'image-prompt',
+    });
 }
 
-async function image_prompting_generateContinuation(guidance, existing, ctxOptions) {
-    const preambleBlock = await image_prompting_buildPreambleBlock(ctxOptions);
-    const prompt = image_prompting_composeContinuePrompt(preambleBlock, guidance);
-    const systemPrompt = IP_CONTINUE_SYSTEM_PROMPT;
-    const responseLength = image_prompting_getResponseLength();
-
+async function image_prompting_generateContinuation(existing, outputEl, responseLength) {
+    const prompt = image_prompting_composeContinuePrompt(await image_prompting_buildPreambleBlock(responseLength), image_prompting_readGuidance());
     image_prompting_debug('Continuing with existing length', existing.length, 'tokens', responseLength);
-    image_prompting_debug('System prompt:', systemPrompt);
     image_prompting_debug('Prompt:', prompt);
-
-    const outputEl = document.getElementById('ip_prompt_output');
-    // The prompt-so-far is the assistant prefill, so the model continues from
-    // its exact end; strip any prefill echo to keep only the new tail.
-    const result = await withSingleLineDisabled(() => cancellableStreamingGenerate(
-        { prompt, systemPrompt, responseLength, ...(existing ? { prefill: existing } : {}) },
-        outputEl,
-        { append: true, name: 'image-prompt-continue' },
-    ));
-    return stripPrefillEcho(__WEBPACK_EXTERNAL_MODULE__reasoning_js_8d5a64cc_removeReasoningFromString__(result).trim(), existing);
+    return streamContinuation({
+        prompt, systemPrompt: IP_CONTINUE_SYSTEM_PROMPT, responseLength, existing, outputEl,
+        name: 'image-prompt-continue',
+    });
 }
 
 function image_prompting_getPromptTemplate() {
@@ -14660,21 +13829,13 @@ function image_prompting_getPrefill() {
     return textSetting(image_prompting_moduleSettings, 'imagePromptPrefill', DEFAULT_IMAGE_PROMPT_PREFILL);
 }
 
-function image_prompting_getResponseLength() {
-    return parsePositiveInt(document.getElementById('ip_response_length')?.value) ?? image_prompting_getSavedResponseLength();
-}
-
-function image_prompting_getSavedResponseLength() {
-    return positiveIntSetting(image_prompting_moduleSettings, 'imagePromptResponseLength', DEFAULT_IMAGE_PROMPT_RESPONSE_LENGTH);
-}
-
-async function image_prompting_buildPreambleBlock(ctxOptions) {
-    if (!ctxOptions) return '';
-    if (!ctxOptions.includeChat && !(ctxOptions.loreBookNames && ctxOptions.loreBookNames.length)) return '';
+async function image_prompting_buildPreambleBlock(responseLength) {
+    const ctxOptions = image_prompting_readModalContextOptions();
+    if (!ctxOptions.includeChat && !ctxOptions.loreBookNames.length) return '';
     const anchored = contextAnchorIndex !== null;
     const preamble = await buildContextPreamble({
         ...ctxOptions,
-        responseLength: image_prompting_getResponseLength(),
+        responseLength,
         maxContextOverride: image_prompting_moduleSettings?.imagePromptMaxContextOverride || 0,
         ...(anchored ? { endAtMessageIndex: contextAnchorIndex } : {}),
     });
@@ -14686,95 +13847,6 @@ async function image_prompting_buildPreambleBlock(ctxOptions) {
         ? 'Scene to visualize (the roleplay chat up to the chosen moment, characters, and selected lore — the final message of the Recent Chat is the current moment to depict):'
         : 'Scene to visualize (the roleplay chat, characters, and selected lore):';
     return `${header}\n${preamble}\n\n`;
-}
-
-function image_prompting_stopGeneration() {
-    // Route through abortAllGenerations() so that ST's GENERATION_STOPPED
-    // event also fires and the backend fetch is actually cancelled — see
-    // the silent-generation module for the full rationale.
-    abortAllGenerations('image-prompt-cancel');
-    image_prompting_debug('Stop generation triggered');
-}
-
-// ─── UI Helpers ───
-
-const image_prompting_ACTION_BUTTON_IDS = ['ip_generate_btn', 'ip_continue_btn', 'ip_checkpoint_btn', 'ip_retry_btn'];
-
-const image_prompting_ACTION_LABELS = {
-    ip_generate_btn: '<span class="fa-solid fa-wand-magic-sparkles"></span> Generate',
-    ip_continue_btn: '<span class="fa-solid fa-arrow-right"></span> Continue',
-    ip_checkpoint_btn: '<span class="fa-solid fa-flag"></span> Checkpoint',
-    ip_retry_btn: '<span class="fa-solid fa-rotate-right"></span> Retry',
-};
-
-function image_prompting_setGeneratingUI(generating, action) {
-    const guidanceInput = document.getElementById('ip_guidance');
-    const activeBtnId = action === 'continue' ? 'ip_continue_btn' : 'ip_generate_btn';
-
-    for (const id of image_prompting_ACTION_BUTTON_IDS) {
-        const btn = document.getElementById(id);
-        if (!btn) continue;
-        if (generating) {
-            if (id === activeBtnId) {
-                btn.innerHTML = '<span class="fa-solid fa-stop"></span> Stop';
-                btn.classList.remove('ip-disabled');
-            } else {
-                btn.innerHTML = image_prompting_ACTION_LABELS[id];
-                btn.classList.add('ip-disabled');
-            }
-        } else {
-            btn.innerHTML = image_prompting_ACTION_LABELS[id];
-            btn.classList.remove('ip-disabled');
-        }
-    }
-
-    // Popup owns the OK/Cancel buttons; toggle the OK button visually so
-    // users get a clear "wait for generation" hint. The onClosing guard
-    // still blocks the close if they click it mid-flight.
-    const okBtn = image_prompting_activePopup?.okButton;
-    if (okBtn) okBtn.classList.toggle('disabled', !!generating);
-
-    if (generating) {
-        guidanceInput?.setAttribute('disabled', 'true');
-        // The prompt is still being written — there's nothing final to render
-        // yet, so the image hand-off is off-limits until the stream settles.
-        image_prompting_setButtonDisabled('ip_send_imagegen_btn', true);
-    } else {
-        guidanceInput?.removeAttribute('disabled');
-        image_prompting_refreshActionButtonStates();
-    }
-}
-
-function image_prompting_refreshActionButtonStates() {
-    if (image_prompting_isGenerating) return;
-    const output = document.getElementById('ip_prompt_output');
-    const hasText = !!output?.value?.trim();
-
-    image_prompting_setButtonDisabled('ip_continue_btn', !hasText);
-    image_prompting_setButtonDisabled('ip_checkpoint_btn', !hasText);
-    image_prompting_setButtonDisabled('ip_retry_btn', !image_prompting_lastAction || image_prompting_restorePoint === null);
-    // Left disabled while an image is already rendering — setSendingImageUI
-    // owns the button in that window.
-    if (!isSendingImage) image_prompting_setButtonDisabled('ip_send_imagegen_btn', !hasText);
-}
-
-function image_prompting_setButtonDisabled(id, disabled) {
-    const btn = document.getElementById(id);
-    if (!btn) return;
-    if (disabled) btn.classList.add('ip-disabled');
-    else btn.classList.remove('ip-disabled');
-}
-
-function image_prompting_setStatusBar(message) {
-    const bar = document.getElementById('ip_status_bar');
-    const text = document.getElementById('ip_status_text');
-    if (!bar || !text) return;
-    if (message) {
-        text.textContent = message;
-        bar.classList.remove('ip-hidden');
-    } else {
-        bar.classList.add('ip-hidden');
-    }
 }
 
 ;// ./src/retry-continue.js

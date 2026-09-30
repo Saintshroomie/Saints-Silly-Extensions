@@ -24,18 +24,15 @@
    SHARED: BANNERS & STATUS BARS
    ═══════════════════════════════════════════════════════════════════════════════ */
 
-/* One readable surface for every modal banner / status bar (ACC, Compaction,
-   Image Prompting). ST's --SmartThemeBodyColor is the *text* colour, not a
+/* One readable surface for every modal banner / status bar (the generation
+   modals' status bars, Compaction's usage banner, Image Prompting's anchor bar). ST's --SmartThemeBodyColor is the *text* colour, not a
    background — painting a bar with it renders the block in the same colour as
    the text on top of it, which is what made these unreadable (a white bar with
    near-white text on light themes). The surface is a translucent black wash
    instead: it darkens whatever the theme's own background is, so body-coloured
    text keeps its contrast on both light and dark themes. */
-.acc-status-bar,
-.cc-status-bar,
-.ip-status-bar,
-.ip-anchor-bar,
-.cc-usage-banner {
+.sse-modal-status,
+.sse-modal-banner {
     background-color: rgba(0, 0, 0, 0.2);
     border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));
     border-radius: 4px;
@@ -45,13 +42,236 @@
 /* The accent lives on the icon, never on the message text: a theme accent
    (gold, etc.) can fall below readable contrast on a light background, the
    body colour can't. */
-.acc-status-bar > .fa-solid,
-.cc-status-bar > .fa-solid,
-.ip-status-bar > .fa-solid,
-.ip-anchor-bar > .fa-solid {
+.sse-modal-status > .fa-solid,
+.sse-modal-banner > .fa-solid {
     color: var(--SmartThemeQuoteColor, #e8a23a);
 }
 
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   SHARED: GENERATION MODALS
+   (ACC, Compaction, Image Prompting, Character State — rendered inside ST's
+   Popup, which provides the chrome. Markup comes from generation-modal.js.)
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+.sse-modal-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0%;
+    min-height: 0;
+    text-align: left;
+}
+
+.sse-modal-hidden {
+    display: none !important;
+}
+
+.sse-modal-disabled {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+/* ── Context row: Use Chat Context + lore-book picker ── */
+
+.sse-modal-context {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    padding: 8px 10px;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 4px;
+}
+
+.sse-modal-context .checkbox_label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9em;
+    cursor: pointer;
+}
+
+.sse-modal-lorebook-picker {
+    position: relative;
+    font-size: 0.9em;
+}
+
+.sse-modal-lorebook-picker > summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 4px 8px;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0.85;
+}
+
+.sse-modal-lorebook-picker > summary::-webkit-details-marker {
+    display: none;
+}
+
+.sse-modal-lorebook-picker > summary:hover {
+    opacity: 1;
+}
+
+.sse-modal-lorebook-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 2px;
+    z-index: 10002;
+    min-width: 240px;
+    max-height: 260px;
+    overflow-y: auto;
+    background: var(--SmartThemeBlurTintColor, #1a1a2e);
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 4px;
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.sse-modal-lorebook-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.sse-modal-lorebook-empty {
+    opacity: 0.6;
+    font-style: italic;
+}
+
+.sse-modal-preset-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 0.9em;
+}
+
+.sse-modal-preset-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    user-select: none;
+    opacity: 0.85;
+}
+
+/* ── Fields: label on the left, small buttons on the right ── */
+
+.sse-modal-section {
+    margin-bottom: 12px;
+}
+
+.sse-modal-section textarea {
+    width: 100%;
+    margin-top: 4px;
+    resize: vertical;
+}
+
+.sse-modal-field-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.sse-modal-field-header-buttons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sse-modal-small-btn {
+    font-size: 0.8em;
+    padding: 2px 8px;
+    opacity: 0.85;
+    white-space: nowrap;
+}
+
+.sse-modal-small-btn:hover {
+    opacity: 1;
+}
+
+.sse-modal-small-btn.sse-modal-disabled {
+    opacity: 0.3;
+}
+
+.sse-modal-output-section {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0%;
+    min-height: 0;
+}
+
+.sse-modal-output {
+    width: 100%;
+    flex: 1 1 0%;
+    min-height: 200px;
+    resize: vertical;
+}
+
+/* ── Actions, Max Tokens, status ── */
+
+.sse-modal-action-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.sse-modal-action-btn {
+    flex: 1 1 0;
+    min-width: 110px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* The primary "make something" action (Generate, Generate Image, …). */
+.sse-modal-primary {
+    color: var(--SmartThemeQuoteColor, #e8a23a);
+}
+
+.sse-modal-tokens-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-bottom: 12px;
+    font-size: 0.85em;
+    opacity: 0.85;
+}
+
+.sse-modal-tokens-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    user-select: none;
+}
+
+.sse-modal-tokens-input {
+    width: 90px !important;
+    padding: 2px 6px !important;
+    font-size: 0.9em !important;
+    text-align: center;
+}
+
+.sse-modal-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    font-size: 0.9em;
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    POSSESSION STYLES
@@ -313,110 +533,8 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════
-   ACC MODAL STYLES (rendered inside ST's Popup; chrome is provided by Popup)
+   ASSISTED CHARACTER CREATION (modal styles are shared — see GENERATION MODALS)
    ═══════════════════════════════════════════════════════════════════════════════ */
-
-.acc-modal-body {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 0%;
-    min-height: 0;
-    text-align: left;
-}
-
-.acc-brief-section {
-    margin-bottom: 12px;
-}
-
-.acc-brief-section textarea {
-    width: 100%;
-    margin-top: 4px;
-    resize: vertical;
-}
-
-.acc-action-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 8px;
-}
-
-.acc-tokens-row {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 6px;
-    margin-bottom: 12px;
-    font-size: 0.85em;
-    opacity: 0.85;
-}
-
-.acc-tokens-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    user-select: none;
-}
-
-.acc-tokens-input {
-    width: 80px !important;
-    padding: 2px 6px !important;
-    font-size: 0.9em !important;
-    text-align: center;
-}
-
-.acc-action-btn {
-    flex: 1 1 0;
-    min-width: 110px;
-    text-align: center;
-    white-space: nowrap;
-}
-
-.acc-action-btn.acc-disabled {
-    opacity: 0.3;
-    pointer-events: none;
-}
-
-.acc-generate-btn {
-    color: var(--SmartThemeQuoteColor, #e8a23a);
-}
-
-/* Surface/colour come from the shared banner rule at the top of this file. */
-.acc-status-bar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    margin-bottom: 12px;
-    font-size: 0.9em;
-}
-
-.acc-description-section {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 0%;
-    min-height: 0;
-}
-
-.acc-description-section label {
-    margin-bottom: 4px;
-}
-
-.acc-description-output {
-    width: 100%;
-    flex: 1 1 0%;
-    min-height: 200px;
-    resize: vertical;
-}
-
-.acc-description-output[disabled] {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.acc-hidden {
-    display: none !important;
-}
 
 /* ACC Launch button in character creator */
 #acc_launch_btn {
@@ -425,28 +543,9 @@
     gap: 4px;
 }
 
-/* Field header row: label on the left, Clear button on the right. */
-.acc-modal-body .acc-field-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 4px;
-}
-
-.acc-modal-body .acc-clear-btn {
-    font-size: 0.8em;
-    padding: 2px 8px;
-    opacity: 0.85;
-}
-
-.acc-modal-body .acc-clear-btn:hover {
-    opacity: 1;
-}
-
 /* ═══════════════════════════════════════════════════════════════════════════════
-   CHARACTER STATE STYLES (pane rendered inside ST's Popup; reuses the ACC
-   action/status/context classes)
+   CHARACTER STATE STYLES (pane rendered inside ST's Popup; its assist section
+   reuses the shared generation-modal classes)
    ═══════════════════════════════════════════════════════════════════════════════ */
 
 /* Launch button on each group member row, after Possession's radio. */
@@ -578,9 +677,9 @@
     border-top: 1px solid var(--SmartThemeBorderColor, #555);
 }
 
-.cs-assist-section .acc-context-section,
-.cs-assist-section .acc-preset-row,
-.cs-assist-section .acc-status-bar {
+.cs-assist-section .sse-modal-context,
+.cs-assist-section .sse-modal-preset-row,
+.cs-assist-section .sse-modal-status {
     margin-bottom: 0;
 }
 
@@ -596,7 +695,7 @@
     gap: 8px;
 }
 
-.cs-action-row .acc-tokens-label {
+.cs-action-row .sse-modal-tokens-label {
     margin-left: auto;
     font-size: 0.85em;
     opacity: 0.85;
@@ -844,94 +943,9 @@
     text-align: center;
 }
 
-/* ── ACC modal: context preamble controls ── */
-
-.acc-context-section {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-bottom: 12px;
-    padding: 8px 10px;
-    border: 1px solid var(--SmartThemeBorderColor, #555);
-    border-radius: 4px;
-}
-
-.acc-context-section .checkbox_label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.9em;
-    cursor: pointer;
-}
-
-.acc-lorebook-picker {
-    position: relative;
-    font-size: 0.9em;
-}
-
-.acc-lorebook-picker > summary {
-    cursor: pointer;
-    list-style: none;
-    padding: 4px 8px;
-    border: 1px solid var(--SmartThemeBorderColor, #555);
-    border-radius: 4px;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    opacity: 0.85;
-}
-
-.acc-lorebook-picker > summary::-webkit-details-marker {
-    display: none;
-}
-
-.acc-lorebook-picker > summary:hover {
-    opacity: 1;
-}
-
-.acc-lorebook-list {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    margin-top: 2px;
-    z-index: 10002;
-    min-width: 240px;
-    max-height: 260px;
-    overflow-y: auto;
-    background: var(--SmartThemeBlurTintColor, #1a1a2e);
-    border: 1px solid var(--SmartThemeBorderColor, #555);
-    border-radius: 4px;
-    padding: 6px 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-}
-
-.acc-lorebook-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-}
-
-.acc-lorebook-empty {
-    opacity: 0.6;
-    font-style: italic;
-}
-
 /* ═══════════════════════════════════════════════════════════════════════════════
-   COMPACTION MODAL STYLES (rendered inside ST's Popup; mirror the ACC flex chain)
+   COMPACTION MODAL STYLES (on top of the shared generation-modal styles)
    ═══════════════════════════════════════════════════════════════════════════════ */
-
-.cc-modal-body {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 0%;
-    min-height: 0;
-    text-align: left;
-}
 
 /* Surface/colour come from the shared banner rule at the top of this file. */
 .cc-usage-banner {
@@ -948,126 +962,8 @@
     font-weight: 600;
 }
 
-.cc-context-section {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-bottom: 12px;
-    padding: 8px 10px;
-    border: 1px solid var(--SmartThemeBorderColor, #555);
-    border-radius: 4px;
-}
-
 .cc-context-hint {
     opacity: 0.7;
-}
-
-.cc-guidance-section {
-    margin-bottom: 12px;
-}
-
-.cc-guidance-section textarea {
-    width: 100%;
-    margin-top: 4px;
-    resize: vertical;
-}
-
-.cc-action-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 8px;
-}
-
-.cc-action-btn {
-    flex: 1 1 0;
-    min-width: 130px;
-    text-align: center;
-    white-space: nowrap;
-}
-
-.cc-action-btn.cc-disabled {
-    opacity: 0.3;
-    pointer-events: none;
-}
-
-.cc-generate-btn {
-    color: var(--SmartThemeQuoteColor, #e8a23a);
-}
-
-.cc-tokens-row {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 6px;
-    margin-bottom: 12px;
-    font-size: 0.85em;
-    opacity: 0.85;
-}
-
-.cc-tokens-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    user-select: none;
-}
-
-.cc-tokens-input {
-    width: 90px !important;
-    padding: 2px 6px !important;
-    font-size: 0.9em !important;
-    text-align: center;
-}
-
-/* Surface/colour come from the shared banner rule at the top of this file. */
-.cc-status-bar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    margin-bottom: 12px;
-    font-size: 0.9em;
-}
-
-.cc-summary-section {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 0%;
-    min-height: 0;
-}
-
-.cc-summary-section label {
-    margin-bottom: 4px;
-}
-
-.cc-summary-output {
-    width: 100%;
-    flex: 1 1 0%;
-    min-height: 200px;
-    resize: vertical;
-}
-
-.cc-hidden {
-    display: none !important;
-}
-
-.cc-modal-body .cc-field-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 4px;
-}
-
-.cc-modal-body .cc-clear-btn {
-    font-size: 0.8em;
-    padding: 2px 8px;
-    opacity: 0.85;
-}
-
-.cc-modal-body .cc-clear-btn:hover {
-    opacity: 1;
 }
 
 .cc-confirm .cc-dont-ask {
@@ -1075,63 +971,6 @@
     display: flex;
     align-items: center;
     gap: 6px;
-}
-
-/* Compaction lore-book picker (shares the ACC picker shape) */
-.cc-lorebook-picker {
-    position: relative;
-    font-size: 0.9em;
-}
-
-.cc-lorebook-picker > summary {
-    cursor: pointer;
-    list-style: none;
-    padding: 4px 8px;
-    border: 1px solid var(--SmartThemeBorderColor, #555);
-    border-radius: 4px;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    opacity: 0.85;
-}
-
-.cc-lorebook-picker > summary::-webkit-details-marker {
-    display: none;
-}
-
-.cc-lorebook-picker > summary:hover {
-    opacity: 1;
-}
-
-.cc-lorebook-list {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    margin-top: 2px;
-    z-index: 10002;
-    min-width: 240px;
-    max-height: 260px;
-    overflow-y: auto;
-    background: var(--SmartThemeBlurTintColor, #1a1a2e);
-    border: 1px solid var(--SmartThemeBorderColor, #555);
-    border-radius: 4px;
-    padding: 6px 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-}
-
-.cc-lorebook-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-}
-
-.cc-lorebook-empty {
-    opacity: 0.6;
-    font-style: italic;
 }
 
 /* Compaction launch item in the hamburger menu */
@@ -1153,102 +992,8 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════
-   IMAGE PROMPTING MODAL STYLES (rendered inside ST's Popup; mirror the ACC flex chain)
+   IMAGE PROMPTING MODAL STYLES (on top of the shared generation-modal styles)
    ═══════════════════════════════════════════════════════════════════════════════ */
-
-.ip-modal-body {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 0%;
-    min-height: 0;
-    text-align: left;
-}
-
-.ip-context-section {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-bottom: 12px;
-    padding: 8px 10px;
-    border: 1px solid var(--SmartThemeBorderColor, #555);
-    border-radius: 4px;
-}
-
-.ip-context-section .checkbox_label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.9em;
-    cursor: pointer;
-}
-
-.ip-guidance-section {
-    margin-bottom: 12px;
-}
-
-.ip-guidance-section textarea {
-    width: 100%;
-    margin-top: 4px;
-    resize: vertical;
-}
-
-.ip-action-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 8px;
-}
-
-.ip-action-btn {
-    flex: 1 1 0;
-    min-width: 130px;
-    text-align: center;
-    white-space: nowrap;
-}
-
-.ip-action-btn.ip-disabled {
-    opacity: 0.3;
-    pointer-events: none;
-}
-
-.ip-generate-btn {
-    color: var(--SmartThemeQuoteColor, #e8a23a);
-}
-
-.ip-tokens-row {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 6px;
-    margin-bottom: 12px;
-    font-size: 0.85em;
-    opacity: 0.85;
-}
-
-.ip-tokens-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    user-select: none;
-}
-
-.ip-tokens-input {
-    width: 90px !important;
-    padding: 2px 6px !important;
-    font-size: 0.9em !important;
-    text-align: center;
-}
-
-/* Surface/colour come from the shared banner rule at the top of this file. */
-.ip-status-bar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    margin-bottom: 12px;
-    font-size: 0.9em;
-}
 
 /* Context-anchor bar — shown when the modal was opened from a per-message
    button, so the packed chat context ends at that message. */
@@ -1270,129 +1015,19 @@
     opacity: 0.9;
 }
 
-.ip-output-section {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 0%;
-    min-height: 0;
-}
-
-.ip-output-section label {
-    margin-bottom: 4px;
-}
-
-.ip-prompt-output {
-    width: 100%;
-    flex: 1 1 0%;
+.sse-modal-output.ip-prompt-output {
     min-height: 180px;
-    resize: vertical;
-}
-
-.ip-hidden {
-    display: none !important;
-}
-
-.ip-modal-body .ip-field-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 4px;
-}
-
-.ip-modal-body .ip-field-header-buttons {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.ip-modal-body .ip-clear-btn {
-    font-size: 0.8em;
-    padding: 2px 8px;
-    opacity: 0.85;
-}
-
-.ip-modal-body .ip-clear-btn:hover {
-    opacity: 1;
-}
-
-.ip-modal-body .ip-clear-btn.ip-disabled {
-    opacity: 0.3;
-    pointer-events: none;
-}
-
-/* Hand-off to ST's Image Generation extension — tinted like the primary
-   Generate action, since it's the other "make something" button in the modal. */
-.ip-modal-body .ip-send-btn {
-    color: var(--SmartThemeQuoteColor, #e8a23a);
 }
 
 .ip-negative-section {
     margin-top: 10px;
 }
 
-.ip-modal-body .ip-negative-prompt {
+.ip-negative-prompt {
     width: 100%;
     min-height: 60px;
     resize: vertical;
     font-size: 0.9em;
-}
-
-/* Image Prompting lore-book picker (shares the ACC picker shape) */
-.ip-lorebook-picker {
-    position: relative;
-    font-size: 0.9em;
-}
-
-.ip-lorebook-picker > summary {
-    cursor: pointer;
-    list-style: none;
-    padding: 4px 8px;
-    border: 1px solid var(--SmartThemeBorderColor, #555);
-    border-radius: 4px;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    opacity: 0.85;
-}
-
-.ip-lorebook-picker > summary::-webkit-details-marker {
-    display: none;
-}
-
-.ip-lorebook-picker > summary:hover {
-    opacity: 1;
-}
-
-.ip-lorebook-list {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    margin-top: 2px;
-    z-index: 10002;
-    min-width: 240px;
-    max-height: 260px;
-    overflow-y: auto;
-    background: var(--SmartThemeBlurTintColor, #1a1a2e);
-    border: 1px solid var(--SmartThemeBorderColor, #555);
-    border-radius: 4px;
-    padding: 6px 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-}
-
-.ip-lorebook-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-}
-
-.ip-lorebook-empty {
-    opacity: 0.6;
-    font-style: italic;
 }
 
 /* Image Prompting saved-prompt store (per-chat) */
@@ -1905,26 +1540,6 @@
     width: auto !important;
     min-width: 120px;
     max-width: 260px;
-}
-
-.acc-preset-row,
-.ip-preset-row,
-.cc-preset-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-    font-size: 0.9em;
-}
-
-.acc-preset-label,
-.ip-preset-label,
-.cc-preset-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    user-select: none;
-    opacity: 0.85;
 }
 
 .wia-controls .wia-preset-row {

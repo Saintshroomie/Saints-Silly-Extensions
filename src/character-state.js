@@ -17,7 +17,6 @@
  * Discovery and reply parsing are pure helpers in character-state-parsing.js.
  */
 
-import { removeReasoningFromString } from '../../../../reasoning.js';
 import {
     Popup,
     POPUP_TYPE,
@@ -33,10 +32,7 @@ import {
     toast,
     buildContextPreamble,
     createLoreBookPicker,
-    streamingGenerate,
-    withSingleLineDisabled,
     applyTemplateMacros,
-    stripPrefillEcho,
     showPromptPreview,
     getChatCharacters,
     getCurrentChatId,
@@ -48,6 +44,7 @@ import {
     isSilentGenerationAbort,
 } from './silent-generation.js';
 import { createToolPresetSelector } from './prompt-templates.js';
+import { MODAL_LOREBOOK_PREFIX, setModalStatus, statusBarHtml, streamFresh } from './generation-modal.js';
 import {
     discoverVariables,
     humanizeVariableName,
@@ -486,34 +483,31 @@ function buildAssistSection() {
     section.className = 'cs-assist-section';
     section.innerHTML = `
         <div class="cs-assist-title"><span class="fa-solid fa-wand-magic-sparkles"></span> <b>Update with AI</b></div>
-        <div class="acc-context-section cs-context-section">
+        <div class="sse-modal-context">
             <label class="checkbox_label" title="Give the model the character cards, the chat's relevant World Info, and the recent chat. Needed when the instruction is left blank.">
                 <input id="cs_use_chat_context" type="checkbox" />
                 <span>Use Chat Context</span>
             </label>
             <div class="cs-lorebook-host"></div>
         </div>
-        <div class="acc-preset-row cs-preset-row">
-            <label class="acc-preset-label"><span class="fa-solid fa-file-pen"></span> Prompt Preset:</label>
+        <div class="sse-modal-preset-row">
+            <label class="sse-modal-preset-label"><span class="fa-solid fa-file-pen"></span> Prompt Preset:</label>
             <div class="cs-preset-host"></div>
         </div>
         <textarea id="cs_instruction" class="text_pole cs-instruction" rows="3" placeholder="How should these change? e.g. &quot;She changes into a swimsuit for the beach&quot;. Leave blank to update from what happened in the recent chat."></textarea>
         <div class="cs-action-row">
-            <div id="cs_generate_btn" class="menu_button interactable acc-action-btn acc-generate-btn" title="Ask the model for new values. Proposals fill the fields above; nothing is saved until Apply.">
+            <div id="cs_generate_btn" class="menu_button interactable sse-modal-action-btn sse-modal-primary" title="Ask the model for new values. Proposals fill the fields above; nothing is saved until Apply.">
                 <span class="fa-solid fa-wand-magic-sparkles"></span> Propose Changes
             </div>
-            <div id="cs_revert_btn" class="menu_button interactable acc-action-btn" title="Undo every change in this pane">
+            <div id="cs_revert_btn" class="menu_button interactable sse-modal-action-btn" title="Undo every change in this pane">
                 <span class="fa-solid fa-rotate-left"></span> Revert All
             </div>
-            <label class="acc-tokens-label" for="cs_response_length" title="Maximum tokens for the model's reply">
+            <label class="sse-modal-tokens-label" for="cs_response_length" title="Maximum tokens for the model's reply">
                 <span class="fa-solid fa-coins"></span> Max Tokens:
             </label>
-            <input id="cs_response_length" type="number" class="text_pole acc-tokens-input" min="50" max="8192" step="50" />
+            <input id="cs_response_length" type="number" class="text_pole sse-modal-tokens-input" min="50" max="8192" step="50" />
         </div>
-        <div class="acc-status-bar acc-hidden" id="cs_status_bar">
-            <span class="fa-solid fa-spinner fa-spin"></span>
-            <span id="cs_status_text"></span>
-        </div>
+        ${statusBarHtml('cs')}
         <details class="cs-reply-details">
             <summary>Model reply</summary>
             <textarea id="cs_reply" class="text_pole cs-reply" rows="5" readonly placeholder="The model's raw reply appears here."></textarea>
@@ -534,7 +528,7 @@ function buildAssistSection() {
     });
 
     const picker = createLoreBookPicker({
-        classPrefix: 'acc-lorebook',
+        classPrefix: MODAL_LOREBOOK_PREFIX,
         initialSelection: persistedModalState.selectedLoreBooks.slice(),
         debug,
     });
@@ -543,7 +537,6 @@ function buildAssistSection() {
 
     section.querySelector('.cs-preset-host').replaceWith(createToolPresetSelector({
         toolKey: 'character-state',
-        className: 'acc-preset-select',
         title: 'Prompt preset used for Propose Changes. Save and edit presets in the extension settings.',
     }));
 
@@ -719,13 +712,7 @@ async function generateReply(instruction, ctxOptions, replyEl) {
     debug('Prompt:', prompt);
     debug('Prefill:', prefill);
 
-    const result = await withSingleLineDisabled(() => streamingGenerate(
-        { prompt, systemPrompt, responseLength, ...(prefill ? { prefill } : {}) },
-        replyEl,
-        { append: false, name: 'character-state' },
-    ));
-    const cleaned = stripPrefillEcho(removeReasoningFromString(result).trim(), prefill);
-    return (prefill || '') + cleaned;
+    return streamFresh({ prompt, systemPrompt, responseLength, prefill, outputEl: replyEl, name: 'character-state' });
 }
 
 async function buildPreambleBlock(ctxOptions) {
@@ -770,7 +757,7 @@ const GENERATE_LABEL = '<span class="fa-solid fa-wand-magic-sparkles"></span> Pr
 function setGeneratingUI(generating) {
     const btn = document.getElementById('cs_generate_btn');
     if (btn) btn.innerHTML = generating ? '<span class="fa-solid fa-stop"></span> Stop' : GENERATE_LABEL;
-    document.getElementById('cs_revert_btn')?.classList.toggle('acc-disabled', generating);
+    document.getElementById('cs_revert_btn')?.classList.toggle('sse-modal-disabled', generating);
     const instruction = document.getElementById('cs_instruction');
     if (generating) instruction?.setAttribute('disabled', 'true');
     else instruction?.removeAttribute('disabled');
@@ -783,15 +770,7 @@ function setGeneratingUI(generating) {
 }
 
 function setStatusBar(message) {
-    const bar = document.getElementById('cs_status_bar');
-    const text = document.getElementById('cs_status_text');
-    if (!bar || !text) return;
-    if (message) {
-        text.textContent = message;
-        bar.classList.remove('acc-hidden');
-    } else {
-        bar.classList.add('acc-hidden');
-    }
+    setModalStatus('cs', message);
 }
 
 // ─── Group Member Row Buttons ───
