@@ -50,6 +50,7 @@ import {
     formatVariablesBlock,
     parseStateReply,
 } from './character-state-parsing.js';
+import { resolveGroupMemberRow } from './group-members.js';
 
 // ─── Default Prompt ───
 
@@ -827,29 +828,11 @@ function setStatusBar(message) {
 // member list is re-rendered by ST (group edits, paging, search), so an
 // observer on #rm_group_members keeps the buttons present.
 
-function resolveRowAvatar(entry) {
-    const ctx = getContext();
-    // Current ST marks rows with data-chid; older builds used chid / grid.
-    const chid = entry.getAttribute('data-chid') ?? entry.getAttribute('chid');
-    if (chid !== null) {
-        const char = ctx.characters?.[parseInt(chid, 10)];
-        if (char?.avatar) return char.avatar;
-    }
-    const grid = entry.getAttribute('grid');
-    if (grid) return grid;
-    // Last resort: the avatar filename in the row's thumbnail URL.
-    const src = entry.querySelector('img')?.getAttribute('src') || '';
-    const match = src.match(/[?&]file=([^&]+)|\/characters\/([^/?]+)/);
-    const file = match?.[1] || match?.[2];
-    return file ? decodeURIComponent(file) : null;
-}
-
 function injectGroupButtons() {
     if (!moduleSettings?.characterStateEnabled || !getContext().groupId) return;
     document.querySelectorAll('#rm_group_members .group_member').forEach(entry => {
         if (entry.querySelector('.character_state_btn')) return;
-        const avatar = resolveRowAvatar(entry);
-        const char = findCharacterByAvatar(avatar);
+        const char = resolveGroupMemberRow(entry, getContext().characters).character;
         if (!char) return;
 
         const btn = document.createElement('div');

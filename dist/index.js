@@ -4048,11 +4048,93 @@ async function buildContextPreamble({
 
 ;// external "../../../../slash-commands/SlashCommandArgument.js"
 
+;// ./src/group-members.js
+/**
+ * Group member rows — resolving the character a row in ST's group panel
+ * (`#rm_group_members .group_member`) stands for. No SillyTavern imports, so
+ * it's unit-tested under plain Node (test/group-members.test.mjs); callers
+ * pass the row element and `context.characters`.
+ *
+ * ST has marked the row two ways:
+ *   - `data-chid="<index>"` — current builds (ST commit 7c9b347, Jan 2025,
+ *     "Refactor chid/grid attributes to data attributes").
+ *   - `chid="<index>"` — older builds.
+ * Both hold an index into `context.characters`. The row's thumbnail URL names
+ * the avatar file directly, so it's the cross-check and the last resort: an
+ * index can go stale if the characters array is rebuilt after the row was
+ * rendered, the file name can't.
+ */
+
+/**
+ * The avatar file named by a row's thumbnail, e.g.
+ * `/thumbnail?type=avatar&file=Peter.png` or `/characters/Peter.png`.
+ *
+ * @param {{ querySelector: Function }} entry
+ * @returns {string|null}
+ */
+function avatarFromRowThumbnail(entry) {
+    const src = entry?.querySelector?.('img')?.getAttribute?.('src') || '';
+    const match = src.match(/[?&]file=([^&]+)|\/characters\/([^/?]+)/);
+    const file = match?.[1] || match?.[2];
+    if (!file) return null;
+    try {
+        return decodeURIComponent(file);
+    } catch {
+        return file;
+    }
+}
+
+/** The character index a row carries: `data-chid` (current ST) or `chid` (older). */
+function rowIndex(entry) {
+    for (const attr of ['data-chid', 'chid']) {
+        const raw = entry?.getAttribute?.(attr);
+        if (raw === null || raw === undefined || String(raw).trim() === '') continue;
+        const index = Number(raw);
+        if (Number.isInteger(index) && index >= 0) return index;
+    }
+    return null;
+}
+
+/**
+ * Resolve a group member row to its character.
+ *
+ * Order: the row's index attribute (`data-chid`, then `chid`), checked
+ * against the thumbnail's avatar file (the file wins if they disagree), then
+ * a legacy `grid` avatar attribute, then the thumbnail alone. The name falls
+ * back to the row's `.ch_name` text when no character matched.
+ *
+ * @param {{ getAttribute: Function, querySelector: Function }} entry
+ * @param {object[]} characters - `context.characters`
+ * @returns {{ character: object|null, avatar: string|null, name: string|null }}
+ */
+function resolveGroupMemberRow(entry, characters) {
+    const list = Array.isArray(characters) ? characters : [];
+    const byAvatar = avatar => (avatar ? list.find(c => c?.avatar === avatar) || null : null);
+
+    const index = rowIndex(entry);
+    const thumbAvatar = avatarFromRowThumbnail(entry);
+    let character = index !== null ? list[index] || null : null;
+    if (thumbAvatar && character?.avatar !== thumbAvatar) {
+        character = byAvatar(thumbAvatar) || character;
+    }
+    const gridAvatar = entry?.getAttribute?.('grid') || null;
+    if (!character) character = byAvatar(gridAvatar);
+
+    const avatar = character?.avatar || gridAvatar || thumbAvatar || null;
+    const nameEl = entry?.querySelector?.('.ch_name');
+    const name = character?.name
+        || nameEl?.textContent?.trim()
+        || nameEl?.getAttribute?.('title')
+        || null;
+    return { character, avatar, name };
+}
+
 ;// ./src/possession.js
 /**
  * Possession module — lets the user "possess" a character so their messages
  * are posted under that character's name/avatar.
  */
+
 
 
 
@@ -4342,53 +4424,9 @@ function injectGroupRadioButtons() {
     memberEntries.forEach(entry => {
         if (entry.querySelector('.possession_radio_wrapper')) return;
 
-        const charId = entry.getAttribute('chid');
-        const gridAvatar = entry.getAttribute('grid');
-        let charName = null;
-        let charAvatar = null;
-
-        // Try chid first (character index)
-        if (charId !== null) {
-            const char = context.characters[parseInt(charId)];
-            if (char) {
-                charName = char.name;
-                charAvatar = char.avatar;
-            }
-        }
-
-        // Fallback to grid attribute (avatar filename)
-        if (!charAvatar && gridAvatar) {
-            const char = context.characters.find(c => c.avatar === gridAvatar);
-            if (char) {
-                charName = charName || char.name;
-                charAvatar = char.avatar;
-            } else {
-                // grid is the avatar filename even if character lookup fails
-                charAvatar = gridAvatar;
-            }
-        }
-
-        // Fallback: extract avatar from the member's displayed image
-        if (!charAvatar) {
-            const img = entry.querySelector('img');
-            if (img?.src) {
-                const match = img.src.match(/[?&]file=([^&]+)|\/characters\/([^/?]+)/);
-                const filename = match?.[1] || match?.[2];
-                if (filename) {
-                    const decoded = decodeURIComponent(filename);
-                    charAvatar = decoded;
-                    if (!charName) {
-                        const char = context.characters.find(c => c.avatar === decoded);
-                        if (char) charName = char.name;
-                    }
-                }
-            }
-        }
-
-        if (!charName) {
-            const nameEl = entry.querySelector('.ch_name');
-            if (nameEl) charName = nameEl.textContent?.trim() || nameEl.getAttribute('title');
-        }
+        // data-chid on current ST, chid on older builds, thumbnail as the
+        // cross-check / last resort (see group-members.js).
+        const { avatar: charAvatar, name: charName } = resolveGroupMemberRow(entry, context.characters);
 
         if (!charName) return;
 
@@ -9063,6 +9101,7 @@ function parseStateReply(text, variables) {
 
 
 
+
 // ─── Default Prompt ───
 
 const DEFAULT_CHARACTER_STATE_PROMPT = `{{context}}Task: update the state variables of the roleplay character {{character}}.
@@ -9839,29 +9878,11 @@ function character_state_setStatusBar(message) {
 // member list is re-rendered by ST (group edits, paging, search), so an
 // observer on #rm_group_members keeps the buttons present.
 
-function resolveRowAvatar(entry) {
-    const ctx = getContext();
-    // Current ST marks rows with data-chid; older builds used chid / grid.
-    const chid = entry.getAttribute('data-chid') ?? entry.getAttribute('chid');
-    if (chid !== null) {
-        const char = ctx.characters?.[parseInt(chid, 10)];
-        if (char?.avatar) return char.avatar;
-    }
-    const grid = entry.getAttribute('grid');
-    if (grid) return grid;
-    // Last resort: the avatar filename in the row's thumbnail URL.
-    const src = entry.querySelector('img')?.getAttribute('src') || '';
-    const match = src.match(/[?&]file=([^&]+)|\/characters\/([^/?]+)/);
-    const file = match?.[1] || match?.[2];
-    return file ? decodeURIComponent(file) : null;
-}
-
 function injectGroupButtons() {
     if (!character_state_moduleSettings?.characterStateEnabled || !getContext().groupId) return;
     document.querySelectorAll('#rm_group_members .group_member').forEach(entry => {
         if (entry.querySelector('.character_state_btn')) return;
-        const avatar = resolveRowAvatar(entry);
-        const char = findCharacterByAvatar(avatar);
+        const char = resolveGroupMemberRow(entry, getContext().characters).character;
         if (!char) return;
 
         const btn = document.createElement('div');

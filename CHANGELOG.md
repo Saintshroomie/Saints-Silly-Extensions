@@ -29,6 +29,15 @@ released version. When cutting a release, move these notes into a new
   stored in the chat's local variables (the same store as `/setvar`), and the
   prompt is preset-managed with a preview in the new settings drawer.
 
+### Fixed
+- **Possession finds group members by the attribute current SillyTavern uses** —
+  SillyTavern marks group member rows with `data-chid` (older versions used
+  `chid`), and Possession only read the old one, so on current versions it fell
+  back to parsing each member's thumbnail URL to tell who a row was. It now reads
+  `data-chid` first and still reads `chid`, so it works the same on older
+  SillyTavern versions. The lookup is shared with Character State and
+  unit-tested for both.
+
 ### Changed
 - **The Scenario (Cold-open) preset assigns overrides set-once** — its override
   lines are now `{{if !.var}}{{.var = value}}{{/if}}`. A scenario is re-read
