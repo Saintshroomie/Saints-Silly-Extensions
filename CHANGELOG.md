@@ -44,6 +44,26 @@ released version. When cutting a release, move these notes into a new
   chat once you change it, with a **Chat's books** button to go back.
 
 ### Fixed
+- **Phrase Ban no longer runs away while a Retry checkpoint is active** — when
+  a reply hit a banned phrase on a checkpointed message, Phrase Ban retried
+  from the checkpoint but didn't wait for that retry to finish, so it kept
+  starting new ones: in testing, one hit produced 34 continues instead of the
+  1 + Max Rewrite Attempts it should. Each retry now finishes before Phrase Ban
+  checks it again, and Max Rewrite Attempts is respected.
+- **"Not while generating" checks work again** — several tools checked a
+  generation flag SillyTavern doesn't provide, so these guards never ran: Compaction's
+  auto-open, the per-message Reformat and Image Prompt buttons, Possession's
+  Continue and impersonate buttons, Retry, rephrasing a message, and Retry's
+  "an edit re-anchors the checkpoint" rule (which could adopt text the model was
+  still writing).
+- **Prefills can be cleared** — emptying the Prefill field in Assisted Character
+  Creation, World Info Assist or Narrative Guidance quietly restored the default
+  text, so those tools could never run without a prefill. An empty prefill now
+  sends none, as it already did in Compaction, Image Prompting, Character State
+  and Reformatting.
+- **Quieter console** — the extension logged its entire settings object (every
+  prompt included) on each page load and a line on every keystroke in a prompt
+  field. That logging now follows the Diagnostics debug toggles.
 - **Group Director can voice walk-on characters again** — picking a walk-on
   never produced a reply: its placeholder appeared and vanished, sometimes with
   SillyTavern's "Deleted group member swiped" warning. SillyTavern only
@@ -65,6 +85,14 @@ released version. When cutting a release, move these notes into a new
   unit-tested for both.
 
 ### Changed
+- **Character Creation, Compaction and Image Prompting share one modal
+  implementation** — Generate / Continue / Checkpoint / Retry, Stop, Max Tokens
+  and the status bar now behave and look the same in all three. Retrying a
+  Generate in Compaction or Image Prompting now runs the same check as Generate
+  (Character Creation already did), so it refuses with the same message when
+  there's nothing to work from.
+- **Rephrasing a message you're editing** now waits for SillyTavern to finish
+  saving the edit instead of pausing a fixed 100 ms.
 - **The Scenario and Scenario Arc presets evolve the current guidance** — each
   refresh now rewrites the tier's active guidance (an applied scenario or the
   last refresh) to where the story stands, from the chat and lore, instead of
