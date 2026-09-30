@@ -57,6 +57,7 @@ Unit tests only cover the pure modules. Everything that touches SillyTavern (but
 
 - The fallback reply comes from `setReply(text)`, re-read on every request.
 - `setReplyRules([{ match, reply }])` gives different replies per request: the first rule whose `match` substring appears in the prompt wins. Use it to tell a silent tool generation apart from a chat turn.
+- A rule's optional `chunkDelayMs` spaces out its streamed chunks, so a script can click Stop mid-stream (`{ match, reply: 'x'.repeat(640), chunkDelayMs: 150 }`).
 - `run()` clears both when it finishes.
 - It streams when asked, so streaming paths are exercised.
 - The request log is `$SSE_TEST_DIR/fake-llm-requests.jsonl`, one JSON line per request: `{ at, url, body }`.

@@ -12,6 +12,8 @@ _Changes that have landed on the development branch but are not yet part of a
 released version. When cutting a release, move these notes into a new
 `## [X.Y.Z]` section and run `npm version`._
 
+## [1.4.0] - 2026-09-30
+
 ### Added
 - **Character State** — a new tool for changing a character's state variables
   as the roleplay unfolds: the chat variables its card and lore read, such as
@@ -43,28 +45,15 @@ released version. When cutting a release, move these notes into a new
   chat, persona, and in a one-on-one chat the character's own), remembered per
   chat once you change it, with a **Chat's books** button to go back.
 
-### Fixed
-- **Group Director can voice walk-on characters again** — picking a walk-on
-  never produced a reply: its placeholder appeared and vanished, sometimes with
-  SillyTavern's "Deleted group member swiped" warning. SillyTavern only
-  regenerates a group message it can tie to a group member, and a walk-on has no
-  character card. A walk-on reply now borrows a member's turn (the last member to
-  speak) with the speaker name switched to the walk-on's, so the prompt asks for
-  the walk-on's line and the reply is posted under its name. For that reply a
-  group set to swap character cards includes every member's card, each under its
-  own name, so the host member's card isn't presented as the walk-on's. The same
-  fix makes SillyTavern's own swipe and Continue work on walk-on messages,
-  including ones split out of earlier replies. If SillyTavern's swipes are turned
-  off, the Director now says so instead of failing silently.
-- **Possession finds group members by the attribute current SillyTavern uses** —
-  SillyTavern marks group member rows with `data-chid` (older versions used
-  `chid`), and Possession only read the old one, so on current versions it fell
-  back to parsing each member's thumbnail URL to tell who a row was. It now reads
-  `data-chid` first and still reads `chid`, so it works the same on older
-  SillyTavern versions. The lookup is shared with Character State and
-  unit-tested for both.
-
 ### Changed
+- **Character Creation, Compaction and Image Prompting share one modal
+  implementation** — Generate / Continue / Checkpoint / Retry, Stop, Max Tokens
+  and the status bar now behave and look the same in all three. Retrying a
+  Generate in Compaction or Image Prompting now runs the same check as Generate
+  (Character Creation already did), so it refuses with the same message when
+  there's nothing to work from.
+- **Rephrasing a message you're editing** now waits for SillyTavern to finish
+  saving the edit instead of pausing a fixed 100 ms.
 - **The Scenario and Scenario Arc presets evolve the current guidance** — each
   refresh now rewrites the tier's active guidance (an applied scenario or the
   last refresh) to where the story stands, from the chat and lore, instead of
@@ -222,8 +211,6 @@ released version. When cutting a release, move these notes into a new
   replies next. The roll runs in the background and highlights its suggestion
   when ready; the "director is choosing…" status moved from the toast into the
   dialog.
-
-### Changed
 - **Built-in presets upgrade themselves.** Image Prompting's Anima/Danbooru
   presets and the st-toolkit presets now share one versioned mechanism: when a
   release revises a built-in, copies you never edited are replaced with the new
@@ -246,6 +233,45 @@ released version. When cutting a release, move these notes into a new
   write real members' dialogue as `Name: "..."` lines will be split too.)
 
 ### Fixed
+- **Phrase Ban no longer runs away while a Retry checkpoint is active** — when
+  a reply hit a banned phrase on a checkpointed message, Phrase Ban retried
+  from the checkpoint but didn't wait for that retry to finish, so it kept
+  starting new ones: in testing, one hit produced 34 continues instead of the
+  1 + Max Rewrite Attempts it should. Each retry now finishes before Phrase Ban
+  checks it again, and Max Rewrite Attempts is respected.
+- **"Not while generating" checks work again** — several tools checked a
+  generation flag SillyTavern doesn't provide, so these guards never ran: Compaction's
+  auto-open, the per-message Reformat and Image Prompt buttons, Possession's
+  Continue and impersonate buttons, Retry, rephrasing a message, and Retry's
+  "an edit re-anchors the checkpoint" rule (which could adopt text the model was
+  still writing).
+- **Prefills can be cleared** — emptying the Prefill field in Assisted Character
+  Creation, World Info Assist or Narrative Guidance quietly restored the default
+  text, so those tools could never run without a prefill. An empty prefill now
+  sends none, as it already did in Compaction, Image Prompting, Character State
+  and Reformatting.
+- **Quieter console** — the extension logged its entire settings object (every
+  prompt included) on each page load and a line on every keystroke in a prompt
+  field. That logging now follows the Diagnostics debug toggles.
+- **Group Director can voice walk-on characters again** — picking a walk-on
+  never produced a reply: its placeholder appeared and vanished, sometimes with
+  SillyTavern's "Deleted group member swiped" warning. SillyTavern only
+  regenerates a group message it can tie to a group member, and a walk-on has no
+  character card. A walk-on reply now borrows a member's turn (the last member to
+  speak) with the speaker name switched to the walk-on's, so the prompt asks for
+  the walk-on's line and the reply is posted under its name. For that reply a
+  group set to swap character cards includes every member's card, each under its
+  own name, so the host member's card isn't presented as the walk-on's. The same
+  fix makes SillyTavern's own swipe and Continue work on walk-on messages,
+  including ones split out of earlier replies. If SillyTavern's swipes are turned
+  off, the Director now says so instead of failing silently.
+- **Possession finds group members by the attribute current SillyTavern uses** —
+  SillyTavern marks group member rows with `data-chid` (older versions used
+  `chid`), and Possession only read the old one, so on current versions it fell
+  back to parsing each member's thumbnail URL to tell who a row was. It now reads
+  `data-chid` first and still reads `chid`, so it works the same on older
+  SillyTavern versions. The lookup is shared with Character State and
+  unit-tested for both.
 - **Group Director — skipped after a possessed Auto Phrasing send.** With Auto
   Phrasing and Possession both on in a group, submitting a message rephrased it,
   posted it as the possessed character, and then asked SillyTavern for the reply
@@ -462,7 +488,8 @@ Initial release. Bundles seven roleplay tools for SillyTavern:
 Plus shared infrastructure: cancellable **Silent Generation** (with live
 streaming) and per-tool **Prompt Presets**.
 
-[Unreleased]: https://github.com/Saintshroomie/Saints-Silly-Extensions/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/Saintshroomie/Saints-Silly-Extensions/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/Saintshroomie/Saints-Silly-Extensions/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/Saintshroomie/Saints-Silly-Extensions/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/Saintshroomie/Saints-Silly-Extensions/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/Saintshroomie/Saints-Silly-Extensions/releases/tag/v1.1.0

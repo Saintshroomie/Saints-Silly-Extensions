@@ -18,8 +18,12 @@ import { SlashCommandParser } from '../../../../slash-commands/SlashCommandParse
 import { SlashCommand } from '../../../../slash-commands/SlashCommand.js';
 import {
     getContext,
+    isGenerationInProgress,
+    confirmActiveMessageEdit,
+    waitForMessageEditClosed,
     createDebugLogger,
     toast,
+    createSettingsBinder,
 } from './utils.js';
 
 // ─── Module State ───
@@ -111,25 +115,6 @@ function resetRetryState() {
     };
 }
 
-// ─── Auto-Confirm Edit ───
-
-/**
- * If any message is currently being edited (has a visible edit textarea),
- * confirm the edit so the message exits editing state before we proceed.
- */
-function confirmActiveMessageEdit() {
-    const visibleEditButtons = document.querySelector('#chat .mes .mes_edit_buttons[style*="display: inline-flex"]');
-    if (visibleEditButtons) {
-        const editDoneBtn = visibleEditButtons.querySelector('.mes_edit_done');
-        if (editDoneBtn) {
-            debug('confirmActiveMessageEdit: found active edit, clicking confirm');
-            editDoneBtn.click();
-            return true;
-        }
-    }
-    return false;
-}
-
 // ─── Core Retry Logic ───
 
 async function doRetry() {
@@ -137,11 +122,12 @@ async function doRetry() {
 
     // Auto-confirm any in-progress message edit
     const editWasActive = confirmActiveMessageEdit();
+    if (editWasActive) await waitForMessageEditClosed();
 
     const context = getContext();
 
     // Guard: no generation in progress
-    if (context.isGenerating) {
+    if (isGenerationInProgress()) {
         debug('doRetry: generation in progress, aborting');
         rcToast('Cannot retry while generation is in progress.', 'warning');
         return;
@@ -378,7 +364,10 @@ export async function retryFromCheckpoint() {
 
     snapshotLocked = true;
     debug('retryFromCheckpoint: snapshotLocked = true, triggering continue (attempt', retryState.retryCount, ')');
-    await triggerContinue();
+    // `/continue` returns as soon as it has *queued* the generation unless
+    // it's told to await it; Phrase Ban re-scans the message right after this
+    // resolves, so it must not resolve mid-stream.
+    await triggerContinue({ awaitGeneration: true });
     await waitForGenerationToFinish();
     return true;
 }
@@ -388,7 +377,7 @@ function waitForGenerationToFinish(timeoutMs = 5 * 60 * 1000) {
     return new Promise((resolve) => {
         const start = Date.now();
         const tick = () => {
-            if (!getContext().isGenerating || Date.now() - start > timeoutMs) {
+            if (!isGenerationInProgress() || Date.now() - start > timeoutMs) {
                 resolve();
                 return;
             }
@@ -444,7 +433,7 @@ function reRenderMessage(messageIndex) {
     }
 }
 
-async function triggerContinue() {
+async function triggerContinue({ awaitGeneration = false } = {}) {
     const context = getContext();
 
     // Reinject the Phrasing seed for the checkpointed message's active swipe,
@@ -457,7 +446,7 @@ async function triggerContinue() {
     // Approach 1: Slash command system (most stable)
     if (context.executeSlashCommandsWithOptions) {
         debug('triggerContinue: using slash command /continue');
-        await context.executeSlashCommandsWithOptions('/continue');
+        await context.executeSlashCommandsWithOptions(awaitGeneration ? '/continue await=true' : '/continue');
         return;
     }
 
@@ -600,62 +589,21 @@ function showQuickRetryButton() {
 // ─── Settings Panel ───
 
 export function bindRetryContinueSettings(saveSettings) {
-    const autoContinueCheck = document.getElementById('retry_continue_autocontinue');
-    if (autoContinueCheck) {
-        autoContinueCheck.checked = !!moduleSettings.retryAutoContinue;
-        autoContinueCheck.addEventListener('change', () => {
-            moduleSettings.retryAutoContinue = autoContinueCheck.checked;
-            saveSettings();
-        });
-    }
+    const bind = createSettingsBinder(moduleSettings, saveSettings);
+    bind.checkbox('retry_continue_autocontinue', 'retryAutoContinue');
+    bind.checkbox('retry_continue_autoset', 'retryAutoSetOnContinue');
+    bind.checkbox('retry_continue_show_toasts', 'retryShowToasts');
+    bind.select('retry_continue_indicator_style', 'retryIndicatorStyle', 'border', updateMessageIndicator);
 
-    const autoSetCheck = document.getElementById('retry_continue_autoset');
-    if (autoSetCheck) {
-        autoSetCheck.checked = !!moduleSettings.retryAutoSetOnContinue;
-        autoSetCheck.addEventListener('change', () => {
-            moduleSettings.retryAutoSetOnContinue = autoSetCheck.checked;
-            saveSettings();
-        });
-    }
+    document.getElementById('retry_continue_clear')?.addEventListener('click', () => {
+        resetRetryState();
+        saveRetryState();
+        updateButtonVisuals();
+        updateMessageIndicator();
+        rcToast('Retry checkpoint cleared.');
+    });
 
-    const toastCheck = document.getElementById('retry_continue_show_toasts');
-    if (toastCheck) {
-        toastCheck.checked = !!moduleSettings.retryShowToasts;
-        toastCheck.addEventListener('change', () => {
-            moduleSettings.retryShowToasts = toastCheck.checked;
-            saveSettings();
-        });
-    }
-
-    const styleSelect = document.getElementById('retry_continue_indicator_style');
-    if (styleSelect) {
-        styleSelect.value = moduleSettings.retryIndicatorStyle || 'border';
-        styleSelect.addEventListener('change', () => {
-            moduleSettings.retryIndicatorStyle = styleSelect.value;
-            saveSettings();
-            updateMessageIndicator();
-        });
-    }
-
-    const clearBtn = document.getElementById('retry_continue_clear');
-    if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            resetRetryState();
-            saveRetryState();
-            updateButtonVisuals();
-            updateMessageIndicator();
-            rcToast('Retry checkpoint cleared.');
-        });
-    }
-
-    const debugCheck = document.getElementById('retry_continue_debug_mode');
-    if (debugCheck) {
-        debugCheck.checked = !!moduleSettings.retryDebugMode;
-        debugCheck.addEventListener('change', () => {
-            moduleSettings.retryDebugMode = debugCheck.checked;
-            saveSettings();
-        });
-    }
+    bind.checkbox('retry_continue_debug_mode', 'retryDebugMode');
 }
 
 // ─── Slash Commands ───
@@ -791,12 +739,12 @@ export function onRetryContinueCharacterMessageRendered() {
  */
 export function onRetryContinueMessageEdited(messageId) {
     const ctx = getContext();
-    debug('event: MESSAGE_EDITED | messageId =', messageId, '| snapshotLocked =', snapshotLocked, '| isGenerating =', ctx.isGenerating);
+    debug('event: MESSAGE_EDITED | messageId =', messageId, '| snapshotLocked =', snapshotLocked, '| isGenerating =', isGenerationInProgress());
     if (snapshotLocked) {
         debug('event: MESSAGE_EDITED — skipping (snapshotLocked)');
         return;
     }
-    if (ctx.isGenerating) {
+    if (isGenerationInProgress()) {
         debug('event: MESSAGE_EDITED — skipping (isGenerating)');
         return;
     }

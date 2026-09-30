@@ -415,7 +415,7 @@ Open **Extensions** > **Saint's Silly Extensions** in SillyTavern's settings pan
 | Max Context Override | If > 0, caps how many tokens of chat context the preamble packer uses for ACC generations. 0 = use the model's full context size. |
 | Preset / Preview Assembled Prompt | Save named bundles of the ACC prompt + prefill and preview exactly what gets sent (see Tool Presets & Prompt Preview below) |
 | Prompt Template | Customize the prompt sent to the LLM for character generation. Supports `{{context}}` and `{{brief}}` placeholders; if missing, the context is prepended and the brief appended automatically. |
-| Prefill Template | The assistant prefix the model continues from, also kept at the top of the final description. If the backend ignores prefills and the model repeats it, the echo is stripped automatically. |
+| Prefill Template | The assistant prefix the model continues from, also kept at the top of the final description. If the backend ignores prefills and the model repeats it, the echo is stripped automatically. Leave it empty to send no prefill. |
 
 ### World Info Assist Settings
 

@@ -29,16 +29,19 @@ import { is_group_generating } from '../../../../group-chats.js';
 import {
     setExtensionPrompt,
     extension_prompt_types,
-    extension_prompt_roles,
     substituteParamsExtended,
 } from '../../../../../script.js';
 import {
     getContext,
+    isGenerationInProgress,
     createDebugLogger,
     toast,
     stickyToast,
     showPromptPreview,
+    resolveInjectionRole,
+    createSettingsBinder,
 } from './utils.js';
+import { templateSetting } from './settings-helpers.js';
 
 // ─── Constants ───
 
@@ -201,15 +204,11 @@ function getMaxRetries() {
 }
 
 function getPromptTemplate() {
-    return (moduleSettings?.phraseBanPrompt && moduleSettings.phraseBanPrompt.trim())
-        ? moduleSettings.phraseBanPrompt
-        : DEFAULT_PHRASE_BAN_PROMPT;
+    return templateSetting(moduleSettings, 'phraseBanPrompt', DEFAULT_PHRASE_BAN_PROMPT);
 }
 
 function getProactivePromptTemplate() {
-    return (moduleSettings?.phraseBanProactivePrompt && moduleSettings.phraseBanProactivePrompt.trim())
-        ? moduleSettings.phraseBanProactivePrompt
-        : DEFAULT_PHRASE_BAN_PROACTIVE_PROMPT;
+    return templateSetting(moduleSettings, 'phraseBanProactivePrompt', DEFAULT_PHRASE_BAN_PROACTIVE_PROMPT);
 }
 
 // ─── Proactive: Per-chat Learned List ───
@@ -295,15 +294,6 @@ function clearLearnedPhrases() {
 
 // ─── Proactive: Injection ───
 
-function resolveInjectionRole(name) {
-    switch ((name || DEFAULT_PHRASE_BAN_INJECTION_ROLE).toLowerCase()) {
-        case 'user': return extension_prompt_roles.USER;
-        case 'assistant': return extension_prompt_roles.ASSISTANT;
-        case 'system':
-        default: return extension_prompt_roles.SYSTEM;
-    }
-}
-
 function clearProactiveInjection() {
     setExtensionPrompt(PHRASE_BAN_INJECTION_KEY, '', extension_prompt_types.NONE, 0);
 }
@@ -334,7 +324,7 @@ export function reapplyProactiveInjection() {
     const depth = Number.isFinite(configuredDepth) && configuredDepth >= 0
         ? configuredDepth
         : DEFAULT_PHRASE_BAN_INJECTION_DEPTH;
-    const role = resolveInjectionRole(moduleSettings.phraseBanInjectionRole);
+    const role = resolveInjectionRole(moduleSettings.phraseBanInjectionRole || DEFAULT_PHRASE_BAN_INJECTION_ROLE);
     setExtensionPrompt(
         PHRASE_BAN_INJECTION_KEY,
         body,
@@ -409,7 +399,7 @@ function delay(ms) {
  */
 async function waitUntilGenerationSettles(timeoutMs = SETTLE_TIMEOUT_MS) {
     const start = Date.now();
-    while (getContext().isGenerating || is_group_generating) {
+    while (isGenerationInProgress() || is_group_generating) {
         if (Date.now() - start > timeoutMs) return false;
         await delay(POLL_INTERVAL_MS);
     }
@@ -614,72 +604,20 @@ function refreshLearnedPanel() {
 }
 
 export function bindPhraseBanSettings(saveSettings) {
-    const enabledCb = document.getElementById('phrase_ban_enabled');
-    if (enabledCb) {
-        enabledCb.checked = !!moduleSettings.phraseBanEnabled;
-        enabledCb.addEventListener('change', () => {
-            moduleSettings.phraseBanEnabled = enabledCb.checked;
-            saveSettings();
-            reapplyProactiveInjection();
-        });
-    }
-
-    const autoCb = document.getElementById('phrase_ban_auto');
-    if (autoCb) {
-        autoCb.checked = !!moduleSettings.phraseBanAuto;
-        autoCb.addEventListener('change', () => {
-            moduleSettings.phraseBanAuto = autoCb.checked;
-            saveSettings();
-        });
-    }
-
-    const proactiveCb = document.getElementById('phrase_ban_proactive');
-    if (proactiveCb) {
-        proactiveCb.checked = !!moduleSettings.phraseBanProactive;
-        proactiveCb.addEventListener('change', () => {
-            moduleSettings.phraseBanProactive = proactiveCb.checked;
-            saveSettings();
-            reapplyProactiveInjection();
-        });
-    }
-
-    const depthInput = document.getElementById('phrase_ban_injection_depth');
-    if (depthInput) {
-        const configuredDepth = moduleSettings.phraseBanInjectionDepth;
-        depthInput.value = Number.isFinite(configuredDepth) ? configuredDepth : DEFAULT_PHRASE_BAN_INJECTION_DEPTH;
-        depthInput.addEventListener('input', () => {
-            const n = parseInt(depthInput.value, 10);
-            if (Number.isFinite(n) && n >= 0) {
-                moduleSettings.phraseBanInjectionDepth = n;
-                saveSettings();
-                reapplyProactiveInjection();
-            }
-        });
-    }
-
-    const roleSelect = document.getElementById('phrase_ban_injection_role');
-    if (roleSelect) {
-        roleSelect.value = moduleSettings.phraseBanInjectionRole || DEFAULT_PHRASE_BAN_INJECTION_ROLE;
-        roleSelect.addEventListener('change', () => {
-            moduleSettings.phraseBanInjectionRole = roleSelect.value;
-            saveSettings();
-            reapplyProactiveInjection();
-        });
-    }
-
-    const proactivePromptArea = document.getElementById('phrase_ban_proactive_prompt_textarea');
-    if (proactivePromptArea) {
-        proactivePromptArea.value = moduleSettings.phraseBanProactivePrompt || DEFAULT_PHRASE_BAN_PROACTIVE_PROMPT;
-        proactivePromptArea.addEventListener('input', () => {
-            const value = proactivePromptArea.value;
-            moduleSettings.phraseBanProactivePrompt = value;
-            saveSettings();
-            if (value.trim() && !value.includes('{{bannedPhrases}}')) {
-                toast('Warning: Proactive template lacks {{bannedPhrases}}; the AI won\'t see the learned list.', 'warning', 'Phrase Ban');
-            }
-            reapplyProactiveInjection();
-        });
-    }
+    const bind = createSettingsBinder(moduleSettings, saveSettings);
+    bind.checkbox('phrase_ban_enabled', 'phraseBanEnabled', reapplyProactiveInjection);
+    bind.checkbox('phrase_ban_auto', 'phraseBanAuto');
+    bind.checkbox('phrase_ban_proactive', 'phraseBanProactive', reapplyProactiveInjection);
+    bind.number('phrase_ban_injection_depth', 'phraseBanInjectionDepth', {
+        min: 0, fallback: DEFAULT_PHRASE_BAN_INJECTION_DEPTH, onChange: reapplyProactiveInjection,
+    });
+    bind.select('phrase_ban_injection_role', 'phraseBanInjectionRole', DEFAULT_PHRASE_BAN_INJECTION_ROLE, reapplyProactiveInjection);
+    bind.text('phrase_ban_proactive_prompt_textarea', 'phraseBanProactivePrompt', getProactivePromptTemplate(), (value) => {
+        if (value.trim() && !value.includes('{{bannedPhrases}}')) {
+            toast('Warning: Proactive template lacks {{bannedPhrases}}; the AI won\'t see the learned list.', 'warning', 'Phrase Ban');
+        }
+        reapplyProactiveInjection();
+    });
 
     const learnedArea = document.getElementById('phrase_ban_learned_textarea');
     if (learnedArea) {
@@ -700,49 +638,15 @@ export function bindPhraseBanSettings(saveSettings) {
 
     refreshLearnedPanel();
 
-    const retriesInput = document.getElementById('phrase_ban_max_retries');
-    if (retriesInput) {
-        retriesInput.value = getMaxRetries();
-        retriesInput.addEventListener('input', () => {
-            const n = parseInt(retriesInput.value, 10);
-            if (Number.isFinite(n) && n >= 0) {
-                moduleSettings.phraseBanMaxRetries = n;
-                saveSettings();
-            }
-        });
-    }
-
-    const patternsArea = document.getElementById('phrase_ban_patterns_textarea');
-    if (patternsArea) {
-        patternsArea.value = moduleSettings.phraseBanPatterns || '';
-        patternsArea.addEventListener('input', () => {
-            moduleSettings.phraseBanPatterns = patternsArea.value;
-            saveSettings();
-            updatePatternStatus();
-        });
-        updatePatternStatus();
-    }
-
-    const promptArea = document.getElementById('phrase_ban_prompt_textarea');
-    if (promptArea) {
-        promptArea.value = moduleSettings.phraseBanPrompt || DEFAULT_PHRASE_BAN_PROMPT;
-        promptArea.addEventListener('input', () => {
-            moduleSettings.phraseBanPrompt = promptArea.value;
-            saveSettings();
-        });
-    }
+    bind.number('phrase_ban_max_retries', 'phraseBanMaxRetries', { min: 0, fallback: DEFAULT_PHRASE_BAN_MAX_RETRIES });
+    bind.text('phrase_ban_patterns_textarea', 'phraseBanPatterns', moduleSettings.phraseBanPatterns || '', updatePatternStatus);
+    updatePatternStatus();
+    bind.text('phrase_ban_prompt_textarea', 'phraseBanPrompt', getPromptTemplate());
 
     document.getElementById('phrase_ban_preview_btn')
         ?.addEventListener('click', showPhraseBanPromptPreview);
 
-    const debugCb = document.getElementById('phrase_ban_debug_mode');
-    if (debugCb) {
-        debugCb.checked = !!moduleSettings.phraseBanDebugMode;
-        debugCb.addEventListener('change', () => {
-            moduleSettings.phraseBanDebugMode = debugCb.checked;
-            saveSettings();
-        });
-    }
+    bind.checkbox('phrase_ban_debug_mode', 'phraseBanDebugMode');
 }
 
 function showPhraseBanPromptPreview() {

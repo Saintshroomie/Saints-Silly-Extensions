@@ -17,7 +17,6 @@
  * Discovery and reply parsing are pure helpers in character-state-parsing.js.
  */
 
-import { removeReasoningFromString } from '../../../../reasoning.js';
 import {
     Popup,
     POPUP_TYPE,
@@ -33,17 +32,19 @@ import {
     toast,
     buildContextPreamble,
     createLoreBookPicker,
-    streamingGenerate,
-    withSingleLineDisabled,
     applyTemplateMacros,
-    stripPrefillEcho,
     showPromptPreview,
+    getChatCharacters,
+    getCurrentChatId,
+    createSettingsBinder,
 } from './utils.js';
+import { templateSetting, textSetting, parsePositiveInt, positiveIntSetting } from './settings-helpers.js';
 import {
     abortAllGenerations,
     isSilentGenerationAbort,
 } from './silent-generation.js';
 import { createToolPresetSelector } from './prompt-templates.js';
+import { MODAL_LOREBOOK_PREFIX, setModalStatus, statusBarHtml, streamFresh } from './generation-modal.js';
 import {
     discoverVariables,
     humanizeVariableName,
@@ -134,22 +135,6 @@ function findCharacterByAvatar(avatar) {
     return getContext().characters?.find(c => c?.avatar === avatar) || null;
 }
 
-/** Group members (or the solo character) of the open chat, as character objects. */
-function chatCharacters() {
-    const ctx = getContext();
-    if (ctx.groupId) {
-        const group = ctx.groups?.find(g => g.id === ctx.groupId);
-        return (group?.members || []).map(findCharacterByAvatar).filter(Boolean);
-    }
-    const char = ctx.characters?.[ctx.characterId];
-    return char ? [char] : [];
-}
-
-function currentChatId() {
-    const ctx = getContext();
-    return (typeof ctx.getCurrentChatId === 'function' ? ctx.getCurrentChatId() : ctx.chatId) || null;
-}
-
 // ─── Variable Discovery ───
 
 /** Lore books tied to a character: its primary (linked) book plus any additional books. */
@@ -237,7 +222,7 @@ export async function openCharacterStateModal(avatar) {
         toast('Character not found.', 'warning');
         return;
     }
-    const chatId = currentChatId();
+    const chatId = getCurrentChatId();
     if (!chatId) {
         toast('Open a chat first: state variables are stored per chat.', 'warning');
         return;
@@ -321,7 +306,7 @@ function capturePersistedModalState(body) {
 /** Close the pane if the chat it was opened for is no longer the open chat. */
 export function onCharacterStateChatChanged() {
     syncCharacterStateButtons();
-    if (!activePopup || currentChatId() === openChatId) return;
+    if (!activePopup || getCurrentChatId() === openChatId) return;
     debug('Chat changed under the open pane; closing without applying');
     if (isGenerating) {
         abortRequested = true;
@@ -498,34 +483,31 @@ function buildAssistSection() {
     section.className = 'cs-assist-section';
     section.innerHTML = `
         <div class="cs-assist-title"><span class="fa-solid fa-wand-magic-sparkles"></span> <b>Update with AI</b></div>
-        <div class="acc-context-section cs-context-section">
+        <div class="sse-modal-context">
             <label class="checkbox_label" title="Give the model the character cards, the chat's relevant World Info, and the recent chat. Needed when the instruction is left blank.">
                 <input id="cs_use_chat_context" type="checkbox" />
                 <span>Use Chat Context</span>
             </label>
             <div class="cs-lorebook-host"></div>
         </div>
-        <div class="acc-preset-row cs-preset-row">
-            <label class="acc-preset-label"><span class="fa-solid fa-file-pen"></span> Prompt Preset:</label>
+        <div class="sse-modal-preset-row">
+            <label class="sse-modal-preset-label"><span class="fa-solid fa-file-pen"></span> Prompt Preset:</label>
             <div class="cs-preset-host"></div>
         </div>
         <textarea id="cs_instruction" class="text_pole cs-instruction" rows="3" placeholder="How should these change? e.g. &quot;She changes into a swimsuit for the beach&quot;. Leave blank to update from what happened in the recent chat."></textarea>
         <div class="cs-action-row">
-            <div id="cs_generate_btn" class="menu_button interactable acc-action-btn acc-generate-btn" title="Ask the model for new values. Proposals fill the fields above; nothing is saved until Apply.">
+            <div id="cs_generate_btn" class="menu_button interactable sse-modal-action-btn sse-modal-primary" title="Ask the model for new values. Proposals fill the fields above; nothing is saved until Apply.">
                 <span class="fa-solid fa-wand-magic-sparkles"></span> Propose Changes
             </div>
-            <div id="cs_revert_btn" class="menu_button interactable acc-action-btn" title="Undo every change in this pane">
+            <div id="cs_revert_btn" class="menu_button interactable sse-modal-action-btn" title="Undo every change in this pane">
                 <span class="fa-solid fa-rotate-left"></span> Revert All
             </div>
-            <label class="acc-tokens-label" for="cs_response_length" title="Maximum tokens for the model's reply">
+            <label class="sse-modal-tokens-label" for="cs_response_length" title="Maximum tokens for the model's reply">
                 <span class="fa-solid fa-coins"></span> Max Tokens:
             </label>
-            <input id="cs_response_length" type="number" class="text_pole acc-tokens-input" min="50" max="8192" step="50" />
+            <input id="cs_response_length" type="number" class="text_pole sse-modal-tokens-input" min="50" max="8192" step="50" />
         </div>
-        <div class="acc-status-bar acc-hidden" id="cs_status_bar">
-            <span class="fa-solid fa-spinner fa-spin"></span>
-            <span id="cs_status_text"></span>
-        </div>
+        ${statusBarHtml('cs')}
         <details class="cs-reply-details">
             <summary>Model reply</summary>
             <textarea id="cs_reply" class="text_pole cs-reply" rows="5" readonly placeholder="The model's raw reply appears here."></textarea>
@@ -546,7 +528,7 @@ function buildAssistSection() {
     });
 
     const picker = createLoreBookPicker({
-        classPrefix: 'acc-lorebook',
+        classPrefix: MODAL_LOREBOOK_PREFIX,
         initialSelection: persistedModalState.selectedLoreBooks.slice(),
         debug,
     });
@@ -555,7 +537,6 @@ function buildAssistSection() {
 
     section.querySelector('.cs-preset-host').replaceWith(createToolPresetSelector({
         toolKey: 'character-state',
-        className: 'acc-preset-select',
         title: 'Prompt preset used for Propose Changes. Save and edit presets in the extension settings.',
     }));
 
@@ -577,7 +558,7 @@ function buildAssistSection() {
 async function applyChanges() {
     const changed = rows.filter(isDirty);
     if (!changed.length) return;
-    if (currentChatId() !== openChatId) {
+    if (getCurrentChatId() !== openChatId) {
         toast('The chat changed since this pane opened; nothing was applied.', 'warning');
         return;
     }
@@ -731,13 +712,7 @@ async function generateReply(instruction, ctxOptions, replyEl) {
     debug('Prompt:', prompt);
     debug('Prefill:', prefill);
 
-    const result = await withSingleLineDisabled(() => streamingGenerate(
-        { prompt, systemPrompt, responseLength, ...(prefill ? { prefill } : {}) },
-        replyEl,
-        { append: false, name: 'character-state' },
-    ));
-    const cleaned = stripPrefillEcho(removeReasoningFromString(result).trim(), prefill);
-    return (prefill || '') + cleaned;
+    return streamFresh({ prompt, systemPrompt, responseLength, prefill, outputEl: replyEl, name: 'character-state' });
 }
 
 async function buildPreambleBlock(ctxOptions) {
@@ -753,24 +728,19 @@ async function buildPreambleBlock(ctxOptions) {
 }
 
 function getPromptTemplate() {
-    const stored = moduleSettings?.characterStatePrompt;
-    return (typeof stored === 'string' && stored.trim()) ? stored : DEFAULT_CHARACTER_STATE_PROMPT;
+    return templateSetting(moduleSettings, 'characterStatePrompt', DEFAULT_CHARACTER_STATE_PROMPT);
 }
 
 function getPrefill() {
-    const stored = moduleSettings?.characterStatePrefill;
-    return typeof stored === 'string' ? stored : DEFAULT_CHARACTER_STATE_PREFILL;
+    return textSetting(moduleSettings, 'characterStatePrefill', DEFAULT_CHARACTER_STATE_PREFILL);
 }
 
 function getResponseLength() {
-    const parsed = parseInt(document.getElementById('cs_response_length')?.value, 10);
-    if (!isNaN(parsed) && parsed > 0) return parsed;
-    return getSavedResponseLength();
+    return parsePositiveInt(document.getElementById('cs_response_length')?.value) ?? getSavedResponseLength();
 }
 
 function getSavedResponseLength() {
-    const setting = moduleSettings?.characterStateResponseLength;
-    return (typeof setting === 'number' && setting > 0) ? setting : DEFAULT_CHARACTER_STATE_RESPONSE_LENGTH;
+    return positiveIntSetting(moduleSettings, 'characterStateResponseLength', DEFAULT_CHARACTER_STATE_RESPONSE_LENGTH);
 }
 
 function stopGeneration() {
@@ -787,7 +757,7 @@ const GENERATE_LABEL = '<span class="fa-solid fa-wand-magic-sparkles"></span> Pr
 function setGeneratingUI(generating) {
     const btn = document.getElementById('cs_generate_btn');
     if (btn) btn.innerHTML = generating ? '<span class="fa-solid fa-stop"></span> Stop' : GENERATE_LABEL;
-    document.getElementById('cs_revert_btn')?.classList.toggle('acc-disabled', generating);
+    document.getElementById('cs_revert_btn')?.classList.toggle('sse-modal-disabled', generating);
     const instruction = document.getElementById('cs_instruction');
     if (generating) instruction?.setAttribute('disabled', 'true');
     else instruction?.removeAttribute('disabled');
@@ -800,15 +770,7 @@ function setGeneratingUI(generating) {
 }
 
 function setStatusBar(message) {
-    const bar = document.getElementById('cs_status_bar');
-    const text = document.getElementById('cs_status_text');
-    if (!bar || !text) return;
-    if (message) {
-        text.textContent = message;
-        bar.classList.remove('acc-hidden');
-    } else {
-        bar.classList.add('acc-hidden');
-    }
+    setModalStatus('cs', message);
 }
 
 // ─── Group Member Row Buttons ───
@@ -920,44 +882,15 @@ export function onCharacterStateGroupUpdated() {
 // ─── Settings Bindings ───
 
 export function bindCharacterStateSettings(saveSettings) {
-    const bindCheckbox = (id, key, after) => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.checked = !!moduleSettings[key];
-        el.addEventListener('change', () => {
-            moduleSettings[key] = el.checked;
-            saveSettings();
-            after?.();
-        });
-    };
-    bindCheckbox('character_state_enabled', 'characterStateEnabled', syncCharacterStateButtons);
-    bindCheckbox('character_state_debug_mode', 'characterStateDebugMode');
-
-    const bindTextarea = (id, key, fallback) => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        const stored = moduleSettings[key];
-        el.value = typeof stored === 'string' ? stored : fallback;
-        el.addEventListener('input', () => {
-            moduleSettings[key] = el.value;
-            saveSettings();
-        });
-    };
-    bindTextarea('character_state_prompt_textarea', 'characterStatePrompt', DEFAULT_CHARACTER_STATE_PROMPT);
-    bindTextarea('character_state_prefill_textarea', 'characterStatePrefill', DEFAULT_CHARACTER_STATE_PREFILL);
-
-    const bindNumber = (id, key, fallback) => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.value = moduleSettings[key] || fallback;
-        el.addEventListener('input', () => {
-            const n = parseInt(el.value, 10);
-            moduleSettings[key] = Number.isFinite(n) && n > 0 ? n : fallback;
-            saveSettings();
-        });
-    };
-    bindNumber('character_state_response_length', 'characterStateResponseLength', DEFAULT_CHARACTER_STATE_RESPONSE_LENGTH);
-    bindNumber('character_state_max_context_override', 'characterStateMaxContextOverride', 0);
+    const bind = createSettingsBinder(moduleSettings, saveSettings);
+    bind.checkbox('character_state_enabled', 'characterStateEnabled', syncCharacterStateButtons);
+    bind.checkbox('character_state_debug_mode', 'characterStateDebugMode');
+    bind.text('character_state_prompt_textarea', 'characterStatePrompt', getPromptTemplate());
+    bind.text('character_state_prefill_textarea', 'characterStatePrefill', getPrefill());
+    bind.number('character_state_response_length', 'characterStateResponseLength', {
+        fallback: DEFAULT_CHARACTER_STATE_RESPONSE_LENGTH,
+    });
+    bind.number('character_state_max_context_override', 'characterStateMaxContextOverride', { zeroMeansOff: true });
 
     document.getElementById('character_state_preview_btn')
         ?.addEventListener('click', showCharacterStatePromptPreview);
@@ -984,7 +917,7 @@ function showCharacterStatePromptPreview() {
 
 function findChatCharacter(query) {
     const q = String(query || '').trim().toLowerCase();
-    const cast = chatCharacters();
+    const cast = getChatCharacters();
     if (!q) return cast.length === 1 ? cast[0] : null;
     return cast.find(c => c.name?.toLowerCase() === q)
         || cast.find(c => c.avatar?.toLowerCase() === q)

@@ -16,11 +16,15 @@ import {
     getContext,
     createDebugLogger,
     confirmActiveMessageEdit,
+    waitForMessageEditClosed,
     getEditingMessageIndex,
     isGenerationInProgress,
     waitForGenerationEnd,
     showPromptPreview,
+    toast,
+    createSettingsBinder,
 } from './utils.js';
+import { templateSetting } from './settings-helpers.js';
 
 // ─── Constants ───
 
@@ -55,7 +59,7 @@ let autoPhrasingStopped = false;
 /** @type {{ settings: object }} */
 let ctx = null;
 
-/** @type {{ isPossessing: function, getPossessedCharName: function, postPossessedMessage: function }} */
+/** @type {{ isPossessing: function, postPossessedMessage: function }} */
 let possessionApi = null;
 
 /** @type {{ runDirectorTurn: function }} */
@@ -72,11 +76,11 @@ export function isPhrasing() {
 // ─── Prompt Management ───
 
 function getActivePrompt() {
-    return ctx.settings.phrasingPrompt || DEFAULT_PHRASING_PROMPT;
+    return templateSetting(ctx.settings, 'phrasingPrompt', DEFAULT_PHRASING_PROMPT);
 }
 
 function getActiveInversePrompt() {
-    return ctx.settings.phrasingInversePrompt || DEFAULT_PHRASING_INVERSE_PROMPT;
+    return templateSetting(ctx.settings, 'phrasingInversePrompt', DEFAULT_PHRASING_INVERSE_PROMPT);
 }
 
 function formatSwipesContext(swipes, speakerName) {
@@ -230,15 +234,19 @@ export function applyPhrasingEnabledState() {
 // ─── Primary Flow (Input Enrichment) ───
 
 /**
- * @param {string} seedText
+ * Enrich the user's typed text: while possessing, post it as the possessed
+ * character and swipe-rewrite that message; otherwise inject it (labelled
+ * with the persona's name) and run /impersonate.
+ *
+ * @param {string} inputText - The raw text the user typed.
  * @param {object} [options]
  * @param {(index: number) => void} [options.onMessagePosted] - Called with the
  *   chat index once a possessed message has been posted, before it is rewritten.
  *   Lets callers tell "nothing happened" apart from "the message is in the chat
  *   but the rewrite did not finish".
  */
-async function doPrimaryFlow(seedText, options = {}) {
-    debug('doPrimaryFlow — starting, seed length:', seedText.length);
+async function doPrimaryFlow(inputText, options = {}) {
+    debug('doPrimaryFlow — starting, input length:', inputText.length);
     const context = getContext();
 
     if (isGenerationInProgress()) {
@@ -252,23 +260,18 @@ async function doPrimaryFlow(seedText, options = {}) {
         if (possessionApi?.isPossessing()) {
             debug('doPrimaryFlow — possessed path: posting message then swiping');
 
-            const colonIndex = seedText.indexOf(': ');
-            const rawText = colonIndex !== -1 ? seedText.substring(colonIndex + 2) : seedText;
-
-            const messageIndex = await possessionApi.postPossessedMessage(rawText);
+            const messageIndex = await possessionApi.postPossessedMessage(inputText);
             if (messageIndex < 0) {
                 debug('doPrimaryFlow — FAILED: could not post possessed message');
                 return '';
             }
             options.onMessagePosted?.(messageIndex);
 
-            await new Promise(resolve => setTimeout(resolve, 100));
-
             const result = await doSwipeMode(messageIndex);
             debug('doPrimaryFlow — possessed path complete, result length:', result.length);
             return result;
         } else {
-            const assembled = assemblePrompt(seedText);
+            const assembled = assemblePrompt(formatSeedWithSpeaker(inputText, true));
             injectPhrasingPrompt(assembled);
 
             debug('doPrimaryFlow — normal path: triggering /impersonate');
@@ -317,7 +320,7 @@ async function doSwipeMode(messageIndex, options = {}) {
     debug('doSwipeMode — starting for message index:', messageIndex);
     const context = getContext();
 
-    if (context.isGenerating) {
+    if (isGenerationInProgress()) {
         debug('doSwipeMode — ABORTED: generation in progress');
         return '';
     }
@@ -331,7 +334,7 @@ async function doSwipeMode(messageIndex, options = {}) {
     const rawSeedText = message.mes;
     if (!rawSeedText || !rawSeedText.trim()) {
         debug('doSwipeMode — ABORTED: message is empty');
-        toastr.warning('Cannot rephrase an empty message.', 'Phrasing!');
+        toast('Cannot rephrase an empty message.', 'warning', 'Phrasing!');
         return '';
     }
 
@@ -460,31 +463,27 @@ async function onInputPhrasingClick() {
             debug('onInputPhrasingClick — empty input, no edit → rephrase last message');
             const lastIndex = context.chat.length - 1;
             if (lastIndex < 0) {
-                toastr.warning('No messages to rephrase.', 'Phrasing!');
+                toast('No messages to rephrase.', 'warning', 'Phrasing!');
                 return;
             }
             await doSwipeMode(lastIndex);
         } else if (editingIndex >= 0 && !inputText) {
             debug('onInputPhrasingClick — editing message at index', editingIndex, '→ confirm and rephrase');
             confirmActiveMessageEdit();
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await waitForMessageEditClosed();
             await doSwipeMode(editingIndex);
         } else {
             if (editingIndex >= 0) {
                 debug('onInputPhrasingClick — confirming active edit before processing input');
                 confirmActiveMessageEdit();
-                await new Promise(resolve => setTimeout(resolve, 100));
+                await waitForMessageEditClosed();
             }
 
             debug('onInputPhrasingClick — input text present, seed length:', inputText.length);
             textarea.value = '';
             textarea.dispatchEvent(new Event('input', { bubbles: true }));
 
-            const formattedSeed = possessionApi?.isPossessing()
-                ? formatSeedWithSpeaker(inputText, false, possessionApi.getPossessedCharName())
-                : formatSeedWithSpeaker(inputText, true);
-
-            await doPrimaryFlow(formattedSeed);
+            await doPrimaryFlow(inputText);
         }
     } finally {
         showAllPhrasingButtons();
@@ -567,11 +566,7 @@ async function runAutoPhrasing(inputText) {
     try {
         setInput('');
 
-        const seedText = possessing
-            ? formatSeedWithSpeaker(inputText, false, possessionApi.getPossessedCharName())
-            : formatSeedWithSpeaker(inputText, true);
-
-        const result = await doPrimaryFlow(seedText, {
+        const result = await doPrimaryFlow(inputText, {
             onMessagePosted: () => { posted = true; },
         });
 
@@ -579,7 +574,7 @@ async function runAutoPhrasing(inputText) {
             if (!posted) {
                 debug('runAutoPhrasing — nothing was posted, handing the text back');
                 setInput(inputText);
-                toastr.warning('Auto Phrasing could not post the message. Your text was left in the chat box.', 'Phrasing!');
+                toast('Auto Phrasing could not post the message. Your text was left in the chat box.', 'warning', 'Phrasing!');
                 return;
             }
             if (autoPhrasingStopped) {
@@ -594,7 +589,7 @@ async function runAutoPhrasing(inputText) {
             debug('runAutoPhrasing — rewrite produced nothing, handing the text back');
             setInput(inputText);
             if (!autoPhrasingStopped) {
-                toastr.warning('Auto Phrasing produced nothing. Your text was left in the chat box.', 'Phrasing!');
+                toast('Auto Phrasing produced nothing. Your text was left in the chat box.', 'warning', 'Phrasing!');
             }
             return;
         }
@@ -612,7 +607,7 @@ async function runAutoPhrasing(inputText) {
         console.error('[PHRASING] Auto Phrasing failed:', err);
         // Never swallow the user's message on an unexpected failure.
         if (!posted && !textarea?.value?.trim()) setInput(inputText);
-        toastr.error('Auto Phrasing failed. See the console for details.', 'Phrasing!');
+        toast('Auto Phrasing failed. See the console for details.', 'error', 'Phrasing!');
     } finally {
         autoPhrasingBusy = false;
         showAllPhrasingButtons();
@@ -758,63 +753,13 @@ export function createHamburgerMenuItem() {
 // ─── Settings Panel ───
 
 export function bindPhrasingSettings(saveSettings) {
-    const phrasingEnabled = document.getElementById('phrasing_enabled');
-    if (phrasingEnabled) {
-        phrasingEnabled.checked = ctx.settings.phrasingEnabled;
-        phrasingEnabled.addEventListener('change', (e) => {
-            ctx.settings.phrasingEnabled = e.target.checked;
-            saveSettings();
-            applyPhrasingEnabledState();
-        });
-    }
-
-    const phrasingAutoEnabled = document.getElementById('phrasing_auto_enabled');
-    if (phrasingAutoEnabled) {
-        phrasingAutoEnabled.checked = ctx.settings.phrasingAutoEnabled;
-        phrasingAutoEnabled.addEventListener('change', (e) => {
-            ctx.settings.phrasingAutoEnabled = e.target.checked;
-            saveSettings();
-            debug('autoPhrasing toggled to', ctx.settings.phrasingAutoEnabled);
-        });
-    }
-
-    const phrasingDebugMode = document.getElementById('phrasing_debug_mode');
-    if (phrasingDebugMode) {
-        phrasingDebugMode.checked = ctx.settings.phrasingDebugMode;
-        phrasingDebugMode.addEventListener('change', (e) => {
-            ctx.settings.phrasingDebugMode = e.target.checked;
-            saveSettings();
-            debug('debugMode toggled to', ctx.settings.phrasingDebugMode);
-        });
-    }
-
-    const phrasingInverseGuidance = document.getElementById('phrasing_inverse_guidance');
-    if (phrasingInverseGuidance) {
-        phrasingInverseGuidance.checked = ctx.settings.phrasingInverseGuidance;
-        phrasingInverseGuidance.addEventListener('change', (e) => {
-            ctx.settings.phrasingInverseGuidance = e.target.checked;
-            saveSettings();
-            debug('inverseGuidance toggled to', ctx.settings.phrasingInverseGuidance);
-        });
-    }
-
-    const phrasingPromptArea = document.getElementById('phrasing_prompt_textarea');
-    if (phrasingPromptArea) {
-        phrasingPromptArea.value = ctx.settings.phrasingPrompt || DEFAULT_PHRASING_PROMPT;
-        phrasingPromptArea.addEventListener('input', () => {
-            ctx.settings.phrasingPrompt = phrasingPromptArea.value;
-            saveSettings();
-        });
-    }
-
-    const phrasingInverseArea = document.getElementById('phrasing_inverse_prompt_textarea');
-    if (phrasingInverseArea) {
-        phrasingInverseArea.value = ctx.settings.phrasingInversePrompt || DEFAULT_PHRASING_INVERSE_PROMPT;
-        phrasingInverseArea.addEventListener('input', () => {
-            ctx.settings.phrasingInversePrompt = phrasingInverseArea.value;
-            saveSettings();
-        });
-    }
+    const bind = createSettingsBinder(ctx.settings, saveSettings);
+    bind.checkbox('phrasing_enabled', 'phrasingEnabled', applyPhrasingEnabledState);
+    bind.checkbox('phrasing_auto_enabled', 'phrasingAutoEnabled');
+    bind.checkbox('phrasing_debug_mode', 'phrasingDebugMode');
+    bind.checkbox('phrasing_inverse_guidance', 'phrasingInverseGuidance');
+    bind.text('phrasing_prompt_textarea', 'phrasingPrompt', getActivePrompt());
+    bind.text('phrasing_inverse_prompt_textarea', 'phrasingInversePrompt', getActiveInversePrompt());
 
     document.getElementById('phrasing_preview_btn')
         ?.addEventListener('click', showPhrasingPromptPreview);
@@ -850,15 +795,12 @@ export function registerPhrasingSlashCommand() {
             const rawSeedText = unnamedArgs?.trim();
 
             if (rawSeedText) {
-                const seedText = possessionApi?.isPossessing()
-                    ? formatSeedWithSpeaker(rawSeedText, false, possessionApi.getPossessedCharName())
-                    : formatSeedWithSpeaker(rawSeedText, true);
-                return await doPrimaryFlow(seedText);
+                return await doPrimaryFlow(rawSeedText);
             } else {
                 const context = getContext();
                 const lastIndex = context.chat.length - 1;
                 if (lastIndex < 0) {
-                    toastr.warning('No messages to rephrase.', 'Phrasing!');
+                    toast('No messages to rephrase.', 'warning', 'Phrasing!');
                     return '';
                 }
                 return await doSwipeMode(lastIndex);
@@ -883,7 +825,7 @@ export function registerPhrasingSlashCommand() {
 /**
  * @param {object} options
  * @param {object} options.settings       - Shared mutable settings reference.
- * @param {object} options.possessionApi  - { isPossessing(), getPossessedCharName(), postPossessedMessage(text) }
+ * @param {object} options.possessionApi  - { isPossessing(), postPossessedMessage(text) }
  */
 export function initPhrasing({ settings, possessionApi: pApi, directorApi: dApi }) {
     ctx = { settings };

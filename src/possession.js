@@ -6,7 +6,7 @@
 import { SlashCommandParser } from '../../../../slash-commands/SlashCommandParser.js';
 import { SlashCommand } from '../../../../slash-commands/SlashCommand.js';
 import { ARGUMENT_TYPE, SlashCommandArgument } from '../../../../slash-commands/SlashCommandArgument.js';
-import { getContext, createDebugLogger, toast as showToast } from './utils.js';
+import { getContext, createDebugLogger, createSettingsBinder, isGenerationInProgress, toast } from './utils.js';
 import { resolveGroupMemberRow } from './group-members.js';
 
 const POSSESSION_METADATA_KEY = 'possession';
@@ -28,19 +28,16 @@ let phrasingApi = null;
 
 let debug = () => {};
 
-function toast(message, type = 'info') {
+/** Possession's status toasts, silenced by its Show Toasts setting. */
+function possessionToast(message, type = 'info') {
     if (!ctx.settings.possessionShowToast) return;
-    showToast(message, type, 'Saint\'s Silly Extensions');
+    toast(message, type, 'Saint\'s Silly Extensions');
 }
 
 // ─── Public Getters ───
 
 export function isPossessing() {
     return ctx.settings.possessionEnabled && possessedCharName !== null;
-}
-
-export function getPossessedCharName() {
-    return possessedCharName;
 }
 
 // ─── Persistence ───
@@ -103,7 +100,7 @@ function validatePossessedCharInGroup() {
     });
     if (!isMember) {
         debug('Possessed character removed from group, clearing');
-        toast(`${possessedCharName} was removed from the group. Possession cleared.`, 'warning');
+        possessionToast(`${possessedCharName} was removed from the group. Possession cleared.`, 'warning');
         setPossession(null);
     }
 }
@@ -140,10 +137,10 @@ function setPossession(charName, charAvatar) {
     syncAllPossessionUI();
     if (previous !== charName) {
         if (charName) {
-            toast(`Possessing ${charName}`, 'success');
+            possessionToast(`Possessing ${charName}`, 'success');
             debug('Now possessing:', charName);
         } else if (previous) {
-            toast('Possession cleared', 'info');
+            possessionToast('Possession cleared', 'info');
             debug('Possession cleared');
         }
     }
@@ -216,8 +213,7 @@ export function onMessageSent(messageIndex) {
 function handleContinueIntercept(event) {
     if (!ctx.settings.possessionEnabled || !isPossessing()) return;
     if (inPossessedContinue) return;
-    const context = getContext();
-    if (context.isGenerating) return;
+    if (isGenerationInProgress()) return;
 
     const textarea = document.getElementById('send_textarea');
     const text = textarea?.value?.trim();
@@ -457,7 +453,7 @@ function injectPossessionImpersonateButton() {
 
     btn.addEventListener('click', async () => {
         const context = getContext();
-        if (context.isGenerating) return;
+        if (isGenerationInProgress()) return;
 
         debug('Possession impersonate clicked — triggering generation for', char.name);
 
@@ -553,34 +549,10 @@ export function onGroupWrapperFinished() {
 // ─── Settings Panel ───
 
 export function bindPossessionSettings(saveSettings) {
-    const possessionEnabled = document.getElementById('possession_enabled');
-    if (possessionEnabled) {
-        possessionEnabled.checked = ctx.settings.possessionEnabled;
-        possessionEnabled.addEventListener('change', (e) => {
-            ctx.settings.possessionEnabled = e.target.checked;
-            saveSettings();
-            syncAllPossessionUI();
-        });
-    }
-
-    const possessionShowToast = document.getElementById('possession_show_toast');
-    if (possessionShowToast) {
-        possessionShowToast.checked = ctx.settings.possessionShowToast;
-        possessionShowToast.addEventListener('change', (e) => {
-            ctx.settings.possessionShowToast = e.target.checked;
-            saveSettings();
-        });
-    }
-
-    const possessionDebugMode = document.getElementById('possession_debug_mode');
-    if (possessionDebugMode) {
-        possessionDebugMode.checked = ctx.settings.possessionDebugMode;
-        possessionDebugMode.addEventListener('change', (e) => {
-            ctx.settings.possessionDebugMode = e.target.checked;
-            saveSettings();
-            debug('debugMode toggled to', ctx.settings.possessionDebugMode);
-        });
-    }
+    const bind = createSettingsBinder(ctx.settings, saveSettings);
+    bind.checkbox('possession_enabled', 'possessionEnabled', syncAllPossessionUI);
+    bind.checkbox('possession_show_toast', 'possessionShowToast');
+    bind.checkbox('possession_debug_mode', 'possessionDebugMode');
 }
 
 // ─── Slash Commands ───
@@ -593,7 +565,7 @@ export function registerPossessionSlashCommands() {
 
             if (!name) {
                 if (isPossessing()) {
-                    toastr.info(`Currently possessing: ${possessedCharName}`, 'Possession');
+                    toast(`Currently possessing: ${possessedCharName}`, 'info', 'Possession');
                     return possessedCharName;
                 }
                 const context = getContext();
@@ -604,7 +576,7 @@ export function registerPossessionSlashCommands() {
                         return char.name;
                     }
                 }
-                toastr.info('No character is currently possessed.', 'Possession');
+                toast('No character is currently possessed.', 'info', 'Possession');
                 return 'None';
             }
 
@@ -614,7 +586,7 @@ export function registerPossessionSlashCommands() {
             if (context.groupId) {
                 const group = context.groups.find(g => g.id === context.groupId);
                 if (!group) {
-                    toastr.error('No active group found.', 'Possession');
+                    toast('No active group found.', 'error', 'Possession');
                     return '';
                 }
                 const match = group.members
@@ -623,7 +595,7 @@ export function registerPossessionSlashCommands() {
                     .find(c => c.name.toLowerCase().includes(nameLower));
 
                 if (!match) {
-                    toastr.error(`No group member matching "${name}" found.`, 'Possession');
+                    toast(`No group member matching "${name}" found.`, 'error', 'Possession');
                     return '';
                 }
                 setPossession(match.name, match.avatar);
@@ -634,7 +606,7 @@ export function registerPossessionSlashCommands() {
                     setPossession(char.name, char.avatar);
                     return char.name;
                 }
-                toastr.error(`Character "${name}" does not match the active character.`, 'Possession');
+                toast(`Character "${name}" does not match the active character.`, 'error', 'Possession');
                 return '';
             }
         },

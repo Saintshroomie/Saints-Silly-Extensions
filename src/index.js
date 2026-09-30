@@ -1,5 +1,6 @@
-// Saint's Silly Extensions — Possession, Phrasing, and Assisted Character Creation
-// Allows the user to "possess" a character, enrich messages with AI narration, and create characters with LLM assistance.
+// Saint's Silly Extensions — entry point. Owns the shared settings object,
+// initializes every tool module, injects the settings panel, and wires
+// SillyTavern's events to the modules' handlers.
 
 import './style.css';
 import settingsHtml from './settings.html';
@@ -16,7 +17,6 @@ import {
 import {
     initPossession,
     isPossessing,
-    getPossessedCharName,
     postPossessedMessage,
     loadPossessionState,
     syncAllPossessionUI,
@@ -459,13 +459,15 @@ const TOOL_PRESET_CONFIG = [
 
 let settings = { ...defaultSettings };
 
-const SSEDebug = createDebugLogger('SAINTS-SILLY-EXTENSIONS', () => true);
+// Lifecycle logging for the extension as a whole — on whenever any tool's
+// debug mode is (Diagnostics drawer), silent otherwise.
+const SSEDebug = createDebugLogger('SAINTS-SILLY-EXTENSIONS',
+    () => Object.keys(settings).some(key => key.endsWith('DebugMode') && settings[key]));
 
 // ─── Settings Persistence ───
 
 function saveSettings() {
     saveExtensionSettings(EXTENSION_NAME, settings);
-    SSEDebug('Settings saved');
 }
 
 function loadSettings() {
@@ -499,7 +501,7 @@ function loadSettings() {
         migrated = true;
     }
     if (migrated) saveSettings();
-    SSEDebug('Settings loaded:', JSON.stringify(settings));
+    SSEDebug('Settings loaded');
 }
 
 // ─── Settings Panel ───
@@ -606,6 +608,12 @@ function onGroupWrapperFinishedHandler(data) {
 jQuery(async () => {
     loadSettings();
 
+    // Wire up the global "stop button → abort silent generations" hook
+    // before subscribing any per-module handlers, so a stop event always
+    // unblocks in-flight silent jobs first. (Also before the settings panel
+    // binds, which reads this module's settings.)
+    initSilentGeneration({ settings });
+
     // Wire up cross-module dependencies via shared settings reference
     initPossession({
         settings,
@@ -613,7 +621,7 @@ jQuery(async () => {
     });
     initPhrasing({
         settings,
-        possessionApi: { isPossessing, getPossessedCharName, postPossessedMessage },
+        possessionApi: { isPossessing, postPossessedMessage },
         // Auto Phrasing's possessed send posts the message itself, so the
         // Director's MESSAGE_SENT path never fires — it asks for the turn here
         // instead of letting ST pick the next speaker.
@@ -685,11 +693,6 @@ jQuery(async () => {
     // plus the optional auto-set-on-Continue hook on ST's native Continue.
     createRetryContinueButtons();
     hookRetryAutoContinue();
-
-    // Wire up the global "stop button → abort silent generations" hook
-    // before subscribing any per-module handlers, so a stop event always
-    // unblocks in-flight silent jobs first.
-    initSilentGeneration({ settings });
 
     // Subscribe to events
     const { eventSource, eventTypes } = getContext();

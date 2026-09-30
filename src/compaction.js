@@ -28,7 +28,6 @@
 // request through unchanged, so the namespace resolves at runtime.
 import * as hostScript from '../../../../../script.js';
 import { getTokenCountAsync } from '../../../../tokenizers.js';
-import { removeReasoningFromString } from '../../../../reasoning.js';
 import { createNewGroupChat } from '../../../../group-chats.js';
 import {
     Popup,
@@ -39,22 +38,28 @@ import { SlashCommandParser } from '../../../../slash-commands/SlashCommandParse
 import { SlashCommand } from '../../../../slash-commands/SlashCommand.js';
 import {
     getContext,
+    isGenerationInProgress,
     createDebugLogger,
     toast,
     buildContextPreamble,
     createLoreBookPicker,
-    streamingGenerate,
-    withSingleLineDisabled,
     applyTemplateMacros,
-    stripPrefillEcho,
     showPromptPreview,
     estimateChatTokens,
+    createSettingsBinder,
 } from './utils.js';
-import {
-    abortAllGenerations,
-    isSilentGenerationAbort,
-} from './silent-generation.js';
+import { templateSetting, textSetting, positiveIntSetting } from './settings-helpers.js';
 import { createToolPresetSelector } from './prompt-templates.js';
+import {
+    MODAL_LOREBOOK_PREFIX,
+    actionRowHtml,
+    createGenerationActions,
+    smallButtonHtml,
+    statusBarHtml,
+    streamContinuation,
+    streamFresh,
+    tokensRowHtml,
+} from './generation-modal.js';
 
 // ─── Defaults ───
 
@@ -118,15 +123,8 @@ let lastPromptTokens = 0;
 // freshly-created/seeded chat.
 let compacting = false;
 
-// Modal summary-generation runtime (mirrors ACC).
-let isGenerating = false;
-let abortRequested = false;
-let activeAction = null;   // which button initiated the current generation
-let lastAction = null;     // 'generate' | 'continue' — what Retry should redo
-let restorePoint = null;   // preview snapshot used by Retry
-
 let activePopup = null;
-let activeBody = null;
+let lorebookPicker = null;
 
 let guidanceSaveTimer = null;
 
@@ -152,35 +150,21 @@ export function initCompaction({ settings, saveSettings, resyncChatState }) {
 // ─── Settings Helpers ───
 
 function getSummaryTemplate() {
-    const stored = moduleSettings?.compactionSummaryPrompt;
-    return (typeof stored === 'string' && stored.trim()) ? stored : DEFAULT_COMPACTION_SUMMARY_PROMPT;
+    return templateSetting(moduleSettings, 'compactionSummaryPrompt', DEFAULT_COMPACTION_SUMMARY_PROMPT);
 }
 
 function getPrefill() {
-    const stored = moduleSettings?.compactionSummaryPrefill;
-    return (typeof stored === 'string') ? stored : DEFAULT_COMPACTION_SUMMARY_PREFILL;
+    return textSetting(moduleSettings, 'compactionSummaryPrefill', DEFAULT_COMPACTION_SUMMARY_PREFILL);
 }
 
 function getTailLength() {
-    const n = moduleSettings?.compactionTailLength;
-    return (Number.isFinite(n) && n > 0) ? Math.floor(n) : DEFAULT_COMPACTION_TAIL_LENGTH;
+    return positiveIntSetting(moduleSettings, 'compactionTailLength', DEFAULT_COMPACTION_TAIL_LENGTH);
 }
 
 function getThresholdRatio() {
     const n = moduleSettings?.compactionThresholdPercent;
     const pct = (Number.isFinite(n) && n > 0) ? n : DEFAULT_COMPACTION_THRESHOLD_PERCENT;
     return Math.min(Math.max(pct, 1), 100) / 100;
-}
-
-function getResponseLength() {
-    const input = document.getElementById('cc_response_length');
-    if (input) {
-        const parsed = parseInt(input.value, 10);
-        if (!isNaN(parsed) && parsed > 0) return parsed;
-    }
-    const setting = moduleSettings?.compactionSummaryResponseLength;
-    if (typeof setting === 'number' && setting > 0) return setting;
-    return DEFAULT_COMPACTION_RESPONSE_LENGTH;
 }
 
 // ─── Per-chat Guidance Persistence ───
@@ -327,7 +311,7 @@ async function maybeAutoTrigger() {
     if (!moduleSettings?.compactionEnabled || !moduleSettings?.compactionAutoEnabled) return;
     if (compacting || activePopup) return;
     const ctx = getContext();
-    if (ctx.isGenerating) return;
+    if (isGenerationInProgress()) return;
     if (!hasActiveCharacterOrGroup(ctx)) return;
 
     const usage = await getContextUsage();
@@ -343,7 +327,7 @@ async function maybeAutoTrigger() {
     // Re-check guards: the confirm dialog is async and the user may have
     // started a generation, or a compaction may have begun, meanwhile.
     if (compacting || activePopup) return;
-    if (getContext().isGenerating) return;
+    if (isGenerationInProgress()) return;
     openCompactionModal({ auto: true });
 }
 
@@ -416,68 +400,27 @@ export function createCompactionMenuItem() {
 // ─── Settings Bindings ───
 
 export function bindCompactionSettings(saveSettings) {
-    bindCheckbox('compaction_enabled', 'compactionEnabled', saveSettings);
-    bindCheckbox('compaction_auto_enabled', 'compactionAutoEnabled', saveSettings);
-    bindCheckbox('compaction_confirm_auto', 'compactionConfirmAuto', saveSettings);
-    bindCheckbox('compaction_migrate_state', 'compactionMigrateState', saveSettings);
-    bindCheckbox('compaction_debug_mode', 'compactionDebugMode', saveSettings);
+    const bind = createSettingsBinder(moduleSettings, saveSettings);
+    bind.checkbox('compaction_enabled', 'compactionEnabled');
+    bind.checkbox('compaction_auto_enabled', 'compactionAutoEnabled');
+    bind.checkbox('compaction_confirm_auto', 'compactionConfirmAuto');
+    bind.checkbox('compaction_migrate_state', 'compactionMigrateState');
+    bind.checkbox('compaction_debug_mode', 'compactionDebugMode');
 
-    bindNumber('compaction_threshold_percent', 'compactionThresholdPercent', saveSettings, { min: 1, max: 100 });
-    bindNumber('compaction_tail_length', 'compactionTailLength', saveSettings, { min: 1 });
-    bindNumber('compaction_response_length', 'compactionSummaryResponseLength', saveSettings, { min: 50 });
-    bindNumber('compaction_max_context_override', 'compactionMaxContextOverride', saveSettings, { min: 0, allowZero: true });
+    bind.number('compaction_threshold_percent', 'compactionThresholdPercent', {
+        max: 100, fallback: DEFAULT_COMPACTION_THRESHOLD_PERCENT,
+    });
+    bind.number('compaction_tail_length', 'compactionTailLength', { fallback: DEFAULT_COMPACTION_TAIL_LENGTH });
+    bind.number('compaction_response_length', 'compactionSummaryResponseLength', {
+        min: 50, fallback: DEFAULT_COMPACTION_RESPONSE_LENGTH,
+    });
+    bind.number('compaction_max_context_override', 'compactionMaxContextOverride', { zeroMeansOff: true });
 
-    const promptArea = document.getElementById('compaction_summary_prompt_textarea');
-    if (promptArea) {
-        promptArea.value = moduleSettings.compactionSummaryPrompt || DEFAULT_COMPACTION_SUMMARY_PROMPT;
-        promptArea.addEventListener('input', () => {
-            moduleSettings.compactionSummaryPrompt = promptArea.value;
-            saveSettings();
-        });
-    }
-
-    const prefillArea = document.getElementById('compaction_summary_prefill_textarea');
-    if (prefillArea) {
-        prefillArea.value = (typeof moduleSettings.compactionSummaryPrefill === 'string')
-            ? moduleSettings.compactionSummaryPrefill
-            : DEFAULT_COMPACTION_SUMMARY_PREFILL;
-        prefillArea.addEventListener('input', () => {
-            moduleSettings.compactionSummaryPrefill = prefillArea.value;
-            saveSettings();
-        });
-    }
+    bind.text('compaction_summary_prompt_textarea', 'compactionSummaryPrompt', getSummaryTemplate());
+    bind.text('compaction_summary_prefill_textarea', 'compactionSummaryPrefill', getPrefill());
 
     document.getElementById('compaction_preview_btn')
         ?.addEventListener('click', showCompactionPromptPreview);
-}
-
-function bindCheckbox(id, key, saveSettings) {
-    const cb = document.getElementById(id);
-    if (!cb) return;
-    cb.checked = !!moduleSettings[key];
-    cb.addEventListener('change', () => {
-        moduleSettings[key] = cb.checked;
-        saveSettings();
-    });
-}
-
-function bindNumber(id, key, saveSettings, { min = 0, max = Infinity, allowZero = false } = {}) {
-    const input = document.getElementById(id);
-    if (!input) return;
-    input.value = Number.isFinite(moduleSettings[key]) ? moduleSettings[key] : 0;
-    input.addEventListener('input', () => {
-        const n = parseInt(input.value, 10);
-        if (!Number.isFinite(n)) return;
-        if (allowZero && n === 0) {
-            moduleSettings[key] = 0;
-            saveSettings();
-            return;
-        }
-        if (n >= min && n <= max) {
-            moduleSettings[key] = n;
-            saveSettings();
-        }
-    });
 }
 
 // ─── Prompt Composition ───
@@ -535,12 +478,12 @@ export function showCompactionPromptPreview() {
 
 // ─── Preamble ───
 
-async function buildSummaryPreamble(loreBookNames) {
+async function buildSummaryPreamble(responseLength) {
     const tail = getTailLength();
     const preamble = await buildContextPreamble({
         includeChat: true,
-        loreBookNames: Array.isArray(loreBookNames) ? loreBookNames : [],
-        responseLength: getResponseLength(),
+        loreBookNames: lorebookPicker?.getSelected() ?? [],
+        responseLength,
         maxContextOverride: moduleSettings?.compactionMaxContextOverride || 0,
         excludeRecentCount: tail,
     });
@@ -551,6 +494,34 @@ async function buildSummaryPreamble(loreBookNames) {
 
 // ─── Modal ───
 
+const actions = createGenerationActions({
+    prefix: 'cc',
+    outputId: 'cc_summary_output',
+    noun: 'summary',
+    aNoun: 'a summary',
+    generateLabel: 'Generate Summary',
+    statusText: { generate: 'Generating summary…', continue: 'Continuing summary…' },
+    lockIds: ['cc_guidance'],
+    responseLength: {
+        get settings() { return moduleSettings; },
+        key: 'compactionSummaryResponseLength',
+        fallback: DEFAULT_COMPACTION_RESPONSE_LENGTH,
+        save: () => saveSettingsFn?.(),
+    },
+    getPopup: () => activePopup,
+    canRun: () => {
+        const length = getContext().chat?.length || 0;
+        if (length > getTailLength()) return true;
+        toast(`The chat has ${length} messages — at or below the tail length (${getTailLength()}). There's nothing to summarize away.`, 'warning');
+        return false;
+    },
+    run: (action, { existing, outputEl, responseLength }) => (action === 'continue'
+        ? generateContinuation(existing, outputEl, responseLength)
+        : generateSummary(outputEl, responseLength)),
+    logLabel: 'Compaction summary',
+    debug: (...args) => debug(...args),
+});
+
 async function openCompactionModal({ auto = false } = {}) {
     debug('openCompactionModal — auto:', auto, 'activePopup:', !!activePopup, 'compacting:', compacting);
     if (activePopup) return;
@@ -560,7 +531,7 @@ async function openCompactionModal({ auto = false } = {}) {
         return;
     }
     const ctx = getContext();
-    if (ctx.isGenerating) {
+    if (isGenerationInProgress()) {
         debug('open refused — generation in progress');
         if (!auto) toast('Wait for the current generation to finish before compacting.', 'warning');
         return;
@@ -573,12 +544,7 @@ async function openCompactionModal({ auto = false } = {}) {
     }
     debug('open allowed — chat length:', ctx.chat?.length, 'groupId:', ctx.groupId ?? '(solo)');
 
-    isGenerating = false;
-    abortRequested = false;
-    activeAction = null;
-    lastAction = null;
-    restorePoint = null;
-
+    actions.reset();
     const body = buildModalBody();
 
     const popup = new Popup(body, POPUP_TYPE.TEXT, '', {
@@ -589,13 +555,13 @@ async function openCompactionModal({ auto = false } = {}) {
         allowVerticalScrolling: true,
         onOpen: () => {
             bindModalHandlers();
-            refreshActionButtonStates();
+            actions.bind();
             updateUsageBanner();
             debug('Modal opened', auto ? '(auto)' : '(manual)');
         },
         onClosing: (p) => {
             if (p.result === POPUP_RESULT.AFFIRMATIVE) {
-                if (isGenerating) {
+                if (actions.isGenerating()) {
                     toast('Wait for the summary generation to finish before clicking Compact.', 'warning');
                     return false;
                 }
@@ -607,15 +573,11 @@ async function openCompactionModal({ auto = false } = {}) {
                 return true;
             }
             // Cancel / Esc / X — abort any in-flight summary gen, commit nothing.
-            if (isGenerating) {
-                abortRequested = true;
-                stopGeneration();
-            }
+            actions.stopIfRunning();
             return true;
         },
     });
     activePopup = popup;
-    activeBody = body;
 
     let committed = false;
     try {
@@ -630,140 +592,83 @@ async function openCompactionModal({ auto = false } = {}) {
             }
         }
     } finally {
+        actions.commitResponseLength(body);
         activePopup = null;
-        activeBody = null;
-        isGenerating = false;
-        activeAction = null;
-        lastAction = null;
-        restorePoint = null;
+        lorebookPicker = null;
+        actions.reset();
         debug('Modal closed', committed ? '(compacted)' : '(no commit)');
     }
 }
 
 function buildModalBody() {
     const root = document.createElement('div');
-    root.className = 'cc-modal-body';
+    root.className = 'sse-modal-body';
     root.innerHTML = `
-        <div class="cc-usage-banner" id="cc_usage_banner">Measuring context usage…</div>
-        <div class="cc-context-section">
+        <div class="sse-modal-banner cc-usage-banner" id="cc_usage_banner">Measuring context usage…</div>
+        <div class="sse-modal-context">
             <div class="cc-lorebook-host"></div>
             <small class="cc-context-hint">Selected lore books are folded into the summary so canon isn't lost.</small>
         </div>
-        <div class="cc-preset-row">
-            <label class="cc-preset-label"><span class="fa-solid fa-file-pen"></span> Prompt Preset:</label>
+        <div class="sse-modal-preset-row">
+            <label class="sse-modal-preset-label"><span class="fa-solid fa-file-pen"></span> Prompt Preset:</label>
             <div class="cc-preset-host"></div>
         </div>
-        <div class="cc-guidance-section">
-            <div class="cc-field-header">
+        <div class="sse-modal-section">
+            <div class="sse-modal-field-header">
                 <label for="cc_guidance"><b>Summary Guidance:</b></label>
-                <div id="cc_clear_guidance_btn" class="menu_button interactable cc-clear-btn" title="Clear the guidance">
-                    <span class="fa-solid fa-eraser"></span> Clear
-                </div>
+                ${smallButtonHtml('cc_clear_guidance_btn', 'fa-eraser', 'Clear', 'Clear the guidance')}
             </div>
             <textarea id="cc_guidance" class="text_pole" rows="3" placeholder="Demand specific details the summary must preserve (names, items, promises, plot threads, ongoing states…). Persisted per-chat."></textarea>
         </div>
-        <div class="cc-action-row">
-            <div id="cc_generate_btn" class="menu_button interactable cc-action-btn cc-generate-btn" title="Generate a fresh summary from the chat (replaces the preview)">
-                <span class="fa-solid fa-wand-magic-sparkles"></span> Generate Summary
-            </div>
-            <div id="cc_continue_btn" class="menu_button interactable cc-action-btn" title="Continue from where the summary leaves off">
-                <span class="fa-solid fa-arrow-right"></span> Continue
-            </div>
-            <div id="cc_checkpoint_btn" class="menu_button interactable cc-action-btn" title="Save the current summary as the Retry restore point">
-                <span class="fa-solid fa-flag"></span> Checkpoint
-            </div>
-            <div id="cc_retry_btn" class="menu_button interactable cc-action-btn" title="Restore to the last snapshot and re-run the last action">
-                <span class="fa-solid fa-rotate-right"></span> Retry
-            </div>
-        </div>
-        <div class="cc-tokens-row">
-            <label class="cc-tokens-label" for="cc_response_length" title="Maximum tokens for the summary generation">
-                <span class="fa-solid fa-coins"></span> Max Tokens:
-            </label>
-            <input id="cc_response_length" type="number" class="text_pole cc-tokens-input" min="50" max="16384" step="50" />
-        </div>
-        <div class="cc-status-bar cc-hidden" id="cc_status_bar">
-            <span class="fa-solid fa-spinner fa-spin"></span>
-            <span id="cc_status_text"></span>
-        </div>
-        <div class="cc-summary-section">
-            <div class="cc-field-header">
+        ${actionRowHtml('cc', {
+        noun: 'summary',
+        generateLabel: 'Generate Summary',
+        generateTitle: 'Generate a fresh summary from the chat (replaces the preview)',
+    })}
+        ${tokensRowHtml('cc', { max: 16384, title: 'Maximum tokens for the summary generation' })}
+        ${statusBarHtml('cc')}
+        <div class="sse-modal-output-section">
+            <div class="sse-modal-field-header">
                 <label for="cc_summary_output"><b>Story so far (summary preview):</b></label>
-                <div id="cc_clear_output_btn" class="menu_button interactable cc-clear-btn" title="Clear the summary preview">
-                    <span class="fa-solid fa-eraser"></span> Clear
-                </div>
+                ${smallButtonHtml('cc_clear_output_btn', 'fa-eraser', 'Clear', 'Clear the summary preview')}
             </div>
-            <textarea id="cc_summary_output" class="text_pole cc-summary-output" rows="16" placeholder="The generated summary will appear here. Edit it freely — this exact text becomes the &quot;Story so far&quot; message. Then click Compact."></textarea>
+            <textarea id="cc_summary_output" class="text_pole sse-modal-output" rows="16" placeholder="The generated summary will appear here. Edit it freely — this exact text becomes the &quot;Story so far&quot; message. Then click Compact."></textarea>
         </div>
     `;
 
     const guidanceEl = root.querySelector('#cc_guidance');
-    if (guidanceEl) guidanceEl.value = readGuidance();
+    guidanceEl.value = readGuidance();
+    actions.fillResponseLength(root);
 
-    const tokenInput = root.querySelector('#cc_response_length');
-    if (tokenInput) tokenInput.value = String(getResponseLength());
-
-    const picker = createLoreBookPicker({
-        classPrefix: 'cc-lorebook',
+    lorebookPicker = createLoreBookPicker({
+        classPrefix: MODAL_LOREBOOK_PREFIX,
         title: 'Lore Books',
         debug,
     });
-    root.querySelector('.cc-lorebook-host').replaceWith(picker.element);
-    root._ccLorebookPicker = picker;
+    root.querySelector('.cc-lorebook-host').replaceWith(lorebookPicker.element);
 
     // Point-of-use preset selection — which summary prompt + prefill bundle
     // Generate Summary uses, synced with the settings widget (which also
     // manages presets).
     root.querySelector('.cc-preset-host').replaceWith(createToolPresetSelector({
         toolKey: 'compaction',
-        className: 'cc-preset-select',
         title: 'Prompt preset used for Generate Summary — the bundle of summary prompt + prefill. '
             + 'Save and edit presets in the extension settings.',
     }));
 
-    debug('Modal body built — guidance length:', (guidanceEl?.value || '').length, 'response length:', tokenInput?.value);
+    debug('Modal body built — guidance length:', guidanceEl.value.length);
     return root;
 }
 
 function bindModalHandlers() {
-    document.getElementById('cc_generate_btn')?.addEventListener('click', handleGenerate);
-    document.getElementById('cc_continue_btn')?.addEventListener('click', handleContinue);
-    document.getElementById('cc_checkpoint_btn')?.addEventListener('click', handleCheckpoint);
-    document.getElementById('cc_retry_btn')?.addEventListener('click', handleRetry);
-
-    const output = document.getElementById('cc_summary_output');
-    output?.addEventListener('input', refreshActionButtonStates);
-
     const guidance = document.getElementById('cc_guidance');
     guidance?.addEventListener('input', () => scheduleGuidanceSave(guidance.value));
 
-    const tokenInput = document.getElementById('cc_response_length');
-    tokenInput?.addEventListener('change', () => {
-        const parsed = parseInt(tokenInput.value, 10);
-        if (!isNaN(parsed) && parsed > 0) {
-            moduleSettings.compactionSummaryResponseLength = parsed;
-            saveSettingsFn?.();
-        }
-    });
-
     document.getElementById('cc_clear_guidance_btn')?.addEventListener('click', () => {
-        if (isGenerating) return;
-        const g = document.getElementById('cc_guidance');
-        if (!g) return;
-        g.value = '';
+        if (actions.isGenerating() || !guidance) return;
+        guidance.value = '';
         scheduleGuidanceSave('');
-        g.focus();
-    });
-
-    document.getElementById('cc_clear_output_btn')?.addEventListener('click', () => {
-        if (isGenerating) return;
-        const out = document.getElementById('cc_summary_output');
-        if (!out) return;
-        out.value = '';
-        restorePoint = null;
-        lastAction = null;
-        out.focus();
-        refreshActionButtonStates();
+        guidance.focus();
     });
 }
 
@@ -787,261 +692,29 @@ async function updateUsageBanner() {
     }
 }
 
-// ─── Modal Actions (mirror ACC) ───
+// ─── Summary Generation ───
 
-function readModalLoreBooks() {
-    const picker = activeBody?._ccLorebookPicker;
-    return picker ? picker.getSelected() : [];
-}
-
-async function handleGenerate() {
-    debug('handleGenerate — isGenerating:', isGenerating, 'activeAction:', activeAction);
-    if (isGenerating) {
-        if (activeAction === 'generate') {
-            abortRequested = true;
-            stopGeneration();
-        }
-        return;
-    }
-    const ctx = getContext();
-    if ((ctx.chat?.length || 0) <= getTailLength()) {
-        toast(`The chat has ${ctx.chat?.length || 0} messages — at or below the tail length (${getTailLength()}). There's nothing to summarize away.`, 'warning');
-        return;
-    }
-    const output = document.getElementById('cc_summary_output');
-    restorePoint = output?.value || '';
-    await runSummaryGeneration('generate');
-}
-
-async function handleContinue() {
-    debug('handleContinue — isGenerating:', isGenerating, 'activeAction:', activeAction);
-    if (isGenerating) {
-        if (activeAction === 'continue') {
-            abortRequested = true;
-            stopGeneration();
-        }
-        return;
-    }
-    const output = document.getElementById('cc_summary_output');
-    const existing = output?.value || '';
-    if (!existing.trim()) {
-        toast('Nothing to continue from. Generate a summary first or type some text.', 'warning');
-        return;
-    }
-    restorePoint = existing;
-    await runSummaryGeneration('continue');
-}
-
-function handleCheckpoint() {
-    if (isGenerating) return;
-    const output = document.getElementById('cc_summary_output');
-    const current = output?.value || '';
-    if (!current.trim()) {
-        toast('Nothing to checkpoint — the summary is empty.', 'warning');
-        return;
-    }
-    restorePoint = current;
-    lastAction = 'continue';
-    toast('Checkpoint saved. Retry will restore to this point.', 'success');
-    refreshActionButtonStates();
-}
-
-async function handleRetry() {
-    if (isGenerating) return;
-    if (!lastAction || restorePoint === null) {
-        toast('Nothing to retry yet.', 'warning');
-        return;
-    }
-    if (lastAction === 'continue' && !restorePoint.trim()) {
-        toast('Cannot continue from an empty restore point.', 'warning');
-        return;
-    }
-    const output = document.getElementById('cc_summary_output');
-    if (output) output.value = restorePoint;
-    await runSummaryGeneration(lastAction);
-}
-
-async function runSummaryGeneration(action) {
-    debug('runSummaryGeneration — action:', action);
-    isGenerating = true;
-    abortRequested = false;
-    activeAction = action;
-
-    const isContinue = action === 'continue';
-    setGeneratingUI(true, action);
-    setStatusBar(isContinue ? 'Continuing summary…' : 'Generating summary…');
-
-    try {
-        const loreBookNames = readModalLoreBooks();
-        const guidance = document.getElementById('cc_guidance')?.value || '';
-        const output = document.getElementById('cc_summary_output');
-        const existing = output?.value || '';
-
-        const result = isContinue
-            ? await generateContinuation(loreBookNames, guidance, existing)
-            : await generateSummary(loreBookNames, guidance);
-
-        if (abortRequested) {
-            debug(`${action} aborted, discarding result; keeping the streamed partial`);
-            // The streamed partial is left in the field on purpose so the user
-            // can edit it and Continue from there. Treat the stop like a short
-            // result so Retry can redo it (Continue/Checkpoint enable on field
-            // content via refreshActionButtonStates in finally).
-            if (output?.value?.trim()) lastAction = action;
-            return;
-        }
-        if (!output) return;
-        if (isContinue) {
-            const sep = needsSeparator(existing) ? ' ' : '';
-            output.value = existing + sep + result;
-        } else {
-            output.value = result;
-        }
-        lastAction = action;
-        debug(`${action} complete, length:`, result.length);
-    } catch (err) {
-        if (isSilentGenerationAbort(err)) {
-            debug(`${action} aborted via cancellation; keeping the streamed partial`);
-            const out = document.getElementById('cc_summary_output');
-            if (out?.value?.trim()) lastAction = action;
-        } else if (!abortRequested) {
-            console.error('Compaction summary error:', err);
-            toast(`Summary generation failed: ${err.message}`, 'error');
-        }
-    } finally {
-        isGenerating = false;
-        abortRequested = false;
-        activeAction = null;
-        setGeneratingUI(false, action);
-        setStatusBar(null);
-        refreshActionButtonStates();
-    }
-}
-
-function needsSeparator(text) {
-    if (!text) return false;
-    const last = text[text.length - 1];
-    return last !== ' ' && last !== '\n' && last !== '\t';
-}
-
-async function generateSummary(loreBookNames, guidance) {
-    const preambleBlock = await buildSummaryPreamble(loreBookNames);
-    const prompt = composeSummaryPrompt(preambleBlock, guidance);
-    const systemPrompt = COMPACTION_SUMMARY_SYSTEM_PROMPT;
-    const responseLength = getResponseLength();
+async function generateSummary(outputEl, responseLength) {
+    const guidance = document.getElementById('cc_guidance')?.value || '';
+    const prompt = composeSummaryPrompt(await buildSummaryPreamble(responseLength), guidance);
     const prefill = getPrefill();
-
-    debug('generateSummary — lore books:', loreBookNames, 'guidance length:', (guidance || '').length,
-        'prompt length:', prompt.length, 'responseLength:', responseLength, 'prefill?', !!prefill);
-
-    const outputEl = document.getElementById('cc_summary_output');
-    debug('generateSummary — streamingGenerate START');
-    const result = await withSingleLineDisabled(() => streamingGenerate(
-        { prompt, systemPrompt, responseLength, ...(prefill ? { prefill } : {}) },
-        outputEl,
-        { append: false, name: 'compaction-summary' },
-    ));
-    debug('generateSummary — streamingGenerate RESOLVED, raw length:', (result || '').length);
-    const cleaned = stripPrefillEcho(removeReasoningFromString(result).trim(), prefill);
-    return (prefill || '') + cleaned;
+    debug('generateSummary — guidance length:', guidance.length, 'prompt length:', prompt.length,
+        'responseLength:', responseLength, 'prefill?', !!prefill);
+    return streamFresh({
+        prompt, systemPrompt: COMPACTION_SUMMARY_SYSTEM_PROMPT, responseLength, prefill, outputEl,
+        name: 'compaction-summary',
+    });
 }
 
-async function generateContinuation(loreBookNames, guidance, existing) {
-    const preambleBlock = await buildSummaryPreamble(loreBookNames);
-    const prompt = composeContinuePrompt(preambleBlock, guidance);
-    const systemPrompt = COMPACTION_CONTINUE_SYSTEM_PROMPT;
-    const responseLength = getResponseLength();
-
-    debug('generateContinuation — existing length:', existing.length, 'prompt length:', prompt.length, 'responseLength:', responseLength);
-
-    const outputEl = document.getElementById('cc_summary_output');
-    debug('generateContinuation — streamingGenerate START');
-    // The recap-so-far is the assistant prefill — the model continues from its
-    // exact end. Strip any prefill echo so we keep only the new tail.
-    const result = await withSingleLineDisabled(() => streamingGenerate(
-        { prompt, systemPrompt, responseLength, ...(existing ? { prefill: existing } : {}) },
-        outputEl,
-        { append: true, name: 'compaction-continue' },
-    ));
-    debug('generateContinuation — streamingGenerate RESOLVED, raw length:', (result || '').length);
-    return stripPrefillEcho(removeReasoningFromString(result).trim(), existing);
-}
-
-function stopGeneration() {
-    // Route through abortAllGenerations() so ST's GENERATION_STOPPED fires and
-    // the backend actually halts (not just our local controllers).
-    abortAllGenerations('compaction-cancel');
-    debug('Stop generation triggered');
-}
-
-// ─── Modal UI Helpers ───
-
-const ACTION_BUTTON_IDS = ['cc_generate_btn', 'cc_continue_btn', 'cc_checkpoint_btn', 'cc_retry_btn'];
-
-const ACTION_LABELS = {
-    cc_generate_btn: '<span class="fa-solid fa-wand-magic-sparkles"></span> Generate Summary',
-    cc_continue_btn: '<span class="fa-solid fa-arrow-right"></span> Continue',
-    cc_checkpoint_btn: '<span class="fa-solid fa-flag"></span> Checkpoint',
-    cc_retry_btn: '<span class="fa-solid fa-rotate-right"></span> Retry',
-};
-
-function setGeneratingUI(generating, action) {
-    const guidanceInput = document.getElementById('cc_guidance');
-    const activeBtnId = action === 'continue' ? 'cc_continue_btn' : 'cc_generate_btn';
-
-    for (const id of ACTION_BUTTON_IDS) {
-        const btn = document.getElementById(id);
-        if (!btn) continue;
-        if (generating) {
-            if (id === activeBtnId) {
-                btn.innerHTML = '<span class="fa-solid fa-stop"></span> Stop';
-                btn.classList.remove('cc-disabled');
-            } else {
-                btn.innerHTML = ACTION_LABELS[id];
-                btn.classList.add('cc-disabled');
-            }
-        } else {
-            btn.innerHTML = ACTION_LABELS[id];
-            btn.classList.remove('cc-disabled');
-        }
-    }
-
-    const okBtn = activePopup?.okButton;
-    if (okBtn) okBtn.classList.toggle('disabled', !!generating);
-
-    if (generating) {
-        guidanceInput?.setAttribute('disabled', 'true');
-    } else {
-        guidanceInput?.removeAttribute('disabled');
-        refreshActionButtonStates();
-    }
-}
-
-function refreshActionButtonStates() {
-    if (isGenerating) return;
-    const output = document.getElementById('cc_summary_output');
-    const hasText = !!output?.value?.trim();
-    setButtonDisabled('cc_continue_btn', !hasText);
-    setButtonDisabled('cc_checkpoint_btn', !hasText);
-    setButtonDisabled('cc_retry_btn', !lastAction || restorePoint === null);
-}
-
-function setButtonDisabled(id, disabled) {
-    const btn = document.getElementById(id);
-    if (!btn) return;
-    btn.classList.toggle('cc-disabled', disabled);
-}
-
-function setStatusBar(message) {
-    const bar = document.getElementById('cc_status_bar');
-    const text = document.getElementById('cc_status_text');
-    if (!bar || !text) return;
-    if (message) {
-        text.textContent = message;
-        bar.classList.remove('cc-hidden');
-    } else {
-        bar.classList.add('cc-hidden');
-    }
+async function generateContinuation(existing, outputEl, responseLength) {
+    const guidance = document.getElementById('cc_guidance')?.value || '';
+    const prompt = composeContinuePrompt(await buildSummaryPreamble(responseLength), guidance);
+    debug('generateContinuation — existing length:', existing.length, 'prompt length:', prompt.length,
+        'responseLength:', responseLength);
+    return streamContinuation({
+        prompt, systemPrompt: COMPACTION_CONTINUE_SYSTEM_PROMPT, responseLength, existing, outputEl,
+        name: 'compaction-continue',
+    });
 }
 
 // ─── Commit Pipeline ───
