@@ -39,6 +39,7 @@ import {
     stripPrefillEcho,
     showPromptPreview,
 } from './utils.js';
+import { templateSetting, textSetting, parsePositiveInt, positiveIntSetting } from './settings-helpers.js';
 import {
     abortAllGenerations,
     isSilentGenerationAbort,
@@ -753,24 +754,19 @@ async function buildPreambleBlock(ctxOptions) {
 }
 
 function getPromptTemplate() {
-    const stored = moduleSettings?.characterStatePrompt;
-    return (typeof stored === 'string' && stored.trim()) ? stored : DEFAULT_CHARACTER_STATE_PROMPT;
+    return templateSetting(moduleSettings, 'characterStatePrompt', DEFAULT_CHARACTER_STATE_PROMPT);
 }
 
 function getPrefill() {
-    const stored = moduleSettings?.characterStatePrefill;
-    return typeof stored === 'string' ? stored : DEFAULT_CHARACTER_STATE_PREFILL;
+    return textSetting(moduleSettings, 'characterStatePrefill', DEFAULT_CHARACTER_STATE_PREFILL);
 }
 
 function getResponseLength() {
-    const parsed = parseInt(document.getElementById('cs_response_length')?.value, 10);
-    if (!isNaN(parsed) && parsed > 0) return parsed;
-    return getSavedResponseLength();
+    return parsePositiveInt(document.getElementById('cs_response_length')?.value) ?? getSavedResponseLength();
 }
 
 function getSavedResponseLength() {
-    const setting = moduleSettings?.characterStateResponseLength;
-    return (typeof setting === 'number' && setting > 0) ? setting : DEFAULT_CHARACTER_STATE_RESPONSE_LENGTH;
+    return positiveIntSetting(moduleSettings, 'characterStateResponseLength', DEFAULT_CHARACTER_STATE_RESPONSE_LENGTH);
 }
 
 function stopGeneration() {

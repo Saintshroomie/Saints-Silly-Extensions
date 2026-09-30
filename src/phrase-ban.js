@@ -40,6 +40,7 @@ import {
     stickyToast,
     showPromptPreview,
 } from './utils.js';
+import { templateSetting } from './settings-helpers.js';
 
 // ─── Constants ───
 
@@ -202,15 +203,11 @@ function getMaxRetries() {
 }
 
 function getPromptTemplate() {
-    return (moduleSettings?.phraseBanPrompt && moduleSettings.phraseBanPrompt.trim())
-        ? moduleSettings.phraseBanPrompt
-        : DEFAULT_PHRASE_BAN_PROMPT;
+    return templateSetting(moduleSettings, 'phraseBanPrompt', DEFAULT_PHRASE_BAN_PROMPT);
 }
 
 function getProactivePromptTemplate() {
-    return (moduleSettings?.phraseBanProactivePrompt && moduleSettings.phraseBanProactivePrompt.trim())
-        ? moduleSettings.phraseBanProactivePrompt
-        : DEFAULT_PHRASE_BAN_PROACTIVE_PROMPT;
+    return templateSetting(moduleSettings, 'phraseBanProactivePrompt', DEFAULT_PHRASE_BAN_PROACTIVE_PROMPT);
 }
 
 // ─── Proactive: Per-chat Learned List ───

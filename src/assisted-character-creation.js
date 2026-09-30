@@ -23,6 +23,7 @@ import {
     stripPrefillEcho,
     showPromptPreview,
 } from './utils.js';
+import { templateSetting, textSetting, parsePositiveInt, positiveIntSetting } from './settings-helpers.js';
 import {
     abortAllGenerations,
     isSilentGenerationAbort,
@@ -229,7 +230,7 @@ export function bindACCSettings(saveSettings) {
         });
     }
     if (promptArea) {
-        promptArea.value = moduleSettings.accPrompt || DEFAULT_ACC_PROMPT;
+        promptArea.value = getPromptTemplate();
         promptArea.addEventListener('input', () => {
             moduleSettings.accPrompt = promptArea.value;
             saveSettings();
@@ -238,7 +239,7 @@ export function bindACCSettings(saveSettings) {
 
     const prefillArea = document.getElementById('acc_prefill_textarea');
     if (prefillArea) {
-        prefillArea.value = moduleSettings.accPrefill || DEFAULT_ACC_PREFILL;
+        prefillArea.value = getPrefill();
         prefillArea.addEventListener('input', () => {
             moduleSettings.accPrefill = prefillArea.value;
             saveSettings();
@@ -736,28 +737,19 @@ async function generateContinuation(brief, existing, ctxOptions) {
 }
 
 function getPromptTemplate() {
-    const stored = moduleSettings?.accPrompt;
-    return (typeof stored === 'string' && stored.trim()) ? stored : DEFAULT_ACC_PROMPT;
+    return templateSetting(moduleSettings, 'accPrompt', DEFAULT_ACC_PROMPT);
 }
 
 function getPrefill() {
-    const stored = moduleSettings?.accPrefill;
-    return (typeof stored === 'string' && stored.length > 0) ? stored : DEFAULT_ACC_PREFILL;
+    return textSetting(moduleSettings, 'accPrefill', DEFAULT_ACC_PREFILL);
 }
 
 function getResponseLength() {
-    const input = document.getElementById('acc_response_length');
-    if (input) {
-        const parsed = parseInt(input.value, 10);
-        if (!isNaN(parsed) && parsed > 0) return parsed;
-    }
-    return getSavedResponseLength();
+    return parsePositiveInt(document.getElementById('acc_response_length')?.value) ?? getSavedResponseLength();
 }
 
 function getSavedResponseLength() {
-    const setting = moduleSettings?.accResponseLength;
-    if (typeof setting === 'number' && setting > 0) return setting;
-    return DEFAULT_ACC_RESPONSE_LENGTH;
+    return positiveIntSetting(moduleSettings, 'accResponseLength', DEFAULT_ACC_RESPONSE_LENGTH);
 }
 
 async function buildPreambleBlock(ctxOptions) {

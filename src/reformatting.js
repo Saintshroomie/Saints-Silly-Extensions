@@ -31,6 +31,7 @@ import {
     stripPrefillEcho,
     showPromptPreview,
 } from './utils.js';
+import { templateSetting, textSetting, positiveIntSetting } from './settings-helpers.js';
 import {
     isSilentGenerationAbort,
 } from './silent-generation.js';
@@ -166,20 +167,19 @@ export function applyRulesReformat(text) {
 // ─── LLM Engine ───
 
 function getReformattingResponseLength() {
-    const n = moduleSettings?.reformattingResponseLength;
-    return (typeof n === 'number' && n > 0) ? n : DEFAULT_REFORMATTING_RESPONSE_LENGTH;
+    return positiveIntSetting(moduleSettings, 'reformattingResponseLength', DEFAULT_REFORMATTING_RESPONSE_LENGTH);
 }
 
 function getReformattingPromptTemplate() {
-    return (moduleSettings?.reformattingPrompt && moduleSettings.reformattingPrompt.trim())
-        ? moduleSettings.reformattingPrompt
-        : DEFAULT_REFORMATTING_PROMPT;
+    return templateSetting(moduleSettings, 'reformattingPrompt', DEFAULT_REFORMATTING_PROMPT);
 }
 
 function getReformattingSystemPrompt() {
-    return (moduleSettings?.reformattingSystemPrompt && moduleSettings.reformattingSystemPrompt.trim())
-        ? moduleSettings.reformattingSystemPrompt
-        : DEFAULT_REFORMATTING_SYSTEM_PROMPT;
+    return templateSetting(moduleSettings, 'reformattingSystemPrompt', DEFAULT_REFORMATTING_SYSTEM_PROMPT);
+}
+
+function getReformattingPrefill() {
+    return textSetting(moduleSettings, 'reformattingPrefill', DEFAULT_REFORMATTING_PREFILL);
 }
 
 /**
@@ -199,9 +199,7 @@ function composeReformattingPrompt(message) {
  * Throws AbortError if cancelled (caller suppresses via isSilentGenerationAbort).
  */
 async function runLLMReformat(text) {
-    const prefill = (typeof moduleSettings?.reformattingPrefill === 'string')
-        ? moduleSettings.reformattingPrefill
-        : DEFAULT_REFORMATTING_PREFILL;
+    const prefill = getReformattingPrefill();
     const userPrompt = composeReformattingPrompt(text);
 
     debug('LLM reformat — prompt length:', userPrompt.length, 'prefill:', prefill);
@@ -502,9 +500,7 @@ export function bindReformattingSettings(saveSettings) {
 
     const prefillArea = document.getElementById('reformatting_prefill_textarea');
     if (prefillArea) {
-        prefillArea.value = typeof moduleSettings.reformattingPrefill === 'string'
-            ? moduleSettings.reformattingPrefill
-            : DEFAULT_REFORMATTING_PREFILL;
+        prefillArea.value = getReformattingPrefill();
         prefillArea.addEventListener('input', () => {
             moduleSettings.reformattingPrefill = prefillArea.value;
             saveSettings();
@@ -528,9 +524,7 @@ function showReformattingPromptPreview() {
     const sampleMessage =
         'CharacterName: *He danced around the room laughing hysterically.* '
         + '"What am I doing? I don\'t even know!"';
-    const prefill = typeof moduleSettings?.reformattingPrefill === 'string'
-        ? moduleSettings.reformattingPrefill
-        : DEFAULT_REFORMATTING_PREFILL;
+    const prefill = getReformattingPrefill();
     showPromptPreview('Reformatting — LLM Prompt Preview', [
         { label: 'System Prompt', text: getReformattingSystemPrompt() },
         { label: 'User Prompt (template with a sample message)', text: composeReformattingPrompt(sampleMessage) },

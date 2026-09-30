@@ -5062,11 +5062,75 @@ function initPossession({ settings, phrasingApi: pApi }) {
     possession_debug = createDebugLogger('POSSESSION', () => settings.possessionDebugMode);
 }
 
+;// ./src/settings-helpers.js
+/**
+ * Pure readers for the shared settings object — kept free of SillyTavern
+ * imports so they're unit-tested under plain Node (test/).
+ *
+ * Every tool reads its prompts, prefills and lengths through these so an
+ * emptied field means the same thing everywhere:
+ *   - a prompt template left blank falls back to the default (an empty
+ *     instruction is never what the user meant);
+ *   - a prefill is literal text, so clearing it really sends no prefill —
+ *     matching how presets store it.
+ */
+
+/**
+ * A prompt template: any non-blank string, else `fallback`.
+ *
+ * @param {object} settings
+ * @param {string} key
+ * @param {string} fallback
+ * @returns {string}
+ */
+function templateSetting(settings, key, fallback) {
+    const value = settings?.[key];
+    return (typeof value === 'string' && value.trim()) ? value : fallback;
+}
+
+/**
+ * Literal text (prefills and other fields where empty is meaningful): any
+ * string, `''` included, else `fallback`.
+ *
+ * @param {object} settings
+ * @param {string} key
+ * @param {string} fallback
+ * @returns {string}
+ */
+function textSetting(settings, key, fallback) {
+    const value = settings?.[key];
+    return (typeof value === 'string') ? value : fallback;
+}
+
+/**
+ * Parse an input value (string or number) as a positive integer.
+ *
+ * @param {unknown} value
+ * @returns {number|null} The integer, or null when it isn't a positive integer.
+ */
+function parsePositiveInt(value) {
+    const n = typeof value === 'number' ? Math.trunc(value) : parseInt(value, 10);
+    return (Number.isFinite(n) && n > 0) ? n : null;
+}
+
+/**
+ * A positive-integer setting (response lengths, turn counts), else `fallback`.
+ *
+ * @param {object} settings
+ * @param {string} key
+ * @param {number} fallback
+ * @returns {number}
+ */
+function positiveIntSetting(settings, key, fallback) {
+    return parsePositiveInt(settings?.[key]) ?? fallback;
+}
+
 ;// ./src/phrasing.js
 /**
  * Phrasing module — enriches messages with AI-generated narration via
  * prompt injection + impersonate/swipe flows.
  */
+
 
 
 
@@ -5124,11 +5188,11 @@ function isPhrasing() {
 // ─── Prompt Management ───
 
 function getActivePrompt() {
-    return phrasing_ctx.settings.phrasingPrompt || DEFAULT_PHRASING_PROMPT;
+    return templateSetting(phrasing_ctx.settings, 'phrasingPrompt', DEFAULT_PHRASING_PROMPT);
 }
 
 function getActiveInversePrompt() {
-    return phrasing_ctx.settings.phrasingInversePrompt || DEFAULT_PHRASING_INVERSE_PROMPT;
+    return templateSetting(phrasing_ctx.settings, 'phrasingInversePrompt', DEFAULT_PHRASING_INVERSE_PROMPT);
 }
 
 function formatSwipesContext(swipes, speakerName) {
@@ -5978,6 +6042,7 @@ function initPhrasing({ settings, possessionApi: pApi, directorApi: dApi }) {
 
 
 
+
 // ─── Constants ───
 
 // {{phrasingSeed}} and {{bannedPhrases}} are substituted by the Phrasing
@@ -6139,15 +6204,11 @@ function getMaxRetries() {
 }
 
 function getPromptTemplate() {
-    return (phrase_ban_moduleSettings?.phraseBanPrompt && phrase_ban_moduleSettings.phraseBanPrompt.trim())
-        ? phrase_ban_moduleSettings.phraseBanPrompt
-        : DEFAULT_PHRASE_BAN_PROMPT;
+    return templateSetting(phrase_ban_moduleSettings, 'phraseBanPrompt', DEFAULT_PHRASE_BAN_PROMPT);
 }
 
 function getProactivePromptTemplate() {
-    return (phrase_ban_moduleSettings?.phraseBanProactivePrompt && phrase_ban_moduleSettings.phraseBanProactivePrompt.trim())
-        ? phrase_ban_moduleSettings.phraseBanProactivePrompt
-        : DEFAULT_PHRASE_BAN_PROACTIVE_PROMPT;
+    return templateSetting(phrase_ban_moduleSettings, 'phraseBanProactivePrompt', DEFAULT_PHRASE_BAN_PROACTIVE_PROMPT);
 }
 
 // ─── Proactive: Per-chat Learned List ───
@@ -7409,6 +7470,7 @@ function setupToolPresets({ toolKey, label, containerId, fields, responseLength 
 
 
 
+
 // ─── Default Prompt ───
 
 // {{context}} and {{brief}} are this extension's placeholders (substituted
@@ -7609,7 +7671,7 @@ function bindACCSettings(saveSettings) {
         });
     }
     if (promptArea) {
-        promptArea.value = assisted_character_creation_moduleSettings.accPrompt || DEFAULT_ACC_PROMPT;
+        promptArea.value = assisted_character_creation_getPromptTemplate();
         promptArea.addEventListener('input', () => {
             assisted_character_creation_moduleSettings.accPrompt = promptArea.value;
             saveSettings();
@@ -7618,7 +7680,7 @@ function bindACCSettings(saveSettings) {
 
     const prefillArea = document.getElementById('acc_prefill_textarea');
     if (prefillArea) {
-        prefillArea.value = assisted_character_creation_moduleSettings.accPrefill || DEFAULT_ACC_PREFILL;
+        prefillArea.value = getPrefill();
         prefillArea.addEventListener('input', () => {
             assisted_character_creation_moduleSettings.accPrefill = prefillArea.value;
             saveSettings();
@@ -8116,28 +8178,19 @@ async function generateContinuation(brief, existing, ctxOptions) {
 }
 
 function assisted_character_creation_getPromptTemplate() {
-    const stored = assisted_character_creation_moduleSettings?.accPrompt;
-    return (typeof stored === 'string' && stored.trim()) ? stored : DEFAULT_ACC_PROMPT;
+    return templateSetting(assisted_character_creation_moduleSettings, 'accPrompt', DEFAULT_ACC_PROMPT);
 }
 
 function getPrefill() {
-    const stored = assisted_character_creation_moduleSettings?.accPrefill;
-    return (typeof stored === 'string' && stored.length > 0) ? stored : DEFAULT_ACC_PREFILL;
+    return textSetting(assisted_character_creation_moduleSettings, 'accPrefill', DEFAULT_ACC_PREFILL);
 }
 
 function getResponseLength() {
-    const input = document.getElementById('acc_response_length');
-    if (input) {
-        const parsed = parseInt(input.value, 10);
-        if (!isNaN(parsed) && parsed > 0) return parsed;
-    }
-    return getSavedResponseLength();
+    return parsePositiveInt(document.getElementById('acc_response_length')?.value) ?? getSavedResponseLength();
 }
 
 function getSavedResponseLength() {
-    const setting = assisted_character_creation_moduleSettings?.accResponseLength;
-    if (typeof setting === 'number' && setting > 0) return setting;
-    return DEFAULT_ACC_RESPONSE_LENGTH;
+    return positiveIntSetting(assisted_character_creation_moduleSettings, 'accResponseLength', DEFAULT_ACC_RESPONSE_LENGTH);
 }
 
 async function buildPreambleBlock(ctxOptions) {
@@ -8256,6 +8309,7 @@ function setStatusBar(message) {
 
 
 
+
 // ─── Default Prompt ───
 
 // {{context}} and {{guidance}} are this extension's placeholders
@@ -8332,22 +8386,16 @@ let saveSettingsCb = null;
 const entryStates = new Map(); // id -> { hasGenerated, generating, activeAction }
 
 function getWIAResponseLength() {
-    const n = world_info_assist_moduleSettings?.wiaResponseLength;
-    return (typeof n === 'number' && n > 0) ? n : DEFAULT_WIA_RESPONSE_LENGTH;
+    return positiveIntSetting(world_info_assist_moduleSettings, 'wiaResponseLength', DEFAULT_WIA_RESPONSE_LENGTH);
 }
 
 function resolveWIAPrefill(title) {
     const trimmedTitle = (title || '').trim();
     if (trimmedTitle) {
-        const tpl = (typeof world_info_assist_moduleSettings?.wiaPrefillTitled === 'string' && world_info_assist_moduleSettings.wiaPrefillTitled)
-            ? world_info_assist_moduleSettings.wiaPrefillTitled
-            : DEFAULT_WIA_PREFILL_TITLED;
+        const tpl = textSetting(world_info_assist_moduleSettings, 'wiaPrefillTitled', DEFAULT_WIA_PREFILL_TITLED);
         return __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParamsExtended__(tpl, { title: trimmedTitle });
     }
-    const tpl = (typeof world_info_assist_moduleSettings?.wiaPrefillUntitled === 'string' && world_info_assist_moduleSettings.wiaPrefillUntitled)
-        ? world_info_assist_moduleSettings.wiaPrefillUntitled
-        : DEFAULT_WIA_PREFILL_UNTITLED;
-    return __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParamsExtended__(tpl, {});
+    return __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_substituteParamsExtended__(textSetting(world_info_assist_moduleSettings, 'wiaPrefillUntitled', DEFAULT_WIA_PREFILL_UNTITLED), {});
 }
 
 // ─── Init ───
@@ -8779,9 +8827,7 @@ function setUIState(formEl, state, activeAction = null) {
 // ─── Generation ───
 
 function getWIAPromptTemplate() {
-    return (world_info_assist_moduleSettings?.wiaPrompt && world_info_assist_moduleSettings.wiaPrompt.trim())
-        ? world_info_assist_moduleSettings.wiaPrompt
-        : DEFAULT_WIA_PROMPT;
+    return templateSetting(world_info_assist_moduleSettings, 'wiaPrompt', DEFAULT_WIA_PROMPT);
 }
 
 /**
@@ -9033,7 +9079,7 @@ function bindWIASettings(saveSettings) {
 
     const prefillTitledArea = document.getElementById('wia_prefill_titled_textarea');
     if (prefillTitledArea) {
-        prefillTitledArea.value = world_info_assist_moduleSettings.wiaPrefillTitled || DEFAULT_WIA_PREFILL_TITLED;
+        prefillTitledArea.value = textSetting(world_info_assist_moduleSettings, 'wiaPrefillTitled', DEFAULT_WIA_PREFILL_TITLED);
         prefillTitledArea.addEventListener('input', () => {
             world_info_assist_moduleSettings.wiaPrefillTitled = prefillTitledArea.value;
             saveSettings();
@@ -9042,7 +9088,7 @@ function bindWIASettings(saveSettings) {
 
     const prefillUntitledArea = document.getElementById('wia_prefill_untitled_textarea');
     if (prefillUntitledArea) {
-        prefillUntitledArea.value = world_info_assist_moduleSettings.wiaPrefillUntitled || DEFAULT_WIA_PREFILL_UNTITLED;
+        prefillUntitledArea.value = textSetting(world_info_assist_moduleSettings, 'wiaPrefillUntitled', DEFAULT_WIA_PREFILL_UNTITLED);
         prefillUntitledArea.addEventListener('input', () => {
             world_info_assist_moduleSettings.wiaPrefillUntitled = prefillUntitledArea.value;
             saveSettings();
@@ -9341,6 +9387,7 @@ function parseStateReply(text, variables) {
  *
  * Discovery and reply parsing are pure helpers in character-state-parsing.js.
  */
+
 
 
 
@@ -10055,24 +10102,19 @@ async function character_state_buildPreambleBlock(ctxOptions) {
 }
 
 function character_state_getPromptTemplate() {
-    const stored = character_state_moduleSettings?.characterStatePrompt;
-    return (typeof stored === 'string' && stored.trim()) ? stored : DEFAULT_CHARACTER_STATE_PROMPT;
+    return templateSetting(character_state_moduleSettings, 'characterStatePrompt', DEFAULT_CHARACTER_STATE_PROMPT);
 }
 
 function character_state_getPrefill() {
-    const stored = character_state_moduleSettings?.characterStatePrefill;
-    return typeof stored === 'string' ? stored : DEFAULT_CHARACTER_STATE_PREFILL;
+    return textSetting(character_state_moduleSettings, 'characterStatePrefill', DEFAULT_CHARACTER_STATE_PREFILL);
 }
 
 function character_state_getResponseLength() {
-    const parsed = parseInt(document.getElementById('cs_response_length')?.value, 10);
-    if (!isNaN(parsed) && parsed > 0) return parsed;
-    return character_state_getSavedResponseLength();
+    return parsePositiveInt(document.getElementById('cs_response_length')?.value) ?? character_state_getSavedResponseLength();
 }
 
 function character_state_getSavedResponseLength() {
-    const setting = character_state_moduleSettings?.characterStateResponseLength;
-    return (typeof setting === 'number' && setting > 0) ? setting : DEFAULT_CHARACTER_STATE_RESPONSE_LENGTH;
+    return positiveIntSetting(character_state_moduleSettings, 'characterStateResponseLength', DEFAULT_CHARACTER_STATE_RESPONSE_LENGTH);
 }
 
 function character_state_stopGeneration() {
@@ -10367,6 +10409,7 @@ function registerCharacterStateSlashCommand() {
 
 
 
+
 // ─── Constants ───
 
 const NG_METADATA_KEY = 'narrativeGuidance';
@@ -10459,6 +10502,11 @@ function settingKey(track, suffix) {
 
 function getSetting(track, suffix) {
     return narrative_guidance_moduleSettings?.[settingKey(track, suffix)];
+}
+
+/** The track's prefill — literal, so a cleared field sends none. */
+function narrative_guidance_getPrefill(track) {
+    return textSetting(narrative_guidance_moduleSettings, settingKey(track, 'GenerationPrompt'), track.defaultGenerationPrompt);
 }
 
 function domId(track, suffix) {
@@ -10763,7 +10811,7 @@ function showNGPromptPreview(track) {
     const sampleLong = track.hierarchical
         ? 'Long-term story direction to stay consistent with:\n(the active long-term guidance)\n\n'
         : '';
-    const prefill = getSetting(track, 'GenerationPrompt') || track.defaultGenerationPrompt;
+    const prefill = narrative_guidance_getPrefill(track);
     const injectionTpl = getSetting(track, 'InjectionPrompt') || track.defaultInjectionPrompt;
     const injection = applyTemplateMacros(injectionTpl, {
         guidance: '(the generated guidance text, outer brackets stripped)',
@@ -10839,7 +10887,7 @@ async function regenGuidance(track, reason) {
 
         const longGuidanceBlock = track.hierarchical ? buildLongGuidanceBlock() : '';
 
-        const prefill = getSetting(track, 'GenerationPrompt') || track.defaultGenerationPrompt;
+        const prefill = narrative_guidance_getPrefill(track);
 
         const currentGuidanceBlock = buildCurrentGuidanceBlock(track, state.guidance);
 
@@ -11467,7 +11515,7 @@ function bindTrackControls(track, saveSettings) {
 
     const genArea = trackEl(track, 'generation_prompt_textarea');
     if (genArea) {
-        genArea.value = getSetting(track, 'GenerationPrompt') || track.defaultGenerationPrompt;
+        genArea.value = narrative_guidance_getPrefill(track);
         genArea.addEventListener('input', () => {
             narrative_guidance_moduleSettings[settingKey(track, 'GenerationPrompt')] = genArea.value;
             saveSettings();
@@ -11752,6 +11800,7 @@ function initNarrativeGuidance({ settings }) {
 
 
 
+
 // ─── Constants ───
 
 // {{message}} is this extension's placeholder (substituted by
@@ -11883,20 +11932,19 @@ function applyRulesReformat(text) {
 // ─── LLM Engine ───
 
 function getReformattingResponseLength() {
-    const n = reformatting_moduleSettings?.reformattingResponseLength;
-    return (typeof n === 'number' && n > 0) ? n : DEFAULT_REFORMATTING_RESPONSE_LENGTH;
+    return positiveIntSetting(reformatting_moduleSettings, 'reformattingResponseLength', DEFAULT_REFORMATTING_RESPONSE_LENGTH);
 }
 
 function getReformattingPromptTemplate() {
-    return (reformatting_moduleSettings?.reformattingPrompt && reformatting_moduleSettings.reformattingPrompt.trim())
-        ? reformatting_moduleSettings.reformattingPrompt
-        : DEFAULT_REFORMATTING_PROMPT;
+    return templateSetting(reformatting_moduleSettings, 'reformattingPrompt', DEFAULT_REFORMATTING_PROMPT);
 }
 
 function getReformattingSystemPrompt() {
-    return (reformatting_moduleSettings?.reformattingSystemPrompt && reformatting_moduleSettings.reformattingSystemPrompt.trim())
-        ? reformatting_moduleSettings.reformattingSystemPrompt
-        : DEFAULT_REFORMATTING_SYSTEM_PROMPT;
+    return templateSetting(reformatting_moduleSettings, 'reformattingSystemPrompt', DEFAULT_REFORMATTING_SYSTEM_PROMPT);
+}
+
+function getReformattingPrefill() {
+    return textSetting(reformatting_moduleSettings, 'reformattingPrefill', DEFAULT_REFORMATTING_PREFILL);
 }
 
 /**
@@ -11916,9 +11964,7 @@ function composeReformattingPrompt(message) {
  * Throws AbortError if cancelled (caller suppresses via isSilentGenerationAbort).
  */
 async function runLLMReformat(text) {
-    const prefill = (typeof reformatting_moduleSettings?.reformattingPrefill === 'string')
-        ? reformatting_moduleSettings.reformattingPrefill
-        : DEFAULT_REFORMATTING_PREFILL;
+    const prefill = getReformattingPrefill();
     const userPrompt = composeReformattingPrompt(text);
 
     reformatting_debug('LLM reformat — prompt length:', userPrompt.length, 'prefill:', prefill);
@@ -12219,9 +12265,7 @@ function bindReformattingSettings(saveSettings) {
 
     const prefillArea = document.getElementById('reformatting_prefill_textarea');
     if (prefillArea) {
-        prefillArea.value = typeof reformatting_moduleSettings.reformattingPrefill === 'string'
-            ? reformatting_moduleSettings.reformattingPrefill
-            : DEFAULT_REFORMATTING_PREFILL;
+        prefillArea.value = getReformattingPrefill();
         prefillArea.addEventListener('input', () => {
             reformatting_moduleSettings.reformattingPrefill = prefillArea.value;
             saveSettings();
@@ -12245,9 +12289,7 @@ function showReformattingPromptPreview() {
     const sampleMessage =
         'CharacterName: *He danced around the room laughing hysterically.* '
         + '"What am I doing? I don\'t even know!"';
-    const prefill = typeof reformatting_moduleSettings?.reformattingPrefill === 'string'
-        ? reformatting_moduleSettings.reformattingPrefill
-        : DEFAULT_REFORMATTING_PREFILL;
+    const prefill = getReformattingPrefill();
     showPromptPreview('Reformatting — LLM Prompt Preview', [
         { label: 'System Prompt', text: getReformattingSystemPrompt() },
         { label: 'User Prompt (template with a sample message)', text: composeReformattingPrompt(sampleMessage) },
@@ -12312,6 +12354,7 @@ function registerReformattingSlashCommand() {
 // (`hostScript.doNewChat?.(...)`) and fall back to confirmed primitives if a
 // build ever lacks the export. The webpack externals rule passes the `../`
 // request through unchanged, so the namespace resolves at runtime.
+
 
 
 
@@ -12419,18 +12462,15 @@ function initCompaction({ settings, saveSettings, resyncChatState }) {
 // ─── Settings Helpers ───
 
 function getSummaryTemplate() {
-    const stored = compaction_moduleSettings?.compactionSummaryPrompt;
-    return (typeof stored === 'string' && stored.trim()) ? stored : DEFAULT_COMPACTION_SUMMARY_PROMPT;
+    return templateSetting(compaction_moduleSettings, 'compactionSummaryPrompt', DEFAULT_COMPACTION_SUMMARY_PROMPT);
 }
 
 function compaction_getPrefill() {
-    const stored = compaction_moduleSettings?.compactionSummaryPrefill;
-    return (typeof stored === 'string') ? stored : DEFAULT_COMPACTION_SUMMARY_PREFILL;
+    return textSetting(compaction_moduleSettings, 'compactionSummaryPrefill', DEFAULT_COMPACTION_SUMMARY_PREFILL);
 }
 
 function getTailLength() {
-    const n = compaction_moduleSettings?.compactionTailLength;
-    return (Number.isFinite(n) && n > 0) ? Math.floor(n) : DEFAULT_COMPACTION_TAIL_LENGTH;
+    return positiveIntSetting(compaction_moduleSettings, 'compactionTailLength', DEFAULT_COMPACTION_TAIL_LENGTH);
 }
 
 function getThresholdRatio() {
@@ -12440,14 +12480,8 @@ function getThresholdRatio() {
 }
 
 function compaction_getResponseLength() {
-    const input = document.getElementById('cc_response_length');
-    if (input) {
-        const parsed = parseInt(input.value, 10);
-        if (!isNaN(parsed) && parsed > 0) return parsed;
-    }
-    const setting = compaction_moduleSettings?.compactionSummaryResponseLength;
-    if (typeof setting === 'number' && setting > 0) return setting;
-    return DEFAULT_COMPACTION_RESPONSE_LENGTH;
+    return parsePositiveInt(document.getElementById('cc_response_length')?.value)
+        ?? positiveIntSetting(compaction_moduleSettings, 'compactionSummaryResponseLength', DEFAULT_COMPACTION_RESPONSE_LENGTH);
 }
 
 // ─── Per-chat Guidance Persistence ───
@@ -13784,6 +13818,7 @@ const IMAGE_PROMPT_PRESETS_SPEC = {
  * copied / deleted from the Saved Prompts section of the modal, so a good
  * prompt bound to a scene can be retrieved later in that chat.
  */
+
 
 
 
@@ -15159,28 +15194,19 @@ async function image_prompting_generateContinuation(guidance, existing, ctxOptio
 }
 
 function image_prompting_getPromptTemplate() {
-    const stored = image_prompting_moduleSettings?.imagePromptPrompt;
-    return (typeof stored === 'string' && stored.trim()) ? stored : DEFAULT_IMAGE_PROMPT_PROMPT;
+    return templateSetting(image_prompting_moduleSettings, 'imagePromptPrompt', DEFAULT_IMAGE_PROMPT_PROMPT);
 }
 
 function image_prompting_getPrefill() {
-    const stored = image_prompting_moduleSettings?.imagePromptPrefill;
-    return (typeof stored === 'string') ? stored : DEFAULT_IMAGE_PROMPT_PREFILL;
+    return textSetting(image_prompting_moduleSettings, 'imagePromptPrefill', DEFAULT_IMAGE_PROMPT_PREFILL);
 }
 
 function image_prompting_getResponseLength() {
-    const input = document.getElementById('ip_response_length');
-    if (input) {
-        const parsed = parseInt(input.value, 10);
-        if (!isNaN(parsed) && parsed > 0) return parsed;
-    }
-    return image_prompting_getSavedResponseLength();
+    return parsePositiveInt(document.getElementById('ip_response_length')?.value) ?? image_prompting_getSavedResponseLength();
 }
 
 function image_prompting_getSavedResponseLength() {
-    const setting = image_prompting_moduleSettings?.imagePromptResponseLength;
-    if (typeof setting === 'number' && setting > 0) return setting;
-    return DEFAULT_IMAGE_PROMPT_RESPONSE_LENGTH;
+    return positiveIntSetting(image_prompting_moduleSettings, 'imagePromptResponseLength', DEFAULT_IMAGE_PROMPT_RESPONSE_LENGTH);
 }
 
 async function image_prompting_buildPreambleBlock(ctxOptions) {

@@ -28,6 +28,7 @@ import {
     saveWIAEntryGuidanceDebounced,
     flushWIAEntryGuidanceSave,
 } from './utils.js';
+import { templateSetting, textSetting, positiveIntSetting } from './settings-helpers.js';
 import {
     isSilentGenerationAbort,
     abortAllGenerations,
@@ -110,22 +111,16 @@ let saveSettingsCb = null;
 const entryStates = new Map(); // id -> { hasGenerated, generating, activeAction }
 
 function getWIAResponseLength() {
-    const n = moduleSettings?.wiaResponseLength;
-    return (typeof n === 'number' && n > 0) ? n : DEFAULT_WIA_RESPONSE_LENGTH;
+    return positiveIntSetting(moduleSettings, 'wiaResponseLength', DEFAULT_WIA_RESPONSE_LENGTH);
 }
 
 function resolveWIAPrefill(title) {
     const trimmedTitle = (title || '').trim();
     if (trimmedTitle) {
-        const tpl = (typeof moduleSettings?.wiaPrefillTitled === 'string' && moduleSettings.wiaPrefillTitled)
-            ? moduleSettings.wiaPrefillTitled
-            : DEFAULT_WIA_PREFILL_TITLED;
+        const tpl = textSetting(moduleSettings, 'wiaPrefillTitled', DEFAULT_WIA_PREFILL_TITLED);
         return substituteParamsExtended(tpl, { title: trimmedTitle });
     }
-    const tpl = (typeof moduleSettings?.wiaPrefillUntitled === 'string' && moduleSettings.wiaPrefillUntitled)
-        ? moduleSettings.wiaPrefillUntitled
-        : DEFAULT_WIA_PREFILL_UNTITLED;
-    return substituteParamsExtended(tpl, {});
+    return substituteParamsExtended(textSetting(moduleSettings, 'wiaPrefillUntitled', DEFAULT_WIA_PREFILL_UNTITLED), {});
 }
 
 // ─── Init ───
@@ -557,9 +552,7 @@ function setUIState(formEl, state, activeAction = null) {
 // ─── Generation ───
 
 function getWIAPromptTemplate() {
-    return (moduleSettings?.wiaPrompt && moduleSettings.wiaPrompt.trim())
-        ? moduleSettings.wiaPrompt
-        : DEFAULT_WIA_PROMPT;
+    return templateSetting(moduleSettings, 'wiaPrompt', DEFAULT_WIA_PROMPT);
 }
 
 /**
@@ -811,7 +804,7 @@ export function bindWIASettings(saveSettings) {
 
     const prefillTitledArea = document.getElementById('wia_prefill_titled_textarea');
     if (prefillTitledArea) {
-        prefillTitledArea.value = moduleSettings.wiaPrefillTitled || DEFAULT_WIA_PREFILL_TITLED;
+        prefillTitledArea.value = textSetting(moduleSettings, 'wiaPrefillTitled', DEFAULT_WIA_PREFILL_TITLED);
         prefillTitledArea.addEventListener('input', () => {
             moduleSettings.wiaPrefillTitled = prefillTitledArea.value;
             saveSettings();
@@ -820,7 +813,7 @@ export function bindWIASettings(saveSettings) {
 
     const prefillUntitledArea = document.getElementById('wia_prefill_untitled_textarea');
     if (prefillUntitledArea) {
-        prefillUntitledArea.value = moduleSettings.wiaPrefillUntitled || DEFAULT_WIA_PREFILL_UNTITLED;
+        prefillUntitledArea.value = textSetting(moduleSettings, 'wiaPrefillUntitled', DEFAULT_WIA_PREFILL_UNTITLED);
         prefillUntitledArea.addEventListener('input', () => {
             moduleSettings.wiaPrefillUntitled = prefillUntitledArea.value;
             saveSettings();

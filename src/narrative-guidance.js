@@ -54,6 +54,7 @@ import {
     stripOuterBrackets,
     showPromptPreview,
 } from './utils.js';
+import { textSetting } from './settings-helpers.js';
 import {
     findTaggedScenarios,
     characterFileName,
@@ -157,6 +158,11 @@ function settingKey(track, suffix) {
 
 function getSetting(track, suffix) {
     return moduleSettings?.[settingKey(track, suffix)];
+}
+
+/** The track's prefill — literal, so a cleared field sends none. */
+function getPrefill(track) {
+    return textSetting(moduleSettings, settingKey(track, 'GenerationPrompt'), track.defaultGenerationPrompt);
 }
 
 function domId(track, suffix) {
@@ -461,7 +467,7 @@ function showNGPromptPreview(track) {
     const sampleLong = track.hierarchical
         ? 'Long-term story direction to stay consistent with:\n(the active long-term guidance)\n\n'
         : '';
-    const prefill = getSetting(track, 'GenerationPrompt') || track.defaultGenerationPrompt;
+    const prefill = getPrefill(track);
     const injectionTpl = getSetting(track, 'InjectionPrompt') || track.defaultInjectionPrompt;
     const injection = applyTemplateMacros(injectionTpl, {
         guidance: '(the generated guidance text, outer brackets stripped)',
@@ -537,7 +543,7 @@ async function regenGuidance(track, reason) {
 
         const longGuidanceBlock = track.hierarchical ? buildLongGuidanceBlock() : '';
 
-        const prefill = getSetting(track, 'GenerationPrompt') || track.defaultGenerationPrompt;
+        const prefill = getPrefill(track);
 
         const currentGuidanceBlock = buildCurrentGuidanceBlock(track, state.guidance);
 
@@ -1165,7 +1171,7 @@ function bindTrackControls(track, saveSettings) {
 
     const genArea = trackEl(track, 'generation_prompt_textarea');
     if (genArea) {
-        genArea.value = getSetting(track, 'GenerationPrompt') || track.defaultGenerationPrompt;
+        genArea.value = getPrefill(track);
         genArea.addEventListener('input', () => {
             moduleSettings[settingKey(track, 'GenerationPrompt')] = genArea.value;
             saveSettings();

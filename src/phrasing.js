@@ -21,6 +21,7 @@ import {
     waitForGenerationEnd,
     showPromptPreview,
 } from './utils.js';
+import { templateSetting } from './settings-helpers.js';
 
 // ─── Constants ───
 
@@ -72,11 +73,11 @@ export function isPhrasing() {
 // ─── Prompt Management ───
 
 function getActivePrompt() {
-    return ctx.settings.phrasingPrompt || DEFAULT_PHRASING_PROMPT;
+    return templateSetting(ctx.settings, 'phrasingPrompt', DEFAULT_PHRASING_PROMPT);
 }
 
 function getActiveInversePrompt() {
-    return ctx.settings.phrasingInversePrompt || DEFAULT_PHRASING_INVERSE_PROMPT;
+    return templateSetting(ctx.settings, 'phrasingInversePrompt', DEFAULT_PHRASING_INVERSE_PROMPT);
 }
 
 function formatSwipesContext(swipes, speakerName) {

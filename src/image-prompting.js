@@ -37,6 +37,7 @@ import {
     showPromptPreview,
     copyTextToClipboard,
 } from './utils.js';
+import { templateSetting, textSetting, parsePositiveInt, positiveIntSetting } from './settings-helpers.js';
 import {
     abortAllGenerations,
     isSilentGenerationAbort,
@@ -1427,28 +1428,19 @@ async function generateContinuation(guidance, existing, ctxOptions) {
 }
 
 function getPromptTemplate() {
-    const stored = moduleSettings?.imagePromptPrompt;
-    return (typeof stored === 'string' && stored.trim()) ? stored : DEFAULT_IMAGE_PROMPT_PROMPT;
+    return templateSetting(moduleSettings, 'imagePromptPrompt', DEFAULT_IMAGE_PROMPT_PROMPT);
 }
 
 function getPrefill() {
-    const stored = moduleSettings?.imagePromptPrefill;
-    return (typeof stored === 'string') ? stored : DEFAULT_IMAGE_PROMPT_PREFILL;
+    return textSetting(moduleSettings, 'imagePromptPrefill', DEFAULT_IMAGE_PROMPT_PREFILL);
 }
 
 function getResponseLength() {
-    const input = document.getElementById('ip_response_length');
-    if (input) {
-        const parsed = parseInt(input.value, 10);
-        if (!isNaN(parsed) && parsed > 0) return parsed;
-    }
-    return getSavedResponseLength();
+    return parsePositiveInt(document.getElementById('ip_response_length')?.value) ?? getSavedResponseLength();
 }
 
 function getSavedResponseLength() {
-    const setting = moduleSettings?.imagePromptResponseLength;
-    if (typeof setting === 'number' && setting > 0) return setting;
-    return DEFAULT_IMAGE_PROMPT_RESPONSE_LENGTH;
+    return positiveIntSetting(moduleSettings, 'imagePromptResponseLength', DEFAULT_IMAGE_PROMPT_RESPONSE_LENGTH);
 }
 
 async function buildPreambleBlock(ctxOptions) {

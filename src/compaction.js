@@ -51,6 +51,7 @@ import {
     showPromptPreview,
     estimateChatTokens,
 } from './utils.js';
+import { templateSetting, textSetting, parsePositiveInt, positiveIntSetting } from './settings-helpers.js';
 import {
     abortAllGenerations,
     isSilentGenerationAbort,
@@ -153,18 +154,15 @@ export function initCompaction({ settings, saveSettings, resyncChatState }) {
 // ─── Settings Helpers ───
 
 function getSummaryTemplate() {
-    const stored = moduleSettings?.compactionSummaryPrompt;
-    return (typeof stored === 'string' && stored.trim()) ? stored : DEFAULT_COMPACTION_SUMMARY_PROMPT;
+    return templateSetting(moduleSettings, 'compactionSummaryPrompt', DEFAULT_COMPACTION_SUMMARY_PROMPT);
 }
 
 function getPrefill() {
-    const stored = moduleSettings?.compactionSummaryPrefill;
-    return (typeof stored === 'string') ? stored : DEFAULT_COMPACTION_SUMMARY_PREFILL;
+    return textSetting(moduleSettings, 'compactionSummaryPrefill', DEFAULT_COMPACTION_SUMMARY_PREFILL);
 }
 
 function getTailLength() {
-    const n = moduleSettings?.compactionTailLength;
-    return (Number.isFinite(n) && n > 0) ? Math.floor(n) : DEFAULT_COMPACTION_TAIL_LENGTH;
+    return positiveIntSetting(moduleSettings, 'compactionTailLength', DEFAULT_COMPACTION_TAIL_LENGTH);
 }
 
 function getThresholdRatio() {
@@ -174,14 +172,8 @@ function getThresholdRatio() {
 }
 
 function getResponseLength() {
-    const input = document.getElementById('cc_response_length');
-    if (input) {
-        const parsed = parseInt(input.value, 10);
-        if (!isNaN(parsed) && parsed > 0) return parsed;
-    }
-    const setting = moduleSettings?.compactionSummaryResponseLength;
-    if (typeof setting === 'number' && setting > 0) return setting;
-    return DEFAULT_COMPACTION_RESPONSE_LENGTH;
+    return parsePositiveInt(document.getElementById('cc_response_length')?.value)
+        ?? positiveIntSetting(moduleSettings, 'compactionSummaryResponseLength', DEFAULT_COMPACTION_RESPONSE_LENGTH);
 }
 
 // ─── Per-chat Guidance Persistence ───
