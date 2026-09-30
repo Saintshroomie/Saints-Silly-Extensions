@@ -63,7 +63,7 @@ import { oai_settings, getChatCompletionModel, createGenerationParameters } from
 import { getTextGenGenerationData } from '../../../../textgen-settings.js';
 import { kai_settings, kai_flags, getKoboldGenerationData, generateKoboldWithStreaming } from '../../../../kai-settings.js';
 import { nai_settings, getNovelGenerationData, generateNovelWithStreaming } from '../../../../nai-settings.js';
-import { getContext, createDebugLogger } from './utils.js';
+import { getContext, createDebugLogger, createSettingsBinder } from './utils.js';
 
 // ─── Module State ───
 
@@ -97,24 +97,9 @@ export function initSilentGeneration({ settings }) {
  * @param {() => void} saveSettings - Persist callback.
  */
 export function bindSilentGenerationSettings(saveSettings) {
-    const debugCb = document.getElementById('silent_generation_debug_mode');
-    if (debugCb) {
-        debugCb.checked = !!moduleSettings?.silentGenerationDebugMode;
-        debugCb.addEventListener('change', () => {
-            if (moduleSettings) moduleSettings.silentGenerationDebugMode = debugCb.checked;
-            saveSettings();
-            debug('Debug mode toggled:', debugCb.checked);
-        });
-    }
-    const streamingCb = document.getElementById('silent_generation_streaming');
-    if (streamingCb) {
-        streamingCb.checked = moduleSettings?.silentGenerationStreaming !== false;
-        streamingCb.addEventListener('change', () => {
-            if (moduleSettings) moduleSettings.silentGenerationStreaming = streamingCb.checked;
-            saveSettings();
-            debug('Streaming toggled:', streamingCb.checked);
-        });
-    }
+    const bind = createSettingsBinder(moduleSettings, saveSettings);
+    bind.checkbox('silent_generation_debug_mode', 'silentGenerationDebugMode');
+    bind.checkbox('silent_generation_streaming', 'silentGenerationStreaming');
 }
 
 // ─── Public API ───

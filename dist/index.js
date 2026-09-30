@@ -2780,24 +2780,9 @@ function initSilentGeneration({ settings }) {
  * @param {() => void} saveSettings - Persist callback.
  */
 function bindSilentGenerationSettings(saveSettings) {
-    const debugCb = document.getElementById('silent_generation_debug_mode');
-    if (debugCb) {
-        debugCb.checked = !!moduleSettings?.silentGenerationDebugMode;
-        debugCb.addEventListener('change', () => {
-            if (moduleSettings) moduleSettings.silentGenerationDebugMode = debugCb.checked;
-            saveSettings();
-            debug('Debug mode toggled:', debugCb.checked);
-        });
-    }
-    const streamingCb = document.getElementById('silent_generation_streaming');
-    if (streamingCb) {
-        streamingCb.checked = moduleSettings?.silentGenerationStreaming !== false;
-        streamingCb.addEventListener('change', () => {
-            if (moduleSettings) moduleSettings.silentGenerationStreaming = streamingCb.checked;
-            saveSettings();
-            debug('Streaming toggled:', streamingCb.checked);
-        });
-    }
+    const bind = createSettingsBinder(moduleSettings, saveSettings);
+    bind.checkbox('silent_generation_debug_mode', 'silentGenerationDebugMode');
+    bind.checkbox('silent_generation_streaming', 'silentGenerationStreaming');
 }
 
 // ─── Public API ───
@@ -3500,6 +3485,93 @@ function saveExtensionSettings(extensionName, settings) {
     const context = getContext();
     context.extensionSettings[extensionName] = { ...settings };
     context.saveSettingsDebounced();
+}
+
+// ─── Settings Panel Binding ───
+
+/**
+ * Two-way binders between settings-panel controls and the shared settings
+ * object. Each fills its control from `settings`, then writes user changes
+ * back and calls `save()`; `onChange(value)` runs after the save. A missing
+ * element is skipped, so binding never throws on a partial panel.
+ *
+ * Text binders listen on `input`, which is also what the preset widgets
+ * dispatch when they load a preset — that's how a preset load persists.
+ *
+ * @param {object} settings - The shared settings object.
+ * @param {() => void} save - Persists settings.
+ *
+ * @example
+ *   const bind = createSettingsBinder(moduleSettings, saveSettings);
+ *   bind.checkbox('acc_enabled', 'accEnabled');
+ *   bind.number('acc_max_context_override', 'accMaxContextOverride', { zeroMeansOff: true });
+ *   bind.text('acc_prompt_textarea', 'accPrompt', getPromptTemplate());
+ */
+function createSettingsBinder(settings, save) {
+    const byId = id => document.getElementById(id);
+    return {
+        /** Boolean setting ↔ checkbox. */
+        checkbox(id, key, onChange) {
+            const el = byId(id);
+            if (!el) return;
+            el.checked = !!settings[key];
+            el.addEventListener('change', () => {
+                settings[key] = el.checked;
+                save();
+                onChange?.(el.checked);
+            });
+        },
+
+        /** String setting ↔ `<select>`; shows `fallback` while unset. */
+        select(id, key, fallback, onChange) {
+            const el = byId(id);
+            if (!el) return;
+            el.value = settings[key] || fallback;
+            el.addEventListener('change', () => {
+                settings[key] = el.value;
+                save();
+                onChange?.(el.value);
+            });
+        },
+
+        /**
+         * String setting ↔ textarea / text input. `initial` is what to show
+         * (usually the tool's resolved getter, so a blank template shows its
+         * default); the raw typed text is what's stored.
+         */
+        text(id, key, initial, onChange) {
+            const el = byId(id);
+            if (!el) return;
+            el.value = initial ?? settings[key] ?? '';
+            el.addEventListener('input', () => {
+                settings[key] = el.value;
+                save();
+                onChange?.(el.value);
+            });
+        },
+
+        /**
+         * Integer setting ↔ number input. Values in [min, max] are stored;
+         * anything else is ignored — or, with `zeroMeansOff`, stored as 0
+         * (the "no override" value of the Max Context Override fields).
+         * Shows `fallback` while the stored value is out of range.
+         */
+        number(id, key, { fallback = 0, min = 1, max = Infinity, zeroMeansOff = false, onChange } = {}) {
+            const el = byId(id);
+            if (!el) return;
+            const inRange = n => Number.isFinite(n) && n >= min && n <= max;
+            const stored = settings[key];
+            el.value = (inRange(stored) || (zeroMeansOff && stored === 0)) ? stored : fallback;
+            el.addEventListener('input', () => {
+                const n = parseInt(el.value, 10);
+                if (inRange(n)) settings[key] = n;
+                else if (zeroMeansOff) settings[key] = 0;
+                else return;
+                save();
+                onChange?.(settings[key]);
+            });
+        },
+    };
 }
 
 // ─── Message Edit Helpers ───
@@ -4981,34 +5053,10 @@ function onGroupWrapperFinished() {
 // ─── Settings Panel ───
 
 function bindPossessionSettings(saveSettings) {
-    const possessionEnabled = document.getElementById('possession_enabled');
-    if (possessionEnabled) {
-        possessionEnabled.checked = ctx.settings.possessionEnabled;
-        possessionEnabled.addEventListener('change', (e) => {
-            ctx.settings.possessionEnabled = e.target.checked;
-            saveSettings();
-            syncAllPossessionUI();
-        });
-    }
-
-    const possessionShowToast = document.getElementById('possession_show_toast');
-    if (possessionShowToast) {
-        possessionShowToast.checked = ctx.settings.possessionShowToast;
-        possessionShowToast.addEventListener('change', (e) => {
-            ctx.settings.possessionShowToast = e.target.checked;
-            saveSettings();
-        });
-    }
-
-    const possessionDebugMode = document.getElementById('possession_debug_mode');
-    if (possessionDebugMode) {
-        possessionDebugMode.checked = ctx.settings.possessionDebugMode;
-        possessionDebugMode.addEventListener('change', (e) => {
-            ctx.settings.possessionDebugMode = e.target.checked;
-            saveSettings();
-            possession_debug('debugMode toggled to', ctx.settings.possessionDebugMode);
-        });
-    }
+    const bind = createSettingsBinder(ctx.settings, saveSettings);
+    bind.checkbox('possession_enabled', 'possessionEnabled', syncAllPossessionUI);
+    bind.checkbox('possession_show_toast', 'possessionShowToast');
+    bind.checkbox('possession_debug_mode', 'possessionDebugMode');
 }
 
 // ─── Slash Commands ───
@@ -5909,63 +5957,13 @@ function createHamburgerMenuItem() {
 // ─── Settings Panel ───
 
 function bindPhrasingSettings(saveSettings) {
-    const phrasingEnabled = document.getElementById('phrasing_enabled');
-    if (phrasingEnabled) {
-        phrasingEnabled.checked = phrasing_ctx.settings.phrasingEnabled;
-        phrasingEnabled.addEventListener('change', (e) => {
-            phrasing_ctx.settings.phrasingEnabled = e.target.checked;
-            saveSettings();
-            applyPhrasingEnabledState();
-        });
-    }
-
-    const phrasingAutoEnabled = document.getElementById('phrasing_auto_enabled');
-    if (phrasingAutoEnabled) {
-        phrasingAutoEnabled.checked = phrasing_ctx.settings.phrasingAutoEnabled;
-        phrasingAutoEnabled.addEventListener('change', (e) => {
-            phrasing_ctx.settings.phrasingAutoEnabled = e.target.checked;
-            saveSettings();
-            phrasing_debug('autoPhrasing toggled to', phrasing_ctx.settings.phrasingAutoEnabled);
-        });
-    }
-
-    const phrasingDebugMode = document.getElementById('phrasing_debug_mode');
-    if (phrasingDebugMode) {
-        phrasingDebugMode.checked = phrasing_ctx.settings.phrasingDebugMode;
-        phrasingDebugMode.addEventListener('change', (e) => {
-            phrasing_ctx.settings.phrasingDebugMode = e.target.checked;
-            saveSettings();
-            phrasing_debug('debugMode toggled to', phrasing_ctx.settings.phrasingDebugMode);
-        });
-    }
-
-    const phrasingInverseGuidance = document.getElementById('phrasing_inverse_guidance');
-    if (phrasingInverseGuidance) {
-        phrasingInverseGuidance.checked = phrasing_ctx.settings.phrasingInverseGuidance;
-        phrasingInverseGuidance.addEventListener('change', (e) => {
-            phrasing_ctx.settings.phrasingInverseGuidance = e.target.checked;
-            saveSettings();
-            phrasing_debug('inverseGuidance toggled to', phrasing_ctx.settings.phrasingInverseGuidance);
-        });
-    }
-
-    const phrasingPromptArea = document.getElementById('phrasing_prompt_textarea');
-    if (phrasingPromptArea) {
-        phrasingPromptArea.value = phrasing_ctx.settings.phrasingPrompt || DEFAULT_PHRASING_PROMPT;
-        phrasingPromptArea.addEventListener('input', () => {
-            phrasing_ctx.settings.phrasingPrompt = phrasingPromptArea.value;
-            saveSettings();
-        });
-    }
-
-    const phrasingInverseArea = document.getElementById('phrasing_inverse_prompt_textarea');
-    if (phrasingInverseArea) {
-        phrasingInverseArea.value = phrasing_ctx.settings.phrasingInversePrompt || DEFAULT_PHRASING_INVERSE_PROMPT;
-        phrasingInverseArea.addEventListener('input', () => {
-            phrasing_ctx.settings.phrasingInversePrompt = phrasingInverseArea.value;
-            saveSettings();
-        });
-    }
+    const bind = createSettingsBinder(phrasing_ctx.settings, saveSettings);
+    bind.checkbox('phrasing_enabled', 'phrasingEnabled', applyPhrasingEnabledState);
+    bind.checkbox('phrasing_auto_enabled', 'phrasingAutoEnabled');
+    bind.checkbox('phrasing_debug_mode', 'phrasingDebugMode');
+    bind.checkbox('phrasing_inverse_guidance', 'phrasingInverseGuidance');
+    bind.text('phrasing_prompt_textarea', 'phrasingPrompt', getActivePrompt());
+    bind.text('phrasing_inverse_prompt_textarea', 'phrasingInversePrompt', getActiveInversePrompt());
 
     document.getElementById('phrasing_preview_btn')
         ?.addEventListener('click', showPhrasingPromptPreview);
@@ -6636,72 +6634,20 @@ function refreshLearnedPanel() {
 }
 
 function bindPhraseBanSettings(saveSettings) {
-    const enabledCb = document.getElementById('phrase_ban_enabled');
-    if (enabledCb) {
-        enabledCb.checked = !!phrase_ban_moduleSettings.phraseBanEnabled;
-        enabledCb.addEventListener('change', () => {
-            phrase_ban_moduleSettings.phraseBanEnabled = enabledCb.checked;
-            saveSettings();
-            reapplyProactiveInjection();
-        });
-    }
-
-    const autoCb = document.getElementById('phrase_ban_auto');
-    if (autoCb) {
-        autoCb.checked = !!phrase_ban_moduleSettings.phraseBanAuto;
-        autoCb.addEventListener('change', () => {
-            phrase_ban_moduleSettings.phraseBanAuto = autoCb.checked;
-            saveSettings();
-        });
-    }
-
-    const proactiveCb = document.getElementById('phrase_ban_proactive');
-    if (proactiveCb) {
-        proactiveCb.checked = !!phrase_ban_moduleSettings.phraseBanProactive;
-        proactiveCb.addEventListener('change', () => {
-            phrase_ban_moduleSettings.phraseBanProactive = proactiveCb.checked;
-            saveSettings();
-            reapplyProactiveInjection();
-        });
-    }
-
-    const depthInput = document.getElementById('phrase_ban_injection_depth');
-    if (depthInput) {
-        const configuredDepth = phrase_ban_moduleSettings.phraseBanInjectionDepth;
-        depthInput.value = Number.isFinite(configuredDepth) ? configuredDepth : DEFAULT_PHRASE_BAN_INJECTION_DEPTH;
-        depthInput.addEventListener('input', () => {
-            const n = parseInt(depthInput.value, 10);
-            if (Number.isFinite(n) && n >= 0) {
-                phrase_ban_moduleSettings.phraseBanInjectionDepth = n;
-                saveSettings();
-                reapplyProactiveInjection();
-            }
-        });
-    }
-
-    const roleSelect = document.getElementById('phrase_ban_injection_role');
-    if (roleSelect) {
-        roleSelect.value = phrase_ban_moduleSettings.phraseBanInjectionRole || DEFAULT_PHRASE_BAN_INJECTION_ROLE;
-        roleSelect.addEventListener('change', () => {
-            phrase_ban_moduleSettings.phraseBanInjectionRole = roleSelect.value;
-            saveSettings();
-            reapplyProactiveInjection();
-        });
-    }
-
-    const proactivePromptArea = document.getElementById('phrase_ban_proactive_prompt_textarea');
-    if (proactivePromptArea) {
-        proactivePromptArea.value = phrase_ban_moduleSettings.phraseBanProactivePrompt || DEFAULT_PHRASE_BAN_PROACTIVE_PROMPT;
-        proactivePromptArea.addEventListener('input', () => {
-            const value = proactivePromptArea.value;
-            phrase_ban_moduleSettings.phraseBanProactivePrompt = value;
-            saveSettings();
-            if (value.trim() && !value.includes('{{bannedPhrases}}')) {
-                toast('Warning: Proactive template lacks {{bannedPhrases}}; the AI won\'t see the learned list.', 'warning', 'Phrase Ban');
-            }
-            reapplyProactiveInjection();
-        });
-    }
+    const bind = createSettingsBinder(phrase_ban_moduleSettings, saveSettings);
+    bind.checkbox('phrase_ban_enabled', 'phraseBanEnabled', reapplyProactiveInjection);
+    bind.checkbox('phrase_ban_auto', 'phraseBanAuto');
+    bind.checkbox('phrase_ban_proactive', 'phraseBanProactive', reapplyProactiveInjection);
+    bind.number('phrase_ban_injection_depth', 'phraseBanInjectionDepth', {
+        min: 0, fallback: DEFAULT_PHRASE_BAN_INJECTION_DEPTH, onChange: reapplyProactiveInjection,
+    });
+    bind.select('phrase_ban_injection_role', 'phraseBanInjectionRole', DEFAULT_PHRASE_BAN_INJECTION_ROLE, reapplyProactiveInjection);
+    bind.text('phrase_ban_proactive_prompt_textarea', 'phraseBanProactivePrompt', getProactivePromptTemplate(), (value) => {
+        if (value.trim() && !value.includes('{{bannedPhrases}}')) {
+            toast('Warning: Proactive template lacks {{bannedPhrases}}; the AI won\'t see the learned list.', 'warning', 'Phrase Ban');
+        }
+        reapplyProactiveInjection();
+    });
 
     const learnedArea = document.getElementById('phrase_ban_learned_textarea');
     if (learnedArea) {
@@ -6722,49 +6668,15 @@ function bindPhraseBanSettings(saveSettings) {
 
     refreshLearnedPanel();
 
-    const retriesInput = document.getElementById('phrase_ban_max_retries');
-    if (retriesInput) {
-        retriesInput.value = getMaxRetries();
-        retriesInput.addEventListener('input', () => {
-            const n = parseInt(retriesInput.value, 10);
-            if (Number.isFinite(n) && n >= 0) {
-                phrase_ban_moduleSettings.phraseBanMaxRetries = n;
-                saveSettings();
-            }
-        });
-    }
-
-    const patternsArea = document.getElementById('phrase_ban_patterns_textarea');
-    if (patternsArea) {
-        patternsArea.value = phrase_ban_moduleSettings.phraseBanPatterns || '';
-        patternsArea.addEventListener('input', () => {
-            phrase_ban_moduleSettings.phraseBanPatterns = patternsArea.value;
-            saveSettings();
-            updatePatternStatus();
-        });
-        updatePatternStatus();
-    }
-
-    const promptArea = document.getElementById('phrase_ban_prompt_textarea');
-    if (promptArea) {
-        promptArea.value = phrase_ban_moduleSettings.phraseBanPrompt || DEFAULT_PHRASE_BAN_PROMPT;
-        promptArea.addEventListener('input', () => {
-            phrase_ban_moduleSettings.phraseBanPrompt = promptArea.value;
-            saveSettings();
-        });
-    }
+    bind.number('phrase_ban_max_retries', 'phraseBanMaxRetries', { min: 0, fallback: DEFAULT_PHRASE_BAN_MAX_RETRIES });
+    bind.text('phrase_ban_patterns_textarea', 'phraseBanPatterns', phrase_ban_moduleSettings.phraseBanPatterns || '', updatePatternStatus);
+    updatePatternStatus();
+    bind.text('phrase_ban_prompt_textarea', 'phraseBanPrompt', getPromptTemplate());
 
     document.getElementById('phrase_ban_preview_btn')
         ?.addEventListener('click', showPhraseBanPromptPreview);
 
-    const debugCb = document.getElementById('phrase_ban_debug_mode');
-    if (debugCb) {
-        debugCb.checked = !!phrase_ban_moduleSettings.phraseBanDebugMode;
-        debugCb.addEventListener('change', () => {
-            phrase_ban_moduleSettings.phraseBanDebugMode = debugCb.checked;
-            saveSettings();
-        });
-    }
+    bind.checkbox('phrase_ban_debug_mode', 'phraseBanDebugMode');
 }
 
 function showPhraseBanPromptPreview() {
@@ -7666,49 +7578,12 @@ function assisted_character_creation_onCharacterPageLoaded() {
  * @param {function} saveSettings
  */
 function bindACCSettings(saveSettings) {
-    const enabledCb = document.getElementById('acc_enabled');
-    const debugCb = document.getElementById('acc_debug_mode');
-    const promptArea = document.getElementById('acc_prompt_textarea');
-
-    if (enabledCb) {
-        enabledCb.checked = assisted_character_creation_moduleSettings.accEnabled;
-        enabledCb.addEventListener('change', () => {
-            assisted_character_creation_moduleSettings.accEnabled = enabledCb.checked;
-            saveSettings();
-        });
-    }
-    if (debugCb) {
-        debugCb.checked = assisted_character_creation_moduleSettings.accDebugMode;
-        debugCb.addEventListener('change', () => {
-            assisted_character_creation_moduleSettings.accDebugMode = debugCb.checked;
-            saveSettings();
-        });
-    }
-    const maxContextInput = document.getElementById('acc_max_context_override');
-    if (maxContextInput) {
-        maxContextInput.value = assisted_character_creation_moduleSettings.accMaxContextOverride || 0;
-        maxContextInput.addEventListener('input', () => {
-            const n = parseInt(maxContextInput.value, 10);
-            assisted_character_creation_moduleSettings.accMaxContextOverride = Number.isFinite(n) && n > 0 ? n : 0;
-            saveSettings();
-        });
-    }
-    if (promptArea) {
-        promptArea.value = assisted_character_creation_getPromptTemplate();
-        promptArea.addEventListener('input', () => {
-            assisted_character_creation_moduleSettings.accPrompt = promptArea.value;
-            saveSettings();
-        });
-    }
-
-    const prefillArea = document.getElementById('acc_prefill_textarea');
-    if (prefillArea) {
-        prefillArea.value = getPrefill();
-        prefillArea.addEventListener('input', () => {
-            assisted_character_creation_moduleSettings.accPrefill = prefillArea.value;
-            saveSettings();
-        });
-    }
+    const bind = createSettingsBinder(assisted_character_creation_moduleSettings, saveSettings);
+    bind.checkbox('acc_enabled', 'accEnabled');
+    bind.checkbox('acc_debug_mode', 'accDebugMode');
+    bind.number('acc_max_context_override', 'accMaxContextOverride', { zeroMeansOff: true });
+    bind.text('acc_prompt_textarea', 'accPrompt', assisted_character_creation_getPromptTemplate());
+    bind.text('acc_prefill_textarea', 'accPrefill', getPrefill());
 
     document.getElementById('acc_preview_btn')
         ?.addEventListener('click', showACCPromptPreview);
@@ -9034,89 +8909,18 @@ async function onRetry(formEl, id) {
  */
 function bindWIASettings(saveSettings) {
     saveSettingsCb = saveSettings;
-
-    const enabledCb = document.getElementById('wia_enabled');
-    const debugCb = document.getElementById('wia_debug_mode');
-    const promptArea = document.getElementById('wia_prompt_textarea');
-
-    if (enabledCb) {
-        enabledCb.checked = !!world_info_assist_moduleSettings.wiaEnabled;
-        enabledCb.addEventListener('change', () => {
-            world_info_assist_moduleSettings.wiaEnabled = enabledCb.checked;
-            saveSettings();
-            if (world_info_assist_moduleSettings.wiaEnabled) {
-                rescanAllForms();
-            } else {
-                removeAllControls();
-            }
-        });
-    }
-    const copyBtnCb = document.getElementById('wia_copy_button_enabled');
-    if (copyBtnCb) {
-        copyBtnCb.checked = !!world_info_assist_moduleSettings.wiaCopyButtonEnabled;
-        copyBtnCb.addEventListener('change', () => {
-            world_info_assist_moduleSettings.wiaCopyButtonEnabled = copyBtnCb.checked;
-            saveSettings();
-            if (world_info_assist_moduleSettings.wiaCopyButtonEnabled) {
-                rescanAllForms();
-            } else {
-                removeCopyButtons();
-            }
-        });
-    }
-    if (debugCb) {
-        debugCb.checked = !!world_info_assist_moduleSettings.wiaDebugMode;
-        debugCb.addEventListener('change', () => {
-            world_info_assist_moduleSettings.wiaDebugMode = debugCb.checked;
-            saveSettings();
-        });
-    }
-    const maxContextInput = document.getElementById('wia_max_context_override');
-    if (maxContextInput) {
-        maxContextInput.value = world_info_assist_moduleSettings.wiaMaxContextOverride || 0;
-        maxContextInput.addEventListener('input', () => {
-            const n = parseInt(maxContextInput.value, 10);
-            world_info_assist_moduleSettings.wiaMaxContextOverride = Number.isFinite(n) && n > 0 ? n : 0;
-            saveSettings();
-        });
-    }
-    const responseLengthInput = document.getElementById('wia_response_length');
-    if (responseLengthInput) {
-        responseLengthInput.value = world_info_assist_moduleSettings.wiaResponseLength || DEFAULT_WIA_RESPONSE_LENGTH;
-        responseLengthInput.addEventListener('input', () => {
-            const n = parseInt(responseLengthInput.value, 10);
-            if (Number.isFinite(n) && n > 0) {
-                world_info_assist_moduleSettings.wiaResponseLength = n;
-                saveSettings();
-                document.querySelectorAll('.wia-tokens-input').forEach(el => { el.value = n; });
-            }
-        });
-    }
-    if (promptArea) {
-        promptArea.value = world_info_assist_moduleSettings.wiaPrompt || DEFAULT_WIA_PROMPT;
-        promptArea.addEventListener('input', () => {
-            world_info_assist_moduleSettings.wiaPrompt = promptArea.value;
-            saveSettings();
-        });
-    }
-
-    const prefillTitledArea = document.getElementById('wia_prefill_titled_textarea');
-    if (prefillTitledArea) {
-        prefillTitledArea.value = textSetting(world_info_assist_moduleSettings, 'wiaPrefillTitled', DEFAULT_WIA_PREFILL_TITLED);
-        prefillTitledArea.addEventListener('input', () => {
-            world_info_assist_moduleSettings.wiaPrefillTitled = prefillTitledArea.value;
-            saveSettings();
-        });
-    }
-
-    const prefillUntitledArea = document.getElementById('wia_prefill_untitled_textarea');
-    if (prefillUntitledArea) {
-        prefillUntitledArea.value = textSetting(world_info_assist_moduleSettings, 'wiaPrefillUntitled', DEFAULT_WIA_PREFILL_UNTITLED);
-        prefillUntitledArea.addEventListener('input', () => {
-            world_info_assist_moduleSettings.wiaPrefillUntitled = prefillUntitledArea.value;
-            saveSettings();
-        });
-    }
+    const bind = createSettingsBinder(world_info_assist_moduleSettings, saveSettings);
+    bind.checkbox('wia_enabled', 'wiaEnabled', on => (on ? rescanAllForms() : removeAllControls()));
+    bind.checkbox('wia_copy_button_enabled', 'wiaCopyButtonEnabled', on => (on ? rescanAllForms() : removeCopyButtons()));
+    bind.checkbox('wia_debug_mode', 'wiaDebugMode');
+    bind.number('wia_max_context_override', 'wiaMaxContextOverride', { zeroMeansOff: true });
+    bind.number('wia_response_length', 'wiaResponseLength', {
+        fallback: DEFAULT_WIA_RESPONSE_LENGTH,
+        onChange: n => document.querySelectorAll('.wia-tokens-input').forEach(el => { el.value = n; }),
+    });
+    bind.text('wia_prompt_textarea', 'wiaPrompt', getWIAPromptTemplate());
+    bind.text('wia_prefill_titled_textarea', 'wiaPrefillTitled', textSetting(world_info_assist_moduleSettings, 'wiaPrefillTitled', DEFAULT_WIA_PREFILL_TITLED));
+    bind.text('wia_prefill_untitled_textarea', 'wiaPrefillUntitled', textSetting(world_info_assist_moduleSettings, 'wiaPrefillUntitled', DEFAULT_WIA_PREFILL_UNTITLED));
 
     document.getElementById('wia_preview_btn')
         ?.addEventListener('click', showWIAPromptPreview);
@@ -10271,44 +10075,15 @@ function onCharacterStateGroupUpdated() {
 // ─── Settings Bindings ───
 
 function bindCharacterStateSettings(saveSettings) {
-    const bindCheckbox = (id, key, after) => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.checked = !!character_state_moduleSettings[key];
-        el.addEventListener('change', () => {
-            character_state_moduleSettings[key] = el.checked;
-            saveSettings();
-            after?.();
-        });
-    };
-    bindCheckbox('character_state_enabled', 'characterStateEnabled', syncCharacterStateButtons);
-    bindCheckbox('character_state_debug_mode', 'characterStateDebugMode');
-
-    const bindTextarea = (id, key, fallback) => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        const stored = character_state_moduleSettings[key];
-        el.value = typeof stored === 'string' ? stored : fallback;
-        el.addEventListener('input', () => {
-            character_state_moduleSettings[key] = el.value;
-            saveSettings();
-        });
-    };
-    bindTextarea('character_state_prompt_textarea', 'characterStatePrompt', DEFAULT_CHARACTER_STATE_PROMPT);
-    bindTextarea('character_state_prefill_textarea', 'characterStatePrefill', DEFAULT_CHARACTER_STATE_PREFILL);
-
-    const bindNumber = (id, key, fallback) => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.value = character_state_moduleSettings[key] || fallback;
-        el.addEventListener('input', () => {
-            const n = parseInt(el.value, 10);
-            character_state_moduleSettings[key] = Number.isFinite(n) && n > 0 ? n : fallback;
-            saveSettings();
-        });
-    };
-    bindNumber('character_state_response_length', 'characterStateResponseLength', DEFAULT_CHARACTER_STATE_RESPONSE_LENGTH);
-    bindNumber('character_state_max_context_override', 'characterStateMaxContextOverride', 0);
+    const bind = createSettingsBinder(character_state_moduleSettings, saveSettings);
+    bind.checkbox('character_state_enabled', 'characterStateEnabled', syncCharacterStateButtons);
+    bind.checkbox('character_state_debug_mode', 'characterStateDebugMode');
+    bind.text('character_state_prompt_textarea', 'characterStatePrompt', character_state_getPromptTemplate());
+    bind.text('character_state_prefill_textarea', 'characterStatePrefill', character_state_getPrefill());
+    bind.number('character_state_response_length', 'characterStateResponseLength', {
+        fallback: DEFAULT_CHARACTER_STATE_RESPONSE_LENGTH,
+    });
+    bind.number('character_state_max_context_override', 'characterStateMaxContextOverride', { zeroMeansOff: true });
 
     document.getElementById('character_state_preview_btn')
         ?.addEventListener('click', showCharacterStatePromptPreview);
@@ -10511,6 +10286,16 @@ function getSetting(track, suffix) {
     return narrative_guidance_moduleSettings?.[settingKey(track, suffix)];
 }
 
+/** The track's generation instructions (blank → the track's default). */
+function getUserPrompt(track) {
+    return templateSetting(narrative_guidance_moduleSettings, settingKey(track, 'Prompt'), track.defaultUserPrompt);
+}
+
+/** The track's injection wrapper (blank → the track's default). */
+function getInjectionTemplate(track) {
+    return templateSetting(narrative_guidance_moduleSettings, settingKey(track, 'InjectionPrompt'), track.defaultInjectionPrompt);
+}
+
 /** The track's prefill — literal, so a cleared field sends none. */
 function narrative_guidance_getPrefill(track) {
     return textSetting(narrative_guidance_moduleSettings, settingKey(track, 'GenerationPrompt'), track.defaultGenerationPrompt);
@@ -10614,8 +10399,7 @@ function scheduleChatStateSave(track, state) {
 }
 
 function resolveTurnCount(track) {
-    const n = getSetting(track, 'DefaultTurnCount');
-    return Number.isFinite(n) && n > 0 ? n : track.defaultTurnCount;
+    return positiveIntSetting(narrative_guidance_moduleSettings, settingKey(track, 'DefaultTurnCount'), track.defaultTurnCount);
 }
 
 // ─── Chat Characters & Lore ───
@@ -10708,7 +10492,7 @@ function reapplyInjection(track) {
         clearInjection(track);
         return;
     }
-    const tpl = getSetting(track, 'InjectionPrompt') || track.defaultInjectionPrompt;
+    const tpl = getInjectionTemplate(track);
     // state.guidance retains the generation prefill (so the textarea shows
     // it). Strip outer brackets here so {{guidance}} substitutes cleanly
     // into whatever injection template the user has configured.
@@ -10745,11 +10529,7 @@ function reapplyInjection(track) {
  * then long-term arc, then themes), matching the pre-template behavior.
  */
 function composeGenerationPrompt(track, preambleBlock, themesBlock, longGuidanceBlock, currentGuidanceBlock = '') {
-    const configured = getSetting(track, 'Prompt');
-    const tpl = (typeof configured === 'string' && configured.trim())
-        ? configured
-        : track.defaultUserPrompt;
-    const { text, used } = applyTemplateMacros(tpl, {
+    const { text, used } = applyTemplateMacros(getUserPrompt(track), {
         context: preambleBlock || '',
         themes: themesBlock || '',
         longGuidance: longGuidanceBlock || '',
@@ -10791,7 +10571,7 @@ function showNGPromptPreview(track) {
         ? 'Long-term story direction to stay consistent with:\n(the active long-term guidance)\n\n'
         : '';
     const prefill = narrative_guidance_getPrefill(track);
-    const injectionTpl = getSetting(track, 'InjectionPrompt') || track.defaultInjectionPrompt;
+    const injectionTpl = getInjectionTemplate(track);
     const injection = applyTemplateMacros(injectionTpl, {
         guidance: '(the generated guidance text, outer brackets stripped)',
     }).text;
@@ -11421,121 +11201,32 @@ function populateLoreBookPicker(track) {
 
 /** Bind every per-track control in the settings panel for one track. */
 function bindTrackControls(track, saveSettings) {
-    const enabledCb = trackEl(track, 'enabled');
-    if (enabledCb) {
-        enabledCb.checked = !!getSetting(track, 'Enabled');
-        enabledCb.addEventListener('change', () => {
-            narrative_guidance_moduleSettings[settingKey(track, 'Enabled')] = enabledCb.checked;
-            saveSettings();
-            if (enabledCb.checked) {
-                reapplyInjection(track);
-            } else {
-                clearInjection(track);
-            }
-        });
-    }
+    const bind = createSettingsBinder(narrative_guidance_moduleSettings, saveSettings);
+    const id = suffix => domId(track, suffix);
+    const key = suffix => settingKey(track, suffix);
+    const reapply = () => reapplyInjection(track);
 
-    const autoRegenCb = trackEl(track, 'auto_regen');
-    if (autoRegenCb) {
-        autoRegenCb.checked = !!getSetting(track, 'AutoRegen');
-        autoRegenCb.addEventListener('change', () => {
-            narrative_guidance_moduleSettings[settingKey(track, 'AutoRegen')] = autoRegenCb.checked;
-            saveSettings();
-        });
-    }
-
-    const turnCountInput = trackEl(track, 'default_turn_count');
-    if (turnCountInput) {
-        turnCountInput.value = getSetting(track, 'DefaultTurnCount') || track.defaultTurnCount;
-        turnCountInput.addEventListener('input', () => {
-            const n = parseInt(turnCountInput.value, 10);
-            if (Number.isFinite(n) && n > 0) {
-                narrative_guidance_moduleSettings[settingKey(track, 'DefaultTurnCount')] = n;
-                saveSettings();
-            }
-        });
-    }
-
-    const responseLengthInput = trackEl(track, 'response_length');
-    if (responseLengthInput) {
-        responseLengthInput.value = getSetting(track, 'ResponseLength') || DEFAULT_NG_RESPONSE_LENGTH;
-        responseLengthInput.addEventListener('input', () => {
-            const n = parseInt(responseLengthInput.value, 10);
-            if (Number.isFinite(n) && n > 0) {
-                narrative_guidance_moduleSettings[settingKey(track, 'ResponseLength')] = n;
-                saveSettings();
-            }
-        });
-    }
-
-    const maxContextInput = trackEl(track, 'max_context_override');
-    if (maxContextInput) {
-        maxContextInput.value = getSetting(track, 'MaxContextOverride') || 0;
-        maxContextInput.addEventListener('input', () => {
-            const n = parseInt(maxContextInput.value, 10);
-            narrative_guidance_moduleSettings[settingKey(track, 'MaxContextOverride')] = Number.isFinite(n) && n > 0 ? n : 0;
-            saveSettings();
-        });
-    }
-
-    const userPromptArea = trackEl(track, 'user_prompt_textarea');
-    if (userPromptArea) {
-        userPromptArea.value = getSetting(track, 'Prompt') || track.defaultUserPrompt;
-        userPromptArea.addEventListener('input', () => {
-            narrative_guidance_moduleSettings[settingKey(track, 'Prompt')] = userPromptArea.value;
-            saveSettings();
-        });
-    }
-
-    const genArea = trackEl(track, 'generation_prompt_textarea');
-    if (genArea) {
-        genArea.value = narrative_guidance_getPrefill(track);
-        genArea.addEventListener('input', () => {
-            narrative_guidance_moduleSettings[settingKey(track, 'GenerationPrompt')] = genArea.value;
-            saveSettings();
-        });
-    }
-
-    const injectArea = trackEl(track, 'injection_prompt_textarea');
-    if (injectArea) {
-        injectArea.value = getSetting(track, 'InjectionPrompt') || track.defaultInjectionPrompt;
-        injectArea.addEventListener('input', () => {
-            const value = injectArea.value;
-            narrative_guidance_moduleSettings[settingKey(track, 'InjectionPrompt')] = value;
-            saveSettings();
+    bind.checkbox(id('enabled'), key('Enabled'), on => (on ? reapplyInjection(track) : clearInjection(track)));
+    bind.checkbox(id('auto_regen'), key('AutoRegen'));
+    bind.number(id('default_turn_count'), key('DefaultTurnCount'), { fallback: track.defaultTurnCount });
+    bind.number(id('response_length'), key('ResponseLength'), { fallback: DEFAULT_NG_RESPONSE_LENGTH });
+    bind.number(id('max_context_override'), key('MaxContextOverride'), { zeroMeansOff: true });
+    bind.text(id('user_prompt_textarea'), key('Prompt'),
+        getUserPrompt(track));
+    bind.text(id('generation_prompt_textarea'), key('GenerationPrompt'), narrative_guidance_getPrefill(track));
+    bind.text(id('injection_prompt_textarea'), key('InjectionPrompt'),
+        getInjectionTemplate(track), (value) => {
             if (value.trim() && !value.includes('{{guidance}}')) {
                 toast('Warning: Injection template lacks {{guidance}}; the AI won\'t see the guidance text.', 'warning');
             }
-            reapplyInjection(track);
+            reapply();
         });
-    }
 
     trackEl(track, 'preview_btn')
         ?.addEventListener('click', () => showNGPromptPreview(track));
 
-    const depthInput = trackEl(track, 'injection_depth');
-    if (depthInput) {
-        const configuredDepth = getSetting(track, 'InjectionDepth');
-        depthInput.value = Number.isFinite(configuredDepth) ? configuredDepth : DEFAULT_NG_INJECTION_DEPTH;
-        depthInput.addEventListener('input', () => {
-            const n = parseInt(depthInput.value, 10);
-            if (Number.isFinite(n) && n >= 0) {
-                narrative_guidance_moduleSettings[settingKey(track, 'InjectionDepth')] = n;
-                saveSettings();
-                reapplyInjection(track);
-            }
-        });
-    }
-
-    const scanCb = trackEl(track, 'scan_world_info');
-    if (scanCb) {
-        scanCb.checked = getSetting(track, 'ScanWorldInfo') !== false;
-        scanCb.addEventListener('change', () => {
-            narrative_guidance_moduleSettings[settingKey(track, 'ScanWorldInfo')] = scanCb.checked;
-            saveSettings();
-            reapplyInjection(track);
-        });
-    }
+    bind.number(id('injection_depth'), key('InjectionDepth'), { min: 0, fallback: DEFAULT_NG_INJECTION_DEPTH, onChange: reapply });
+    bind.checkbox(id('scan_world_info'), key('ScanWorldInfo'), reapply);
 
     trackEl(track, 'lorebooks_reset')?.addEventListener('click', () => {
         const state = loadChatState(track);
@@ -11547,15 +11238,7 @@ function bindTrackControls(track, saveSettings) {
         narrative_guidance_debug(`[${track.id}] Lore books reset to the chat's own`);
     });
 
-    const roleSelect = trackEl(track, 'injection_role');
-    if (roleSelect) {
-        roleSelect.value = getSetting(track, 'InjectionRole') || DEFAULT_NG_INJECTION_ROLE;
-        roleSelect.addEventListener('change', () => {
-            narrative_guidance_moduleSettings[settingKey(track, 'InjectionRole')] = roleSelect.value;
-            saveSettings();
-            reapplyInjection(track);
-        });
-    }
+    bind.select(id('injection_role'), key('InjectionRole'), DEFAULT_NG_INJECTION_ROLE, reapply);
 
     const themesArea = trackEl(track, 'themes_textarea');
     if (themesArea) {
@@ -11658,16 +11341,7 @@ function bindNarrativeGuidanceSettings(saveSettings) {
         bindTrackControls(track, saveSettings);
     }
     bindScenarioControls();
-
-    // Shared (non per-track) controls.
-    const debugCb = document.getElementById('ng_debug_mode');
-    if (debugCb) {
-        debugCb.checked = !!narrative_guidance_moduleSettings.narrativeGuidanceDebugMode;
-        debugCb.addEventListener('change', () => {
-            narrative_guidance_moduleSettings.narrativeGuidanceDebugMode = debugCb.checked;
-            saveSettings();
-        });
-    }
+    createSettingsBinder(narrative_guidance_moduleSettings, saveSettings).checkbox('ng_debug_mode', 'narrativeGuidanceDebugMode');
 }
 
 // ─── Settings Migration ───
@@ -12156,37 +11830,19 @@ function startReformattingObserver() {
 // ─── Settings Panel ───
 
 function bindReformattingSettings(saveSettings) {
-    const enabledCb = document.getElementById('reformatting_enabled');
-    if (enabledCb) {
-        enabledCb.checked = !!reformatting_moduleSettings.reformattingEnabled;
-        enabledCb.addEventListener('change', () => {
-            reformatting_moduleSettings.reformattingEnabled = enabledCb.checked;
-            saveSettings();
-            if (reformatting_moduleSettings.reformattingEnabled) {
-                rescanReformatButtons();
-            } else {
-                removeAllReformatButtons();
-            }
-        });
-    }
+    const bind = createSettingsBinder(reformatting_moduleSettings, saveSettings);
+    bind.checkbox('reformatting_enabled', 'reformattingEnabled',
+        on => (on ? rescanReformatButtons() : removeAllReformatButtons()));
 
-    const engineSelect = document.getElementById('reformatting_engine');
-    if (engineSelect) {
-        engineSelect.value = reformatting_moduleSettings.reformattingEngine || 'rules';
-        const syncEngineSections = () => {
-            const isLLM = engineSelect.value === 'llm';
-            document.getElementById('reformatting_rules_section')
-                ?.classList.toggle('reformatting-hidden', isLLM);
-            document.getElementById('reformatting_llm_section')
-                ?.classList.toggle('reformatting-hidden', !isLLM);
-        };
-        engineSelect.addEventListener('change', () => {
-            reformatting_moduleSettings.reformattingEngine = engineSelect.value;
-            saveSettings();
-            syncEngineSections();
-        });
-        syncEngineSections();
-    }
+    const syncEngineSections = () => {
+        const isLLM = reformatting_moduleSettings.reformattingEngine === 'llm';
+        document.getElementById('reformatting_rules_section')
+            ?.classList.toggle('reformatting-hidden', isLLM);
+        document.getElementById('reformatting_llm_section')
+            ?.classList.toggle('reformatting-hidden', !isLLM);
+    };
+    bind.select('reformatting_engine', 'reformattingEngine', 'rules', syncEngineSections);
+    syncEngineSections();
 
     const asteriskMode = reformatting_moduleSettings.reformattingAsteriskMode || 'strip';
     document.querySelectorAll('input[name="reformatting_asterisk_mode"]').forEach((radio) => {
@@ -12198,65 +11854,18 @@ function bindReformattingSettings(saveSettings) {
         });
     });
 
-    const collapseCb = document.getElementById('reformatting_collapse_whitespace');
-    if (collapseCb) {
-        collapseCb.checked = !!reformatting_moduleSettings.reformattingCollapseWhitespace;
-        collapseCb.addEventListener('change', () => {
-            reformatting_moduleSettings.reformattingCollapseWhitespace = collapseCb.checked;
-            saveSettings();
-        });
-    }
-
-    const responseLengthInput = document.getElementById('reformatting_response_length');
-    if (responseLengthInput) {
-        responseLengthInput.value = reformatting_moduleSettings.reformattingResponseLength || DEFAULT_REFORMATTING_RESPONSE_LENGTH;
-        responseLengthInput.addEventListener('input', () => {
-            const n = parseInt(responseLengthInput.value, 10);
-            if (Number.isFinite(n) && n > 0) {
-                reformatting_moduleSettings.reformattingResponseLength = n;
-                saveSettings();
-            }
-        });
-    }
-
-    const systemPromptArea = document.getElementById('reformatting_system_prompt_textarea');
-    if (systemPromptArea) {
-        systemPromptArea.value = reformatting_moduleSettings.reformattingSystemPrompt || DEFAULT_REFORMATTING_SYSTEM_PROMPT;
-        systemPromptArea.addEventListener('input', () => {
-            reformatting_moduleSettings.reformattingSystemPrompt = systemPromptArea.value;
-            saveSettings();
-        });
-    }
-
-    const promptArea = document.getElementById('reformatting_prompt_textarea');
-    if (promptArea) {
-        promptArea.value = reformatting_moduleSettings.reformattingPrompt || DEFAULT_REFORMATTING_PROMPT;
-        promptArea.addEventListener('input', () => {
-            reformatting_moduleSettings.reformattingPrompt = promptArea.value;
-            saveSettings();
-        });
-    }
-
-    const prefillArea = document.getElementById('reformatting_prefill_textarea');
-    if (prefillArea) {
-        prefillArea.value = getReformattingPrefill();
-        prefillArea.addEventListener('input', () => {
-            reformatting_moduleSettings.reformattingPrefill = prefillArea.value;
-            saveSettings();
-        });
-    }
+    bind.checkbox('reformatting_collapse_whitespace', 'reformattingCollapseWhitespace');
+    bind.number('reformatting_response_length', 'reformattingResponseLength', {
+        fallback: DEFAULT_REFORMATTING_RESPONSE_LENGTH,
+    });
+    bind.text('reformatting_system_prompt_textarea', 'reformattingSystemPrompt', getReformattingSystemPrompt());
+    bind.text('reformatting_prompt_textarea', 'reformattingPrompt', getReformattingPromptTemplate());
+    bind.text('reformatting_prefill_textarea', 'reformattingPrefill', getReformattingPrefill());
 
     document.getElementById('reformatting_preview_btn')
         ?.addEventListener('click', showReformattingPromptPreview);
 
-    const debugCb = document.getElementById('reformatting_debug_mode');
-    if (debugCb) {
-        debugCb.checked = !!reformatting_moduleSettings.reformattingDebugMode;
-        debugCb.addEventListener('change', () => {
-            reformatting_moduleSettings.reformattingDebugMode = debugCb.checked;
-            saveSettings();
-        });
-    }
+    bind.checkbox('reformatting_debug_mode', 'reformattingDebugMode');
 }
 
 function showReformattingPromptPreview() {
@@ -12691,68 +12300,27 @@ function createCompactionMenuItem() {
 // ─── Settings Bindings ───
 
 function bindCompactionSettings(saveSettings) {
-    bindCheckbox('compaction_enabled', 'compactionEnabled', saveSettings);
-    bindCheckbox('compaction_auto_enabled', 'compactionAutoEnabled', saveSettings);
-    bindCheckbox('compaction_confirm_auto', 'compactionConfirmAuto', saveSettings);
-    bindCheckbox('compaction_migrate_state', 'compactionMigrateState', saveSettings);
-    bindCheckbox('compaction_debug_mode', 'compactionDebugMode', saveSettings);
+    const bind = createSettingsBinder(compaction_moduleSettings, saveSettings);
+    bind.checkbox('compaction_enabled', 'compactionEnabled');
+    bind.checkbox('compaction_auto_enabled', 'compactionAutoEnabled');
+    bind.checkbox('compaction_confirm_auto', 'compactionConfirmAuto');
+    bind.checkbox('compaction_migrate_state', 'compactionMigrateState');
+    bind.checkbox('compaction_debug_mode', 'compactionDebugMode');
 
-    bindNumber('compaction_threshold_percent', 'compactionThresholdPercent', saveSettings, { min: 1, max: 100 });
-    bindNumber('compaction_tail_length', 'compactionTailLength', saveSettings, { min: 1 });
-    bindNumber('compaction_response_length', 'compactionSummaryResponseLength', saveSettings, { min: 50 });
-    bindNumber('compaction_max_context_override', 'compactionMaxContextOverride', saveSettings, { min: 0, allowZero: true });
+    bind.number('compaction_threshold_percent', 'compactionThresholdPercent', {
+        max: 100, fallback: DEFAULT_COMPACTION_THRESHOLD_PERCENT,
+    });
+    bind.number('compaction_tail_length', 'compactionTailLength', { fallback: DEFAULT_COMPACTION_TAIL_LENGTH });
+    bind.number('compaction_response_length', 'compactionSummaryResponseLength', {
+        min: 50, fallback: DEFAULT_COMPACTION_RESPONSE_LENGTH,
+    });
+    bind.number('compaction_max_context_override', 'compactionMaxContextOverride', { zeroMeansOff: true });
 
-    const promptArea = document.getElementById('compaction_summary_prompt_textarea');
-    if (promptArea) {
-        promptArea.value = compaction_moduleSettings.compactionSummaryPrompt || DEFAULT_COMPACTION_SUMMARY_PROMPT;
-        promptArea.addEventListener('input', () => {
-            compaction_moduleSettings.compactionSummaryPrompt = promptArea.value;
-            saveSettings();
-        });
-    }
-
-    const prefillArea = document.getElementById('compaction_summary_prefill_textarea');
-    if (prefillArea) {
-        prefillArea.value = (typeof compaction_moduleSettings.compactionSummaryPrefill === 'string')
-            ? compaction_moduleSettings.compactionSummaryPrefill
-            : DEFAULT_COMPACTION_SUMMARY_PREFILL;
-        prefillArea.addEventListener('input', () => {
-            compaction_moduleSettings.compactionSummaryPrefill = prefillArea.value;
-            saveSettings();
-        });
-    }
+    bind.text('compaction_summary_prompt_textarea', 'compactionSummaryPrompt', getSummaryTemplate());
+    bind.text('compaction_summary_prefill_textarea', 'compactionSummaryPrefill', compaction_getPrefill());
 
     document.getElementById('compaction_preview_btn')
         ?.addEventListener('click', showCompactionPromptPreview);
-}
-
-function bindCheckbox(id, key, saveSettings) {
-    const cb = document.getElementById(id);
-    if (!cb) return;
-    cb.checked = !!compaction_moduleSettings[key];
-    cb.addEventListener('change', () => {
-        compaction_moduleSettings[key] = cb.checked;
-        saveSettings();
-    });
-}
-
-function bindNumber(id, key, saveSettings, { min = 0, max = Infinity, allowZero = false } = {}) {
-    const input = document.getElementById(id);
-    if (!input) return;
-    input.value = Number.isFinite(compaction_moduleSettings[key]) ? compaction_moduleSettings[key] : 0;
-    input.addEventListener('input', () => {
-        const n = parseInt(input.value, 10);
-        if (!Number.isFinite(n)) return;
-        if (allowZero && n === 0) {
-            compaction_moduleSettings[key] = 0;
-            saveSettings();
-            return;
-        }
-        if (n >= min && n <= max) {
-            compaction_moduleSettings[key] = n;
-            saveSettings();
-        }
-    });
 }
 
 // ─── Prompt Composition ───
@@ -14272,105 +13840,22 @@ function bindImagePromptSettings(saveSettings) {
         }
     };
 
-    const enabledCb = document.getElementById('image_prompt_enabled');
-    if (enabledCb) {
-        enabledCb.checked = image_prompting_moduleSettings.imagePromptEnabled;
-        enabledCb.addEventListener('change', () => {
-            image_prompting_moduleSettings.imagePromptEnabled = enabledCb.checked;
-            saveSettings();
-            syncMessageButtons();
-        });
-    }
-
-    const messageButtonCb = document.getElementById('image_prompt_message_button_enabled');
-    if (messageButtonCb) {
-        messageButtonCb.checked = !!image_prompting_moduleSettings.imagePromptMessageButtonEnabled;
-        messageButtonCb.addEventListener('change', () => {
-            image_prompting_moduleSettings.imagePromptMessageButtonEnabled = messageButtonCb.checked;
-            saveSettings();
-            syncMessageButtons();
-        });
-    }
-
-    const autoGenerateCb = document.getElementById('image_prompt_message_button_autogenerate');
-    if (autoGenerateCb) {
-        autoGenerateCb.checked = !!image_prompting_moduleSettings.imagePromptMessageButtonAutoGenerate;
-        autoGenerateCb.addEventListener('change', () => {
-            image_prompting_moduleSettings.imagePromptMessageButtonAutoGenerate = autoGenerateCb.checked;
-            saveSettings();
-        });
-    }
-
-    const sendToImageGenCb = document.getElementById('image_prompt_send_to_imagegen');
-    if (sendToImageGenCb) {
-        sendToImageGenCb.checked = image_prompting_moduleSettings.imagePromptSendToImageGenEnabled !== false;
-        sendToImageGenCb.addEventListener('change', () => {
-            image_prompting_moduleSettings.imagePromptSendToImageGenEnabled = sendToImageGenCb.checked;
-            saveSettings();
-            // The modal may be open behind the settings drawer.
-            refreshImageGenButton();
-            renderSavedPrompts();
-        });
-    }
-
-    const imageGenQuietCb = document.getElementById('image_prompt_imagegen_quiet');
-    if (imageGenQuietCb) {
-        imageGenQuietCb.checked = !!image_prompting_moduleSettings.imagePromptImageGenQuiet;
-        imageGenQuietCb.addEventListener('change', () => {
-            image_prompting_moduleSettings.imagePromptImageGenQuiet = imageGenQuietCb.checked;
-            saveSettings();
-        });
-    }
-
-    const debugCb = document.getElementById('image_prompt_debug_mode');
-    if (debugCb) {
-        debugCb.checked = image_prompting_moduleSettings.imagePromptDebugMode;
-        debugCb.addEventListener('change', () => {
-            image_prompting_moduleSettings.imagePromptDebugMode = debugCb.checked;
-            saveSettings();
-        });
-    }
-
-    const maxContextInput = document.getElementById('image_prompt_max_context_override');
-    if (maxContextInput) {
-        maxContextInput.value = image_prompting_moduleSettings.imagePromptMaxContextOverride || 0;
-        maxContextInput.addEventListener('input', () => {
-            const n = parseInt(maxContextInput.value, 10);
-            image_prompting_moduleSettings.imagePromptMaxContextOverride = Number.isFinite(n) && n > 0 ? n : 0;
-            saveSettings();
-        });
-    }
-
-    const promptArea = document.getElementById('image_prompt_prompt_textarea');
-    if (promptArea) {
-        promptArea.value = image_prompting_moduleSettings.imagePromptPrompt || DEFAULT_IMAGE_PROMPT_PROMPT;
-        promptArea.addEventListener('input', () => {
-            image_prompting_moduleSettings.imagePromptPrompt = promptArea.value;
-            saveSettings();
-        });
-    }
-
-    const prefillArea = document.getElementById('image_prompt_prefill_textarea');
-    if (prefillArea) {
-        prefillArea.value = (typeof image_prompting_moduleSettings.imagePromptPrefill === 'string')
-            ? image_prompting_moduleSettings.imagePromptPrefill
-            : DEFAULT_IMAGE_PROMPT_PREFILL;
-        prefillArea.addEventListener('input', () => {
-            image_prompting_moduleSettings.imagePromptPrefill = prefillArea.value;
-            saveSettings();
-        });
-    }
-
-    const negativeArea = document.getElementById('image_prompt_negative_textarea');
-    if (negativeArea) {
-        negativeArea.value = (typeof image_prompting_moduleSettings.imagePromptNegative === 'string')
-            ? image_prompting_moduleSettings.imagePromptNegative
-            : DEFAULT_IMAGE_PROMPT_NEGATIVE;
-        negativeArea.addEventListener('input', () => {
-            image_prompting_moduleSettings.imagePromptNegative = negativeArea.value;
-            saveSettings();
-        });
-    }
+    const bind = createSettingsBinder(image_prompting_moduleSettings, saveSettings);
+    bind.checkbox('image_prompt_enabled', 'imagePromptEnabled', syncMessageButtons);
+    bind.checkbox('image_prompt_message_button_enabled', 'imagePromptMessageButtonEnabled', syncMessageButtons);
+    bind.checkbox('image_prompt_message_button_autogenerate', 'imagePromptMessageButtonAutoGenerate');
+    bind.checkbox('image_prompt_send_to_imagegen', 'imagePromptSendToImageGenEnabled', () => {
+        // The modal may be open behind the settings drawer.
+        refreshImageGenButton();
+        renderSavedPrompts();
+    });
+    bind.checkbox('image_prompt_imagegen_quiet', 'imagePromptImageGenQuiet');
+    bind.checkbox('image_prompt_debug_mode', 'imagePromptDebugMode');
+    bind.number('image_prompt_max_context_override', 'imagePromptMaxContextOverride', { zeroMeansOff: true });
+    bind.text('image_prompt_prompt_textarea', 'imagePromptPrompt', image_prompting_getPromptTemplate());
+    bind.text('image_prompt_prefill_textarea', 'imagePromptPrefill', image_prompting_getPrefill());
+    bind.text('image_prompt_negative_textarea', 'imagePromptNegative',
+        textSetting(image_prompting_moduleSettings, 'imagePromptNegative', DEFAULT_IMAGE_PROMPT_NEGATIVE));
 
     document.getElementById('image_prompt_preview_btn')
         ?.addEventListener('click', showImagePromptPreview);
@@ -15876,62 +15361,21 @@ function showQuickRetryButton() {
 // ─── Settings Panel ───
 
 function bindRetryContinueSettings(saveSettings) {
-    const autoContinueCheck = document.getElementById('retry_continue_autocontinue');
-    if (autoContinueCheck) {
-        autoContinueCheck.checked = !!retry_continue_moduleSettings.retryAutoContinue;
-        autoContinueCheck.addEventListener('change', () => {
-            retry_continue_moduleSettings.retryAutoContinue = autoContinueCheck.checked;
-            saveSettings();
-        });
-    }
+    const bind = createSettingsBinder(retry_continue_moduleSettings, saveSettings);
+    bind.checkbox('retry_continue_autocontinue', 'retryAutoContinue');
+    bind.checkbox('retry_continue_autoset', 'retryAutoSetOnContinue');
+    bind.checkbox('retry_continue_show_toasts', 'retryShowToasts');
+    bind.select('retry_continue_indicator_style', 'retryIndicatorStyle', 'border', updateMessageIndicator);
 
-    const autoSetCheck = document.getElementById('retry_continue_autoset');
-    if (autoSetCheck) {
-        autoSetCheck.checked = !!retry_continue_moduleSettings.retryAutoSetOnContinue;
-        autoSetCheck.addEventListener('change', () => {
-            retry_continue_moduleSettings.retryAutoSetOnContinue = autoSetCheck.checked;
-            saveSettings();
-        });
-    }
+    document.getElementById('retry_continue_clear')?.addEventListener('click', () => {
+        resetRetryState();
+        saveRetryState();
+        updateButtonVisuals();
+        updateMessageIndicator();
+        rcToast('Retry checkpoint cleared.');
+    });
 
-    const toastCheck = document.getElementById('retry_continue_show_toasts');
-    if (toastCheck) {
-        toastCheck.checked = !!retry_continue_moduleSettings.retryShowToasts;
-        toastCheck.addEventListener('change', () => {
-            retry_continue_moduleSettings.retryShowToasts = toastCheck.checked;
-            saveSettings();
-        });
-    }
-
-    const styleSelect = document.getElementById('retry_continue_indicator_style');
-    if (styleSelect) {
-        styleSelect.value = retry_continue_moduleSettings.retryIndicatorStyle || 'border';
-        styleSelect.addEventListener('change', () => {
-            retry_continue_moduleSettings.retryIndicatorStyle = styleSelect.value;
-            saveSettings();
-            updateMessageIndicator();
-        });
-    }
-
-    const clearBtn = document.getElementById('retry_continue_clear');
-    if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            resetRetryState();
-            saveRetryState();
-            updateButtonVisuals();
-            updateMessageIndicator();
-            rcToast('Retry checkpoint cleared.');
-        });
-    }
-
-    const debugCheck = document.getElementById('retry_continue_debug_mode');
-    if (debugCheck) {
-        debugCheck.checked = !!retry_continue_moduleSettings.retryDebugMode;
-        debugCheck.addEventListener('change', () => {
-            retry_continue_moduleSettings.retryDebugMode = debugCheck.checked;
-            saveSettings();
-        });
-    }
+    bind.checkbox('retry_continue_debug_mode', 'retryDebugMode');
 }
 
 // ─── Slash Commands ───
@@ -17012,10 +16456,7 @@ function useAlignedContext(ctx) {
  * is appended (roster) / prepended (context) so old templates keep working.
  */
 function composeDirectorPrompt(rosterBlock, contextBlock) {
-    const configured = director_moduleSettings?.directorPrompt;
-    const tpl = (typeof configured === 'string' && configured.trim())
-        ? configured
-        : DEFAULT_DIRECTOR_PROMPT;
+    const tpl = templateSetting(director_moduleSettings, 'directorPrompt', DEFAULT_DIRECTOR_PROMPT);
     const { text, used } = applyTemplateMacros(tpl, {
         roster: rosterBlock || '',
         context: contextBlock || '',
@@ -17409,8 +16850,7 @@ async function triggerChoice(ctx, chosen) {
 
 /** How many speakers the director chains back-to-back per invocation. */
 function resolveConsecutiveTurns() {
-    const n = director_moduleSettings?.directorConsecutiveTurns;
-    return Number.isFinite(n) && n > 0 ? Math.floor(n) : DEFAULT_DIRECTOR_CONSECUTIVE_TURNS;
+    return positiveIntSetting(director_moduleSettings, 'directorConsecutiveTurns', DEFAULT_DIRECTOR_CONSECUTIVE_TURNS);
 }
 
 /**
@@ -17693,111 +17133,26 @@ function refreshWalkOnPanel() {
 // ─── Settings Panel ───
 
 function bindDirectorSettings(saveSettings) {
-    const enabledCb = document.getElementById('director_enabled');
-    if (enabledCb) {
-        enabledCb.checked = !!director_moduleSettings.directorEnabled;
-        enabledCb.addEventListener('change', () => {
-            director_moduleSettings.directorEnabled = enabledCb.checked;
-            saveSettings();
-            if (enabledCb.checked) {
-                applyManualMode().catch(err => console.error('Group Director: applyManualMode failed:', err));
-            } else {
-                restoreStrategy().catch(err => console.error('Group Director: restoreStrategy failed:', err));
-            }
-        });
-    }
-
-    const confirmCb = document.getElementById('director_confirm');
-    if (confirmCb) {
-        confirmCb.checked = !!director_moduleSettings.directorConfirm;
-        confirmCb.addEventListener('change', () => {
-            director_moduleSettings.directorConfirm = confirmCb.checked;
-            saveSettings();
-        });
-    }
-
-    const consecutiveInput = document.getElementById('director_consecutive_turns');
-    if (consecutiveInput) {
-        consecutiveInput.value = director_moduleSettings.directorConsecutiveTurns || DEFAULT_DIRECTOR_CONSECUTIVE_TURNS;
-        consecutiveInput.addEventListener('input', () => {
-            const n = parseInt(consecutiveInput.value, 10);
-            if (Number.isFinite(n) && n > 0) {
-                director_moduleSettings.directorConsecutiveTurns = n;
-                saveSettings();
-            }
-        });
-    }
-
-    const alignedCb = document.getElementById('director_aligned_context');
-    if (alignedCb) {
-        alignedCb.checked = !!director_moduleSettings.directorAlignedContext;
-        alignedCb.addEventListener('change', () => {
-            director_moduleSettings.directorAlignedContext = alignedCb.checked;
-            saveSettings();
-        });
-    }
-
-    const responseLengthInput = document.getElementById('director_response_length');
-    if (responseLengthInput) {
-        responseLengthInput.value = director_moduleSettings.directorResponseLength || DEFAULT_DIRECTOR_RESPONSE_LENGTH;
-        responseLengthInput.addEventListener('input', () => {
-            const n = parseInt(responseLengthInput.value, 10);
-            if (Number.isFinite(n) && n > 0) {
-                director_moduleSettings.directorResponseLength = n;
-                saveSettings();
-            }
-        });
-    }
-
-    const maxContextInput = document.getElementById('director_max_context_override');
-    if (maxContextInput) {
-        maxContextInput.value = director_moduleSettings.directorMaxContextOverride || 0;
-        maxContextInput.addEventListener('input', () => {
-            const n = parseInt(maxContextInput.value, 10);
-            director_moduleSettings.directorMaxContextOverride = Number.isFinite(n) && n > 0 ? n : 0;
-            saveSettings();
-        });
-    }
-
-    const promptArea = document.getElementById('director_prompt_textarea');
-    if (promptArea) {
-        promptArea.value = director_moduleSettings.directorPrompt || DEFAULT_DIRECTOR_PROMPT;
-        promptArea.addEventListener('input', () => {
-            director_moduleSettings.directorPrompt = promptArea.value;
-            saveSettings();
-        });
-    }
+    const bind = createSettingsBinder(director_moduleSettings, saveSettings);
+    bind.checkbox('director_enabled', 'directorEnabled', (on) => {
+        const [label, apply] = on ? ['applyManualMode', applyManualMode] : ['restoreStrategy', restoreStrategy];
+        apply().catch(err => console.error(`Group Director: ${label} failed:`, err));
+    });
+    bind.checkbox('director_confirm', 'directorConfirm');
+    bind.number('director_consecutive_turns', 'directorConsecutiveTurns', { fallback: DEFAULT_DIRECTOR_CONSECUTIVE_TURNS });
+    bind.checkbox('director_aligned_context', 'directorAlignedContext');
+    bind.number('director_response_length', 'directorResponseLength', { fallback: DEFAULT_DIRECTOR_RESPONSE_LENGTH });
+    bind.number('director_max_context_override', 'directorMaxContextOverride', { zeroMeansOff: true });
+    bind.text('director_prompt_textarea', 'directorPrompt',
+        templateSetting(director_moduleSettings, 'directorPrompt', DEFAULT_DIRECTOR_PROMPT));
 
     document.getElementById('director_preview_btn')
         ?.addEventListener('click', showDirectorPromptPreview);
 
     // Walk-on detection
-    const walkOnsCb = document.getElementById('director_walkons_enabled');
-    if (walkOnsCb) {
-        walkOnsCb.checked = !!director_moduleSettings.directorWalkOnsEnabled;
-        walkOnsCb.addEventListener('change', () => {
-            director_moduleSettings.directorWalkOnsEnabled = walkOnsCb.checked;
-            saveSettings();
-        });
-    }
-
-    const splitAutoCb = document.getElementById('director_walkon_split_auto');
-    if (splitAutoCb) {
-        splitAutoCb.checked = !!director_moduleSettings.directorWalkOnSplitAuto;
-        splitAutoCb.addEventListener('change', () => {
-            director_moduleSettings.directorWalkOnSplitAuto = splitAutoCb.checked;
-            saveSettings();
-        });
-    }
-
-    const includeWalkOnsCb = document.getElementById('director_include_walkons');
-    if (includeWalkOnsCb) {
-        includeWalkOnsCb.checked = !!director_moduleSettings.directorIncludeWalkOns;
-        includeWalkOnsCb.addEventListener('change', () => {
-            director_moduleSettings.directorIncludeWalkOns = includeWalkOnsCb.checked;
-            saveSettings();
-        });
-    }
+    bind.checkbox('director_walkons_enabled', 'directorWalkOnsEnabled');
+    bind.checkbox('director_walkon_split_auto', 'directorWalkOnSplitAuto');
+    bind.checkbox('director_include_walkons', 'directorIncludeWalkOns');
 
     const walkOnsArea = document.getElementById('director_walkons_textarea');
     if (walkOnsArea) {
@@ -17810,14 +17165,7 @@ function bindDirectorSettings(saveSettings) {
     document.getElementById('director_walkons_scan')
         ?.addEventListener('click', scanWholeChatForWalkOns);
 
-    const debugCb = document.getElementById('director_debug_mode');
-    if (debugCb) {
-        debugCb.checked = !!director_moduleSettings.directorDebugMode;
-        debugCb.addEventListener('change', () => {
-            director_moduleSettings.directorDebugMode = debugCb.checked;
-            saveSettings();
-        });
-    }
+    bind.checkbox('director_debug_mode', 'directorDebugMode');
 
     refreshWalkOnPanel();
 }

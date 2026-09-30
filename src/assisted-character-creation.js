@@ -22,6 +22,7 @@ import {
     applyTemplateMacros,
     stripPrefillEcho,
     showPromptPreview,
+    createSettingsBinder,
 } from './utils.js';
 import { templateSetting, textSetting, parsePositiveInt, positiveIntSetting } from './settings-helpers.js';
 import {
@@ -202,49 +203,12 @@ export function onCharacterPageLoaded() {
  * @param {function} saveSettings
  */
 export function bindACCSettings(saveSettings) {
-    const enabledCb = document.getElementById('acc_enabled');
-    const debugCb = document.getElementById('acc_debug_mode');
-    const promptArea = document.getElementById('acc_prompt_textarea');
-
-    if (enabledCb) {
-        enabledCb.checked = moduleSettings.accEnabled;
-        enabledCb.addEventListener('change', () => {
-            moduleSettings.accEnabled = enabledCb.checked;
-            saveSettings();
-        });
-    }
-    if (debugCb) {
-        debugCb.checked = moduleSettings.accDebugMode;
-        debugCb.addEventListener('change', () => {
-            moduleSettings.accDebugMode = debugCb.checked;
-            saveSettings();
-        });
-    }
-    const maxContextInput = document.getElementById('acc_max_context_override');
-    if (maxContextInput) {
-        maxContextInput.value = moduleSettings.accMaxContextOverride || 0;
-        maxContextInput.addEventListener('input', () => {
-            const n = parseInt(maxContextInput.value, 10);
-            moduleSettings.accMaxContextOverride = Number.isFinite(n) && n > 0 ? n : 0;
-            saveSettings();
-        });
-    }
-    if (promptArea) {
-        promptArea.value = getPromptTemplate();
-        promptArea.addEventListener('input', () => {
-            moduleSettings.accPrompt = promptArea.value;
-            saveSettings();
-        });
-    }
-
-    const prefillArea = document.getElementById('acc_prefill_textarea');
-    if (prefillArea) {
-        prefillArea.value = getPrefill();
-        prefillArea.addEventListener('input', () => {
-            moduleSettings.accPrefill = prefillArea.value;
-            saveSettings();
-        });
-    }
+    const bind = createSettingsBinder(moduleSettings, saveSettings);
+    bind.checkbox('acc_enabled', 'accEnabled');
+    bind.checkbox('acc_debug_mode', 'accDebugMode');
+    bind.number('acc_max_context_override', 'accMaxContextOverride', { zeroMeansOff: true });
+    bind.text('acc_prompt_textarea', 'accPrompt', getPromptTemplate());
+    bind.text('acc_prefill_textarea', 'accPrefill', getPrefill());
 
     document.getElementById('acc_preview_btn')
         ?.addEventListener('click', showACCPromptPreview);

@@ -22,6 +22,7 @@ import {
     waitForGenerationEnd,
     showPromptPreview,
     toast,
+    createSettingsBinder,
 } from './utils.js';
 import { templateSetting } from './settings-helpers.js';
 
@@ -752,63 +753,13 @@ export function createHamburgerMenuItem() {
 // ─── Settings Panel ───
 
 export function bindPhrasingSettings(saveSettings) {
-    const phrasingEnabled = document.getElementById('phrasing_enabled');
-    if (phrasingEnabled) {
-        phrasingEnabled.checked = ctx.settings.phrasingEnabled;
-        phrasingEnabled.addEventListener('change', (e) => {
-            ctx.settings.phrasingEnabled = e.target.checked;
-            saveSettings();
-            applyPhrasingEnabledState();
-        });
-    }
-
-    const phrasingAutoEnabled = document.getElementById('phrasing_auto_enabled');
-    if (phrasingAutoEnabled) {
-        phrasingAutoEnabled.checked = ctx.settings.phrasingAutoEnabled;
-        phrasingAutoEnabled.addEventListener('change', (e) => {
-            ctx.settings.phrasingAutoEnabled = e.target.checked;
-            saveSettings();
-            debug('autoPhrasing toggled to', ctx.settings.phrasingAutoEnabled);
-        });
-    }
-
-    const phrasingDebugMode = document.getElementById('phrasing_debug_mode');
-    if (phrasingDebugMode) {
-        phrasingDebugMode.checked = ctx.settings.phrasingDebugMode;
-        phrasingDebugMode.addEventListener('change', (e) => {
-            ctx.settings.phrasingDebugMode = e.target.checked;
-            saveSettings();
-            debug('debugMode toggled to', ctx.settings.phrasingDebugMode);
-        });
-    }
-
-    const phrasingInverseGuidance = document.getElementById('phrasing_inverse_guidance');
-    if (phrasingInverseGuidance) {
-        phrasingInverseGuidance.checked = ctx.settings.phrasingInverseGuidance;
-        phrasingInverseGuidance.addEventListener('change', (e) => {
-            ctx.settings.phrasingInverseGuidance = e.target.checked;
-            saveSettings();
-            debug('inverseGuidance toggled to', ctx.settings.phrasingInverseGuidance);
-        });
-    }
-
-    const phrasingPromptArea = document.getElementById('phrasing_prompt_textarea');
-    if (phrasingPromptArea) {
-        phrasingPromptArea.value = ctx.settings.phrasingPrompt || DEFAULT_PHRASING_PROMPT;
-        phrasingPromptArea.addEventListener('input', () => {
-            ctx.settings.phrasingPrompt = phrasingPromptArea.value;
-            saveSettings();
-        });
-    }
-
-    const phrasingInverseArea = document.getElementById('phrasing_inverse_prompt_textarea');
-    if (phrasingInverseArea) {
-        phrasingInverseArea.value = ctx.settings.phrasingInversePrompt || DEFAULT_PHRASING_INVERSE_PROMPT;
-        phrasingInverseArea.addEventListener('input', () => {
-            ctx.settings.phrasingInversePrompt = phrasingInverseArea.value;
-            saveSettings();
-        });
-    }
+    const bind = createSettingsBinder(ctx.settings, saveSettings);
+    bind.checkbox('phrasing_enabled', 'phrasingEnabled', applyPhrasingEnabledState);
+    bind.checkbox('phrasing_auto_enabled', 'phrasingAutoEnabled');
+    bind.checkbox('phrasing_debug_mode', 'phrasingDebugMode');
+    bind.checkbox('phrasing_inverse_guidance', 'phrasingInverseGuidance');
+    bind.text('phrasing_prompt_textarea', 'phrasingPrompt', getActivePrompt());
+    bind.text('phrasing_inverse_prompt_textarea', 'phrasingInversePrompt', getActiveInversePrompt());
 
     document.getElementById('phrasing_preview_btn')
         ?.addEventListener('click', showPhrasingPromptPreview);

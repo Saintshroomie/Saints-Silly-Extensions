@@ -50,6 +50,7 @@ import {
     stripPrefillEcho,
     showPromptPreview,
     estimateChatTokens,
+    createSettingsBinder,
 } from './utils.js';
 import { templateSetting, textSetting, parsePositiveInt, positiveIntSetting } from './settings-helpers.js';
 import {
@@ -409,68 +410,27 @@ export function createCompactionMenuItem() {
 // ─── Settings Bindings ───
 
 export function bindCompactionSettings(saveSettings) {
-    bindCheckbox('compaction_enabled', 'compactionEnabled', saveSettings);
-    bindCheckbox('compaction_auto_enabled', 'compactionAutoEnabled', saveSettings);
-    bindCheckbox('compaction_confirm_auto', 'compactionConfirmAuto', saveSettings);
-    bindCheckbox('compaction_migrate_state', 'compactionMigrateState', saveSettings);
-    bindCheckbox('compaction_debug_mode', 'compactionDebugMode', saveSettings);
+    const bind = createSettingsBinder(moduleSettings, saveSettings);
+    bind.checkbox('compaction_enabled', 'compactionEnabled');
+    bind.checkbox('compaction_auto_enabled', 'compactionAutoEnabled');
+    bind.checkbox('compaction_confirm_auto', 'compactionConfirmAuto');
+    bind.checkbox('compaction_migrate_state', 'compactionMigrateState');
+    bind.checkbox('compaction_debug_mode', 'compactionDebugMode');
 
-    bindNumber('compaction_threshold_percent', 'compactionThresholdPercent', saveSettings, { min: 1, max: 100 });
-    bindNumber('compaction_tail_length', 'compactionTailLength', saveSettings, { min: 1 });
-    bindNumber('compaction_response_length', 'compactionSummaryResponseLength', saveSettings, { min: 50 });
-    bindNumber('compaction_max_context_override', 'compactionMaxContextOverride', saveSettings, { min: 0, allowZero: true });
+    bind.number('compaction_threshold_percent', 'compactionThresholdPercent', {
+        max: 100, fallback: DEFAULT_COMPACTION_THRESHOLD_PERCENT,
+    });
+    bind.number('compaction_tail_length', 'compactionTailLength', { fallback: DEFAULT_COMPACTION_TAIL_LENGTH });
+    bind.number('compaction_response_length', 'compactionSummaryResponseLength', {
+        min: 50, fallback: DEFAULT_COMPACTION_RESPONSE_LENGTH,
+    });
+    bind.number('compaction_max_context_override', 'compactionMaxContextOverride', { zeroMeansOff: true });
 
-    const promptArea = document.getElementById('compaction_summary_prompt_textarea');
-    if (promptArea) {
-        promptArea.value = moduleSettings.compactionSummaryPrompt || DEFAULT_COMPACTION_SUMMARY_PROMPT;
-        promptArea.addEventListener('input', () => {
-            moduleSettings.compactionSummaryPrompt = promptArea.value;
-            saveSettings();
-        });
-    }
-
-    const prefillArea = document.getElementById('compaction_summary_prefill_textarea');
-    if (prefillArea) {
-        prefillArea.value = (typeof moduleSettings.compactionSummaryPrefill === 'string')
-            ? moduleSettings.compactionSummaryPrefill
-            : DEFAULT_COMPACTION_SUMMARY_PREFILL;
-        prefillArea.addEventListener('input', () => {
-            moduleSettings.compactionSummaryPrefill = prefillArea.value;
-            saveSettings();
-        });
-    }
+    bind.text('compaction_summary_prompt_textarea', 'compactionSummaryPrompt', getSummaryTemplate());
+    bind.text('compaction_summary_prefill_textarea', 'compactionSummaryPrefill', getPrefill());
 
     document.getElementById('compaction_preview_btn')
         ?.addEventListener('click', showCompactionPromptPreview);
-}
-
-function bindCheckbox(id, key, saveSettings) {
-    const cb = document.getElementById(id);
-    if (!cb) return;
-    cb.checked = !!moduleSettings[key];
-    cb.addEventListener('change', () => {
-        moduleSettings[key] = cb.checked;
-        saveSettings();
-    });
-}
-
-function bindNumber(id, key, saveSettings, { min = 0, max = Infinity, allowZero = false } = {}) {
-    const input = document.getElementById(id);
-    if (!input) return;
-    input.value = Number.isFinite(moduleSettings[key]) ? moduleSettings[key] : 0;
-    input.addEventListener('input', () => {
-        const n = parseInt(input.value, 10);
-        if (!Number.isFinite(n)) return;
-        if (allowZero && n === 0) {
-            moduleSettings[key] = 0;
-            saveSettings();
-            return;
-        }
-        if (n >= min && n <= max) {
-            moduleSettings[key] = n;
-            saveSettings();
-        }
-    });
 }
 
 // ─── Prompt Composition ───

@@ -30,6 +30,7 @@ import {
     applyTemplateMacros,
     stripPrefillEcho,
     showPromptPreview,
+    createSettingsBinder,
 } from './utils.js';
 import { templateSetting, textSetting, positiveIntSetting } from './settings-helpers.js';
 import {
@@ -417,37 +418,19 @@ export function startReformattingObserver() {
 // ─── Settings Panel ───
 
 export function bindReformattingSettings(saveSettings) {
-    const enabledCb = document.getElementById('reformatting_enabled');
-    if (enabledCb) {
-        enabledCb.checked = !!moduleSettings.reformattingEnabled;
-        enabledCb.addEventListener('change', () => {
-            moduleSettings.reformattingEnabled = enabledCb.checked;
-            saveSettings();
-            if (moduleSettings.reformattingEnabled) {
-                rescanReformatButtons();
-            } else {
-                removeAllReformatButtons();
-            }
-        });
-    }
+    const bind = createSettingsBinder(moduleSettings, saveSettings);
+    bind.checkbox('reformatting_enabled', 'reformattingEnabled',
+        on => (on ? rescanReformatButtons() : removeAllReformatButtons()));
 
-    const engineSelect = document.getElementById('reformatting_engine');
-    if (engineSelect) {
-        engineSelect.value = moduleSettings.reformattingEngine || 'rules';
-        const syncEngineSections = () => {
-            const isLLM = engineSelect.value === 'llm';
-            document.getElementById('reformatting_rules_section')
-                ?.classList.toggle('reformatting-hidden', isLLM);
-            document.getElementById('reformatting_llm_section')
-                ?.classList.toggle('reformatting-hidden', !isLLM);
-        };
-        engineSelect.addEventListener('change', () => {
-            moduleSettings.reformattingEngine = engineSelect.value;
-            saveSettings();
-            syncEngineSections();
-        });
-        syncEngineSections();
-    }
+    const syncEngineSections = () => {
+        const isLLM = moduleSettings.reformattingEngine === 'llm';
+        document.getElementById('reformatting_rules_section')
+            ?.classList.toggle('reformatting-hidden', isLLM);
+        document.getElementById('reformatting_llm_section')
+            ?.classList.toggle('reformatting-hidden', !isLLM);
+    };
+    bind.select('reformatting_engine', 'reformattingEngine', 'rules', syncEngineSections);
+    syncEngineSections();
 
     const asteriskMode = moduleSettings.reformattingAsteriskMode || 'strip';
     document.querySelectorAll('input[name="reformatting_asterisk_mode"]').forEach((radio) => {
@@ -459,65 +442,18 @@ export function bindReformattingSettings(saveSettings) {
         });
     });
 
-    const collapseCb = document.getElementById('reformatting_collapse_whitespace');
-    if (collapseCb) {
-        collapseCb.checked = !!moduleSettings.reformattingCollapseWhitespace;
-        collapseCb.addEventListener('change', () => {
-            moduleSettings.reformattingCollapseWhitespace = collapseCb.checked;
-            saveSettings();
-        });
-    }
-
-    const responseLengthInput = document.getElementById('reformatting_response_length');
-    if (responseLengthInput) {
-        responseLengthInput.value = moduleSettings.reformattingResponseLength || DEFAULT_REFORMATTING_RESPONSE_LENGTH;
-        responseLengthInput.addEventListener('input', () => {
-            const n = parseInt(responseLengthInput.value, 10);
-            if (Number.isFinite(n) && n > 0) {
-                moduleSettings.reformattingResponseLength = n;
-                saveSettings();
-            }
-        });
-    }
-
-    const systemPromptArea = document.getElementById('reformatting_system_prompt_textarea');
-    if (systemPromptArea) {
-        systemPromptArea.value = moduleSettings.reformattingSystemPrompt || DEFAULT_REFORMATTING_SYSTEM_PROMPT;
-        systemPromptArea.addEventListener('input', () => {
-            moduleSettings.reformattingSystemPrompt = systemPromptArea.value;
-            saveSettings();
-        });
-    }
-
-    const promptArea = document.getElementById('reformatting_prompt_textarea');
-    if (promptArea) {
-        promptArea.value = moduleSettings.reformattingPrompt || DEFAULT_REFORMATTING_PROMPT;
-        promptArea.addEventListener('input', () => {
-            moduleSettings.reformattingPrompt = promptArea.value;
-            saveSettings();
-        });
-    }
-
-    const prefillArea = document.getElementById('reformatting_prefill_textarea');
-    if (prefillArea) {
-        prefillArea.value = getReformattingPrefill();
-        prefillArea.addEventListener('input', () => {
-            moduleSettings.reformattingPrefill = prefillArea.value;
-            saveSettings();
-        });
-    }
+    bind.checkbox('reformatting_collapse_whitespace', 'reformattingCollapseWhitespace');
+    bind.number('reformatting_response_length', 'reformattingResponseLength', {
+        fallback: DEFAULT_REFORMATTING_RESPONSE_LENGTH,
+    });
+    bind.text('reformatting_system_prompt_textarea', 'reformattingSystemPrompt', getReformattingSystemPrompt());
+    bind.text('reformatting_prompt_textarea', 'reformattingPrompt', getReformattingPromptTemplate());
+    bind.text('reformatting_prefill_textarea', 'reformattingPrefill', getReformattingPrefill());
 
     document.getElementById('reformatting_preview_btn')
         ?.addEventListener('click', showReformattingPromptPreview);
 
-    const debugCb = document.getElementById('reformatting_debug_mode');
-    if (debugCb) {
-        debugCb.checked = !!moduleSettings.reformattingDebugMode;
-        debugCb.addEventListener('change', () => {
-            moduleSettings.reformattingDebugMode = debugCb.checked;
-            saveSettings();
-        });
-    }
+    bind.checkbox('reformatting_debug_mode', 'reformattingDebugMode');
 }
 
 function showReformattingPromptPreview() {

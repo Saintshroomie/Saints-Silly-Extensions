@@ -23,6 +23,7 @@ import {
     waitForMessageEditClosed,
     createDebugLogger,
     toast,
+    createSettingsBinder,
 } from './utils.js';
 
 // ─── Module State ───
@@ -588,62 +589,21 @@ function showQuickRetryButton() {
 // ─── Settings Panel ───
 
 export function bindRetryContinueSettings(saveSettings) {
-    const autoContinueCheck = document.getElementById('retry_continue_autocontinue');
-    if (autoContinueCheck) {
-        autoContinueCheck.checked = !!moduleSettings.retryAutoContinue;
-        autoContinueCheck.addEventListener('change', () => {
-            moduleSettings.retryAutoContinue = autoContinueCheck.checked;
-            saveSettings();
-        });
-    }
+    const bind = createSettingsBinder(moduleSettings, saveSettings);
+    bind.checkbox('retry_continue_autocontinue', 'retryAutoContinue');
+    bind.checkbox('retry_continue_autoset', 'retryAutoSetOnContinue');
+    bind.checkbox('retry_continue_show_toasts', 'retryShowToasts');
+    bind.select('retry_continue_indicator_style', 'retryIndicatorStyle', 'border', updateMessageIndicator);
 
-    const autoSetCheck = document.getElementById('retry_continue_autoset');
-    if (autoSetCheck) {
-        autoSetCheck.checked = !!moduleSettings.retryAutoSetOnContinue;
-        autoSetCheck.addEventListener('change', () => {
-            moduleSettings.retryAutoSetOnContinue = autoSetCheck.checked;
-            saveSettings();
-        });
-    }
+    document.getElementById('retry_continue_clear')?.addEventListener('click', () => {
+        resetRetryState();
+        saveRetryState();
+        updateButtonVisuals();
+        updateMessageIndicator();
+        rcToast('Retry checkpoint cleared.');
+    });
 
-    const toastCheck = document.getElementById('retry_continue_show_toasts');
-    if (toastCheck) {
-        toastCheck.checked = !!moduleSettings.retryShowToasts;
-        toastCheck.addEventListener('change', () => {
-            moduleSettings.retryShowToasts = toastCheck.checked;
-            saveSettings();
-        });
-    }
-
-    const styleSelect = document.getElementById('retry_continue_indicator_style');
-    if (styleSelect) {
-        styleSelect.value = moduleSettings.retryIndicatorStyle || 'border';
-        styleSelect.addEventListener('change', () => {
-            moduleSettings.retryIndicatorStyle = styleSelect.value;
-            saveSettings();
-            updateMessageIndicator();
-        });
-    }
-
-    const clearBtn = document.getElementById('retry_continue_clear');
-    if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-            resetRetryState();
-            saveRetryState();
-            updateButtonVisuals();
-            updateMessageIndicator();
-            rcToast('Retry checkpoint cleared.');
-        });
-    }
-
-    const debugCheck = document.getElementById('retry_continue_debug_mode');
-    if (debugCheck) {
-        debugCheck.checked = !!moduleSettings.retryDebugMode;
-        debugCheck.addEventListener('change', () => {
-            moduleSettings.retryDebugMode = debugCheck.checked;
-            saveSettings();
-        });
-    }
+    bind.checkbox('retry_continue_debug_mode', 'retryDebugMode');
 }
 
 // ─── Slash Commands ───

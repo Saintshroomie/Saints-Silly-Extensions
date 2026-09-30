@@ -6,7 +6,7 @@
 import { SlashCommandParser } from '../../../../slash-commands/SlashCommandParser.js';
 import { SlashCommand } from '../../../../slash-commands/SlashCommand.js';
 import { ARGUMENT_TYPE, SlashCommandArgument } from '../../../../slash-commands/SlashCommandArgument.js';
-import { getContext, createDebugLogger, isGenerationInProgress, toast } from './utils.js';
+import { getContext, createDebugLogger, createSettingsBinder, isGenerationInProgress, toast } from './utils.js';
 import { resolveGroupMemberRow } from './group-members.js';
 
 const POSSESSION_METADATA_KEY = 'possession';
@@ -549,34 +549,10 @@ export function onGroupWrapperFinished() {
 // ─── Settings Panel ───
 
 export function bindPossessionSettings(saveSettings) {
-    const possessionEnabled = document.getElementById('possession_enabled');
-    if (possessionEnabled) {
-        possessionEnabled.checked = ctx.settings.possessionEnabled;
-        possessionEnabled.addEventListener('change', (e) => {
-            ctx.settings.possessionEnabled = e.target.checked;
-            saveSettings();
-            syncAllPossessionUI();
-        });
-    }
-
-    const possessionShowToast = document.getElementById('possession_show_toast');
-    if (possessionShowToast) {
-        possessionShowToast.checked = ctx.settings.possessionShowToast;
-        possessionShowToast.addEventListener('change', (e) => {
-            ctx.settings.possessionShowToast = e.target.checked;
-            saveSettings();
-        });
-    }
-
-    const possessionDebugMode = document.getElementById('possession_debug_mode');
-    if (possessionDebugMode) {
-        possessionDebugMode.checked = ctx.settings.possessionDebugMode;
-        possessionDebugMode.addEventListener('change', (e) => {
-            ctx.settings.possessionDebugMode = e.target.checked;
-            saveSettings();
-            debug('debugMode toggled to', ctx.settings.possessionDebugMode);
-        });
-    }
+    const bind = createSettingsBinder(ctx.settings, saveSettings);
+    bind.checkbox('possession_enabled', 'possessionEnabled', syncAllPossessionUI);
+    bind.checkbox('possession_show_toast', 'possessionShowToast');
+    bind.checkbox('possession_debug_mode', 'possessionDebugMode');
 }
 
 // ─── Slash Commands ───

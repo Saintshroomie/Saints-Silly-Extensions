@@ -40,6 +40,7 @@ import {
     showPromptPreview,
     getChatCharacters,
     getCurrentChatId,
+    createSettingsBinder,
 } from './utils.js';
 import { templateSetting, textSetting, parsePositiveInt, positiveIntSetting } from './settings-helpers.js';
 import {
@@ -902,44 +903,15 @@ export function onCharacterStateGroupUpdated() {
 // ─── Settings Bindings ───
 
 export function bindCharacterStateSettings(saveSettings) {
-    const bindCheckbox = (id, key, after) => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.checked = !!moduleSettings[key];
-        el.addEventListener('change', () => {
-            moduleSettings[key] = el.checked;
-            saveSettings();
-            after?.();
-        });
-    };
-    bindCheckbox('character_state_enabled', 'characterStateEnabled', syncCharacterStateButtons);
-    bindCheckbox('character_state_debug_mode', 'characterStateDebugMode');
-
-    const bindTextarea = (id, key, fallback) => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        const stored = moduleSettings[key];
-        el.value = typeof stored === 'string' ? stored : fallback;
-        el.addEventListener('input', () => {
-            moduleSettings[key] = el.value;
-            saveSettings();
-        });
-    };
-    bindTextarea('character_state_prompt_textarea', 'characterStatePrompt', DEFAULT_CHARACTER_STATE_PROMPT);
-    bindTextarea('character_state_prefill_textarea', 'characterStatePrefill', DEFAULT_CHARACTER_STATE_PREFILL);
-
-    const bindNumber = (id, key, fallback) => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.value = moduleSettings[key] || fallback;
-        el.addEventListener('input', () => {
-            const n = parseInt(el.value, 10);
-            moduleSettings[key] = Number.isFinite(n) && n > 0 ? n : fallback;
-            saveSettings();
-        });
-    };
-    bindNumber('character_state_response_length', 'characterStateResponseLength', DEFAULT_CHARACTER_STATE_RESPONSE_LENGTH);
-    bindNumber('character_state_max_context_override', 'characterStateMaxContextOverride', 0);
+    const bind = createSettingsBinder(moduleSettings, saveSettings);
+    bind.checkbox('character_state_enabled', 'characterStateEnabled', syncCharacterStateButtons);
+    bind.checkbox('character_state_debug_mode', 'characterStateDebugMode');
+    bind.text('character_state_prompt_textarea', 'characterStatePrompt', getPromptTemplate());
+    bind.text('character_state_prefill_textarea', 'characterStatePrefill', getPrefill());
+    bind.number('character_state_response_length', 'characterStateResponseLength', {
+        fallback: DEFAULT_CHARACTER_STATE_RESPONSE_LENGTH,
+    });
+    bind.number('character_state_max_context_override', 'characterStateMaxContextOverride', { zeroMeansOff: true });
 
     document.getElementById('character_state_preview_btn')
         ?.addEventListener('click', showCharacterStatePromptPreview);

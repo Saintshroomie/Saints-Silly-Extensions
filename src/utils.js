@@ -170,6 +170,93 @@ export function saveExtensionSettings(extensionName, settings) {
     context.saveSettingsDebounced();
 }
 
+// ─── Settings Panel Binding ───
+
+/**
+ * Two-way binders between settings-panel controls and the shared settings
+ * object. Each fills its control from `settings`, then writes user changes
+ * back and calls `save()`; `onChange(value)` runs after the save. A missing
+ * element is skipped, so binding never throws on a partial panel.
+ *
+ * Text binders listen on `input`, which is also what the preset widgets
+ * dispatch when they load a preset — that's how a preset load persists.
+ *
+ * @param {object} settings - The shared settings object.
+ * @param {() => void} save - Persists settings.
+ *
+ * @example
+ *   const bind = createSettingsBinder(moduleSettings, saveSettings);
+ *   bind.checkbox('acc_enabled', 'accEnabled');
+ *   bind.number('acc_max_context_override', 'accMaxContextOverride', { zeroMeansOff: true });
+ *   bind.text('acc_prompt_textarea', 'accPrompt', getPromptTemplate());
+ */
+export function createSettingsBinder(settings, save) {
+    const byId = id => document.getElementById(id);
+    return {
+        /** Boolean setting ↔ checkbox. */
+        checkbox(id, key, onChange) {
+            const el = byId(id);
+            if (!el) return;
+            el.checked = !!settings[key];
+            el.addEventListener('change', () => {
+                settings[key] = el.checked;
+                save();
+                onChange?.(el.checked);
+            });
+        },
+
+        /** String setting ↔ `<select>`; shows `fallback` while unset. */
+        select(id, key, fallback, onChange) {
+            const el = byId(id);
+            if (!el) return;
+            el.value = settings[key] || fallback;
+            el.addEventListener('change', () => {
+                settings[key] = el.value;
+                save();
+                onChange?.(el.value);
+            });
+        },
+
+        /**
+         * String setting ↔ textarea / text input. `initial` is what to show
+         * (usually the tool's resolved getter, so a blank template shows its
+         * default); the raw typed text is what's stored.
+         */
+        text(id, key, initial, onChange) {
+            const el = byId(id);
+            if (!el) return;
+            el.value = initial ?? settings[key] ?? '';
+            el.addEventListener('input', () => {
+                settings[key] = el.value;
+                save();
+                onChange?.(el.value);
+            });
+        },
+
+        /**
+         * Integer setting ↔ number input. Values in [min, max] are stored;
+         * anything else is ignored — or, with `zeroMeansOff`, stored as 0
+         * (the "no override" value of the Max Context Override fields).
+         * Shows `fallback` while the stored value is out of range.
+         */
+        number(id, key, { fallback = 0, min = 1, max = Infinity, zeroMeansOff = false, onChange } = {}) {
+            const el = byId(id);
+            if (!el) return;
+            const inRange = n => Number.isFinite(n) && n >= min && n <= max;
+            const stored = settings[key];
+            el.value = (inRange(stored) || (zeroMeansOff && stored === 0)) ? stored : fallback;
+            el.addEventListener('input', () => {
+                const n = parseInt(el.value, 10);
+                if (inRange(n)) settings[key] = n;
+                else if (zeroMeansOff) settings[key] = 0;
+                else return;
+                save();
+                onChange?.(settings[key]);
+            });
+        },
+    };
+}
+
 // ─── Message Edit Helpers ───
 
 /**

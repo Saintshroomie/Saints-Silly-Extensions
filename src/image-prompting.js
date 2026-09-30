@@ -36,6 +36,7 @@ import {
     stripPrefillEcho,
     showPromptPreview,
     copyTextToClipboard,
+    createSettingsBinder,
 } from './utils.js';
 import { templateSetting, textSetting, parsePositiveInt, positiveIntSetting } from './settings-helpers.js';
 import {
@@ -532,105 +533,22 @@ export function bindImagePromptSettings(saveSettings) {
         }
     };
 
-    const enabledCb = document.getElementById('image_prompt_enabled');
-    if (enabledCb) {
-        enabledCb.checked = moduleSettings.imagePromptEnabled;
-        enabledCb.addEventListener('change', () => {
-            moduleSettings.imagePromptEnabled = enabledCb.checked;
-            saveSettings();
-            syncMessageButtons();
-        });
-    }
-
-    const messageButtonCb = document.getElementById('image_prompt_message_button_enabled');
-    if (messageButtonCb) {
-        messageButtonCb.checked = !!moduleSettings.imagePromptMessageButtonEnabled;
-        messageButtonCb.addEventListener('change', () => {
-            moduleSettings.imagePromptMessageButtonEnabled = messageButtonCb.checked;
-            saveSettings();
-            syncMessageButtons();
-        });
-    }
-
-    const autoGenerateCb = document.getElementById('image_prompt_message_button_autogenerate');
-    if (autoGenerateCb) {
-        autoGenerateCb.checked = !!moduleSettings.imagePromptMessageButtonAutoGenerate;
-        autoGenerateCb.addEventListener('change', () => {
-            moduleSettings.imagePromptMessageButtonAutoGenerate = autoGenerateCb.checked;
-            saveSettings();
-        });
-    }
-
-    const sendToImageGenCb = document.getElementById('image_prompt_send_to_imagegen');
-    if (sendToImageGenCb) {
-        sendToImageGenCb.checked = moduleSettings.imagePromptSendToImageGenEnabled !== false;
-        sendToImageGenCb.addEventListener('change', () => {
-            moduleSettings.imagePromptSendToImageGenEnabled = sendToImageGenCb.checked;
-            saveSettings();
-            // The modal may be open behind the settings drawer.
-            refreshImageGenButton();
-            renderSavedPrompts();
-        });
-    }
-
-    const imageGenQuietCb = document.getElementById('image_prompt_imagegen_quiet');
-    if (imageGenQuietCb) {
-        imageGenQuietCb.checked = !!moduleSettings.imagePromptImageGenQuiet;
-        imageGenQuietCb.addEventListener('change', () => {
-            moduleSettings.imagePromptImageGenQuiet = imageGenQuietCb.checked;
-            saveSettings();
-        });
-    }
-
-    const debugCb = document.getElementById('image_prompt_debug_mode');
-    if (debugCb) {
-        debugCb.checked = moduleSettings.imagePromptDebugMode;
-        debugCb.addEventListener('change', () => {
-            moduleSettings.imagePromptDebugMode = debugCb.checked;
-            saveSettings();
-        });
-    }
-
-    const maxContextInput = document.getElementById('image_prompt_max_context_override');
-    if (maxContextInput) {
-        maxContextInput.value = moduleSettings.imagePromptMaxContextOverride || 0;
-        maxContextInput.addEventListener('input', () => {
-            const n = parseInt(maxContextInput.value, 10);
-            moduleSettings.imagePromptMaxContextOverride = Number.isFinite(n) && n > 0 ? n : 0;
-            saveSettings();
-        });
-    }
-
-    const promptArea = document.getElementById('image_prompt_prompt_textarea');
-    if (promptArea) {
-        promptArea.value = moduleSettings.imagePromptPrompt || DEFAULT_IMAGE_PROMPT_PROMPT;
-        promptArea.addEventListener('input', () => {
-            moduleSettings.imagePromptPrompt = promptArea.value;
-            saveSettings();
-        });
-    }
-
-    const prefillArea = document.getElementById('image_prompt_prefill_textarea');
-    if (prefillArea) {
-        prefillArea.value = (typeof moduleSettings.imagePromptPrefill === 'string')
-            ? moduleSettings.imagePromptPrefill
-            : DEFAULT_IMAGE_PROMPT_PREFILL;
-        prefillArea.addEventListener('input', () => {
-            moduleSettings.imagePromptPrefill = prefillArea.value;
-            saveSettings();
-        });
-    }
-
-    const negativeArea = document.getElementById('image_prompt_negative_textarea');
-    if (negativeArea) {
-        negativeArea.value = (typeof moduleSettings.imagePromptNegative === 'string')
-            ? moduleSettings.imagePromptNegative
-            : DEFAULT_IMAGE_PROMPT_NEGATIVE;
-        negativeArea.addEventListener('input', () => {
-            moduleSettings.imagePromptNegative = negativeArea.value;
-            saveSettings();
-        });
-    }
+    const bind = createSettingsBinder(moduleSettings, saveSettings);
+    bind.checkbox('image_prompt_enabled', 'imagePromptEnabled', syncMessageButtons);
+    bind.checkbox('image_prompt_message_button_enabled', 'imagePromptMessageButtonEnabled', syncMessageButtons);
+    bind.checkbox('image_prompt_message_button_autogenerate', 'imagePromptMessageButtonAutoGenerate');
+    bind.checkbox('image_prompt_send_to_imagegen', 'imagePromptSendToImageGenEnabled', () => {
+        // The modal may be open behind the settings drawer.
+        refreshImageGenButton();
+        renderSavedPrompts();
+    });
+    bind.checkbox('image_prompt_imagegen_quiet', 'imagePromptImageGenQuiet');
+    bind.checkbox('image_prompt_debug_mode', 'imagePromptDebugMode');
+    bind.number('image_prompt_max_context_override', 'imagePromptMaxContextOverride', { zeroMeansOff: true });
+    bind.text('image_prompt_prompt_textarea', 'imagePromptPrompt', getPromptTemplate());
+    bind.text('image_prompt_prefill_textarea', 'imagePromptPrefill', getPrefill());
+    bind.text('image_prompt_negative_textarea', 'imagePromptNegative',
+        textSetting(moduleSettings, 'imagePromptNegative', DEFAULT_IMAGE_PROMPT_NEGATIVE));
 
     document.getElementById('image_prompt_preview_btn')
         ?.addEventListener('click', showImagePromptPreview);

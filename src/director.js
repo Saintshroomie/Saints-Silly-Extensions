@@ -46,8 +46,9 @@ import {
     applyTemplateMacros,
     showPromptPreview,
     isGenerationInProgress,
+    createSettingsBinder,
 } from './utils.js';
-import { positiveIntSetting } from './settings-helpers.js';
+import { positiveIntSetting, templateSetting } from './settings-helpers.js';
 import { isSilentGenerationAbort, abortAllGenerations } from './silent-generation.js';
 import {
     matchSpeakerLines,
@@ -673,10 +674,7 @@ function useAlignedContext(ctx) {
  * is appended (roster) / prepended (context) so old templates keep working.
  */
 function composeDirectorPrompt(rosterBlock, contextBlock) {
-    const configured = moduleSettings?.directorPrompt;
-    const tpl = (typeof configured === 'string' && configured.trim())
-        ? configured
-        : DEFAULT_DIRECTOR_PROMPT;
+    const tpl = templateSetting(moduleSettings, 'directorPrompt', DEFAULT_DIRECTOR_PROMPT);
     const { text, used } = applyTemplateMacros(tpl, {
         roster: rosterBlock || '',
         context: contextBlock || '',
@@ -1070,8 +1068,7 @@ async function triggerChoice(ctx, chosen) {
 
 /** How many speakers the director chains back-to-back per invocation. */
 function resolveConsecutiveTurns() {
-    const n = moduleSettings?.directorConsecutiveTurns;
-    return Number.isFinite(n) && n > 0 ? Math.floor(n) : DEFAULT_DIRECTOR_CONSECUTIVE_TURNS;
+    return positiveIntSetting(moduleSettings, 'directorConsecutiveTurns', DEFAULT_DIRECTOR_CONSECUTIVE_TURNS);
 }
 
 /**
@@ -1354,111 +1351,26 @@ function refreshWalkOnPanel() {
 // ─── Settings Panel ───
 
 export function bindDirectorSettings(saveSettings) {
-    const enabledCb = document.getElementById('director_enabled');
-    if (enabledCb) {
-        enabledCb.checked = !!moduleSettings.directorEnabled;
-        enabledCb.addEventListener('change', () => {
-            moduleSettings.directorEnabled = enabledCb.checked;
-            saveSettings();
-            if (enabledCb.checked) {
-                applyManualMode().catch(err => console.error('Group Director: applyManualMode failed:', err));
-            } else {
-                restoreStrategy().catch(err => console.error('Group Director: restoreStrategy failed:', err));
-            }
-        });
-    }
-
-    const confirmCb = document.getElementById('director_confirm');
-    if (confirmCb) {
-        confirmCb.checked = !!moduleSettings.directorConfirm;
-        confirmCb.addEventListener('change', () => {
-            moduleSettings.directorConfirm = confirmCb.checked;
-            saveSettings();
-        });
-    }
-
-    const consecutiveInput = document.getElementById('director_consecutive_turns');
-    if (consecutiveInput) {
-        consecutiveInput.value = moduleSettings.directorConsecutiveTurns || DEFAULT_DIRECTOR_CONSECUTIVE_TURNS;
-        consecutiveInput.addEventListener('input', () => {
-            const n = parseInt(consecutiveInput.value, 10);
-            if (Number.isFinite(n) && n > 0) {
-                moduleSettings.directorConsecutiveTurns = n;
-                saveSettings();
-            }
-        });
-    }
-
-    const alignedCb = document.getElementById('director_aligned_context');
-    if (alignedCb) {
-        alignedCb.checked = !!moduleSettings.directorAlignedContext;
-        alignedCb.addEventListener('change', () => {
-            moduleSettings.directorAlignedContext = alignedCb.checked;
-            saveSettings();
-        });
-    }
-
-    const responseLengthInput = document.getElementById('director_response_length');
-    if (responseLengthInput) {
-        responseLengthInput.value = moduleSettings.directorResponseLength || DEFAULT_DIRECTOR_RESPONSE_LENGTH;
-        responseLengthInput.addEventListener('input', () => {
-            const n = parseInt(responseLengthInput.value, 10);
-            if (Number.isFinite(n) && n > 0) {
-                moduleSettings.directorResponseLength = n;
-                saveSettings();
-            }
-        });
-    }
-
-    const maxContextInput = document.getElementById('director_max_context_override');
-    if (maxContextInput) {
-        maxContextInput.value = moduleSettings.directorMaxContextOverride || 0;
-        maxContextInput.addEventListener('input', () => {
-            const n = parseInt(maxContextInput.value, 10);
-            moduleSettings.directorMaxContextOverride = Number.isFinite(n) && n > 0 ? n : 0;
-            saveSettings();
-        });
-    }
-
-    const promptArea = document.getElementById('director_prompt_textarea');
-    if (promptArea) {
-        promptArea.value = moduleSettings.directorPrompt || DEFAULT_DIRECTOR_PROMPT;
-        promptArea.addEventListener('input', () => {
-            moduleSettings.directorPrompt = promptArea.value;
-            saveSettings();
-        });
-    }
+    const bind = createSettingsBinder(moduleSettings, saveSettings);
+    bind.checkbox('director_enabled', 'directorEnabled', (on) => {
+        const [label, apply] = on ? ['applyManualMode', applyManualMode] : ['restoreStrategy', restoreStrategy];
+        apply().catch(err => console.error(`Group Director: ${label} failed:`, err));
+    });
+    bind.checkbox('director_confirm', 'directorConfirm');
+    bind.number('director_consecutive_turns', 'directorConsecutiveTurns', { fallback: DEFAULT_DIRECTOR_CONSECUTIVE_TURNS });
+    bind.checkbox('director_aligned_context', 'directorAlignedContext');
+    bind.number('director_response_length', 'directorResponseLength', { fallback: DEFAULT_DIRECTOR_RESPONSE_LENGTH });
+    bind.number('director_max_context_override', 'directorMaxContextOverride', { zeroMeansOff: true });
+    bind.text('director_prompt_textarea', 'directorPrompt',
+        templateSetting(moduleSettings, 'directorPrompt', DEFAULT_DIRECTOR_PROMPT));
 
     document.getElementById('director_preview_btn')
         ?.addEventListener('click', showDirectorPromptPreview);
 
     // Walk-on detection
-    const walkOnsCb = document.getElementById('director_walkons_enabled');
-    if (walkOnsCb) {
-        walkOnsCb.checked = !!moduleSettings.directorWalkOnsEnabled;
-        walkOnsCb.addEventListener('change', () => {
-            moduleSettings.directorWalkOnsEnabled = walkOnsCb.checked;
-            saveSettings();
-        });
-    }
-
-    const splitAutoCb = document.getElementById('director_walkon_split_auto');
-    if (splitAutoCb) {
-        splitAutoCb.checked = !!moduleSettings.directorWalkOnSplitAuto;
-        splitAutoCb.addEventListener('change', () => {
-            moduleSettings.directorWalkOnSplitAuto = splitAutoCb.checked;
-            saveSettings();
-        });
-    }
-
-    const includeWalkOnsCb = document.getElementById('director_include_walkons');
-    if (includeWalkOnsCb) {
-        includeWalkOnsCb.checked = !!moduleSettings.directorIncludeWalkOns;
-        includeWalkOnsCb.addEventListener('change', () => {
-            moduleSettings.directorIncludeWalkOns = includeWalkOnsCb.checked;
-            saveSettings();
-        });
-    }
+    bind.checkbox('director_walkons_enabled', 'directorWalkOnsEnabled');
+    bind.checkbox('director_walkon_split_auto', 'directorWalkOnSplitAuto');
+    bind.checkbox('director_include_walkons', 'directorIncludeWalkOns');
 
     const walkOnsArea = document.getElementById('director_walkons_textarea');
     if (walkOnsArea) {
@@ -1471,14 +1383,7 @@ export function bindDirectorSettings(saveSettings) {
     document.getElementById('director_walkons_scan')
         ?.addEventListener('click', scanWholeChatForWalkOns);
 
-    const debugCb = document.getElementById('director_debug_mode');
-    if (debugCb) {
-        debugCb.checked = !!moduleSettings.directorDebugMode;
-        debugCb.addEventListener('change', () => {
-            moduleSettings.directorDebugMode = debugCb.checked;
-            saveSettings();
-        });
-    }
+    bind.checkbox('director_debug_mode', 'directorDebugMode');
 
     refreshWalkOnPanel();
 }

@@ -27,6 +27,7 @@ import {
     readWIAEntryGuidance,
     saveWIAEntryGuidanceDebounced,
     flushWIAEntryGuidanceSave,
+    createSettingsBinder,
 } from './utils.js';
 import { templateSetting, textSetting, positiveIntSetting } from './settings-helpers.js';
 import {
@@ -736,89 +737,18 @@ async function onRetry(formEl, id) {
  */
 export function bindWIASettings(saveSettings) {
     saveSettingsCb = saveSettings;
-
-    const enabledCb = document.getElementById('wia_enabled');
-    const debugCb = document.getElementById('wia_debug_mode');
-    const promptArea = document.getElementById('wia_prompt_textarea');
-
-    if (enabledCb) {
-        enabledCb.checked = !!moduleSettings.wiaEnabled;
-        enabledCb.addEventListener('change', () => {
-            moduleSettings.wiaEnabled = enabledCb.checked;
-            saveSettings();
-            if (moduleSettings.wiaEnabled) {
-                rescanAllForms();
-            } else {
-                removeAllControls();
-            }
-        });
-    }
-    const copyBtnCb = document.getElementById('wia_copy_button_enabled');
-    if (copyBtnCb) {
-        copyBtnCb.checked = !!moduleSettings.wiaCopyButtonEnabled;
-        copyBtnCb.addEventListener('change', () => {
-            moduleSettings.wiaCopyButtonEnabled = copyBtnCb.checked;
-            saveSettings();
-            if (moduleSettings.wiaCopyButtonEnabled) {
-                rescanAllForms();
-            } else {
-                removeCopyButtons();
-            }
-        });
-    }
-    if (debugCb) {
-        debugCb.checked = !!moduleSettings.wiaDebugMode;
-        debugCb.addEventListener('change', () => {
-            moduleSettings.wiaDebugMode = debugCb.checked;
-            saveSettings();
-        });
-    }
-    const maxContextInput = document.getElementById('wia_max_context_override');
-    if (maxContextInput) {
-        maxContextInput.value = moduleSettings.wiaMaxContextOverride || 0;
-        maxContextInput.addEventListener('input', () => {
-            const n = parseInt(maxContextInput.value, 10);
-            moduleSettings.wiaMaxContextOverride = Number.isFinite(n) && n > 0 ? n : 0;
-            saveSettings();
-        });
-    }
-    const responseLengthInput = document.getElementById('wia_response_length');
-    if (responseLengthInput) {
-        responseLengthInput.value = moduleSettings.wiaResponseLength || DEFAULT_WIA_RESPONSE_LENGTH;
-        responseLengthInput.addEventListener('input', () => {
-            const n = parseInt(responseLengthInput.value, 10);
-            if (Number.isFinite(n) && n > 0) {
-                moduleSettings.wiaResponseLength = n;
-                saveSettings();
-                document.querySelectorAll('.wia-tokens-input').forEach(el => { el.value = n; });
-            }
-        });
-    }
-    if (promptArea) {
-        promptArea.value = moduleSettings.wiaPrompt || DEFAULT_WIA_PROMPT;
-        promptArea.addEventListener('input', () => {
-            moduleSettings.wiaPrompt = promptArea.value;
-            saveSettings();
-        });
-    }
-
-    const prefillTitledArea = document.getElementById('wia_prefill_titled_textarea');
-    if (prefillTitledArea) {
-        prefillTitledArea.value = textSetting(moduleSettings, 'wiaPrefillTitled', DEFAULT_WIA_PREFILL_TITLED);
-        prefillTitledArea.addEventListener('input', () => {
-            moduleSettings.wiaPrefillTitled = prefillTitledArea.value;
-            saveSettings();
-        });
-    }
-
-    const prefillUntitledArea = document.getElementById('wia_prefill_untitled_textarea');
-    if (prefillUntitledArea) {
-        prefillUntitledArea.value = textSetting(moduleSettings, 'wiaPrefillUntitled', DEFAULT_WIA_PREFILL_UNTITLED);
-        prefillUntitledArea.addEventListener('input', () => {
-            moduleSettings.wiaPrefillUntitled = prefillUntitledArea.value;
-            saveSettings();
-        });
-    }
+    const bind = createSettingsBinder(moduleSettings, saveSettings);
+    bind.checkbox('wia_enabled', 'wiaEnabled', on => (on ? rescanAllForms() : removeAllControls()));
+    bind.checkbox('wia_copy_button_enabled', 'wiaCopyButtonEnabled', on => (on ? rescanAllForms() : removeCopyButtons()));
+    bind.checkbox('wia_debug_mode', 'wiaDebugMode');
+    bind.number('wia_max_context_override', 'wiaMaxContextOverride', { zeroMeansOff: true });
+    bind.number('wia_response_length', 'wiaResponseLength', {
+        fallback: DEFAULT_WIA_RESPONSE_LENGTH,
+        onChange: n => document.querySelectorAll('.wia-tokens-input').forEach(el => { el.value = n; }),
+    });
+    bind.text('wia_prompt_textarea', 'wiaPrompt', getWIAPromptTemplate());
+    bind.text('wia_prefill_titled_textarea', 'wiaPrefillTitled', textSetting(moduleSettings, 'wiaPrefillTitled', DEFAULT_WIA_PREFILL_TITLED));
+    bind.text('wia_prefill_untitled_textarea', 'wiaPrefillUntitled', textSetting(moduleSettings, 'wiaPrefillUntitled', DEFAULT_WIA_PREFILL_UNTITLED));
 
     document.getElementById('wia_preview_btn')
         ?.addEventListener('click', showWIAPromptPreview);

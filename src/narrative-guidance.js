@@ -55,8 +55,9 @@ import {
     getChatCharacters,
     getCurrentChatId,
     resolveInjectionRole,
+    createSettingsBinder,
 } from './utils.js';
-import { textSetting, positiveIntSetting } from './settings-helpers.js';
+import { templateSetting, textSetting, positiveIntSetting } from './settings-helpers.js';
 import {
     findTaggedScenarios,
     characterFileName,
@@ -162,6 +163,16 @@ function getSetting(track, suffix) {
     return moduleSettings?.[settingKey(track, suffix)];
 }
 
+/** The track's generation instructions (blank → the track's default). */
+function getUserPrompt(track) {
+    return templateSetting(moduleSettings, settingKey(track, 'Prompt'), track.defaultUserPrompt);
+}
+
+/** The track's injection wrapper (blank → the track's default). */
+function getInjectionTemplate(track) {
+    return templateSetting(moduleSettings, settingKey(track, 'InjectionPrompt'), track.defaultInjectionPrompt);
+}
+
 /** The track's prefill — literal, so a cleared field sends none. */
 function getPrefill(track) {
     return textSetting(moduleSettings, settingKey(track, 'GenerationPrompt'), track.defaultGenerationPrompt);
@@ -265,8 +276,7 @@ function scheduleChatStateSave(track, state) {
 }
 
 function resolveTurnCount(track) {
-    const n = getSetting(track, 'DefaultTurnCount');
-    return Number.isFinite(n) && n > 0 ? n : track.defaultTurnCount;
+    return positiveIntSetting(moduleSettings, settingKey(track, 'DefaultTurnCount'), track.defaultTurnCount);
 }
 
 // ─── Chat Characters & Lore ───
@@ -359,7 +369,7 @@ function reapplyInjection(track) {
         clearInjection(track);
         return;
     }
-    const tpl = getSetting(track, 'InjectionPrompt') || track.defaultInjectionPrompt;
+    const tpl = getInjectionTemplate(track);
     // state.guidance retains the generation prefill (so the textarea shows
     // it). Strip outer brackets here so {{guidance}} substitutes cleanly
     // into whatever injection template the user has configured.
@@ -396,11 +406,7 @@ function reapplyInjection(track) {
  * then long-term arc, then themes), matching the pre-template behavior.
  */
 function composeGenerationPrompt(track, preambleBlock, themesBlock, longGuidanceBlock, currentGuidanceBlock = '') {
-    const configured = getSetting(track, 'Prompt');
-    const tpl = (typeof configured === 'string' && configured.trim())
-        ? configured
-        : track.defaultUserPrompt;
-    const { text, used } = applyTemplateMacros(tpl, {
+    const { text, used } = applyTemplateMacros(getUserPrompt(track), {
         context: preambleBlock || '',
         themes: themesBlock || '',
         longGuidance: longGuidanceBlock || '',
@@ -442,7 +448,7 @@ function showNGPromptPreview(track) {
         ? 'Long-term story direction to stay consistent with:\n(the active long-term guidance)\n\n'
         : '';
     const prefill = getPrefill(track);
-    const injectionTpl = getSetting(track, 'InjectionPrompt') || track.defaultInjectionPrompt;
+    const injectionTpl = getInjectionTemplate(track);
     const injection = applyTemplateMacros(injectionTpl, {
         guidance: '(the generated guidance text, outer brackets stripped)',
     }).text;
@@ -1072,121 +1078,32 @@ function populateLoreBookPicker(track) {
 
 /** Bind every per-track control in the settings panel for one track. */
 function bindTrackControls(track, saveSettings) {
-    const enabledCb = trackEl(track, 'enabled');
-    if (enabledCb) {
-        enabledCb.checked = !!getSetting(track, 'Enabled');
-        enabledCb.addEventListener('change', () => {
-            moduleSettings[settingKey(track, 'Enabled')] = enabledCb.checked;
-            saveSettings();
-            if (enabledCb.checked) {
-                reapplyInjection(track);
-            } else {
-                clearInjection(track);
-            }
-        });
-    }
+    const bind = createSettingsBinder(moduleSettings, saveSettings);
+    const id = suffix => domId(track, suffix);
+    const key = suffix => settingKey(track, suffix);
+    const reapply = () => reapplyInjection(track);
 
-    const autoRegenCb = trackEl(track, 'auto_regen');
-    if (autoRegenCb) {
-        autoRegenCb.checked = !!getSetting(track, 'AutoRegen');
-        autoRegenCb.addEventListener('change', () => {
-            moduleSettings[settingKey(track, 'AutoRegen')] = autoRegenCb.checked;
-            saveSettings();
-        });
-    }
-
-    const turnCountInput = trackEl(track, 'default_turn_count');
-    if (turnCountInput) {
-        turnCountInput.value = getSetting(track, 'DefaultTurnCount') || track.defaultTurnCount;
-        turnCountInput.addEventListener('input', () => {
-            const n = parseInt(turnCountInput.value, 10);
-            if (Number.isFinite(n) && n > 0) {
-                moduleSettings[settingKey(track, 'DefaultTurnCount')] = n;
-                saveSettings();
-            }
-        });
-    }
-
-    const responseLengthInput = trackEl(track, 'response_length');
-    if (responseLengthInput) {
-        responseLengthInput.value = getSetting(track, 'ResponseLength') || DEFAULT_NG_RESPONSE_LENGTH;
-        responseLengthInput.addEventListener('input', () => {
-            const n = parseInt(responseLengthInput.value, 10);
-            if (Number.isFinite(n) && n > 0) {
-                moduleSettings[settingKey(track, 'ResponseLength')] = n;
-                saveSettings();
-            }
-        });
-    }
-
-    const maxContextInput = trackEl(track, 'max_context_override');
-    if (maxContextInput) {
-        maxContextInput.value = getSetting(track, 'MaxContextOverride') || 0;
-        maxContextInput.addEventListener('input', () => {
-            const n = parseInt(maxContextInput.value, 10);
-            moduleSettings[settingKey(track, 'MaxContextOverride')] = Number.isFinite(n) && n > 0 ? n : 0;
-            saveSettings();
-        });
-    }
-
-    const userPromptArea = trackEl(track, 'user_prompt_textarea');
-    if (userPromptArea) {
-        userPromptArea.value = getSetting(track, 'Prompt') || track.defaultUserPrompt;
-        userPromptArea.addEventListener('input', () => {
-            moduleSettings[settingKey(track, 'Prompt')] = userPromptArea.value;
-            saveSettings();
-        });
-    }
-
-    const genArea = trackEl(track, 'generation_prompt_textarea');
-    if (genArea) {
-        genArea.value = getPrefill(track);
-        genArea.addEventListener('input', () => {
-            moduleSettings[settingKey(track, 'GenerationPrompt')] = genArea.value;
-            saveSettings();
-        });
-    }
-
-    const injectArea = trackEl(track, 'injection_prompt_textarea');
-    if (injectArea) {
-        injectArea.value = getSetting(track, 'InjectionPrompt') || track.defaultInjectionPrompt;
-        injectArea.addEventListener('input', () => {
-            const value = injectArea.value;
-            moduleSettings[settingKey(track, 'InjectionPrompt')] = value;
-            saveSettings();
+    bind.checkbox(id('enabled'), key('Enabled'), on => (on ? reapplyInjection(track) : clearInjection(track)));
+    bind.checkbox(id('auto_regen'), key('AutoRegen'));
+    bind.number(id('default_turn_count'), key('DefaultTurnCount'), { fallback: track.defaultTurnCount });
+    bind.number(id('response_length'), key('ResponseLength'), { fallback: DEFAULT_NG_RESPONSE_LENGTH });
+    bind.number(id('max_context_override'), key('MaxContextOverride'), { zeroMeansOff: true });
+    bind.text(id('user_prompt_textarea'), key('Prompt'),
+        getUserPrompt(track));
+    bind.text(id('generation_prompt_textarea'), key('GenerationPrompt'), getPrefill(track));
+    bind.text(id('injection_prompt_textarea'), key('InjectionPrompt'),
+        getInjectionTemplate(track), (value) => {
             if (value.trim() && !value.includes('{{guidance}}')) {
                 toast('Warning: Injection template lacks {{guidance}}; the AI won\'t see the guidance text.', 'warning');
             }
-            reapplyInjection(track);
+            reapply();
         });
-    }
 
     trackEl(track, 'preview_btn')
         ?.addEventListener('click', () => showNGPromptPreview(track));
 
-    const depthInput = trackEl(track, 'injection_depth');
-    if (depthInput) {
-        const configuredDepth = getSetting(track, 'InjectionDepth');
-        depthInput.value = Number.isFinite(configuredDepth) ? configuredDepth : DEFAULT_NG_INJECTION_DEPTH;
-        depthInput.addEventListener('input', () => {
-            const n = parseInt(depthInput.value, 10);
-            if (Number.isFinite(n) && n >= 0) {
-                moduleSettings[settingKey(track, 'InjectionDepth')] = n;
-                saveSettings();
-                reapplyInjection(track);
-            }
-        });
-    }
-
-    const scanCb = trackEl(track, 'scan_world_info');
-    if (scanCb) {
-        scanCb.checked = getSetting(track, 'ScanWorldInfo') !== false;
-        scanCb.addEventListener('change', () => {
-            moduleSettings[settingKey(track, 'ScanWorldInfo')] = scanCb.checked;
-            saveSettings();
-            reapplyInjection(track);
-        });
-    }
+    bind.number(id('injection_depth'), key('InjectionDepth'), { min: 0, fallback: DEFAULT_NG_INJECTION_DEPTH, onChange: reapply });
+    bind.checkbox(id('scan_world_info'), key('ScanWorldInfo'), reapply);
 
     trackEl(track, 'lorebooks_reset')?.addEventListener('click', () => {
         const state = loadChatState(track);
@@ -1198,15 +1115,7 @@ function bindTrackControls(track, saveSettings) {
         debug(`[${track.id}] Lore books reset to the chat's own`);
     });
 
-    const roleSelect = trackEl(track, 'injection_role');
-    if (roleSelect) {
-        roleSelect.value = getSetting(track, 'InjectionRole') || DEFAULT_NG_INJECTION_ROLE;
-        roleSelect.addEventListener('change', () => {
-            moduleSettings[settingKey(track, 'InjectionRole')] = roleSelect.value;
-            saveSettings();
-            reapplyInjection(track);
-        });
-    }
+    bind.select(id('injection_role'), key('InjectionRole'), DEFAULT_NG_INJECTION_ROLE, reapply);
 
     const themesArea = trackEl(track, 'themes_textarea');
     if (themesArea) {
@@ -1309,16 +1218,7 @@ export function bindNarrativeGuidanceSettings(saveSettings) {
         bindTrackControls(track, saveSettings);
     }
     bindScenarioControls();
-
-    // Shared (non per-track) controls.
-    const debugCb = document.getElementById('ng_debug_mode');
-    if (debugCb) {
-        debugCb.checked = !!moduleSettings.narrativeGuidanceDebugMode;
-        debugCb.addEventListener('change', () => {
-            moduleSettings.narrativeGuidanceDebugMode = debugCb.checked;
-            saveSettings();
-        });
-    }
+    createSettingsBinder(moduleSettings, saveSettings).checkbox('ng_debug_mode', 'narrativeGuidanceDebugMode');
 }
 
 // ─── Settings Migration ───
