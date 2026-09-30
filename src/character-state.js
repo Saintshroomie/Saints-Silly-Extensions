@@ -38,6 +38,8 @@ import {
     applyTemplateMacros,
     stripPrefillEcho,
     showPromptPreview,
+    getChatCharacters,
+    getCurrentChatId,
 } from './utils.js';
 import { templateSetting, textSetting, parsePositiveInt, positiveIntSetting } from './settings-helpers.js';
 import {
@@ -135,22 +137,6 @@ function findCharacterByAvatar(avatar) {
     return getContext().characters?.find(c => c?.avatar === avatar) || null;
 }
 
-/** Group members (or the solo character) of the open chat, as character objects. */
-function chatCharacters() {
-    const ctx = getContext();
-    if (ctx.groupId) {
-        const group = ctx.groups?.find(g => g.id === ctx.groupId);
-        return (group?.members || []).map(findCharacterByAvatar).filter(Boolean);
-    }
-    const char = ctx.characters?.[ctx.characterId];
-    return char ? [char] : [];
-}
-
-function currentChatId() {
-    const ctx = getContext();
-    return (typeof ctx.getCurrentChatId === 'function' ? ctx.getCurrentChatId() : ctx.chatId) || null;
-}
-
 // ─── Variable Discovery ───
 
 /** Lore books tied to a character: its primary (linked) book plus any additional books. */
@@ -238,7 +224,7 @@ export async function openCharacterStateModal(avatar) {
         toast('Character not found.', 'warning');
         return;
     }
-    const chatId = currentChatId();
+    const chatId = getCurrentChatId();
     if (!chatId) {
         toast('Open a chat first: state variables are stored per chat.', 'warning');
         return;
@@ -322,7 +308,7 @@ function capturePersistedModalState(body) {
 /** Close the pane if the chat it was opened for is no longer the open chat. */
 export function onCharacterStateChatChanged() {
     syncCharacterStateButtons();
-    if (!activePopup || currentChatId() === openChatId) return;
+    if (!activePopup || getCurrentChatId() === openChatId) return;
     debug('Chat changed under the open pane; closing without applying');
     if (isGenerating) {
         abortRequested = true;
@@ -578,7 +564,7 @@ function buildAssistSection() {
 async function applyChanges() {
     const changed = rows.filter(isDirty);
     if (!changed.length) return;
-    if (currentChatId() !== openChatId) {
+    if (getCurrentChatId() !== openChatId) {
         toast('The chat changed since this pane opened; nothing was applied.', 'warning');
         return;
     }
@@ -980,7 +966,7 @@ function showCharacterStatePromptPreview() {
 
 function findChatCharacter(query) {
     const q = String(query || '').trim().toLowerCase();
-    const cast = chatCharacters();
+    const cast = getChatCharacters();
     if (!q) return cast.length === 1 ? cast[0] : null;
     return cast.find(c => c.name?.toLowerCase() === q)
         || cast.find(c => c.avatar?.toLowerCase() === q)

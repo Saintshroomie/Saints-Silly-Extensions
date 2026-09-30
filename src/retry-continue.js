@@ -19,6 +19,8 @@ import { SlashCommand } from '../../../../slash-commands/SlashCommand.js';
 import {
     getContext,
     isGenerationInProgress,
+    confirmActiveMessageEdit,
+    waitForMessageEditClosed,
     createDebugLogger,
     toast,
 } from './utils.js';
@@ -112,25 +114,6 @@ function resetRetryState() {
     };
 }
 
-// ─── Auto-Confirm Edit ───
-
-/**
- * If any message is currently being edited (has a visible edit textarea),
- * confirm the edit so the message exits editing state before we proceed.
- */
-function confirmActiveMessageEdit() {
-    const visibleEditButtons = document.querySelector('#chat .mes .mes_edit_buttons[style*="display: inline-flex"]');
-    if (visibleEditButtons) {
-        const editDoneBtn = visibleEditButtons.querySelector('.mes_edit_done');
-        if (editDoneBtn) {
-            debug('confirmActiveMessageEdit: found active edit, clicking confirm');
-            editDoneBtn.click();
-            return true;
-        }
-    }
-    return false;
-}
-
 // ─── Core Retry Logic ───
 
 async function doRetry() {
@@ -138,6 +121,7 @@ async function doRetry() {
 
     // Auto-confirm any in-progress message edit
     const editWasActive = confirmActiveMessageEdit();
+    if (editWasActive) await waitForMessageEditClosed();
 
     const context = getContext();
 

@@ -35,7 +35,6 @@
 import {
     setExtensionPrompt,
     extension_prompt_types,
-    extension_prompt_roles,
 } from '../../../../../script.js';
 import { removeReasoningFromString } from '../../../../reasoning.js';
 import { loadWorldInfo, selected_world_info, world_info } from '../../../../world-info.js';
@@ -53,8 +52,11 @@ import {
     stripPrefillEcho,
     stripOuterBrackets,
     showPromptPreview,
+    getChatCharacters,
+    getCurrentChatId,
+    resolveInjectionRole,
 } from './utils.js';
-import { textSetting } from './settings-helpers.js';
+import { textSetting, positiveIntSetting } from './settings-helpers.js';
 import {
     findTaggedScenarios,
     characterFileName,
@@ -267,31 +269,12 @@ function resolveTurnCount(track) {
     return Number.isFinite(n) && n > 0 ? n : track.defaultTurnCount;
 }
 
-function resolveResponseLength(track) {
-    const n = getSetting(track, 'ResponseLength');
-    return Number.isFinite(n) && n > 0 ? n : DEFAULT_NG_RESPONSE_LENGTH;
-}
-
 // ─── Chat Characters & Lore ───
-
-/** The characters in the open chat: the group's members, or the solo character. */
-function chatCharacters() {
-    const ctx = getContext();
-    const characters = ctx.characters || [];
-    if (ctx.groupId) {
-        const group = ctx.groups?.find(g => g.id === ctx.groupId);
-        return (group?.members || [])
-            .map(avatar => characters.find(c => c?.avatar === avatar))
-            .filter(Boolean);
-    }
-    const char = characters[ctx.characterId];
-    return char ? [char] : [];
-}
 
 /** Each chat character's Character Filter identity: avatar file name + tag IDs. */
 function chatFilterCharacters() {
     const tagMap = getContext().tagMap || {};
-    return chatCharacters().map(char => ({
+    return getChatCharacters().map(char => ({
         fileName: characterFileName(char.avatar),
         tagIds: Array.isArray(tagMap[char.avatar]) ? tagMap[char.avatar] : null,
     }));
@@ -302,7 +285,7 @@ function chatTagIds() {
     const ctx = getContext();
     const tagMap = ctx.tagMap || {};
     const ids = new Set(ctx.groupId ? tagMap[ctx.groupId] || [] : []);
-    for (const char of chatCharacters()) {
+    for (const char of getChatCharacters()) {
         for (const id of tagMap[char.avatar] || []) ids.add(id);
     }
     return [...ids];
@@ -402,15 +385,6 @@ function reapplyInjection(track) {
         role,
     );
     debug(`[${track.id}] Injected guidance — depth:`, depth, 'role:', getSetting(track, 'InjectionRole'), 'scan:', scan, 'body length:', body.length);
-}
-
-function resolveInjectionRole(name) {
-    switch ((name || 'system').toLowerCase()) {
-        case 'user': return extension_prompt_roles.USER;
-        case 'assistant': return extension_prompt_roles.ASSISTANT;
-        case 'system':
-        default: return extension_prompt_roles.SYSTEM;
-    }
 }
 
 // ─── Generation ───
@@ -521,7 +495,7 @@ async function regenGuidance(track, reason) {
     const dismissProgressToast = stickyToast(`Generating ${track.label.toLowerCase()} narrative guidance…`, 'info');
 
     try {
-        const responseLength = resolveResponseLength(track);
+        const responseLength = positiveIntSetting(moduleSettings, settingKey(track, 'ResponseLength'), DEFAULT_NG_RESPONSE_LENGTH);
         const state = loadChatState(track);
         const preamble = await buildContextPreamble({
             includeChat: true,
@@ -630,7 +604,7 @@ async function continueGuidance(track) {
     const dismissProgressToast = stickyToast(`Continuing ${track.label.toLowerCase()} narrative guidance…`, 'info');
 
     try {
-        const responseLength = resolveResponseLength(track);
+        const responseLength = positiveIntSetting(moduleSettings, settingKey(track, 'ResponseLength'), DEFAULT_NG_RESPONSE_LENGTH);
 
         // True positional continuation (like ST's native Continue): the
         // paragraph so far is sent as the assistant prefill, so the model
@@ -705,11 +679,6 @@ function scenarioKey(scenario) {
     return `${scenario.book}\u0000${scenario.uid}`;
 }
 
-function currentChatId() {
-    const ctx = getContext();
-    return (typeof ctx.getCurrentChatId === 'function' ? ctx.getCurrentChatId() : ctx.chatId) || null;
-}
-
 /** Scan every lore book ST knows for scenario entries tagged for this chat. */
 async function scanChatScenarios(tagIds) {
     if (!tagIds.length) return [];
@@ -732,7 +701,7 @@ async function scanChatScenarios(tagIds) {
 export async function refreshNarrativeGuidanceScenarios() {
     if (!document.getElementById('ng_scenario_select')) return;
     const seq = ++scenarioScanSeq;
-    const tagIds = currentChatId() ? chatTagIds() : [];
+    const tagIds = getCurrentChatId() ? chatTagIds() : [];
     let found = [];
     try {
         found = await scanChatScenarios(tagIds);
@@ -777,7 +746,7 @@ function renderScenarioSelect() {
 
     if (hint) {
         const books = [...new Set(scenarioOptions.map(s => s.book))];
-        if (!currentChatId()) {
+        if (!getCurrentChatId()) {
             hint.textContent = 'Open a chat to see its scenarios.';
         } else if (!scenarioScanTags.length) {
             hint.textContent = getContext().groupId
@@ -811,7 +780,7 @@ async function applyScenario(track) {
         toast('Pick a scenario first.', 'warning');
         return;
     }
-    if (!currentChatId()) {
+    if (!getCurrentChatId()) {
         toast('Open a chat first: guidance is stored per chat.', 'warning');
         return;
     }

@@ -29,7 +29,6 @@ import { is_group_generating } from '../../../../group-chats.js';
 import {
     setExtensionPrompt,
     extension_prompt_types,
-    extension_prompt_roles,
     substituteParamsExtended,
 } from '../../../../../script.js';
 import {
@@ -39,6 +38,7 @@ import {
     toast,
     stickyToast,
     showPromptPreview,
+    resolveInjectionRole,
 } from './utils.js';
 import { templateSetting } from './settings-helpers.js';
 
@@ -293,15 +293,6 @@ function clearLearnedPhrases() {
 
 // ─── Proactive: Injection ───
 
-function resolveInjectionRole(name) {
-    switch ((name || DEFAULT_PHRASE_BAN_INJECTION_ROLE).toLowerCase()) {
-        case 'user': return extension_prompt_roles.USER;
-        case 'assistant': return extension_prompt_roles.ASSISTANT;
-        case 'system':
-        default: return extension_prompt_roles.SYSTEM;
-    }
-}
-
 function clearProactiveInjection() {
     setExtensionPrompt(PHRASE_BAN_INJECTION_KEY, '', extension_prompt_types.NONE, 0);
 }
@@ -332,7 +323,7 @@ export function reapplyProactiveInjection() {
     const depth = Number.isFinite(configuredDepth) && configuredDepth >= 0
         ? configuredDepth
         : DEFAULT_PHRASE_BAN_INJECTION_DEPTH;
-    const role = resolveInjectionRole(moduleSettings.phraseBanInjectionRole);
+    const role = resolveInjectionRole(moduleSettings.phraseBanInjectionRole || DEFAULT_PHRASE_BAN_INJECTION_ROLE);
     setExtensionPrompt(
         PHRASE_BAN_INJECTION_KEY,
         body,

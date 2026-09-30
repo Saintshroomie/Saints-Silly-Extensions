@@ -17,10 +17,9 @@ import {
     setWIOriginalDataValue,
     world_names,
 } from '../../../../world-info.js';
-import { getMaxPromptTokens } from '../../../../../script.js';
+import { getMaxPromptTokens, extension_prompt_roles } from '../../../../../script.js';
 import { getTokenCountAsync } from '../../../../tokenizers.js';
 import { Popup, POPUP_TYPE } from '../../../../popup.js';
-import { cancellableStreamingGenerate } from './silent-generation.js';
 import { entryVisibleToAll } from './scenario-books.js';
 
 // ─── Context ───
@@ -31,6 +30,51 @@ import { entryVisibleToAll } from './scenario-books.js';
  */
 export function getContext() {
     return SillyTavern.getContext();
+}
+
+/**
+ * The open chat's id, or null when no chat is open.
+ *
+ * @returns {string|null}
+ */
+export function getCurrentChatId() {
+    const ctx = getContext();
+    return (typeof ctx.getCurrentChatId === 'function' ? ctx.getCurrentChatId() : ctx.chatId) || null;
+}
+
+/**
+ * The characters in the open chat: every member of the group (muted ones
+ * included), or the solo character. Members are resolved by avatar — the
+ * unique on-disk file — since names can collide.
+ *
+ * @returns {object[]}
+ */
+export function getChatCharacters() {
+    const ctx = getContext();
+    const characters = ctx.characters || [];
+    if (ctx.groupId) {
+        const group = ctx.groups?.find(g => g.id === ctx.groupId);
+        return (group?.members || [])
+            .map(avatar => characters.find(c => c?.avatar === avatar))
+            .filter(Boolean);
+    }
+    const char = characters[ctx.characterId];
+    return char ? [char] : [];
+}
+
+/**
+ * Map a role setting ('system' | 'user' | 'assistant') to ST's
+ * `extension_prompt_roles` value; anything else is system.
+ *
+ * @param {string} name
+ * @returns {number}
+ */
+export function resolveInjectionRole(name) {
+    switch (String(name || '').toLowerCase()) {
+        case 'user': return extension_prompt_roles.USER;
+        case 'assistant': return extension_prompt_roles.ASSISTANT;
+        default: return extension_prompt_roles.SYSTEM;
+    }
 }
 
 // ─── Toast Notifications ───
@@ -56,9 +100,11 @@ export function toast(message, type = 'info', title = undefined) {
  * @param {string} message  - Text to display.
  * @param {string} [type]   - One of 'info', 'success', 'warning', 'error'.
  * @param {string} [title]  - Optional toast title.
+ * @param {object} [opts]
+ * @param {() => void} [opts.onClick] - Click handler (e.g. click-to-cancel).
  * @returns {() => void} Dismiss callback.
  */
-export function stickyToast(message, type = 'info', title = undefined) {
+export function stickyToast(message, type = 'info', title = undefined, { onClick } = {}) {
     if (typeof toastr === 'undefined' || !toastr[type]) {
         return () => {};
     }
@@ -67,6 +113,7 @@ export function stickyToast(message, type = 'info', title = undefined) {
         extendedTimeOut: 0,
         tapToDismiss: false,
         closeButton: false,
+        ...(onClick ? { onclick: onClick } : {}),
     });
     let dismissed = false;
     return () => {
@@ -126,23 +173,15 @@ export function saveExtensionSettings(extensionName, settings) {
 // ─── Message Edit Helpers ───
 
 /**
- * If a message is currently being edited (edit textarea visible), click "Done"
- * to confirm the edit programmatically.
+ * The `.mes` element whose text is open in SillyTavern's inline editor, or
+ * null. ST mounts a single `#curEditTextarea` while a message is being edited
+ * and removes it when the edit is confirmed or cancelled — the same marker its
+ * own hotkeys check — so key off that rather than button inline styles.
  *
- * @returns {boolean} `true` if an active edit was confirmed; `false` otherwise.
+ * @returns {HTMLElement|null}
  */
-export function confirmActiveMessageEdit() {
-    const visibleEditButtons = document.querySelector(
-        '#chat .mes .mes_edit_buttons[style*="display: inline-flex"]',
-    );
-    if (visibleEditButtons) {
-        const editDoneBtn = visibleEditButtons.querySelector('.mes_edit_done');
-        if (editDoneBtn) {
-            editDoneBtn.click();
-            return true;
-        }
-    }
-    return false;
+function getActiveEditMessageElement() {
+    return document.querySelector('#chat #curEditTextarea')?.closest('.mes') ?? null;
 }
 
 /**
@@ -152,14 +191,37 @@ export function confirmActiveMessageEdit() {
  * @returns {number}
  */
 export function getEditingMessageIndex() {
-    const visibleEditButtons = document.querySelector(
-        '#chat .mes .mes_edit_buttons[style*="display: inline-flex"]',
-    );
-    if (!visibleEditButtons) return -1;
-    const mesEl = visibleEditButtons.closest('.mes');
-    if (!mesEl) return -1;
-    const mesId = mesEl.getAttribute('mesid');
-    return mesId !== null ? parseInt(mesId) : -1;
+    const mesId = getActiveEditMessageElement()?.getAttribute('mesid');
+    return mesId != null ? parseInt(mesId, 10) : -1;
+}
+
+/**
+ * If a message is currently being edited, click its "Done" button to confirm
+ * the edit programmatically. ST writes the new text into `chat[N].mes`
+ * synchronously on confirm; the rest of its teardown is async — await
+ * {@link waitForMessageEditClosed} before acting on the message.
+ *
+ * @returns {boolean} `true` if an active edit was confirmed; `false` otherwise.
+ */
+export function confirmActiveMessageEdit() {
+    const doneBtn = getActiveEditMessageElement()?.querySelector('.mes_edit_done');
+    if (!doneBtn) return false;
+    doneBtn.click();
+    return true;
+}
+
+/**
+ * Resolve once no message editor is open (ST has finished tearing down a
+ * confirmed edit), or after `timeoutMs`.
+ *
+ * @param {number} [timeoutMs=2000]
+ * @returns {Promise<void>}
+ */
+export async function waitForMessageEditClosed(timeoutMs = 2000) {
+    const start = Date.now();
+    while (getActiveEditMessageElement() && Date.now() - start < timeoutMs) {
+        await new Promise(resolve => setTimeout(resolve, 25));
+    }
 }
 
 // ─── Generation Lifecycle ───
@@ -224,23 +286,13 @@ export function waitForGenerationEnd(timeoutMs = 5 * 60 * 1000) {
 /**
  * Run a raw silent generation, streaming tokens into targetEl as they
  * arrive when the backend supports it (see `cancellableStreamingGenerate`
- * for the support matrix); unsupported backends fall back to a single
- * write of the full response.
+ * for the support matrix). Routed through the silent-generation manager so
+ * ST's Stop button and `abortAllGenerations()` cancel it; on cancel it throws
+ * an AbortError (check with `isSilentGenerationAbort`).
  *
- * Routes through the silent-generation cancellation manager so the call can
- * be aborted by ST's stop button or by `abortAllSilentGenerations()`. On
- * cancel, this throws an AbortError (rather than returning the partial /
- * discarded result) so callers can short-circuit cleanly.
- *
- * @param {object} params - generateRaw parameters (prompt, systemPrompt, responseLength, etc.)
- * @param {HTMLTextAreaElement|null} targetEl - Field to stream into, or null for no streaming.
- * @param {{ append?: boolean, name?: string }} [opts]
- * @returns {Promise<string>} The full generated text.
- * @throws {DOMException} AbortError if the generation was cancelled.
+ * `streamingGenerate(params, targetEl, { append, name })` → full text.
  */
-export async function streamingGenerate(params, targetEl, opts = {}) {
-    return cancellableStreamingGenerate(params, targetEl, opts);
-}
+export { cancellableStreamingGenerate as streamingGenerate } from './silent-generation.js';
 
 // ─── Single-Line Override ───
 
@@ -788,6 +840,13 @@ function anchorChat(chat, endAtMessageIndex) {
         : chat;
 }
 
+/** The caller's max-context override when it's a positive number, else the model's prompt budget. */
+function resolveMaxContext(maxContextOverride) {
+    return (Number.isFinite(maxContextOverride) && maxContextOverride > 0)
+        ? maxContextOverride
+        : getMaxPromptTokens();
+}
+
 /**
  * Pack as many recent chat lines as the token budget allows, newest first,
  * but return them in chronological order. Returns '' if nothing fits.
@@ -903,9 +962,7 @@ export async function buildContextPreamble({
                 .filter(m => m && !m.is_system)
                 .map(m => (includeNames && m.name) ? `${m.name}: ${m.mes ?? ''}` : String(m.mes ?? ''))
                 .reverse();
-            const overrideValid = Number.isFinite(maxContextOverride) && maxContextOverride > 0;
-            const wiMaxContext = overrideValid ? maxContextOverride : getMaxPromptTokens();
-            const wi = await ctx.getWorldInfoPrompt(chatForWI, wiMaxContext, true);
+            const wi = await ctx.getWorldInfoPrompt(chatForWI, resolveMaxContext(maxContextOverride), true);
             const wiText = (wi?.worldInfoString || '').trim();
             if (wiText) sections.push(`[World Info]\n${wiText}`);
         } catch (err) {
@@ -927,8 +984,7 @@ export async function buildContextPreamble({
         if (chat.length) {
             let recentBlock = '';
             try {
-                const overrideValid = Number.isFinite(maxContextOverride) && maxContextOverride > 0;
-                const maxContext = overrideValid ? maxContextOverride : getMaxPromptTokens();
+                const maxContext = resolveMaxContext(maxContextOverride);
                 if (!Number.isFinite(maxContext) || maxContext <= 0) {
                     throw new Error(`maxContext resolved to ${maxContext}`);
                 }

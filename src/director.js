@@ -39,6 +39,7 @@ import {
     getContext,
     createDebugLogger,
     toast,
+    stickyToast,
     buildContextPreamble,
     streamingGenerate,
     withSingleLineDisabled,
@@ -46,6 +47,7 @@ import {
     showPromptPreview,
     isGenerationInProgress,
 } from './utils.js';
+import { positiveIntSetting } from './settings-helpers.js';
 import { isSilentGenerationAbort, abortAllGenerations } from './silent-generation.js';
 import {
     matchSpeakerLines,
@@ -654,11 +656,6 @@ export function startDirectorObserver() {
 
 // ─── Prompt Assembly ───
 
-function resolveResponseLength() {
-    const n = moduleSettings?.directorResponseLength;
-    return Number.isFinite(n) && n > 0 ? n : DEFAULT_DIRECTOR_RESPONSE_LENGTH;
-}
-
 /**
  * Aligned mode routes the director's silent generations through ST's normal
  * pipeline (`generateQuietPrompt`) so their prompt prefix matches the chat and
@@ -856,13 +853,8 @@ async function triggerMember(ctx, member) {
  * via `abortAllGenerations`. Returns a dismiss callback.
  */
 function cancellableProgressToast(message) {
-    if (typeof toastr === 'undefined' || !toastr.info) return () => {};
-    const $toast = toastr.info(message, undefined, {
-        timeOut: 0,
-        extendedTimeOut: 0,
-        tapToDismiss: false,
-        closeButton: false,
-        onclick: () => {
+    return stickyToast(message, 'info', undefined, {
+        onClick: () => {
             generationAborted = true;
             // Lean (raw) path: abort the silent job. Aligned path: stop the
             // pipeline generation. Call both — each is a no-op for the other.
@@ -870,12 +862,6 @@ function cancellableProgressToast(message) {
             abortAllGenerations('director-cancel');
         },
     });
-    let dismissed = false;
-    return () => {
-        if (dismissed) return;
-        dismissed = true;
-        if ($toast) toastr.clear($toast);
-    };
 }
 
 function showRollProgressToast() {
@@ -889,7 +875,7 @@ function showRollProgressToast() {
  * the generation was cancelled in aligned mode (the lean path throws instead).
  */
 async function rollDirector(ctx, roster) {
-    const responseLength = resolveResponseLength();
+    const responseLength = positiveIntSetting(moduleSettings, 'directorResponseLength', DEFAULT_DIRECTOR_RESPONSE_LENGTH);
     const rosterBlock = roster
         .map((m, i) => `${i + 1}. ${m.name}${m.kind === 'walkon' ? ' (walk-on)' : ''}`)
         .join('\n');

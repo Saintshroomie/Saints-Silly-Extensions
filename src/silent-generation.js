@@ -205,15 +205,6 @@ export function abortAllGenerations(reason = 'aborted') {
 }
 
 /**
- * Whether at least one silent generation is currently in flight.
- *
- * @returns {boolean}
- */
-export function hasActiveSilentGenerations() {
-    return activeJobs.size > 0;
-}
-
-/**
  * Run an async generation under the silent-generation cancellation system.
  *
  * The runner receives an AbortSignal. If the user clicks ST's stop button

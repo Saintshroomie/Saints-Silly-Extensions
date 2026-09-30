@@ -2514,6 +2514,174 @@ var code = `<div id="saints_silly_settings" class="extension_settings"> <div cla
 
 ;// external "../../../../popup.js"
 
+;// ./src/scenario-books.js
+/**
+ * Scenario books and lore scoping — pure helpers for Narrative Guidance.
+ * No SillyTavern imports, so they're unit-tested under plain Node
+ * (test/scenario-books.test.mjs); callers pass the loaded books, tag map
+ * data and characters in.
+ *
+ * - Scenario discovery: st-toolkit builds each world's scenarios into a
+ *   `<world>-scenarios` book, one disabled entry per scenario, commented
+ *   `Scenario — <Title>` and filtered to the world's character tag. A chat
+ *   whose group or characters carry that tag gets that world's scenarios.
+ * - Character filters: which lore entries every character in the chat may
+ *   see, mirroring ST's own per-character filter check, so guidance that is
+ *   injected into everyone's prompt is never built from one character's
+ *   private or shared-secret entries.
+ * - The chat's default lore books: the books ST would currently apply.
+ */
+
+// ─── Scenario Entries ───
+
+const SCENARIO_COMMENT_RE = /^\s*Scenario\s*[—–-]\s*(.+?)\s*$/;
+
+/**
+ * The title of an st-toolkit scenario entry (`Scenario — <Title>`), or null
+ * when the entry isn't one.
+ *
+ * @param {{ comment?: string }} entry
+ * @returns {string|null}
+ */
+function scenarioTitle(entry) {
+    const match = String(entry?.comment ?? '').match(SCENARIO_COMMENT_RE);
+    return match ? match[1] : null;
+}
+
+/**
+ * The scenarios a chat can use: st-toolkit scenario entries whose Character
+ * Filter includes one of the chat's tags (the group's own tags or any
+ * member's). Excluding filters and entries without content are skipped.
+ * Entries are returned sorted by book, then title.
+ *
+ * @param {{ name: string, entries: object }[]} books - loaded World Info books
+ * @param {string[]} chatTagIds - tag IDs on the group and its characters
+ * @returns {{ book: string, uid: number|string, title: string, content: string }[]}
+ */
+function findTaggedScenarios(books, chatTagIds) {
+    const tags = new Set(chatTagIds || []);
+    if (!tags.size) return [];
+    const found = [];
+    for (const { name, entries } of books || []) {
+        for (const [key, entry] of Object.entries(entries || {})) {
+            const title = scenarioTitle(entry);
+            if (!title) continue;
+            const content = typeof entry.content === 'string' ? entry.content.trim() : '';
+            if (!content) continue;
+            const filter = entry.characterFilter;
+            if (!filter || filter.isExclude) continue;
+            if (!(filter.tags || []).some(tag => tags.has(tag))) continue;
+            found.push({ book: name, uid: entry.uid ?? key, title, content });
+        }
+    }
+    return found.sort((a, b) => a.book.localeCompare(b.book) || a.title.localeCompare(b.title));
+}
+
+// ─── Character Filters ───
+
+/** ST's filter key for a character: the avatar file without its extension. */
+function characterFileName(avatar) {
+    return String(avatar || '').replace(/\.[^/.]+$/, '');
+}
+
+/**
+ * Whether ST would let `character` see `entry`, mirroring the check in
+ * world-info.js: a names filter, then a tags filter, each inverted by
+ * `isExclude`. As in ST, the tag check is skipped when the character has no
+ * tag-map entry (`tagIds` not an array).
+ *
+ * @param {{ characterFilter?: { names?: string[], tags?: string[], isExclude?: boolean } }} entry
+ * @param {{ fileName: string, tagIds?: string[]|null }} character
+ * @returns {boolean}
+ */
+function entryPassesCharacterFilter(entry, character) {
+    const filter = entry?.characterFilter;
+    if (!filter) return true;
+    const exclude = !!filter.isExclude;
+    if (Array.isArray(filter.names) && filter.names.length > 0) {
+        const included = filter.names.includes(character.fileName);
+        if (exclude ? included : !included) return false;
+    }
+    if (Array.isArray(filter.tags) && filter.tags.length > 0 && Array.isArray(character.tagIds)) {
+        const included = character.tagIds.some(tag => filter.tags.includes(tag));
+        if (exclude ? included : !included) return false;
+    }
+    return true;
+}
+
+/**
+ * Whether every character in the chat may see `entry`. Guidance built from
+ * an entry is injected into every character's prompt, so an entry only some
+ * of them can see (a private layer, a shared secret) must stay out of it.
+ * With no characters to check against, nothing is filtered.
+ *
+ * @param {object} entry
+ * @param {{ fileName: string, tagIds?: string[]|null }[]} characters
+ * @returns {boolean}
+ */
+function entryVisibleToAll(entry, characters) {
+    if (!Array.isArray(characters) || !characters.length) return true;
+    return characters.every(character => entryPassesCharacterFilter(entry, character));
+}
+
+// ─── Default Lore Books ───
+
+/**
+ * A character's own lore books, as ST loads them for its turns: the linked
+ * (primary) book, then any additional books from `world_info.charLore`.
+ *
+ * @param {{ avatar?: string, data?: { extensions?: { world?: string } } }} character
+ * @param {{ name: string, extraBooks?: string[] }[]} [charLore] - `world_info.charLore`
+ * @returns {string[]}
+ */
+function characterLoreBooks(character, charLore = []) {
+    const names = [];
+    const primary = character?.data?.extensions?.world;
+    if (primary) names.push(primary);
+    const fileName = characterFileName(character?.avatar);
+    const extra = (charLore || []).find(e => e?.name === fileName);
+    for (const name of extra?.extraBooks || []) {
+        if (name && !names.includes(name)) names.push(name);
+    }
+    return names;
+}
+
+/**
+ * The lore books ST currently applies to a chat, in its own order: global
+ * (active) books, the chat's bound book, the persona's book, and — in a
+ * one-on-one chat — the character's linked and additional books. A group's
+ * character books are left out: ST loads each only for that member's own
+ * turns, and they hold the members' private layers. Duplicates are dropped,
+ * and when `available` is given, so are books ST doesn't know about.
+ *
+ * @param {object} sources
+ * @param {string[]} [sources.globalBooks]
+ * @param {string|null} [sources.chatBook]
+ * @param {string|null} [sources.personaBook]
+ * @param {string[]} [sources.characterBooks]
+ * @param {boolean} [sources.isGroup]
+ * @param {string[]} [sources.available]
+ * @returns {string[]}
+ */
+function defaultChatLoreBooks({
+    globalBooks = [],
+    chatBook = null,
+    personaBook = null,
+    characterBooks = [],
+    isGroup = false,
+    available = [],
+} = {}) {
+    const ordered = [...globalBooks, chatBook, personaBook, ...(isGroup ? [] : characterBooks)];
+    const known = available.length ? new Set(available) : null;
+    const out = [];
+    for (const name of ordered) {
+        if (!name || out.includes(name)) continue;
+        if (known && !known.has(name)) continue;
+        out.push(name);
+    }
+    return out;
+}
+
 ;// external "../../../../custom-request.js"
 
 ;// external "../../../../openai.js"
@@ -2717,15 +2885,6 @@ function abortAllGenerations(reason = 'aborted') {
     } catch (err) {
         debug('ST stopGeneration() threw:', err);
     }
-}
-
-/**
- * Whether at least one silent generation is currently in flight.
- *
- * @returns {boolean}
- */
-function hasActiveSilentGenerations() {
-    return activeJobs.size > 0;
 }
 
 /**
@@ -3075,174 +3234,6 @@ async function cancellableStreamingGenerate(params, targetEl, { append = false, 
     }
 }
 
-;// ./src/scenario-books.js
-/**
- * Scenario books and lore scoping — pure helpers for Narrative Guidance.
- * No SillyTavern imports, so they're unit-tested under plain Node
- * (test/scenario-books.test.mjs); callers pass the loaded books, tag map
- * data and characters in.
- *
- * - Scenario discovery: st-toolkit builds each world's scenarios into a
- *   `<world>-scenarios` book, one disabled entry per scenario, commented
- *   `Scenario — <Title>` and filtered to the world's character tag. A chat
- *   whose group or characters carry that tag gets that world's scenarios.
- * - Character filters: which lore entries every character in the chat may
- *   see, mirroring ST's own per-character filter check, so guidance that is
- *   injected into everyone's prompt is never built from one character's
- *   private or shared-secret entries.
- * - The chat's default lore books: the books ST would currently apply.
- */
-
-// ─── Scenario Entries ───
-
-const SCENARIO_COMMENT_RE = /^\s*Scenario\s*[—–-]\s*(.+?)\s*$/;
-
-/**
- * The title of an st-toolkit scenario entry (`Scenario — <Title>`), or null
- * when the entry isn't one.
- *
- * @param {{ comment?: string }} entry
- * @returns {string|null}
- */
-function scenarioTitle(entry) {
-    const match = String(entry?.comment ?? '').match(SCENARIO_COMMENT_RE);
-    return match ? match[1] : null;
-}
-
-/**
- * The scenarios a chat can use: st-toolkit scenario entries whose Character
- * Filter includes one of the chat's tags (the group's own tags or any
- * member's). Excluding filters and entries without content are skipped.
- * Entries are returned sorted by book, then title.
- *
- * @param {{ name: string, entries: object }[]} books - loaded World Info books
- * @param {string[]} chatTagIds - tag IDs on the group and its characters
- * @returns {{ book: string, uid: number|string, title: string, content: string }[]}
- */
-function findTaggedScenarios(books, chatTagIds) {
-    const tags = new Set(chatTagIds || []);
-    if (!tags.size) return [];
-    const found = [];
-    for (const { name, entries } of books || []) {
-        for (const [key, entry] of Object.entries(entries || {})) {
-            const title = scenarioTitle(entry);
-            if (!title) continue;
-            const content = typeof entry.content === 'string' ? entry.content.trim() : '';
-            if (!content) continue;
-            const filter = entry.characterFilter;
-            if (!filter || filter.isExclude) continue;
-            if (!(filter.tags || []).some(tag => tags.has(tag))) continue;
-            found.push({ book: name, uid: entry.uid ?? key, title, content });
-        }
-    }
-    return found.sort((a, b) => a.book.localeCompare(b.book) || a.title.localeCompare(b.title));
-}
-
-// ─── Character Filters ───
-
-/** ST's filter key for a character: the avatar file without its extension. */
-function characterFileName(avatar) {
-    return String(avatar || '').replace(/\.[^/.]+$/, '');
-}
-
-/**
- * Whether ST would let `character` see `entry`, mirroring the check in
- * world-info.js: a names filter, then a tags filter, each inverted by
- * `isExclude`. As in ST, the tag check is skipped when the character has no
- * tag-map entry (`tagIds` not an array).
- *
- * @param {{ characterFilter?: { names?: string[], tags?: string[], isExclude?: boolean } }} entry
- * @param {{ fileName: string, tagIds?: string[]|null }} character
- * @returns {boolean}
- */
-function entryPassesCharacterFilter(entry, character) {
-    const filter = entry?.characterFilter;
-    if (!filter) return true;
-    const exclude = !!filter.isExclude;
-    if (Array.isArray(filter.names) && filter.names.length > 0) {
-        const included = filter.names.includes(character.fileName);
-        if (exclude ? included : !included) return false;
-    }
-    if (Array.isArray(filter.tags) && filter.tags.length > 0 && Array.isArray(character.tagIds)) {
-        const included = character.tagIds.some(tag => filter.tags.includes(tag));
-        if (exclude ? included : !included) return false;
-    }
-    return true;
-}
-
-/**
- * Whether every character in the chat may see `entry`. Guidance built from
- * an entry is injected into every character's prompt, so an entry only some
- * of them can see (a private layer, a shared secret) must stay out of it.
- * With no characters to check against, nothing is filtered.
- *
- * @param {object} entry
- * @param {{ fileName: string, tagIds?: string[]|null }[]} characters
- * @returns {boolean}
- */
-function entryVisibleToAll(entry, characters) {
-    if (!Array.isArray(characters) || !characters.length) return true;
-    return characters.every(character => entryPassesCharacterFilter(entry, character));
-}
-
-// ─── Default Lore Books ───
-
-/**
- * A character's own lore books, as ST loads them for its turns: the linked
- * (primary) book, then any additional books from `world_info.charLore`.
- *
- * @param {{ avatar?: string, data?: { extensions?: { world?: string } } }} character
- * @param {{ name: string, extraBooks?: string[] }[]} [charLore] - `world_info.charLore`
- * @returns {string[]}
- */
-function characterLoreBooks(character, charLore = []) {
-    const names = [];
-    const primary = character?.data?.extensions?.world;
-    if (primary) names.push(primary);
-    const fileName = characterFileName(character?.avatar);
-    const extra = (charLore || []).find(e => e?.name === fileName);
-    for (const name of extra?.extraBooks || []) {
-        if (name && !names.includes(name)) names.push(name);
-    }
-    return names;
-}
-
-/**
- * The lore books ST currently applies to a chat, in its own order: global
- * (active) books, the chat's bound book, the persona's book, and — in a
- * one-on-one chat — the character's linked and additional books. A group's
- * character books are left out: ST loads each only for that member's own
- * turns, and they hold the members' private layers. Duplicates are dropped,
- * and when `available` is given, so are books ST doesn't know about.
- *
- * @param {object} sources
- * @param {string[]} [sources.globalBooks]
- * @param {string|null} [sources.chatBook]
- * @param {string|null} [sources.personaBook]
- * @param {string[]} [sources.characterBooks]
- * @param {boolean} [sources.isGroup]
- * @param {string[]} [sources.available]
- * @returns {string[]}
- */
-function defaultChatLoreBooks({
-    globalBooks = [],
-    chatBook = null,
-    personaBook = null,
-    characterBooks = [],
-    isGroup = false,
-    available = [],
-} = {}) {
-    const ordered = [...globalBooks, chatBook, personaBook, ...(isGroup ? [] : characterBooks)];
-    const known = available.length ? new Set(available) : null;
-    const out = [];
-    for (const name of ordered) {
-        if (!name || out.includes(name)) continue;
-        if (known && !known.has(name)) continue;
-        out.push(name);
-    }
-    return out;
-}
-
 ;// ./src/text-utils.js
 /**
  * Pure text helpers shared by the generation tools. No SillyTavern imports,
@@ -3363,7 +3354,6 @@ function stripOuterBrackets(text) {
 
 
 
-
 // ─── Context ───
 
 /**
@@ -3372,6 +3362,51 @@ function stripOuterBrackets(text) {
  */
 function getContext() {
     return SillyTavern.getContext();
+}
+
+/**
+ * The open chat's id, or null when no chat is open.
+ *
+ * @returns {string|null}
+ */
+function getCurrentChatId() {
+    const ctx = getContext();
+    return (typeof ctx.getCurrentChatId === 'function' ? ctx.getCurrentChatId() : ctx.chatId) || null;
+}
+
+/**
+ * The characters in the open chat: every member of the group (muted ones
+ * included), or the solo character. Members are resolved by avatar — the
+ * unique on-disk file — since names can collide.
+ *
+ * @returns {object[]}
+ */
+function getChatCharacters() {
+    const ctx = getContext();
+    const characters = ctx.characters || [];
+    if (ctx.groupId) {
+        const group = ctx.groups?.find(g => g.id === ctx.groupId);
+        return (group?.members || [])
+            .map(avatar => characters.find(c => c?.avatar === avatar))
+            .filter(Boolean);
+    }
+    const char = characters[ctx.characterId];
+    return char ? [char] : [];
+}
+
+/**
+ * Map a role setting ('system' | 'user' | 'assistant') to ST's
+ * `extension_prompt_roles` value; anything else is system.
+ *
+ * @param {string} name
+ * @returns {number}
+ */
+function resolveInjectionRole(name) {
+    switch (String(name || '').toLowerCase()) {
+        case 'user': return __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_roles__.USER;
+        case 'assistant': return __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_roles__.ASSISTANT;
+        default: return __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_roles__.SYSTEM;
+    }
 }
 
 // ─── Toast Notifications ───
@@ -3397,9 +3432,11 @@ function toast(message, type = 'info', title = undefined) {
  * @param {string} message  - Text to display.
  * @param {string} [type]   - One of 'info', 'success', 'warning', 'error'.
  * @param {string} [title]  - Optional toast title.
+ * @param {object} [opts]
+ * @param {() => void} [opts.onClick] - Click handler (e.g. click-to-cancel).
  * @returns {() => void} Dismiss callback.
  */
-function stickyToast(message, type = 'info', title = undefined) {
+function stickyToast(message, type = 'info', title = undefined, { onClick } = {}) {
     if (typeof toastr === 'undefined' || !toastr[type]) {
         return () => {};
     }
@@ -3408,6 +3445,7 @@ function stickyToast(message, type = 'info', title = undefined) {
         extendedTimeOut: 0,
         tapToDismiss: false,
         closeButton: false,
+        ...(onClick ? { onclick: onClick } : {}),
     });
     let dismissed = false;
     return () => {
@@ -3467,23 +3505,15 @@ function saveExtensionSettings(extensionName, settings) {
 // ─── Message Edit Helpers ───
 
 /**
- * If a message is currently being edited (edit textarea visible), click "Done"
- * to confirm the edit programmatically.
+ * The `.mes` element whose text is open in SillyTavern's inline editor, or
+ * null. ST mounts a single `#curEditTextarea` while a message is being edited
+ * and removes it when the edit is confirmed or cancelled — the same marker its
+ * own hotkeys check — so key off that rather than button inline styles.
  *
- * @returns {boolean} `true` if an active edit was confirmed; `false` otherwise.
+ * @returns {HTMLElement|null}
  */
-function confirmActiveMessageEdit() {
-    const visibleEditButtons = document.querySelector(
-        '#chat .mes .mes_edit_buttons[style*="display: inline-flex"]',
-    );
-    if (visibleEditButtons) {
-        const editDoneBtn = visibleEditButtons.querySelector('.mes_edit_done');
-        if (editDoneBtn) {
-            editDoneBtn.click();
-            return true;
-        }
-    }
-    return false;
+function getActiveEditMessageElement() {
+    return document.querySelector('#chat #curEditTextarea')?.closest('.mes') ?? null;
 }
 
 /**
@@ -3493,14 +3523,37 @@ function confirmActiveMessageEdit() {
  * @returns {number}
  */
 function getEditingMessageIndex() {
-    const visibleEditButtons = document.querySelector(
-        '#chat .mes .mes_edit_buttons[style*="display: inline-flex"]',
-    );
-    if (!visibleEditButtons) return -1;
-    const mesEl = visibleEditButtons.closest('.mes');
-    if (!mesEl) return -1;
-    const mesId = mesEl.getAttribute('mesid');
-    return mesId !== null ? parseInt(mesId) : -1;
+    const mesId = getActiveEditMessageElement()?.getAttribute('mesid');
+    return mesId != null ? parseInt(mesId, 10) : -1;
+}
+
+/**
+ * If a message is currently being edited, click its "Done" button to confirm
+ * the edit programmatically. ST writes the new text into `chat[N].mes`
+ * synchronously on confirm; the rest of its teardown is async — await
+ * {@link waitForMessageEditClosed} before acting on the message.
+ *
+ * @returns {boolean} `true` if an active edit was confirmed; `false` otherwise.
+ */
+function confirmActiveMessageEdit() {
+    const doneBtn = getActiveEditMessageElement()?.querySelector('.mes_edit_done');
+    if (!doneBtn) return false;
+    doneBtn.click();
+    return true;
+}
+
+/**
+ * Resolve once no message editor is open (ST has finished tearing down a
+ * confirmed edit), or after `timeoutMs`.
+ *
+ * @param {number} [timeoutMs=2000]
+ * @returns {Promise<void>}
+ */
+async function waitForMessageEditClosed(timeoutMs = 2000) {
+    const start = Date.now();
+    while (getActiveEditMessageElement() && Date.now() - start < timeoutMs) {
+        await new Promise(resolve => setTimeout(resolve, 25));
+    }
 }
 
 // ─── Generation Lifecycle ───
@@ -3565,23 +3618,13 @@ function waitForGenerationEnd(timeoutMs = 5 * 60 * 1000) {
 /**
  * Run a raw silent generation, streaming tokens into targetEl as they
  * arrive when the backend supports it (see `cancellableStreamingGenerate`
- * for the support matrix); unsupported backends fall back to a single
- * write of the full response.
+ * for the support matrix). Routed through the silent-generation manager so
+ * ST's Stop button and `abortAllGenerations()` cancel it; on cancel it throws
+ * an AbortError (check with `isSilentGenerationAbort`).
  *
- * Routes through the silent-generation cancellation manager so the call can
- * be aborted by ST's stop button or by `abortAllSilentGenerations()`. On
- * cancel, this throws an AbortError (rather than returning the partial /
- * discarded result) so callers can short-circuit cleanly.
- *
- * @param {object} params - generateRaw parameters (prompt, systemPrompt, responseLength, etc.)
- * @param {HTMLTextAreaElement|null} targetEl - Field to stream into, or null for no streaming.
- * @param {{ append?: boolean, name?: string }} [opts]
- * @returns {Promise<string>} The full generated text.
- * @throws {DOMException} AbortError if the generation was cancelled.
+ * `streamingGenerate(params, targetEl, { append, name })` → full text.
  */
-async function streamingGenerate(params, targetEl, opts = {}) {
-    return cancellableStreamingGenerate(params, targetEl, opts);
-}
+
 
 // ─── Single-Line Override ───
 
@@ -4129,6 +4172,13 @@ function anchorChat(chat, endAtMessageIndex) {
         : chat;
 }
 
+/** The caller's max-context override when it's a positive number, else the model's prompt budget. */
+function resolveMaxContext(maxContextOverride) {
+    return (Number.isFinite(maxContextOverride) && maxContextOverride > 0)
+        ? maxContextOverride
+        : __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_getMaxPromptTokens__();
+}
+
 /**
  * Pack as many recent chat lines as the token budget allows, newest first,
  * but return them in chronological order. Returns '' if nothing fits.
@@ -4244,9 +4294,7 @@ async function buildContextPreamble({
                 .filter(m => m && !m.is_system)
                 .map(m => (includeNames && m.name) ? `${m.name}: ${m.mes ?? ''}` : String(m.mes ?? ''))
                 .reverse();
-            const overrideValid = Number.isFinite(maxContextOverride) && maxContextOverride > 0;
-            const wiMaxContext = overrideValid ? maxContextOverride : __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_getMaxPromptTokens__();
-            const wi = await ctx.getWorldInfoPrompt(chatForWI, wiMaxContext, true);
+            const wi = await ctx.getWorldInfoPrompt(chatForWI, resolveMaxContext(maxContextOverride), true);
             const wiText = (wi?.worldInfoString || '').trim();
             if (wiText) sections.push(`[World Info]\n${wiText}`);
         } catch (err) {
@@ -4268,8 +4316,7 @@ async function buildContextPreamble({
         if (chat.length) {
             let recentBlock = '';
             try {
-                const overrideValid = Number.isFinite(maxContextOverride) && maxContextOverride > 0;
-                const maxContext = overrideValid ? maxContextOverride : __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_getMaxPromptTokens__();
+                const maxContext = resolveMaxContext(maxContextOverride);
                 if (!Number.isFinite(maxContext) || maxContext <= 0) {
                     throw new Error(`maxContext resolved to ${maxContext}`);
                 }
@@ -4413,7 +4460,8 @@ let phrasingApi = null;
 
 let possession_debug = () => {};
 
-function possession_toast(message, type = 'info') {
+/** Possession's status toasts, silenced by its Show Toasts setting. */
+function possessionToast(message, type = 'info') {
     if (!ctx.settings.possessionShowToast) return;
     toast(message, type, 'Saint\'s Silly Extensions');
 }
@@ -4422,10 +4470,6 @@ function possession_toast(message, type = 'info') {
 
 function isPossessing() {
     return ctx.settings.possessionEnabled && possessedCharName !== null;
-}
-
-function getPossessedCharName() {
-    return possessedCharName;
 }
 
 // ─── Persistence ───
@@ -4488,7 +4532,7 @@ function validatePossessedCharInGroup() {
     });
     if (!isMember) {
         possession_debug('Possessed character removed from group, clearing');
-        possession_toast(`${possessedCharName} was removed from the group. Possession cleared.`, 'warning');
+        possessionToast(`${possessedCharName} was removed from the group. Possession cleared.`, 'warning');
         setPossession(null);
     }
 }
@@ -4525,10 +4569,10 @@ function setPossession(charName, charAvatar) {
     syncAllPossessionUI();
     if (previous !== charName) {
         if (charName) {
-            possession_toast(`Possessing ${charName}`, 'success');
+            possessionToast(`Possessing ${charName}`, 'success');
             possession_debug('Now possessing:', charName);
         } else if (previous) {
-            possession_toast('Possession cleared', 'info');
+            possessionToast('Possession cleared', 'info');
             possession_debug('Possession cleared');
         }
     }
@@ -4977,7 +5021,7 @@ function registerPossessionSlashCommands() {
 
             if (!name) {
                 if (isPossessing()) {
-                    toastr.info(`Currently possessing: ${possessedCharName}`, 'Possession');
+                    toast(`Currently possessing: ${possessedCharName}`, 'info', 'Possession');
                     return possessedCharName;
                 }
                 const context = getContext();
@@ -4988,7 +5032,7 @@ function registerPossessionSlashCommands() {
                         return char.name;
                     }
                 }
-                toastr.info('No character is currently possessed.', 'Possession');
+                toast('No character is currently possessed.', 'info', 'Possession');
                 return 'None';
             }
 
@@ -4998,7 +5042,7 @@ function registerPossessionSlashCommands() {
             if (context.groupId) {
                 const group = context.groups.find(g => g.id === context.groupId);
                 if (!group) {
-                    toastr.error('No active group found.', 'Possession');
+                    toast('No active group found.', 'error', 'Possession');
                     return '';
                 }
                 const match = group.members
@@ -5007,7 +5051,7 @@ function registerPossessionSlashCommands() {
                     .find(c => c.name.toLowerCase().includes(nameLower));
 
                 if (!match) {
-                    toastr.error(`No group member matching "${name}" found.`, 'Possession');
+                    toast(`No group member matching "${name}" found.`, 'error', 'Possession');
                     return '';
                 }
                 setPossession(match.name, match.avatar);
@@ -5018,7 +5062,7 @@ function registerPossessionSlashCommands() {
                     setPossession(char.name, char.avatar);
                     return char.name;
                 }
-                toastr.error(`Character "${name}" does not match the active character.`, 'Possession');
+                toast(`Character "${name}" does not match the active character.`, 'error', 'Possession');
                 return '';
             }
         },
@@ -5171,7 +5215,7 @@ let autoPhrasingStopped = false;
 /** @type {{ settings: object }} */
 let phrasing_ctx = null;
 
-/** @type {{ isPossessing: function, getPossessedCharName: function, postPossessedMessage: function }} */
+/** @type {{ isPossessing: function, postPossessedMessage: function }} */
 let possessionApi = null;
 
 /** @type {{ runDirectorTurn: function }} */
@@ -5346,15 +5390,19 @@ function applyPhrasingEnabledState() {
 // ─── Primary Flow (Input Enrichment) ───
 
 /**
- * @param {string} seedText
+ * Enrich the user's typed text: while possessing, post it as the possessed
+ * character and swipe-rewrite that message; otherwise inject it (labelled
+ * with the persona's name) and run /impersonate.
+ *
+ * @param {string} inputText - The raw text the user typed.
  * @param {object} [options]
  * @param {(index: number) => void} [options.onMessagePosted] - Called with the
  *   chat index once a possessed message has been posted, before it is rewritten.
  *   Lets callers tell "nothing happened" apart from "the message is in the chat
  *   but the rewrite did not finish".
  */
-async function doPrimaryFlow(seedText, options = {}) {
-    phrasing_debug('doPrimaryFlow — starting, seed length:', seedText.length);
+async function doPrimaryFlow(inputText, options = {}) {
+    phrasing_debug('doPrimaryFlow — starting, input length:', inputText.length);
     const context = getContext();
 
     if (isGenerationInProgress()) {
@@ -5368,23 +5416,18 @@ async function doPrimaryFlow(seedText, options = {}) {
         if (possessionApi?.isPossessing()) {
             phrasing_debug('doPrimaryFlow — possessed path: posting message then swiping');
 
-            const colonIndex = seedText.indexOf(': ');
-            const rawText = colonIndex !== -1 ? seedText.substring(colonIndex + 2) : seedText;
-
-            const messageIndex = await possessionApi.postPossessedMessage(rawText);
+            const messageIndex = await possessionApi.postPossessedMessage(inputText);
             if (messageIndex < 0) {
                 phrasing_debug('doPrimaryFlow — FAILED: could not post possessed message');
                 return '';
             }
             options.onMessagePosted?.(messageIndex);
 
-            await new Promise(resolve => setTimeout(resolve, 100));
-
             const result = await doSwipeMode(messageIndex);
             phrasing_debug('doPrimaryFlow — possessed path complete, result length:', result.length);
             return result;
         } else {
-            const assembled = assemblePrompt(seedText);
+            const assembled = assemblePrompt(formatSeedWithSpeaker(inputText, true));
             injectPhrasingPrompt(assembled);
 
             phrasing_debug('doPrimaryFlow — normal path: triggering /impersonate');
@@ -5447,7 +5490,7 @@ async function doSwipeMode(messageIndex, options = {}) {
     const rawSeedText = message.mes;
     if (!rawSeedText || !rawSeedText.trim()) {
         phrasing_debug('doSwipeMode — ABORTED: message is empty');
-        toastr.warning('Cannot rephrase an empty message.', 'Phrasing!');
+        toast('Cannot rephrase an empty message.', 'warning', 'Phrasing!');
         return '';
     }
 
@@ -5576,31 +5619,27 @@ async function onInputPhrasingClick() {
             phrasing_debug('onInputPhrasingClick — empty input, no edit → rephrase last message');
             const lastIndex = context.chat.length - 1;
             if (lastIndex < 0) {
-                toastr.warning('No messages to rephrase.', 'Phrasing!');
+                toast('No messages to rephrase.', 'warning', 'Phrasing!');
                 return;
             }
             await doSwipeMode(lastIndex);
         } else if (editingIndex >= 0 && !inputText) {
             phrasing_debug('onInputPhrasingClick — editing message at index', editingIndex, '→ confirm and rephrase');
             confirmActiveMessageEdit();
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await waitForMessageEditClosed();
             await doSwipeMode(editingIndex);
         } else {
             if (editingIndex >= 0) {
                 phrasing_debug('onInputPhrasingClick — confirming active edit before processing input');
                 confirmActiveMessageEdit();
-                await new Promise(resolve => setTimeout(resolve, 100));
+                await waitForMessageEditClosed();
             }
 
             phrasing_debug('onInputPhrasingClick — input text present, seed length:', inputText.length);
             textarea.value = '';
             textarea.dispatchEvent(new Event('input', { bubbles: true }));
 
-            const formattedSeed = possessionApi?.isPossessing()
-                ? formatSeedWithSpeaker(inputText, false, possessionApi.getPossessedCharName())
-                : formatSeedWithSpeaker(inputText, true);
-
-            await doPrimaryFlow(formattedSeed);
+            await doPrimaryFlow(inputText);
         }
     } finally {
         showAllPhrasingButtons();
@@ -5683,11 +5722,7 @@ async function runAutoPhrasing(inputText) {
     try {
         setInput('');
 
-        const seedText = possessing
-            ? formatSeedWithSpeaker(inputText, false, possessionApi.getPossessedCharName())
-            : formatSeedWithSpeaker(inputText, true);
-
-        const result = await doPrimaryFlow(seedText, {
+        const result = await doPrimaryFlow(inputText, {
             onMessagePosted: () => { posted = true; },
         });
 
@@ -5695,7 +5730,7 @@ async function runAutoPhrasing(inputText) {
             if (!posted) {
                 phrasing_debug('runAutoPhrasing — nothing was posted, handing the text back');
                 setInput(inputText);
-                toastr.warning('Auto Phrasing could not post the message. Your text was left in the chat box.', 'Phrasing!');
+                toast('Auto Phrasing could not post the message. Your text was left in the chat box.', 'warning', 'Phrasing!');
                 return;
             }
             if (autoPhrasingStopped) {
@@ -5710,7 +5745,7 @@ async function runAutoPhrasing(inputText) {
             phrasing_debug('runAutoPhrasing — rewrite produced nothing, handing the text back');
             setInput(inputText);
             if (!autoPhrasingStopped) {
-                toastr.warning('Auto Phrasing produced nothing. Your text was left in the chat box.', 'Phrasing!');
+                toast('Auto Phrasing produced nothing. Your text was left in the chat box.', 'warning', 'Phrasing!');
             }
             return;
         }
@@ -5728,7 +5763,7 @@ async function runAutoPhrasing(inputText) {
         console.error('[PHRASING] Auto Phrasing failed:', err);
         // Never swallow the user's message on an unexpected failure.
         if (!posted && !textarea?.value?.trim()) setInput(inputText);
-        toastr.error('Auto Phrasing failed. See the console for details.', 'Phrasing!');
+        toast('Auto Phrasing failed. See the console for details.', 'error', 'Phrasing!');
     } finally {
         autoPhrasingBusy = false;
         showAllPhrasingButtons();
@@ -5966,15 +6001,12 @@ function registerPhrasingSlashCommand() {
             const rawSeedText = unnamedArgs?.trim();
 
             if (rawSeedText) {
-                const seedText = possessionApi?.isPossessing()
-                    ? formatSeedWithSpeaker(rawSeedText, false, possessionApi.getPossessedCharName())
-                    : formatSeedWithSpeaker(rawSeedText, true);
-                return await doPrimaryFlow(seedText);
+                return await doPrimaryFlow(rawSeedText);
             } else {
                 const context = getContext();
                 const lastIndex = context.chat.length - 1;
                 if (lastIndex < 0) {
-                    toastr.warning('No messages to rephrase.', 'Phrasing!');
+                    toast('No messages to rephrase.', 'warning', 'Phrasing!');
                     return '';
                 }
                 return await doSwipeMode(lastIndex);
@@ -5999,7 +6031,7 @@ function registerPhrasingSlashCommand() {
 /**
  * @param {object} options
  * @param {object} options.settings       - Shared mutable settings reference.
- * @param {object} options.possessionApi  - { isPossessing(), getPossessedCharName(), postPossessedMessage(text) }
+ * @param {object} options.possessionApi  - { isPossessing(), postPossessedMessage(text) }
  */
 function initPhrasing({ settings, possessionApi: pApi, directorApi: dApi }) {
     phrasing_ctx = { settings };
@@ -6294,15 +6326,6 @@ function clearLearnedPhrases() {
 
 // ─── Proactive: Injection ───
 
-function resolveInjectionRole(name) {
-    switch ((name || DEFAULT_PHRASE_BAN_INJECTION_ROLE).toLowerCase()) {
-        case 'user': return __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_roles__.USER;
-        case 'assistant': return __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_roles__.ASSISTANT;
-        case 'system':
-        default: return __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_roles__.SYSTEM;
-    }
-}
-
 function clearProactiveInjection() {
     __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_setExtensionPrompt__(PHRASE_BAN_INJECTION_KEY, '', __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_types__.NONE, 0);
 }
@@ -6333,7 +6356,7 @@ function reapplyProactiveInjection() {
     const depth = Number.isFinite(configuredDepth) && configuredDepth >= 0
         ? configuredDepth
         : DEFAULT_PHRASE_BAN_INJECTION_DEPTH;
-    const role = resolveInjectionRole(phrase_ban_moduleSettings.phraseBanInjectionRole);
+    const role = resolveInjectionRole(phrase_ban_moduleSettings.phraseBanInjectionRole || DEFAULT_PHRASE_BAN_INJECTION_ROLE);
     __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_setExtensionPrompt__(
         PHRASE_BAN_INJECTION_KEY,
         body,
@@ -8145,7 +8168,7 @@ async function generateDescription(brief, ctxOptions) {
     assisted_character_creation_debug('Prefill:', prefill);
 
     const outputEl = document.getElementById('acc_description_output');
-    const result = await withSingleLineDisabled(() => streamingGenerate(
+    const result = await withSingleLineDisabled(() => cancellableStreamingGenerate(
         { prompt, systemPrompt, responseLength, ...(prefill ? { prefill } : {}) },
         outputEl,
         { append: false },
@@ -8169,7 +8192,7 @@ async function generateContinuation(brief, existing, ctxOptions) {
     const outputEl = document.getElementById('acc_description_output');
     // The sheet-so-far is the assistant prefill, so the model continues from
     // its exact end; strip any prefill echo to keep only the new tail.
-    const result = await withSingleLineDisabled(() => streamingGenerate(
+    const result = await withSingleLineDisabled(() => cancellableStreamingGenerate(
         { prompt, systemPrompt, responseLength, ...(existing ? { prefill: existing } : {}) },
         outputEl,
         { append: true },
@@ -8928,7 +8951,7 @@ async function onAssist(formEl, id, isContinue) {
         world_info_assist_debug('User prompt:', userPrompt);
         world_info_assist_debug('Prefill:', prefill);
 
-        const raw = await withSingleLineDisabled(() => streamingGenerate(
+        const raw = await withSingleLineDisabled(() => cancellableStreamingGenerate(
             {
                 prompt: userPrompt,
                 systemPrompt,
@@ -9483,22 +9506,6 @@ function findCharacterByAvatar(avatar) {
     return getContext().characters?.find(c => c?.avatar === avatar) || null;
 }
 
-/** Group members (or the solo character) of the open chat, as character objects. */
-function chatCharacters() {
-    const ctx = getContext();
-    if (ctx.groupId) {
-        const group = ctx.groups?.find(g => g.id === ctx.groupId);
-        return (group?.members || []).map(findCharacterByAvatar).filter(Boolean);
-    }
-    const char = ctx.characters?.[ctx.characterId];
-    return char ? [char] : [];
-}
-
-function currentChatId() {
-    const ctx = getContext();
-    return (typeof ctx.getCurrentChatId === 'function' ? ctx.getCurrentChatId() : ctx.chatId) || null;
-}
-
 // ─── Variable Discovery ───
 
 /** Lore books tied to a character: its primary (linked) book plus any additional books. */
@@ -9586,7 +9593,7 @@ async function openCharacterStateModal(avatar) {
         toast('Character not found.', 'warning');
         return;
     }
-    const chatId = currentChatId();
+    const chatId = getCurrentChatId();
     if (!chatId) {
         toast('Open a chat first: state variables are stored per chat.', 'warning');
         return;
@@ -9670,7 +9677,7 @@ function character_state_capturePersistedModalState(body) {
 /** Close the pane if the chat it was opened for is no longer the open chat. */
 function onCharacterStateChatChanged() {
     syncCharacterStateButtons();
-    if (!character_state_activePopup || currentChatId() === openChatId) return;
+    if (!character_state_activePopup || getCurrentChatId() === openChatId) return;
     character_state_debug('Chat changed under the open pane; closing without applying');
     if (character_state_isGenerating) {
         character_state_abortRequested = true;
@@ -9926,7 +9933,7 @@ function buildAssistSection() {
 async function applyChanges() {
     const changed = rows.filter(character_state_isDirty);
     if (!changed.length) return;
-    if (currentChatId() !== openChatId) {
+    if (getCurrentChatId() !== openChatId) {
         toast('The chat changed since this pane opened; nothing was applied.', 'warning');
         return;
     }
@@ -10080,7 +10087,7 @@ async function generateReply(instruction, ctxOptions, replyEl) {
     character_state_debug('Prompt:', prompt);
     character_state_debug('Prefill:', prefill);
 
-    const result = await withSingleLineDisabled(() => streamingGenerate(
+    const result = await withSingleLineDisabled(() => cancellableStreamingGenerate(
         { prompt, systemPrompt, responseLength, ...(prefill ? { prefill } : {}) },
         replyEl,
         { append: false, name: 'character-state' },
@@ -10328,7 +10335,7 @@ function showCharacterStatePromptPreview() {
 
 function findChatCharacter(query) {
     const q = String(query || '').trim().toLowerCase();
-    const cast = chatCharacters();
+    const cast = getChatCharacters();
     if (!q) return cast.length === 1 ? cast[0] : null;
     return cast.find(c => c.name?.toLowerCase() === q)
         || cast.find(c => c.avatar?.toLowerCase() === q)
@@ -10611,31 +10618,12 @@ function resolveTurnCount(track) {
     return Number.isFinite(n) && n > 0 ? n : track.defaultTurnCount;
 }
 
-function resolveResponseLength(track) {
-    const n = getSetting(track, 'ResponseLength');
-    return Number.isFinite(n) && n > 0 ? n : DEFAULT_NG_RESPONSE_LENGTH;
-}
-
 // ─── Chat Characters & Lore ───
-
-/** The characters in the open chat: the group's members, or the solo character. */
-function narrative_guidance_chatCharacters() {
-    const ctx = getContext();
-    const characters = ctx.characters || [];
-    if (ctx.groupId) {
-        const group = ctx.groups?.find(g => g.id === ctx.groupId);
-        return (group?.members || [])
-            .map(avatar => characters.find(c => c?.avatar === avatar))
-            .filter(Boolean);
-    }
-    const char = characters[ctx.characterId];
-    return char ? [char] : [];
-}
 
 /** Each chat character's Character Filter identity: avatar file name + tag IDs. */
 function chatFilterCharacters() {
     const tagMap = getContext().tagMap || {};
-    return narrative_guidance_chatCharacters().map(char => ({
+    return getChatCharacters().map(char => ({
         fileName: characterFileName(char.avatar),
         tagIds: Array.isArray(tagMap[char.avatar]) ? tagMap[char.avatar] : null,
     }));
@@ -10646,7 +10634,7 @@ function chatTagIds() {
     const ctx = getContext();
     const tagMap = ctx.tagMap || {};
     const ids = new Set(ctx.groupId ? tagMap[ctx.groupId] || [] : []);
-    for (const char of narrative_guidance_chatCharacters()) {
+    for (const char of getChatCharacters()) {
         for (const id of tagMap[char.avatar] || []) ids.add(id);
     }
     return [...ids];
@@ -10733,7 +10721,7 @@ function reapplyInjection(track) {
     const body = applyTemplateMacros(tpl, { guidance: guidanceForInjection }).text;
     const configuredDepth = getSetting(track, 'InjectionDepth');
     const depth = Number.isFinite(configuredDepth) && configuredDepth >= 0 ? configuredDepth : 0;
-    const role = narrative_guidance_resolveInjectionRole(getSetting(track, 'InjectionRole'));
+    const role = resolveInjectionRole(getSetting(track, 'InjectionRole'));
     // Scanned by World Info (on by default), so places and lore the guidance
     // names activate their entries, as a switched-on scenario entry would.
     const scan = getSetting(track, 'ScanWorldInfo') !== false;
@@ -10746,15 +10734,6 @@ function reapplyInjection(track) {
         role,
     );
     narrative_guidance_debug(`[${track.id}] Injected guidance — depth:`, depth, 'role:', getSetting(track, 'InjectionRole'), 'scan:', scan, 'body length:', body.length);
-}
-
-function narrative_guidance_resolveInjectionRole(name) {
-    switch ((name || 'system').toLowerCase()) {
-        case 'user': return __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_roles__.USER;
-        case 'assistant': return __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_roles__.ASSISTANT;
-        case 'system':
-        default: return __WEBPACK_EXTERNAL_MODULE__script_js_588e7203_extension_prompt_roles__.SYSTEM;
-    }
 }
 
 // ─── Generation ───
@@ -10865,7 +10844,7 @@ async function regenGuidance(track, reason) {
     const dismissProgressToast = stickyToast(`Generating ${track.label.toLowerCase()} narrative guidance…`, 'info');
 
     try {
-        const responseLength = resolveResponseLength(track);
+        const responseLength = positiveIntSetting(narrative_guidance_moduleSettings, settingKey(track, 'ResponseLength'), DEFAULT_NG_RESPONSE_LENGTH);
         const state = loadChatState(track);
         const preamble = await buildContextPreamble({
             includeChat: true,
@@ -10897,7 +10876,7 @@ async function regenGuidance(track, reason) {
         narrative_guidance_debug(`[${track.id}] User prompt length:`, userPrompt.length, 'prefill:', prefill);
 
         const guidanceArea = trackEl(track, 'active_guidance_textarea');
-        const raw = await withSingleLineDisabled(() => streamingGenerate(
+        const raw = await withSingleLineDisabled(() => cancellableStreamingGenerate(
             { prompt: userPrompt, systemPrompt, responseLength, prefill },
             guidanceArea,
             { append: false },
@@ -10974,7 +10953,7 @@ async function continueGuidance(track) {
     const dismissProgressToast = stickyToast(`Continuing ${track.label.toLowerCase()} narrative guidance…`, 'info');
 
     try {
-        const responseLength = resolveResponseLength(track);
+        const responseLength = positiveIntSetting(narrative_guidance_moduleSettings, settingKey(track, 'ResponseLength'), DEFAULT_NG_RESPONSE_LENGTH);
 
         // True positional continuation (like ST's native Continue): the
         // paragraph so far is sent as the assistant prefill, so the model
@@ -10994,7 +10973,7 @@ async function continueGuidance(track) {
         narrative_guidance_debug(`[${track.id}] Continue prompt length:`, continuePrompt.length);
 
         const guidanceArea = trackEl(track, 'active_guidance_textarea');
-        const raw = await withSingleLineDisabled(() => streamingGenerate(
+        const raw = await withSingleLineDisabled(() => cancellableStreamingGenerate(
             { prompt: continuePrompt, systemPrompt, responseLength, ...(state.guidance ? { prefill: state.guidance } : {}) },
             guidanceArea,
             { append: true },
@@ -11049,11 +11028,6 @@ function scenarioKey(scenario) {
     return `${scenario.book}\u0000${scenario.uid}`;
 }
 
-function narrative_guidance_currentChatId() {
-    const ctx = getContext();
-    return (typeof ctx.getCurrentChatId === 'function' ? ctx.getCurrentChatId() : ctx.chatId) || null;
-}
-
 /** Scan every lore book ST knows for scenario entries tagged for this chat. */
 async function scanChatScenarios(tagIds) {
     if (!tagIds.length) return [];
@@ -11076,7 +11050,7 @@ async function scanChatScenarios(tagIds) {
 async function refreshNarrativeGuidanceScenarios() {
     if (!document.getElementById('ng_scenario_select')) return;
     const seq = ++scenarioScanSeq;
-    const tagIds = narrative_guidance_currentChatId() ? chatTagIds() : [];
+    const tagIds = getCurrentChatId() ? chatTagIds() : [];
     let found = [];
     try {
         found = await scanChatScenarios(tagIds);
@@ -11121,7 +11095,7 @@ function renderScenarioSelect() {
 
     if (hint) {
         const books = [...new Set(scenarioOptions.map(s => s.book))];
-        if (!narrative_guidance_currentChatId()) {
+        if (!getCurrentChatId()) {
             hint.textContent = 'Open a chat to see its scenarios.';
         } else if (!scenarioScanTags.length) {
             hint.textContent = getContext().groupId
@@ -11155,7 +11129,7 @@ async function applyScenario(track) {
         toast('Pick a scenario first.', 'warning');
         return;
     }
-    if (!narrative_guidance_currentChatId()) {
+    if (!getCurrentChatId()) {
         toast('Open a chat first: guidance is stored per chat.', 'warning');
         return;
     }
@@ -11969,7 +11943,7 @@ async function runLLMReformat(text) {
 
     reformatting_debug('LLM reformat — prompt length:', userPrompt.length, 'prefill:', prefill);
 
-    const raw = await withSingleLineDisabled(() => streamingGenerate(
+    const raw = await withSingleLineDisabled(() => cancellableStreamingGenerate(
         {
             prompt: userPrompt,
             systemPrompt: getReformattingSystemPrompt(),
@@ -13237,7 +13211,7 @@ async function generateSummary(loreBookNames, guidance) {
 
     const outputEl = document.getElementById('cc_summary_output');
     compaction_debug('generateSummary — streamingGenerate START');
-    const result = await withSingleLineDisabled(() => streamingGenerate(
+    const result = await withSingleLineDisabled(() => cancellableStreamingGenerate(
         { prompt, systemPrompt, responseLength, ...(prefill ? { prefill } : {}) },
         outputEl,
         { append: false, name: 'compaction-summary' },
@@ -13259,7 +13233,7 @@ async function compaction_generateContinuation(loreBookNames, guidance, existing
     compaction_debug('generateContinuation — streamingGenerate START');
     // The recap-so-far is the assistant prefill — the model continues from its
     // exact end. Strip any prefill echo so we keep only the new tail.
-    const result = await withSingleLineDisabled(() => streamingGenerate(
+    const result = await withSingleLineDisabled(() => cancellableStreamingGenerate(
         { prompt, systemPrompt, responseLength, ...(existing ? { prefill: existing } : {}) },
         outputEl,
         { append: true, name: 'compaction-continue' },
@@ -15161,7 +15135,7 @@ async function generateImagePrompt(guidance, ctxOptions) {
     image_prompting_debug('Prefill:', prefill);
 
     const outputEl = document.getElementById('ip_prompt_output');
-    const result = await withSingleLineDisabled(() => streamingGenerate(
+    const result = await withSingleLineDisabled(() => cancellableStreamingGenerate(
         { prompt, systemPrompt, responseLength, ...(prefill ? { prefill } : {}) },
         outputEl,
         { append: false, name: 'image-prompt' },
@@ -15185,7 +15159,7 @@ async function image_prompting_generateContinuation(guidance, existing, ctxOptio
     const outputEl = document.getElementById('ip_prompt_output');
     // The prompt-so-far is the assistant prefill, so the model continues from
     // its exact end; strip any prefill echo to keep only the new tail.
-    const result = await withSingleLineDisabled(() => streamingGenerate(
+    const result = await withSingleLineDisabled(() => cancellableStreamingGenerate(
         { prompt, systemPrompt, responseLength, ...(existing ? { prefill: existing } : {}) },
         outputEl,
         { append: true, name: 'image-prompt-continue' },
@@ -15428,32 +15402,14 @@ function resetRetryState() {
     };
 }
 
-// ─── Auto-Confirm Edit ───
-
-/**
- * If any message is currently being edited (has a visible edit textarea),
- * confirm the edit so the message exits editing state before we proceed.
- */
-function retry_continue_confirmActiveMessageEdit() {
-    const visibleEditButtons = document.querySelector('#chat .mes .mes_edit_buttons[style*="display: inline-flex"]');
-    if (visibleEditButtons) {
-        const editDoneBtn = visibleEditButtons.querySelector('.mes_edit_done');
-        if (editDoneBtn) {
-            retry_continue_debug('confirmActiveMessageEdit: found active edit, clicking confirm');
-            editDoneBtn.click();
-            return true;
-        }
-    }
-    return false;
-}
-
 // ─── Core Retry Logic ───
 
 async function doRetry() {
     retry_continue_debug('doRetry: invoked');
 
     // Auto-confirm any in-progress message edit
-    const editWasActive = retry_continue_confirmActiveMessageEdit();
+    const editWasActive = confirmActiveMessageEdit();
+    if (editWasActive) await waitForMessageEditClosed();
 
     const context = getContext();
 
@@ -16443,6 +16399,7 @@ function pickWalkOnHostAvatar(ctx, group, message) {
 
 
 
+
 // ─── Constants ───
 
 const DIRECTOR_METADATA_KEY = 'director';
@@ -17038,11 +16995,6 @@ function startDirectorObserver() {
 
 // ─── Prompt Assembly ───
 
-function director_resolveResponseLength() {
-    const n = director_moduleSettings?.directorResponseLength;
-    return Number.isFinite(n) && n > 0 ? n : DEFAULT_DIRECTOR_RESPONSE_LENGTH;
-}
-
 /**
  * Aligned mode routes the director's silent generations through ST's normal
  * pipeline (`generateQuietPrompt`) so their prompt prefix matches the chat and
@@ -17240,13 +17192,8 @@ async function triggerMember(ctx, member) {
  * via `abortAllGenerations`. Returns a dismiss callback.
  */
 function cancellableProgressToast(message) {
-    if (typeof toastr === 'undefined' || !toastr.info) return () => {};
-    const $toast = toastr.info(message, undefined, {
-        timeOut: 0,
-        extendedTimeOut: 0,
-        tapToDismiss: false,
-        closeButton: false,
-        onclick: () => {
+    return stickyToast(message, 'info', undefined, {
+        onClick: () => {
             generationAborted = true;
             // Lean (raw) path: abort the silent job. Aligned path: stop the
             // pipeline generation. Call both — each is a no-op for the other.
@@ -17254,12 +17201,6 @@ function cancellableProgressToast(message) {
             abortAllGenerations('director-cancel');
         },
     });
-    let dismissed = false;
-    return () => {
-        if (dismissed) return;
-        dismissed = true;
-        if ($toast) toastr.clear($toast);
-    };
 }
 
 function showRollProgressToast() {
@@ -17273,7 +17214,7 @@ function showRollProgressToast() {
  * the generation was cancelled in aligned mode (the lean path throws instead).
  */
 async function rollDirector(ctx, roster) {
-    const responseLength = director_resolveResponseLength();
+    const responseLength = positiveIntSetting(director_moduleSettings, 'directorResponseLength', DEFAULT_DIRECTOR_RESPONSE_LENGTH);
     const rosterBlock = roster
         .map((m, i) => `${i + 1}. ${m.name}${m.kind === 'walkon' ? ' (walk-on)' : ''}`)
         .join('\n');
@@ -17298,7 +17239,7 @@ async function rollDirector(ctx, roster) {
         director_debug('Director roll (lean) — prompt length:', userPrompt.length);
         // No visible target field is needed; stream into a detached scratch element.
         const scratch = document.createElement('textarea');
-        const raw = await withSingleLineDisabled(() => streamingGenerate(
+        const raw = await withSingleLineDisabled(() => cancellableStreamingGenerate(
             { prompt: userPrompt, systemPrompt: DIRECTOR_SYSTEM_PROMPT, responseLength },
             scratch,
             { append: false },
@@ -18301,8 +18242,9 @@ const TOOLKIT_PRESETS_SPEC = {
 };
 
 ;// ./src/index.js
-// Saint's Silly Extensions — Possession, Phrasing, and Assisted Character Creation
-// Allows the user to "possess" a character, enrich messages with AI narration, and create characters with LLM assistance.
+// Saint's Silly Extensions — entry point. Owns the shared settings object,
+// initializes every tool module, injects the settings panel, and wires
+// SillyTavern's events to the modules' handlers.
 
 
 
@@ -18586,13 +18528,15 @@ const TOOL_PRESET_CONFIG = [
 
 let src_settings = { ...defaultSettings };
 
-const SSEDebug = createDebugLogger('SAINTS-SILLY-EXTENSIONS', () => true);
+// Lifecycle logging for the extension as a whole — on whenever any tool's
+// debug mode is (Diagnostics drawer), silent otherwise.
+const SSEDebug = createDebugLogger('SAINTS-SILLY-EXTENSIONS',
+    () => Object.keys(src_settings).some(key => key.endsWith('DebugMode') && src_settings[key]));
 
 // ─── Settings Persistence ───
 
 function saveSettings() {
     saveExtensionSettings(EXTENSION_NAME, src_settings);
-    SSEDebug('Settings saved');
 }
 
 function loadSettings() {
@@ -18626,7 +18570,7 @@ function loadSettings() {
         migrated = true;
     }
     if (migrated) saveSettings();
-    SSEDebug('Settings loaded:', JSON.stringify(src_settings));
+    SSEDebug('Settings loaded');
 }
 
 // ─── Settings Panel ───
@@ -18740,7 +18684,7 @@ jQuery(async () => {
     });
     initPhrasing({
         settings: src_settings,
-        possessionApi: { isPossessing: isPossessing, getPossessedCharName: getPossessedCharName, postPossessedMessage: postPossessedMessage },
+        possessionApi: { isPossessing: isPossessing, postPossessedMessage: postPossessedMessage },
         // Auto Phrasing's possessed send posts the message itself, so the
         // Director's MESSAGE_SENT path never fires — it asks for the turn here
         // instead of letting ST pick the next speaker.
