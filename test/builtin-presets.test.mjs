@@ -9,9 +9,11 @@ import { TOOLKIT_PRESETS_SPEC } from '../src/toolkit-presets.js';
 import { IMAGE_PROMPT_PRESETS_SPEC } from '../src/image-prompt-presets.js';
 import { TOOLS, clone } from './helpers.mjs';
 
-const V1 = JSON.parse(readFileSync(new URL('./fixtures/builtin-presets-v1.json', import.meta.url), 'utf8'));
+const readFixture = name => JSON.parse(readFileSync(new URL(`./fixtures/${name}`, import.meta.url), 'utf8'));
+const V1 = readFixture('builtin-presets-v1.json');
+const V2 = readFixture('builtin-presets-v2.json');
 const SPECS = { toolkit: TOOLKIT_PRESETS_SPEC, 'image-prompt': IMAGE_PROMPT_PRESETS_SPEC };
-const EXTENSION_PLACEHOLDERS = ['context', 'guidance', 'title', 'themes', 'longGuidance'];
+const EXTENSION_PLACEHOLDERS = ['context', 'guidance', 'title', 'themes', 'longGuidance', 'currentGuidance'];
 
 function* builtins(spec) {
     for (const [toolKey, presets] of Object.entries(spec.presets)) {
@@ -50,6 +52,30 @@ test('the cold-open scenario shows the model its override syntax', () => {
     assert.match(prompt, /\{\{\.sableTrueGoalOverride = /);
 });
 
+test('the cold-open scenario assigns every override set-once', () => {
+    const prompt = asSentToModel(TOOLKIT_PRESETS_SPEC.presets.wia['Scenario (Cold-open)'].wiaPrompt);
+    const assignments = [...prompt.matchAll(/^\{\{.*\{\{\.([<>A-Za-z]+) = .*$/gm)];
+    assert.ok(assignments.length >= 6);
+    for (const [line, variable] of assignments) {
+        assert.ok(line.startsWith(`{{if !.${variable}}}{{.${variable} = `) && line.endsWith('}}{{/if}}'), line);
+    }
+});
+
+test('the NG scenario presets evolve the current guidance', () => {
+    const { presets } = TOOLKIT_PRESETS_SPEC;
+    for (const [toolKey, name, key] of [
+        ['ng-short', 'Scenario', 'narrativeGuidanceShortPrompt'],
+        ['ng-long', 'Scenario Arc', 'narrativeGuidanceLongPrompt'],
+    ]) {
+        const template = presets[toolKey][name][key];
+        assert.match(template, /\{\{currentGuidance\}\}/, `${name} has a live {{currentGuidance}}`);
+        const sent = asSentToModel(template);
+        assert.match(sent, /Your reply replaces it, so rewrite it; do not start over\./, name);
+        assert.match(sent, /where they disagree, the chat wins/, name);
+        assert.match(sent, /When no current guidance is given, write the \w+ fresh from the context\./, name);
+    }
+});
+
 test('scenario presets stop at the closing bracket: no Openings block', () => {
     for (const { name, preset } of builtins(TOOLKIT_PRESETS_SPEC)) {
         for (const text of Object.values(preset)) {
@@ -77,16 +103,28 @@ test('built-ins only use their tool\'s prompt fields', () => {
     }
 });
 
-test('retired fingerprints match the texts v1 actually shipped', () => {
+test('retired fingerprints match the texts earlier versions actually shipped', () => {
     for (const [id, spec] of Object.entries(SPECS)) {
         for (const [toolKey, retired] of Object.entries(spec.retired || {})) {
             const keys = TOOLS.find(t => t.toolKey === toolKey).fields.map(f => f.key);
             for (const [name, fingerprints] of Object.entries(retired)) {
-                const shipped = V1[id][toolKey][name];
-                assert.ok(fingerprints.includes(fingerprintPreset(shipped, keys)), `${id}: ${toolKey} / ${name}`);
+                const shipped = [V1, V2].map(fixture => fixture[id]?.[toolKey]?.[name]).filter(Boolean);
+                assert.ok(shipped.length > 0, `${id}: ${toolKey} / ${name} has a fixture`);
+                for (const preset of shipped) {
+                    assert.ok(fingerprints.includes(fingerprintPreset(preset, keys)), `${id}: ${toolKey} / ${name}`);
+                }
             }
         }
     }
+});
+
+test('an untouched v2 Cold-open upgrades to the set-once text', () => {
+    const current = TOOLKIT_PRESETS_SPEC.presets;
+    const toolPresets = clone(current);
+    toolPresets.wia['Scenario (Cold-open)'] = clone(V2.toolkit.wia['Scenario (Cold-open)']);
+    const settings = { builtinPresetVersions: { toolkit: 2 }, toolPresets };
+    assert.equal(seedBuiltinPresets(settings, TOOLS, TOOLKIT_PRESETS_SPEC), true);
+    assert.deepEqual(settings.toolPresets.wia['Scenario (Cold-open)'], current.wia['Scenario (Cold-open)']);
 });
 
 test('an untouched v1 toolkit install upgrades to the current built-ins', () => {
@@ -104,4 +142,16 @@ test('an untouched v1 Image Prompting install picks up the negative prompts', ()
         assert.deepEqual(settings.toolPresets['image-prompt'][name], preset, name);
         assert.ok(preset.imagePromptNegative, `${name} ships a negative prompt`);
     }
+});
+
+test('an untouched v3 install picks up the evolving NG Scenario presets', () => {
+    const current = TOOLKIT_PRESETS_SPEC.presets;
+    const toolPresets = clone(current);
+    // NG Scenario texts were unchanged from v1 through v3.
+    toolPresets['ng-short'].Scenario = clone(V1.toolkit['ng-short'].Scenario);
+    toolPresets['ng-long']['Scenario Arc'] = clone(V1.toolkit['ng-long']['Scenario Arc']);
+    const settings = { builtinPresetVersions: { toolkit: 3 }, toolPresets };
+    assert.equal(seedBuiltinPresets(settings, TOOLS, TOOLKIT_PRESETS_SPEC), true);
+    assert.deepEqual(settings.toolPresets['ng-short'].Scenario, current['ng-short'].Scenario);
+    assert.deepEqual(settings.toolPresets['ng-long']['Scenario Arc'], current['ng-long']['Scenario Arc']);
 });

@@ -1,6 +1,6 @@
 # Saint's Silly Extensions
 
-A [SillyTavern](https://github.com/SillyTavern/SillyTavern) third-party extension that adds ten integrated roleplay tools: **Possession**, **Phrasing**, **Phrase Ban**, **Assisted Character Creation**, **World Info Assist**, **Narrative Guidance**, **Reformatting**, **Compaction**, **Image Prompting**, and **Retry Continue**.
+A [SillyTavern](https://github.com/SillyTavern/SillyTavern) third-party extension that adds twelve integrated roleplay tools: **Possession**, **Phrasing**, **Phrase Ban**, **Assisted Character Creation**, **World Info Assist**, **Character State**, **Narrative Guidance**, **Reformatting**, **Compaction**, **Image Prompting**, **Retry Continue**, and **Group Director**.
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes and version history.
 
@@ -13,6 +13,7 @@ See [CHANGELOG.md](CHANGELOG.md) for release notes and version history.
   - [Phrase Ban](#phrase-ban)
   - [Assisted Character Creation](#assisted-character-creation)
   - [World Info Assist](#world-info-assist)
+  - [Character State](#character-state)
   - [Narrative Guidance](#narrative-guidance)
   - [Reformatting](#reformatting)
   - [Compaction](#compaction)
@@ -27,6 +28,7 @@ See [CHANGELOG.md](CHANGELOG.md) for release notes and version history.
   - [Phrase Ban Settings](#phrase-ban-settings)
   - [Assisted Character Creation Settings](#assisted-character-creation-settings)
   - [World Info Assist Settings](#world-info-assist-settings)
+  - [Character State Settings](#character-state-settings)
   - [Narrative Guidance Settings](#narrative-guidance-settings)
   - [Reformatting Settings](#reformatting-settings)
   - [Compaction Settings](#compaction-settings)
@@ -174,6 +176,27 @@ Adds an **Assist** button to every World Info / lore book entry, letting you dra
 4. Click **Assist** to generate the entry. The result is written into the content textarea and saved automatically.
 5. Click **Continue** to extend the entry, or **Retry** to re-run Assist with your saved guidance (replacing the current content). Use the **Clear** buttons to wipe the guidance or content fields when starting over.
 
+### Character State
+
+View and update a character's **state variables** as the roleplay unfolds: the chat variables its card and lore read, such as clothing, stated goal, and true goal in the st-toolkit style:
+
+```
+Clothing: {{ .peterClothingOverride ?? Worn gray hoodie, dark jeans, scuffed sneakers }};
+```
+
+- **Per-character pane** — A sliders-icon button sits on every group member row (right after Possession's radio), and in the character panel in one-on-one chats. It opens a pane for that one character, so it stays uncluttered however many variables you add.
+- **Found automatically** — The pane lists every variable the character reads with `{{ .name ?? default }}` (also `||`, a bare `{{.name}}`, or `{{getvar::name}}`) in its card fields, character note, linked lore book (where st-toolkit's private layer lives), embedded book, or additional lore books. Each row shows the field label from the card line (`Clothing`, `True Goal`, …), the variable name, where it was found, and its current value, or the card default while it's unset.
+- **Edit by hand** — Type a new value, **Reset** to unset the variable so the card default applies again (emptying a field does the same), or **Undo** back to the chat's current value.
+- **Update with AI** — Write an instruction ("she changes into a swimsuit for the beach") and click **Propose Changes**; the model rewrites only the variables that need it, in the same dense-fragment style. Leave the instruction blank and it reads the recent chat for what has changed (new clothes, a new stated purpose, a shifted aim). Proposals fill the fields and are highlighted; nothing is saved until **Apply**, and you can edit or undo any of them first. **Use Chat Context** gives the model the cards, the chat's relevant World Info, and the recent chat; the lore-book picker adds extra books.
+- **Stored per chat** — Values go into the chat's local variables (`chatMetadata.variables`), the same store `/setvar` uses, so the character's card and lore pick them up on the very next turn. Compaction carries them into the compacted chat.
+- **Scenarios** — A cold-open scenario that assigns these variables must do it set-once, `{{if !.name}}{{.name = value}}{{/if}}`: the scenario is re-read every turn, and a bare `{{.name = value}}` would overwrite your change on the next reply. The built-in **Scenario (Cold-open)** preset writes this form.
+
+**How to use**
+
+1. Open a chat. In a group, click the sliders-icon button on a member's row in the group panel; in a one-on-one chat, open the character panel and click the sliders-icon button there. `/charstate [name]` opens the same pane.
+2. Edit values by hand, or type an instruction (or none) and click **Propose Changes**, then review the highlighted fields.
+3. Click **Apply** to save the changes to this chat.
+
 ### Narrative Guidance
 
 Periodically asks the LLM for a short paragraph of story guidance based on the current chat, character cards, and selected lore books, then injects that paragraph as a system prompt before every AI turn until a per-chat turn counter expires — at which point it auto-regenerates.
@@ -185,13 +208,14 @@ Guidance comes in **two independent tiers** that operate the same way but on dif
 
 Enable either tier on its own or both together. Each tier is fully self-contained — its own enable/auto-regen toggles, refresh horizon, prompts, lore-book picks, themes box, counter, and live guidance paragraph.
 
-- **Per-chat state** — Each tier's active guidance, remaining turn count, themes/ideas, and lore-book selection are persisted per chat (via `chatMetadata`) and reload automatically when switching chats. A brand-new chat starts with nothing selected, so an old chat's lore-book picks never leak into a new one. (Pre-split chats keep their guidance — it lands on the short-term tier.)
+- **Per-chat state** — Each tier's active guidance, remaining turn count, themes/ideas, and lore-book selection are persisted per chat (via `chatMetadata`) and reload automatically when switching chats. A new chat starts with its own lore books (see the picker below), so an old chat's picks never leak into it. (Pre-split chats keep their guidance — it lands on the short-term tier.)
 - **Auto-regenerate at zero** — When a tier's turn counter hits zero on the AI's reply that decrements it, a new guidance paragraph is generated in the background so it's ready before your next send. A full-screen overlay masks the UI for the duration of the regeneration so you can't accidentally send a message mid-regen. Optional per tier — turn it off to keep the counter purely as a manual prompt. A progress toast stays up while a generation runs.
 - **Manual regenerate** — A **Regenerate Now** button in each tier forces a fresh generation at any time. The `-1` and `Reset` buttons next to the remaining-turn display let you nudge or reset that tier's counter without regenerating.
-- **Editable everything** — Per tier: the generation instructions (the user prompt, with `{{context}}` / `{{themes}}` placeholders, plus `{{longGuidance}}` for short-term), the prefill the model continues from, the injection template (with `{{guidance}}` placeholder), and the live guidance paragraph itself are all directly editable. Edits to the active guidance apply on the next AI turn.
+- **Editable everything** — Per tier: the generation instructions (the user prompt, with `{{context}}` / `{{themes}}` / `{{currentGuidance}}` placeholders, plus `{{longGuidance}}` for short-term), the prefill the model continues from, the injection template (with `{{guidance}}` placeholder), and the live guidance paragraph itself are all directly editable. Edits to the active guidance apply on the next AI turn. SillyTavern macros in the guidance (`{{char}}`, variables, `{{if}}`) run when each reply is generated, for the character replying.
 - **Themes / arcs input** — Each tier has a per-chat textarea where you can offer themes, ideas, or general arcs for the model to weave into the next round of guidance.
-- **Injection controls** — Per tier: Depth and Role inputs (mirroring SillyTavern's Author's Note) control where in the prompt the guidance is inserted and which role it speaks as.
-- **Lore book picker** — The chat's relevant World Info is **auto-included** in each tier's guidance context (keyword-matched against the recent chat), so the picker is now an **additive override** — use it only to fold in *extra* books that wouldn't otherwise activate. The selection is **per-chat** — it resets to empty on a new chat and reloads when you switch chats. If a selected lore book is later deleted or renamed, it's silently dropped from the selection (with a one-time notice) the next time that chat's picker is opened or guidance is generated.
+- **Injection controls** — Per tier: Depth and Role inputs (mirroring SillyTavern's Author's Note) control where in the prompt the guidance is inserted and which role it speaks as. **Scan guidance for World Info keywords** (on by default) lets World Info read the injected guidance, so the places, characters, and lore it names activate their entries.
+- **Lore book picker** — The chat's relevant World Info is **auto-included** in each tier's guidance context (keyword-matched against the recent chat). On top of that, the picker starts on **this chat's books**, the ones SillyTavern currently applies to it: the global active books, the chat's bound book, your persona's book, and, in a one-on-one chat, the character's own books. Their entries go into the guidance context in full. Tick or untick books to make the pick your own (remembered per chat); **Chat's books** goes back to following the chat. Guidance reaches every character in the chat, so lore that only some of them may see (an entry filtered to certain characters, such as an st-toolkit shared secret or a member's private book) is left out of it. If a picked book is later deleted or renamed, it's dropped from the selection (with a one-time notice).
+- **Scenarios from st-toolkit scenario books** — The **Scenario** dropdown at the top of the drawer lists the scenarios filtered to this chat's character tag (the tag on the group or its characters, which is how st-toolkit's `<world>-scenarios` book scopes its entries). Pick one and click **Long-term** or **Short-term** to make it that tier's active guidance. It's injected exactly as written, so its set-once override variables and its opening lines work as they do from the book, and the book's entries can stay switched off. The tier's turn counter restarts; with **Auto-Regenerate** on, the tier then evolves the scene when the counter runs out, and with the **Scenario** / **Scenario Arc** presets that means rewriting the scenario to where the story now stands, from the chat and the lore.
 - **Configurable token limits** — Per tier: set the response token limit for the generation, and optionally cap how much chat history feeds into the context preamble.
 - **Scenario presets** — Built-in **Scenario** (short-term) and **Scenario Arc** (long-term) presets write the guidance as an st-toolkit-style Scenario Description, a live scene sheet in place of a prose paragraph. See [Scenario presets](#scenario-presets).
 
@@ -200,7 +224,8 @@ Enable either tier on its own or both together. Each tier is fully self-containe
 1. Open **Extensions** > **Saint's Silly Extensions** and find the **Narrative Guidance** section. It holds two tiers — **Long-term** (the overarching arc) and **Short-term** (the immediate beats). Open either sub-drawer and tick its **Enable** box. You can run one tier or both.
 2. (Optional) Adjust that tier's **Turns Between Regenerations** — how many AI replies elapse between automatic regenerations (defaults: long-term 40, short-term 8).
 3. (Optional) Edit the tier's **Themes / Story Arcs** textarea with anything you want its next round of guidance to weave in — ideas, arcs, "introduce a mysterious stranger", etc.
-4. (Optional) Tick lore books in the tier's picker to fold their entries into that tier's guidance generation context.
+4. (Optional) Adjust the tier's lore books. The picker starts on the books this chat already uses; change it to fold in others.
+   To start from a scene, pick a scenario from the **Scenario** dropdown and click **Short-term** (or **Long-term**).
 5. Send a message in your chat. With **Auto-Regenerate at Zero** on, the first generation for each enabled tier kicks off automatically (the UI is masked while it runs, and a progress toast stays up) and the resulting paragraph fills that tier's **Active Guidance** textarea. If both tiers are enabled, long-term generates first and short-term is seeded from it.
 6. From there, every subsequent AI turn is steered by the active guidance until a tier's counter hits zero, at which point that tier regenerates from the now-updated chat context (and your latest themes). When long-term refreshes, short-term re-aligns to the new arc.
 7. Click a tier's **Regenerate Now** at any time to force an immediate regeneration. Use **-1** and **Reset** to nudge that tier's counter without regenerating. Edit the **Active Guidance** textarea directly to hand-tune the steering.
@@ -237,7 +262,7 @@ Compaction **summarizes the chat, starts a fresh chat seeded with that summary p
 - **The handoff** — The summary lands in the new chat as a visible, editable **"Story so far"** message, followed by the last *N* messages (default 20) copied over **verbatim with swipes preserved**. The old chat is left intact and selectable from history.
 - **Manual or automatic trigger** — Trigger it from the <span title="compress icon">🗜</span> **Compact Chat** item in the hamburger menu or with `/compact`. With **Auto-open at threshold** on, the modal opens on its own once the *measured* outgoing prompt crosses your % of the context window (with an optional confirmation dialog). The trigger is the **only** automatic part — every compaction still requires you to act in the modal. Nothing is ever rewritten headlessly.
 - **st-toolkit recap formats** — Besides the Default prose recap, the **Prompt Preset** menu offers **Scenario (Continuation)** and **Timeline Summary**, which write the recap in st-toolkit's formats (see [Scenario presets](#scenario-presets)).
-- **State migration** — Possession, Narrative Guidance, Phrase Ban, and saved Image Prompt per-chat state carry over to the new chat (World Info Assist guidance travels on the lorebook automatically). Your Summary Guidance is remembered per-chat across compactions of the same storyline.
+- **State migration** — Possession, Narrative Guidance, Phrase Ban, and saved Image Prompt per-chat state, plus the chat's variables (Character State values, anything set with `/setvar`), carry over to the new chat (World Info Assist guidance travels on the lorebook automatically). Your Summary Guidance is remembered per-chat across compactions of the same storyline.
 
 **How to use**
 
@@ -404,6 +429,18 @@ Open **Extensions** > **Saint's Silly Extensions** in SillyTavern's settings pan
 | Prompt Template | Customize the prompt sent to the LLM for World Info entry generation. Supports `{{context}}`, `{{guidance}}`, and `{{title}}` placeholders; if context/guidance are missing, those blocks are added automatically. |
 | Prefill Templates (Titled / Untitled) | The assistant prefixes used when the entry has / lacks a title, also kept at the start of the entry on success. Titled supports `{{title}}`. Prefill echoes from backends that ignore prefills are stripped automatically. |
 
+### Character State Settings
+
+| Setting | Description |
+|---------|-------------|
+| Enable Character State | Show the Character State buttons (group member rows and the one-on-one character panel) and the `/charstate` command |
+| Character State Debug Mode | Log variable discovery, prompts, parsed proposals, and applied writes to the browser console (in the Diagnostics drawer) |
+| Response Token Limit | Maximum tokens for the model's reply to **Propose Changes** (one line per changed variable). Also settable from the pane's Max Tokens field. |
+| Max Context Override | If > 0, caps how many tokens of chat context the preamble packer uses. 0 = use the model's full context size. |
+| Preset / Preview Assembled Prompt | Save named bundles of the prompt + prefill and preview exactly what gets sent (see Tool Presets & Prompt Preview below) |
+| Prompt Template | The user prompt for **Propose Changes**. Placeholders: `{{context}}`, `{{character}}`, `{{variables}}` (each variable with its current value or card default), and `{{guidance}}` (your instruction, or a request to update from the recent chat). Missing placeholders are added automatically. The reply must be `name: value` lines. |
+| Prefill Template | Optional assistant prefix, empty by default. Echoes from backends that ignore prefills are stripped. |
+
 ### Narrative Guidance Settings
 
 The drawer holds two self-contained tiers — **Long-term** (the overarching arc) and **Short-term** (the immediate beats, seeded with the active long-term arc). Every setting below exists **per tier**, except **Narrative Guidance Debug Mode**, which is shared and lives in the Diagnostics drawer. Defaults differ only in the refresh horizon: long-term **40** turns, short-term **8**.
@@ -417,12 +454,14 @@ The drawer holds two self-contained tiers — **Long-term** (the overarching arc
 | Response Token Limit | Maximum tokens the model may use for each guidance paragraph (default 400) |
 | Max Context Override | If > 0, caps how many tokens of chat context the preamble packer uses for that tier's generations. 0 = use the model's full context size. |
 | Preset / Preview Assembled Prompt | Save named bundles of the tier's three prompt fields and preview exactly what gets sent (see Tool Presets & Prompt Preview below) |
-| Generation Instructions Template | The user prompt for each generation. Supports `{{context}}` and `{{themes}}` placeholders (short-term also supports `{{longGuidance}}` — the active long-term arc); if missing, the blocks are prepended automatically. |
+| Generation Instructions Template | The user prompt for each generation. Supports `{{context}}` and `{{themes}}` placeholders (short-term also supports `{{longGuidance}}` — the active long-term arc); if missing, the blocks are prepended automatically. `{{currentGuidance}}` is the tier's own guidance being replaced (an applied scenario, or the last generation), for templates that evolve it; it's only filled where the template asks for it. |
 | Prefill Template | The assistant prefix the LLM continues to produce the guidance paragraph; kept at the start of the stored guidance. Outer brackets are stripped at injection time. |
-| Injection Prompt Template | Template injected before each AI turn. Supports the `{{guidance}}` placeholder. |
+| Injection Prompt Template | Template injected before each AI turn. Supports the `{{guidance}}` placeholder. SillyTavern macros in the template and the guidance run at generation time, for the character replying. |
+| Scan guidance for World Info keywords | Let World Info scan the injected guidance, so what it names activates lore entries (default on) |
 | Depth | Number of recent chat messages to insert the guidance after (0 = at the bottom) |
 | Role | Role used when injecting the guidance (System / User / Assistant) |
-| Lore Books (per-chat) | Optional picker for lore books to feed into that tier's generation context. Stored per chat (resets on a new chat); missing books are dropped automatically |
+| Lore Books (per-chat) | Lore books fed into that tier's generation context. Starts on the books SillyTavern applies to this chat (global, chat, persona, and in a one-on-one chat the character's own); your changes are remembered per chat, and **Chat's books** goes back to following the chat. Entries only some of the chat's characters may see are left out. Missing books are dropped automatically |
+| Scenario (shared) | Scenarios from lore books filtered to this chat's character tags (st-toolkit scenario books), with **Long-term** / **Short-term** buttons to make one that tier's active guidance and restart its counter. The refresh button rescans after you import a book |
 | Themes / Story Arcs (per-chat) | Themes, ideas, or arcs for the model to weave into the tier's next round of guidance |
 | Active Guidance (per-chat) | The tier's currently active guidance paragraph. Edit directly to hand-tune steering; edits apply on the next AI turn. A **Clear** button beside the label wipes the tier's guidance and removes its prompt injection in one click. |
 | Turns Remaining / -1 / Reset / Regenerate Now | Manual controls over that tier's per-chat counter and on-demand regeneration |
@@ -449,7 +488,7 @@ The drawer holds two self-contained tiers — **Long-term** (the overarching arc
 | Enable Compaction | Toggle the Compaction feature, its **Compact Chat** menu item, `/compact`, and the auto-trigger |
 | Auto-open at threshold | When on, automatically open the Compaction modal after a turn finishes once the measured prompt crosses the threshold. The modal still requires you to act — nothing is rewritten headlessly |
 | Confirm before auto-opening | Show a confirmation dialog (with a **Don't ask again** option) before auto-opening the modal |
-| Migrate per-chat extension state | Carry Possession, Narrative Guidance, Phrase Ban, and saved Image Prompt per-chat state into the compacted chat (World Info Assist guidance travels on the lorebook automatically) |
+| Migrate per-chat extension state | Carry Possession, Narrative Guidance, Phrase Ban, and saved Image Prompt per-chat state, plus the chat's variables, into the compacted chat (World Info Assist guidance travels on the lorebook automatically) |
 | Auto Threshold (%) | Percent of the model's context window (measured outgoing prompt) that triggers the auto-open (default 90) |
 | Tail Length | How many of the most recent messages are copied into the new chat verbatim, swipes preserved (default 20). Older messages are replaced by the summary |
 | Summary Token Limit | Maximum tokens for the summary generation (default 1200) |
@@ -549,7 +588,7 @@ Generation templates support tool-specific placeholders, substituted in place. I
 | Phrase Ban | `{{phrasingSeed}}`, `{{bannedPhrases}}` (rewrite prompt); `{{bannedPhrases}}` (proactive prompt) |
 | Assisted Character Creation | `{{context}}`, `{{brief}}` |
 | World Info Assist | `{{context}}`, `{{guidance}}`, `{{title}}` |
-| Narrative Guidance | `{{context}}`, `{{themes}}`, plus `{{longGuidance}}` for the short-term tier (generation instructions); `{{guidance}}` (injection template) |
+| Narrative Guidance | `{{context}}`, `{{themes}}`, `{{currentGuidance}}` (only where used), plus `{{longGuidance}}` for the short-term tier (generation instructions); `{{guidance}}` (injection template) |
 | Reformatting | `{{message}}` (LLM prompt) |
 | Compaction | `{{context}}`, `{{guidance}}` |
 | Image Prompting | `{{context}}`, `{{guidance}}` |
@@ -560,10 +599,10 @@ World Info Assist, both Narrative Guidance tiers, and Compaction ship with built
 
 | Tool | Preset | Writes |
 |------|--------|--------|
-| World Info Assist | **Scenario (Cold-open)** | A fresh scene: `Scenario Title` / `Context` / `Location` / `Opening Focus` / `Offstage`, then `{{.<firstName>ClothingOverride = …}}`, `StatedGoalOverride`, and `TrueGoalOverride` lines for what the scene changes. |
+| World Info Assist | **Scenario (Cold-open)** | A fresh scene: `Scenario Title` / `Context` / `Location` / `Opening Focus` / `Offstage`, then set-once `{{if !.<firstName>ClothingOverride}}{{.<firstName>ClothingOverride = …}}{{/if}}`, `StatedGoalOverride`, and `TrueGoalOverride` lines for what the scene changes (set-once, so [Character State](#character-state) changes aren't overwritten on the next turn). |
 | World Info Assist | **Scenario (Continuation)** | A mid-story pickup built from the chat: `Story So Far`, `Present`, `<Name>'s Current Clothing` / `Current Aim`, and `Open Threads` as plain fields (no variables). Tick **Include chat** on the Assist row so the model has the story to draw from. |
-| Narrative Guidance (short-term) | **Scenario** | The continuation-variant fields as a live scene sheet, regenerated on the tier's clock: the scene as it stands at the latest message, with `Open Threads` for the next few turns. |
-| Narrative Guidance (long-term) | **Scenario Arc** | `Scenario Title` / `Story So Far` / `Context` / `Open Threads` for the overarching arc. The short-term Scenario is seeded from it. |
+| Narrative Guidance (short-term) | **Scenario** | The continuation-variant fields as a live scene sheet, regenerated on the tier's clock: the scene as it stands at the latest message, with `Open Threads` for the next few turns. Each refresh **evolves the current scene** rather than starting over: it rewrites the active guidance (a scenario applied from a scenario book, or the last refresh), keeping what still holds, updating what the chat changed, and moving resolved threads into `Story So Far`. |
+| Narrative Guidance (long-term) | **Scenario Arc** | `Scenario Title` / `Story So Far` / `Context` / `Open Threads` for the overarching arc, evolved from the current arc the same way. The short-term Scenario is seeded from it. |
 | Compaction | **Scenario (Continuation)** | The recap as a continuation scenario: the whole story's public beats in `Story So Far`, then where things stand as the summarized history ends, which is where the verbatim tail picks up. |
 | Compaction | **Timeline Summary** | st-toolkit's numbered event timeline (`**N. Event Title** – …`), one 3–6 sentence paragraph per event, in story order. An earlier compaction's timeline at the top of the chat is carried over whole and the numbering continues. |
 
@@ -585,6 +624,7 @@ Tips:
 | `/phraseban` | Scan the last message against the Phrase Ban regex list and rewrite it (as a new swipe) if banned phrasing is found |
 | `/reformat` | Reformat the last message using the configured engine (keeps the original as a swipe) |
 | `/compact` | Open the Compaction modal to summarize the chat and start a fresh, compacted chat seeded with the summary plus the recent tail |
+| `/charstate [name]` | Open the Character State pane for a character in this chat (the name is required in group chats) |
 | `/imageprompt` | Open the Image Prompting modal to generate a diffusion-model prompt depicting the current moment of the chat |
 | `/retry` | Retry the continuation from the saved checkpoint, creating a new swipe. If no checkpoint exists, sets one from the current message and continues |
 | `/retryclear` | Clear the active retry checkpoint |

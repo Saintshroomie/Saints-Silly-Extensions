@@ -81,11 +81,25 @@ import {
     DEFAULT_WIA_RESPONSE_LENGTH,
 } from './world-info-assist.js';
 import {
+    initCharacterState,
+    bindCharacterStateSettings,
+    startCharacterStateObserver,
+    syncCharacterStateButtons,
+    onCharacterStateChatChanged,
+    onCharacterStateCharacterPageLoaded,
+    onCharacterStateGroupUpdated,
+    registerCharacterStateSlashCommand,
+    DEFAULT_CHARACTER_STATE_PROMPT,
+    DEFAULT_CHARACTER_STATE_PREFILL,
+    DEFAULT_CHARACTER_STATE_RESPONSE_LENGTH,
+} from './character-state.js';
+import {
     initNarrativeGuidance,
     bindNarrativeGuidanceSettings,
     onNarrativeGuidanceChatChanged,
     onNarrativeGuidanceMessageSent,
     onNarrativeGuidanceMessageReceived,
+    refreshNarrativeGuidanceScenarios,
     migrateNarrativeGuidanceSettings,
     DEFAULT_NG_LONG_USER_PROMPT,
     DEFAULT_NG_SHORT_USER_PROMPT,
@@ -217,6 +231,12 @@ const defaultSettings = {
     wiaPrefillUntitled: DEFAULT_WIA_PREFILL_UNTITLED,
     wiaResponseLength: DEFAULT_WIA_RESPONSE_LENGTH,
     wiaMaxContextOverride: 0,
+    characterStateEnabled: true,
+    characterStateDebugMode: false,
+    characterStatePrompt: DEFAULT_CHARACTER_STATE_PROMPT,
+    characterStatePrefill: DEFAULT_CHARACTER_STATE_PREFILL,
+    characterStateResponseLength: DEFAULT_CHARACTER_STATE_RESPONSE_LENGTH,
+    characterStateMaxContextOverride: 0,
     narrativeGuidanceDebugMode: false,
     // Long-term track — the overarching arc on a slow refresh horizon.
     narrativeGuidanceLongEnabled: false,
@@ -229,6 +249,7 @@ const defaultSettings = {
     narrativeGuidanceLongMaxContextOverride: 0,
     narrativeGuidanceLongInjectionDepth: DEFAULT_NG_INJECTION_DEPTH,
     narrativeGuidanceLongInjectionRole: DEFAULT_NG_INJECTION_ROLE,
+    narrativeGuidanceLongScanWorldInfo: true,
     // (Lore-book selection is stored per-chat in chatMetadata, not here.)
     // Short-term track — the immediate beats on a fast refresh horizon,
     // seeded with the active long-term arc.
@@ -242,6 +263,7 @@ const defaultSettings = {
     narrativeGuidanceShortMaxContextOverride: 0,
     narrativeGuidanceShortInjectionDepth: DEFAULT_NG_INJECTION_DEPTH,
     narrativeGuidanceShortInjectionRole: DEFAULT_NG_INJECTION_ROLE,
+    narrativeGuidanceShortScanWorldInfo: true,
     // (Lore-book selection is stored per-chat in chatMetadata, not here.)
     reformattingEnabled: false,
     reformattingEngine: 'rules',
@@ -353,6 +375,16 @@ const TOOL_PRESET_CONFIG = [
             { key: 'wiaPrompt', label: 'Prompt', textareaId: 'wia_prompt_textarea', defaultText: DEFAULT_WIA_PROMPT, legacyDefaultText: LEGACY_DEFAULT_WIA_PROMPT },
             { key: 'wiaPrefillTitled', label: 'Prefill Titled', textareaId: 'wia_prefill_titled_textarea', defaultText: DEFAULT_WIA_PREFILL_TITLED },
             { key: 'wiaPrefillUntitled', label: 'Prefill Untitled', textareaId: 'wia_prefill_untitled_textarea', defaultText: DEFAULT_WIA_PREFILL_UNTITLED },
+        ],
+    },
+    {
+        toolKey: 'character-state',
+        label: 'Character State',
+        containerId: 'character_state_presets',
+        responseLength: { key: 'characterStateResponseLength', inputSelector: '#character_state_response_length, #cs_response_length' },
+        fields: [
+            { key: 'characterStatePrompt', label: 'Prompt', textareaId: 'character_state_prompt_textarea', defaultText: DEFAULT_CHARACTER_STATE_PROMPT },
+            { key: 'characterStatePrefill', label: 'Prefill', textareaId: 'character_state_prefill_textarea', defaultText: DEFAULT_CHARACTER_STATE_PREFILL },
         ],
     },
     {
@@ -480,6 +512,7 @@ function injectSettingsPanel() {
     bindPhraseBanSettings(saveSettings);
     bindACCSettings(saveSettings);
     bindWIASettings(saveSettings);
+    bindCharacterStateSettings(saveSettings);
     bindNarrativeGuidanceSettings(saveSettings);
     bindReformattingSettings(saveSettings);
     bindCompactionSettings(saveSettings);
@@ -539,17 +572,22 @@ function onChatChanged() {
     onRetryContinueChatChanged();
     onDirectorChatChanged();
     rescanSplitButtons();
+    onCharacterStateChatChanged();
     SSEDebug('Chat changed, state reloaded');
 }
 
 function onGroupUpdatedHandler() {
     onGroupUpdated();
+    onCharacterStateGroupUpdated();
+    // Members (and so the chat's tags) may have changed.
+    refreshNarrativeGuidanceScenarios();
     SSEDebug('Group updated, UI rebuilt');
 }
 
 function onCharacterPageLoadedHandler() {
     onCharacterPageLoaded();
     accOnCharacterPageLoaded();
+    onCharacterStateCharacterPageLoaded();
 }
 
 function onGroupWrapperFinishedHandler(data) {
@@ -582,6 +620,7 @@ jQuery(async () => {
     });
     initACC({ settings, saveSettings });
     initWIA({ settings });
+    initCharacterState({ settings, saveSettings });
     initNarrativeGuidance({ settings });
     initReformatting({ settings });
     // resyncChatState re-runs the per-chat state reload after a compaction
@@ -600,6 +639,10 @@ jQuery(async () => {
     // Watch the DOM for World Info entry forms and inject the assist controls
     // and the entry Copy button (each gated on its own setting).
     startWIAObserver();
+
+    // Keep the Character State button on every group member row (next to
+    // Possession's radio); ST re-renders the member list freely.
+    startCharacterStateObserver();
 
     // Watch the chat for messages and inject per-message reformat buttons.
     startReformattingObserver();
@@ -710,9 +753,11 @@ jQuery(async () => {
     registerImagePromptSlashCommand();
     registerRetryContinueSlashCommands();
     registerDirectorSlashCommands();
+    registerCharacterStateSlashCommand();
 
     // Initial state
     syncAllPossessionUI();
+    syncCharacterStateButtons();
     applyPhrasingEnabledState();
     loadRetryState();
 

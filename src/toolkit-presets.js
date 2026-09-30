@@ -57,9 +57,9 @@ Context: Warden Ilsara has called Sable to Thistlemarch under a flag of truce. A
 Location: The elven border outpost at Thistlemarch, dawn;
 Opening Focus: Sable arriving alone at the outpost gate on foot, Patch at her heels, as the guards step out to search her pack;
 Offstage: Warden Ilsara, waiting in the command tent past the gate; she will send for Sable once the search is done;
-{{.sableClothingOverride = Same green coat but clean, hair combed back, scar deliberately left uncovered as a quiet challenge}}
-{{.sableStatedGoalOverride = Hear the wardens out, name her price, and leave with a contract}}
-{{.sableTrueGoalOverride = Learn what the wardens know about the new bloom without revealing the stolen text or the scar's behavior}}
+{{if !.sableClothingOverride}}{{.sableClothingOverride = Same green coat but clean, hair combed back, scar deliberately left uncovered as a quiet challenge}}{{/if}}
+{{if !.sableStatedGoalOverride}}{{.sableStatedGoalOverride = Hear the wardens out, name her price, and leave with a contract}}{{/if}}
+{{if !.sableTrueGoalOverride}}{{.sableTrueGoalOverride = Learn what the wardens know about the new bloom without revealing the stolen text or the scar's behavior}}{{/if}}
 ]`;
 
 // ─── World Info Assist: Cold-open ───
@@ -79,9 +79,9 @@ Context: <the situation as the scene opens: what brought everyone here, what is 
 Location: <specific place, time of day, conditions, concrete setting details>;
 Opening Focus: <who is on-screen at the first moment, exactly where, doing what>;
 Offstage: <each anticipated character: where they are right now, and when or why they will enter>;
-{{.<firstName>ClothingOverride = <scene-specific clothing>}}
-{{.<firstName>StatedGoalOverride = <what they will say they are here for>}}
-{{.<firstName>TrueGoalOverride = <what they are really after in this scene>}}
+{{if !.<firstName>ClothingOverride}}{{.<firstName>ClothingOverride = <scene-specific clothing>}}{{/if}}
+{{if !.<firstName>StatedGoalOverride}}{{.<firstName>StatedGoalOverride = <what they will say they are here for>}}{{/if}}
+{{if !.<firstName>TrueGoalOverride}}{{.<firstName>TrueGoalOverride = <what they are really after in this scene>}}{{/if}}
 ]
 
 Field Rules:
@@ -91,6 +91,7 @@ Field Rules:
 
 Override Rules:
 * Override lines go after Opening Focus / Offstage, one per line, with no labels and no trailing semicolons.
+* Every override line is wrapped set-once, exactly as in the format: {{if !.<variable>}}{{.<variable> = <value>}}{{/if}}, with the same variable name in both places. The scenario is re-read every turn, and the wrapper keeps it from overwriting a value changed later in the chat.
 * <firstName> is the character's first name in lower camelCase: "Sable Voss" → sable, "MJ" → mj, "Mary Jane Watson" → maryJane. Use the same prefix for all three variables.
 * Set only the variables this scene actually changes; anything unset falls back to the character's card. Anticipated (Offstage) characters can have override lines too.
 * TrueGoal may hold a private aim: it surfaces only in that character's own private lore, which only they see.
@@ -157,8 +158,19 @@ export const WIA_SCENARIO_PREFILL_UNTITLED = '[\nScenario Title: ';
 // No Openings block and no override assignments: the chat is already
 // running (the Openings would never show), and the guidance is injected
 // into every character's prompt, so it follows the continuation variant's
-// plain, public-safe fields.
+// plain, public-safe fields. {{currentGuidance}} carries the scene being
+// replaced — a scenario applied from a scenario book, or the last update —
+// so each refresh evolves it rather than starting over.
 const NG_SHORT_SCENARIO_BODY = `Write a Scenario Description (continuation variant) that captures the story exactly as it stands at the latest message and sets up where it heads over the next few turns. It is injected into every character's prompt until the next refresh, as the live state of the scene.
+
+Evolving the current scenario (when the current short-term guidance is given above):
+* It is the scene as it was last set: a hand-written scenario applied from a scenario book, or the previous update. Your reply replaces it, so rewrite it; do not start over.
+* Carry over every field and fact that still holds. Change only what the story has moved on since: time and place, who is present and their visible state, clothing, aims, pressures.
+* Take the story from the recent chat and the lore above, not from the old scenario: where they disagree, the chat wins.
+* Move threads the chat has resolved out of Open Threads into Story So Far, and add the threads the chat has opened.
+* Keep the Scenario Title while it is still the same scene; give it a new title once the story has moved on to a new one.
+* Keep only its fields. Drop opening messages, instructions to the characters, and any {{…}} macros or variable assignments.
+When no current guidance is given, write the scenario fresh from the context.
 
 Output Format (use exactly as written; <angle-bracket> parts are placeholders):
 [
@@ -189,7 +201,7 @@ Format Rules:
 * Return only the bracketed Scenario Description. No commentary, no headings, no code fences.`;
 
 export const NG_SHORT_SCENARIO_PROMPT =
-    `{{context}}{{longGuidance}}{{themes}}${escapeMacroBraces(NG_SHORT_SCENARIO_BODY)}`;
+    `{{context}}{{longGuidance}}{{themes}}{{currentGuidance}}${escapeMacroBraces(NG_SHORT_SCENARIO_BODY)}`;
 
 export const NG_SHORT_SCENARIO_PREFILL = '[\nScenario Title: ';
 
@@ -200,6 +212,15 @@ export const NG_SHORT_SCENARIO_INJECTION =
 // ─── Narrative Guidance: Long-term (story arc) ───
 
 const NG_LONG_SCENARIO_BODY = `Write a Scenario Arc: the overarching situation of the story in Scenario Description style, covering where events are ultimately heading across the next many turns. It is injected into every character's prompt as background, and the short-term scene guidance is built on top of it.
+
+Evolving the current arc (when the current long-term guidance is given above):
+* It is the arc as it was last set: a scenario applied from a scenario book, or the previous update. Your reply replaces it, so rewrite it; do not start over.
+* Carry over every part of it that still holds. Change only what the story has moved on since: the situation, the stakes, where events are heading.
+* Take the story from the chat and the lore above, not from the old arc: where they disagree, the chat wins.
+* Move threads the story has resolved out of Open Threads into Story So Far, and add the long-running threads it has opened.
+* Keep the Scenario Title while the arc is the same one; give it a new title once the story has turned.
+* Write it in the arc format below even when the current guidance is a scene-level scenario. Drop scene details (exact location, who is on-screen), opening messages, and any {{…}} macros or variable assignments.
+When no current guidance is given, write the arc fresh from the context.
 
 Output Format (use exactly as written; <angle-bracket> parts are placeholders):
 [
@@ -223,7 +244,7 @@ Format Rules:
 * Return only the bracketed Scenario Arc. No commentary, no headings, no code fences.`;
 
 export const NG_LONG_SCENARIO_PROMPT =
-    `{{context}}{{themes}}${escapeMacroBraces(NG_LONG_SCENARIO_BODY)}`;
+    `{{context}}{{themes}}{{currentGuidance}}${escapeMacroBraces(NG_LONG_SCENARIO_BODY)}`;
 
 export const NG_LONG_SCENARIO_PREFILL = '[\nScenario Title: ';
 
@@ -313,10 +334,15 @@ export const COMPACTION_TIMELINE_PREFILL = '[\nTimeline Summary\n\n';
 // History: v1 shipped the WIA and NG Scenario presets without response
 // lengths, and the WIA pair ended with the per-character Openings block
 // (flagged by `scenarioPresetsSeeded`). v2 dropped the Openings, added
-// response lengths, and added the Compaction presets.
+// response lengths, and added the Compaction presets. v3 wrapped the
+// Cold-open's override assignments set-once (`{{if !.x}}{{.x = …}}{{/if}}`),
+// matching st-toolkit: a scenario is evaluated every turn, and a bare
+// assignment would undo any mid-chat change (e.g. from Character State). v4
+// gave the NG Scenario / Scenario Arc presets {{currentGuidance}} and rules
+// for evolving it, so an applied scenario is rewritten, not replaced.
 export const TOOLKIT_PRESETS_SPEC = {
     id: 'toolkit',
-    version: 2,
+    version: 4,
     legacyFlag: 'scenarioPresetsSeeded',
     presets: {
         wia: {
@@ -366,10 +392,14 @@ export const TOOLKIT_PRESETS_SPEC = {
         compaction: { 'Scenario (Continuation)': 2, 'Timeline Summary': 2 },
     },
     retired: {
-        // v1 texts (ending with the Openings block).
+        // v1 texts (ending with the Openings block); v2 Cold-open (bare
+        // override assignments).
         wia: {
-            'Scenario (Cold-open)': ['eba40bf9'],
+            'Scenario (Cold-open)': ['eba40bf9', 'c97451a3'],
             'Scenario (Continuation)': ['77579a39'],
         },
+        // v1–v3 texts (no {{currentGuidance}}); unchanged since v1.
+        'ng-short': { 'Scenario': ['96a8a737'] },
+        'ng-long': { 'Scenario Arc': ['9499dc1f'] },
     },
 };

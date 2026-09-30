@@ -10,6 +10,11 @@ export const TOOLS = [
         responseLength: { key: 'wiaResponseLength', inputSelector: '#wia_response_length, .wia-tokens-input' },
     },
     {
+        toolKey: 'character-state',
+        fields: [{ key: 'characterStatePrompt' }, { key: 'characterStatePrefill' }],
+        responseLength: { key: 'characterStateResponseLength', inputSelector: '#character_state_response_length, #cs_response_length' },
+    },
+    {
         toolKey: 'ng-long',
         fields: [
             { key: 'narrativeGuidanceLongPrompt' },

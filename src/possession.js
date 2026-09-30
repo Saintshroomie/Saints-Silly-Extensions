@@ -7,6 +7,7 @@ import { SlashCommandParser } from '../../../../slash-commands/SlashCommandParse
 import { SlashCommand } from '../../../../slash-commands/SlashCommand.js';
 import { ARGUMENT_TYPE, SlashCommandArgument } from '../../../../slash-commands/SlashCommandArgument.js';
 import { getContext, createDebugLogger, toast as showToast } from './utils.js';
+import { resolveGroupMemberRow } from './group-members.js';
 
 const POSSESSION_METADATA_KEY = 'possession';
 
@@ -291,53 +292,9 @@ function injectGroupRadioButtons() {
     memberEntries.forEach(entry => {
         if (entry.querySelector('.possession_radio_wrapper')) return;
 
-        const charId = entry.getAttribute('chid');
-        const gridAvatar = entry.getAttribute('grid');
-        let charName = null;
-        let charAvatar = null;
-
-        // Try chid first (character index)
-        if (charId !== null) {
-            const char = context.characters[parseInt(charId)];
-            if (char) {
-                charName = char.name;
-                charAvatar = char.avatar;
-            }
-        }
-
-        // Fallback to grid attribute (avatar filename)
-        if (!charAvatar && gridAvatar) {
-            const char = context.characters.find(c => c.avatar === gridAvatar);
-            if (char) {
-                charName = charName || char.name;
-                charAvatar = char.avatar;
-            } else {
-                // grid is the avatar filename even if character lookup fails
-                charAvatar = gridAvatar;
-            }
-        }
-
-        // Fallback: extract avatar from the member's displayed image
-        if (!charAvatar) {
-            const img = entry.querySelector('img');
-            if (img?.src) {
-                const match = img.src.match(/[?&]file=([^&]+)|\/characters\/([^/?]+)/);
-                const filename = match?.[1] || match?.[2];
-                if (filename) {
-                    const decoded = decodeURIComponent(filename);
-                    charAvatar = decoded;
-                    if (!charName) {
-                        const char = context.characters.find(c => c.avatar === decoded);
-                        if (char) charName = char.name;
-                    }
-                }
-            }
-        }
-
-        if (!charName) {
-            const nameEl = entry.querySelector('.ch_name');
-            if (nameEl) charName = nameEl.textContent?.trim() || nameEl.getAttribute('title');
-        }
+        // data-chid on current ST, chid on older builds, thumbnail as the
+        // cross-check / last resort (see group-members.js).
+        const { avatar: charAvatar, name: charName } = resolveGroupMemberRow(entry, context.characters);
 
         if (!charName) return;
 
