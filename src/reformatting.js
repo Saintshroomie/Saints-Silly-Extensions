@@ -32,6 +32,7 @@ import {
     showPromptPreview,
     createSettingsBinder,
 } from './utils.js';
+import { applyReformatRules } from './reformat-rules.js';
 import { templateSetting, textSetting, positiveIntSetting } from './settings-helpers.js';
 import {
     isSilentGenerationAbort,
@@ -60,9 +61,8 @@ export const DEFAULT_REFORMATTING_SYSTEM_PROMPT =
     'match a requested style without changing its meaning, dialogue, or ' +
     'wording. Output only the reformatted message — no commentary, no preamble.';
 
-// Per-swipe guard flag: set on the swipe_info entry of a reformatted swipe so
-// the auto path never re-processes (or, for the wrap rule, double-wraps) text
-// it already produced.
+// Per-swipe tag on each reformatted swipe's swipe_info entry, so other tools
+// (Retry Continue) can recognise a tool-generated edit.
 const REFORMAT_FLAG = 'sseReformatted';
 
 // ─── Module State ───
@@ -71,8 +71,8 @@ let moduleSettings = null;
 let debug = () => {};
 let observer = null;
 let listenersInstalled = false;
-// Guards the auto path against reformatting a message we're mid-way through
-// committing (the saveChat / re-render can re-enter the observer/events).
+// Guards against reformatting a message we're mid-way through committing
+// (the saveChat / re-render can re-enter the observer/events).
 let busy = false;
 
 // ─── Init ───
@@ -89,80 +89,12 @@ export function initReformatting({ settings }) {
 
 // ─── Deterministic Rules ───
 
-/** Remove every asterisk (markdown italic / bold emphasis marker). */
-function stripAsterisks(text) {
-    return text.replace(/\*/g, '');
-}
-
-/**
- * Wrap the narration core of a single line in asterisks, leaving any quoted
- * dialogue untouched. Surrounding whitespace is preserved so paragraph shape
- * and spacing around dialogue survive.
- */
-function wrapNarrationLine(line) {
-    if (!line.trim()) return line;
-
-    // Match balanced quote pairs (straight or curly). Everything between/around
-    // them is narration.
-    const quoteRe = /["“][^"”]*["”]/g;
-    let result = '';
-    let lastIndex = 0;
-    let match;
-    while ((match = quoteRe.exec(line)) !== null) {
-        result += wrapNarrationSpan(line.slice(lastIndex, match.index));
-        result += match[0];
-        lastIndex = quoteRe.lastIndex;
-    }
-    result += wrapNarrationSpan(line.slice(lastIndex));
-    return result;
-}
-
-/** Wrap a single non-dialogue span's trimmed core in asterisks. */
-function wrapNarrationSpan(span) {
-    const lead = span.match(/^\s*/)[0];
-    const trail = span.match(/\s*$/)[0];
-    const core = span.slice(lead.length, span.length - trail.length);
-    if (!core) return span;
-    return `${lead}*${core}*${trail}`;
-}
-
-/** Apply the narration-wrapping rule line by line (preserving line breaks). */
-function wrapNarration(text) {
-    return text.split('\n').map(wrapNarrationLine).join('\n');
-}
-
-/** Collapse runs of 3+ blank lines to one, and trim trailing spaces per line. */
-function collapseWhitespace(text) {
-    return text
-        .split('\n')
-        .map(line => line.replace(/[ \t]+$/, ''))
-        .join('\n')
-        .replace(/\n{3,}/g, '\n\n')
-        .trim();
-}
-
-/**
- * Run the configured deterministic rules over `text`. Asterisk handling is a
- * single mutually-exclusive choice ('none' | 'strip' | 'wrap'); 'wrap' strips
- * existing asterisks first so the output is canonical regardless of the input
- * (and never doubles markers). Whitespace collapsing is independent and
- * applies on top of any asterisk mode.
- *
- * @param {string} text
- * @returns {string} The reformatted text (unchanged if no rules apply).
- */
-export function applyRulesReformat(text) {
-    let out = text;
-    const mode = moduleSettings.reformattingAsteriskMode || 'strip';
-    if (mode === 'strip') {
-        out = stripAsterisks(out);
-    } else if (mode === 'wrap') {
-        out = wrapNarration(stripAsterisks(out));
-    }
-    if (moduleSettings.reformattingCollapseWhitespace) {
-        out = collapseWhitespace(out);
-    }
-    return out;
+/** Run the configured deterministic rules over `text` (see reformat-rules.js). */
+function applyRulesReformat(text) {
+    return applyReformatRules(text, {
+        asteriskMode: moduleSettings.reformattingAsteriskMode || 'strip',
+        collapseWhitespace: !!moduleSettings.reformattingCollapseWhitespace,
+    });
 }
 
 // ─── LLM Engine ───
@@ -264,11 +196,9 @@ function commitReformat(index, msg, reformatted) {
  * Reformat one message by chat index.
  *
  * @param {number} index
- * @param {{ manual?: boolean }} [opts] - `manual` clicks ignore the per-swipe
- *        guard and surface "no change" toasts; the auto path stays silent.
  * @returns {Promise<boolean>} `true` if the message was changed.
  */
-export async function reformatMessage(index, { manual = false } = {}) {
+export async function reformatMessage(index) {
     if (busy) {
         debug('reformatMessage — skipped (already running)');
         return false;
@@ -276,13 +206,7 @@ export async function reformatMessage(index, { manual = false } = {}) {
     const context = getContext();
     const msg = context.chat?.[index];
     if (!isReformattableMessage(msg)) {
-        if (manual) toast('Nothing to reformat in this message.', 'warning');
-        return false;
-    }
-
-    // Per-swipe guard — auto never re-touches a swipe we already produced.
-    if (!manual && msg.swipe_info?.[msg.swipe_id ?? 0]?.[REFORMAT_FLAG]) {
-        debug('reformatMessage — skipped (swipe already reformatted)');
+        toast('Nothing to reformat in this message.', 'warning');
         return false;
     }
 
@@ -291,7 +215,7 @@ export async function reformatMessage(index, { manual = false } = {}) {
 
     busy = true;
     let dismissToast = () => {};
-    if (manual && useLLM) dismissToast = stickyToast('Reformatting message…', 'info');
+    if (useLLM) dismissToast = stickyToast('Reformatting message…', 'info');
 
     try {
         let reformatted;
@@ -302,26 +226,26 @@ export async function reformatMessage(index, { manual = false } = {}) {
         }
 
         if (!reformatted) {
-            if (manual) toast('Reformatting produced an empty result; left unchanged.', 'warning');
+            toast('Reformatting produced an empty result; left unchanged.', 'warning');
             return false;
         }
         if (reformatted === original) {
             debug('reformatMessage — no change for index', index);
-            if (manual) toast('Message already matches the target format.', 'info');
+            toast('Message already matches the target format.', 'info');
             return false;
         }
 
         commitReformat(index, msg, reformatted);
         await context.saveChat();
         debug('reformatMessage — reformatted index', index, '| engine:', useLLM ? 'llm' : 'rules');
-        if (manual) toast('Message reformatted. The original is kept as a swipe.', 'success');
+        toast('Message reformatted. The original is kept as a swipe.', 'success');
         return true;
     } catch (err) {
         if (isSilentGenerationAbort(err)) {
             debug('reformatMessage — cancelled for index', index);
         } else {
             console.error('Reformatting error:', err);
-            if (manual) toast(`Reformatting failed: ${err.message}`, 'error');
+            toast(`Reformatting failed: ${err.message}`, 'error');
         }
         return false;
     } finally {
@@ -348,7 +272,7 @@ function onReformatButtonClick(event) {
     const index = mesId !== null ? parseInt(mesId, 10) : -1;
     if (index < 0 || Number.isNaN(index)) return;
     if (isGenerationInProgress()) return;
-    reformatMessage(index, { manual: true });
+    reformatMessage(index);
 }
 
 /** Inject the reformat button into a single `.mes` element if eligible. */
@@ -486,7 +410,7 @@ export function registerReformattingSlashCommand() {
                 toast('No messages to reformat.', 'warning');
                 return '';
             }
-            await reformatMessage(lastIndex, { manual: true });
+            await reformatMessage(lastIndex);
             return '';
         },
         unnamedArgumentList: [],
