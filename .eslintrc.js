@@ -37,6 +37,24 @@ module.exports = {
             },
         },
         {
+            // Manual-test harness (Node + Playwright). Callbacks passed to
+            // page.evaluate() run in the SillyTavern page, hence the browser
+            // env and ST globals.
+            files: ['scripts/manual-test/**/*.mjs'],
+            env: {
+                node: true,
+                browser: true,
+                es2022: true,
+            },
+            globals: {
+                SillyTavern: 'readonly',
+                $: 'readonly',
+            },
+            parserOptions: {
+                sourceType: 'module',
+            },
+        },
+        {
             files: ['webpack.config.js', '.eslintrc.js', 'scripts/**/*.js'],
             parserOptions: {
             },
